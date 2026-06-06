@@ -59,6 +59,7 @@
     transform-origin: top left;
     width: 125%;
   }
+  .ui * { font-size:12px; font-weight:700; }
   .panel{
     background:var(--panel);
     border:1px solid rgba(255,255,255,.35);
@@ -69,7 +70,7 @@
   }
   .knobs{display:grid; grid-template-columns:repeat(5,1fr); gap:6px; align-items:start;}
   .knobBox{text-align:center;}
-  .knobLabel{font-weight:900; font-size:11px; letter-spacing:.03em; margin-bottom:1px;}
+  .knobLabel{letter-spacing:.03em; margin-bottom:1px;}
   .knob{
     width:56px; height:56px; margin:0 auto 2px; border-radius:50%;
     background:radial-gradient(circle at 36% 30%, #8b2020, #4a0a0a 68%, #1a0000 100%);
@@ -80,39 +81,38 @@
     background:var(--fg); transform-origin:50% 23px; transform:translateX(-50%) rotate(var(--deg, -135deg));
   }
   input[type=range]{accent-color:white;}
-  .readout{font-size:13px; font-weight:900; min-height:14px;}
-  .targetReadout{font-size:11px; font-weight:700; opacity:.9; min-height:12px;}
+  .readout{min-height:14px;}
+  .targetReadout{opacity:.9; min-height:12px;}
   .row{display:flex; gap:5px; flex-wrap:wrap; align-items:center; margin:4px 0;}
   button, .fakeButton{
     appearance:none; border:1px solid rgba(255,255,255,.8); background:var(--panel2); color:var(--fg);
-    border-radius:8px; padding:5px 9px; font-size:13px; font-weight:900; cursor:pointer;
+    border-radius:8px; padding:5px 9px; cursor:pointer;
   }
   button:hover{background:rgba(255,255,255,.22)}
-  button.primary{font-size:13px; padding:6px 12px; border-width:2px;}
-  label{font-size:13px; font-weight:800; letter-spacing:.01em;}
+  button.primary{padding:6px 12px; border-width:2px;}
+  label{letter-spacing:.01em;}
   input[type=checkbox]{transform:scale(1.1); accent-color:white; margin-right:4px;}
   input[type=color]{width:30px; height:22px; padding:0; border:1px solid white; background:transparent;}
-  input[type=number]{width:62px; border:1px solid white; background:rgba(0,0,0,.25); color:white; border-radius:6px; padding:3px 4px; font-size:13px; font-weight:800;}
+  input[type=number]{width:62px; border:1px solid white; background:rgba(0,0,0,.25); color:white; border-radius:6px; padding:3px 4px;}
   .seg{display:flex; gap:4px; align-items:center; flex-wrap:wrap;}
   .seg input{display:none}
-  .seg span{display:inline-block; border:1px solid rgba(255,255,255,.75); border-radius:999px; padding:4px 8px; font-size:13px; font-weight:900; cursor:pointer; background:rgba(0,0,0,.22)}
+  .seg span{display:inline-block; border:1px solid rgba(255,255,255,.75); border-radius:999px; padding:4px 8px; cursor:pointer; background:rgba(0,0,0,.22)}
   .seg input:checked + span{background:white; color:#111;}
-  .hint{font-size:11px; line-height:1.2; opacity:.88; margin-top:2px;}
+  .hint{font-size:11px; font-weight:400; line-height:1.2; opacity:.88; margin-top:2px;}
   hr{margin:3px 0;}
 
-  /* compact transport buttons — 11px to fit 7 in one row */
+  /* transport button layout */
   #tap50Btn, #tap100Btn, #tap200Btn, #tapCustomBtn,
   #holdBtn, #releaseBtn, #clearBtn, #tapGoBtn {
-    font-size: 11px !important;
-    padding: 4px 7px !important;
-    min-height: unset !important;
-    line-height: 1.1 !important;
-    border-radius: 6px !important;
+    padding: 4px 7px;
+    min-height: unset;
+    line-height: 1.1;
+    border-radius: 6px;
   }
 
   /* numeric ms / value controls */
   .numeric-ms-control,
-  .numeric-value-control {margin-top: 1px; font-size: 11px; color: #fff;}
+  .numeric-value-control {margin-top: 1px; color: #fff;}
   .numeric-ms-control input,
   .numeric-value-control input {
     width: 58px;
@@ -122,8 +122,6 @@
     border-radius: 4px;
     padding: 2px 4px;
     text-align: right;
-    font-weight: 700;
-    font-size: 11px;
   }
 
   /* hide axis / reference lines */
@@ -167,8 +165,8 @@
 </head>
 <body>
   <div style="padding:6px 36px 0;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
-    <span style="font-size:13px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#fff;opacity:.85">DTP — Model D Contour Visualiser and Animator</span>
-    <button id="helpBtn" title="Keyboard shortcuts" style="font-size:13px;font-weight:900;width:24px;height:24px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.6);background:rgba(0,0,0,.3);color:#fff;cursor:pointer;line-height:1;flex-shrink:0">?</button>
+    <span style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;opacity:.85">DTP — Model D Contour Visualiser and Animator</span>
+    <button id="helpBtn" title="Keyboard shortcuts" style="font-size:13px;font-weight:800;width:24px;height:24px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.6);background:rgba(0,0,0,.3);color:#fff;cursor:pointer;line-height:1;flex-shrink:0">?</button>
   </div>
   <div class="stage">
     <svg id="svg" viewBox="0 0 1200 465" preserveAspectRatio="xMidYMid meet" aria-label="ADSR envelope graph">
@@ -202,15 +200,15 @@
     <div class="panel">
       <div id="presetBtns" style="display:grid;grid-template-columns:repeat(13,1fr);gap:4px;margin-bottom:2px"></div>
       <div class="row" style="gap:4px;margin:2px 0">
-        <button id="exportPresetsBtn" style="font-size:11px;padding:3px 6px">Export</button>
-        <button id="importPresetsBtn" style="font-size:11px;padding:3px 6px">Import</button>
+        <button id="exportPresetsBtn" style="padding:3px 6px">Export</button>
+        <button id="importPresetsBtn" style="padding:3px 6px">Import</button>
       </div>
       <div class="row" style="justify-content:space-between;margin-top:0">
         <div class="seg" title="Live means knobs update the graph immediately. Animate means knobs set targets.">
           <label><input type="radio" name="mode" value="live" checked><span>Live</span></label>
           <label><input type="radio" name="mode" value="animate"><span>Animate</span></label>
         </div>
-        <span id="presetName" style="font-size:13px;font-weight:700;opacity:.85"></span>
+        <span id="presetName" style="opacity:.85"></span>
       </div>
       <div class="knobs">
         <div class="knobBox">
@@ -254,9 +252,9 @@
     <div class="panel">
       <div class="row"><label><input id="loudDecay" type="checkbox"> <span id="loudDecayLabel">Loud Decay</span></label></div>
       <div class="row"><label><input id="drawReleaseWhenZero" type="checkbox"> Draw Release When Zero</label></div>
-      <div class="row"><label><input id="showBounds" type="checkbox"> Show Full Range</label></div>
+      <div class="row"><label><input id="showBounds" type="checkbox"> Show Top And Bottom</label></div>
       <div class="row"><label><input id="frequencyMode" type="checkbox"> Filter Mode</label></div>
-      <div class="row"><label><input id="hpMode" type="checkbox"> LP / HP</label></div>
+      <div class="row"><label><input id="hpMode" type="checkbox"> LP/HP Mode</label></div>
       <div class="row"><label><input id="keyboardControl" type="checkbox"> Mimic Model D Sustain (80%)</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:5px">
@@ -280,8 +278,8 @@
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:10px;align-items:center;flex-wrap:wrap">
         <label><input id="audioEnabled" type="checkbox"> Audio</label>
-        <select id="noteSelect" style="background:rgba(0,0,0,.25);color:#fff;border:1px solid rgba(255,255,255,.8);border-radius:8px;padding:5px 8px;font-weight:800;font-size:13px;max-width:80px"></select>
-        <label style="font-size:13px;font-weight:800">Vol <input id="masterVol" type="range" min="0" max="100" value="70" style="width:60px;vertical-align:middle;accent-color:white"></label>
+        <select id="noteSelect" style="background:rgba(0,0,0,.25);color:#fff;border:1px solid rgba(255,255,255,.8);border-radius:8px;padding:5px 8px;max-width:80px"></select>
+        <label>Vol <input id="masterVol" type="range" min="0" max="100" value="70" style="width:60px;vertical-align:middle;accent-color:white"></label>
       </div>
       <div class="hint">Tap releases after the chosen gate time. Attack, Decay and Release are shown as white strokes with soft colour centres. Sustain is a chunky rightward dotted level guide.</div>
     </div>
@@ -290,26 +288,38 @@
 <!-- Help modal -->
 <div id="helpOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;align-items:center;justify-content:center;">
   <div id="helpModal" style="background:rgba(18,18,18,.97);border:1px solid rgba(255,255,255,.3);border-radius:14px;padding:22px 28px 24px;min-width:340px;color:#fff;font-family:Arial,Helvetica,sans-serif;position:relative;">
-    <button id="helpClose" style="position:absolute;top:10px;right:14px;background:none;border:none;color:rgba(255,255,255,.7);font-size:20px;font-weight:900;cursor:pointer;line-height:1;padding:0">×</button>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 28px;">
+    <button id="helpClose" style="position:absolute;top:10px;right:14px;background:none;border:none;color:rgba(255,255,255,.7);font-size:20px;font-weight:800;cursor:pointer;line-height:1;padding:0">×</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px 24px;">
       <div>
-        <div style="font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:10px">Transport</div>
+        <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:10px">Transport</div>
         <table style="border-collapse:collapse;width:100%">
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900;white-space:nowrap">Space</td><td style="padding:3px 0;font-size:13px">Tap 200ms</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900">1</td><td style="padding:3px 0;font-size:13px">Tap 50ms</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900">2</td><td style="padding:3px 0;font-size:13px">Tap 100ms</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900">3</td><td style="padding:3px 0;font-size:13px">Tap 200ms</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900">H</td><td style="padding:3px 0;font-size:13px">Hold</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900">R</td><td style="padding:3px 0;font-size:13px">Release</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900">C</td><td style="padding:3px 0;font-size:13px">Clear</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">Space</td><td style="padding:3px 0;font-size:13px;font-weight:700">Tap 200ms</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">1</td><td style="padding:3px 0;font-size:13px;font-weight:700">Tap 50ms</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">2</td><td style="padding:3px 0;font-size:13px;font-weight:700">Tap 100ms</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">3</td><td style="padding:3px 0;font-size:13px;font-weight:700">Tap 200ms</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">H</td><td style="padding:3px 0;font-size:13px;font-weight:700">Hold</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">R</td><td style="padding:3px 0;font-size:13px;font-weight:700">Release</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">C</td><td style="padding:3px 0;font-size:13px;font-weight:700">Clear</td></tr>
         </table>
       </div>
       <div>
-        <div style="font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:10px">Navigation</div>
+        <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:10px">Switches</div>
         <table style="border-collapse:collapse;width:100%">
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900">←</td><td style="padding:3px 0;font-size:13px">Previous Preset</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900">→</td><td style="padding:3px 0;font-size:13px">Next Preset</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900">?</td><td style="padding:3px 0;font-size:13px">This Help</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">A</td><td style="padding:3px 0;font-size:13px;font-weight:700">Live/Animate</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">D</td><td style="padding:3px 0;font-size:13px;font-weight:700">Loud Decay</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">Z</td><td style="padding:3px 0;font-size:13px;font-weight:700">Draw Release When Zero</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">T</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Top And Bottom</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">F</td><td style="padding:3px 0;font-size:13px;font-weight:700">Filter Mode</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">M</td><td style="padding:3px 0;font-size:13px;font-weight:700">LP/HP Mode</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">S</td><td style="padding:3px 0;font-size:13px;font-weight:700">Mimic Model D Sustain</td></tr>
+        </table>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:10px">Navigation</div>
+        <table style="border-collapse:collapse;width:100%">
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">←</td><td style="padding:3px 0;font-size:13px;font-weight:700">Previous Preset</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">→</td><td style="padding:3px 0;font-size:13px;font-weight:700">Next Preset</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">?</td><td style="padding:3px 0;font-size:13px;font-weight:700">This Help</td></tr>
         </table>
       </div>
     </div>
@@ -835,7 +845,19 @@ $('helpBtn').addEventListener('click', showHelp);
 $('helpClose').addEventListener('click', hideHelp);
 $('helpOverlay').addEventListener('click', e => { if(e.target===$('helpOverlay')) hideHelp(); });
 
-// ---- Keyboard shortcuts for transport ----
+// ---- Keyboard shortcuts ----
+function toggleCheckbox(id){
+  const el=$(id); if(!el) return;
+  el.checked=!el.checked;
+  el.dispatchEvent(new Event('change',{bubbles:true}));
+}
+function toggleMode(){
+  const live=document.querySelector('input[name="mode"][value="live"]');
+  const anim=document.querySelector('input[name="mode"][value="animate"]');
+  if(!live||!anim) return;
+  if(live.checked){ anim.checked=true; anim.dispatchEvent(new Event('change',{bubbles:true})); }
+  else            { live.checked=true; live.dispatchEvent(new Event('change',{bubbles:true})); }
+}
 document.addEventListener('keydown', e => {
   const tag = document.activeElement ? document.activeElement.tagName : '';
   if(['INPUT','SELECT','TEXTAREA'].includes(tag)) return;
@@ -846,6 +868,7 @@ document.addEventListener('keydown', e => {
   }
   if(e.key === 'Escape') return;
   if(e.key === '?'){ showHelp(); return; }
+  // Transport
   if(e.key === ' '){
     e.preventDefault();
     const customActive = $('tapCustomRow') && $('tapCustomRow').style.display !== 'none';
@@ -857,6 +880,14 @@ document.addEventListener('keydown', e => {
   } else if(e.key === 'r' || e.key === 'R'){
     if(state.currentPhase === 'sustain' || state.currentPhase === 'hold') releaseFromCurrent();
   } else if(e.key === 'c' || e.key === 'C'){ clearBlobAndMarker();
+  // Switches
+  } else if(e.key === 'a' || e.key === 'A'){ toggleMode();
+  } else if(e.key === 'd' || e.key === 'D'){ toggleCheckbox('loudDecay');
+  } else if(e.key === 'z' || e.key === 'Z'){ toggleCheckbox('drawReleaseWhenZero');
+  } else if(e.key === 't' || e.key === 'T'){ toggleCheckbox('showBounds');
+  } else if(e.key === 'f' || e.key === 'F'){ toggleCheckbox('frequencyMode');
+  } else if(e.key === 'm' || e.key === 'M'){ toggleCheckbox('hpMode');
+  } else if(e.key === 's' || e.key === 'S'){ toggleCheckbox('keyboardControl');
   }
 });
 
@@ -1350,7 +1381,7 @@ $('masterVol')&&$('masterVol').addEventListener('input',()=>{ if(masterGain) mas
     PRESETS.forEach((preset, idx) => {
       const btn = document.createElement('button');
       btn.textContent = preset.name;
-      btn.style.cssText = 'font-size:11px;padding:3px 5px';
+      btn.style.padding = '3px 5px';
       btn.addEventListener('mouseenter', () => updatePresetNameDisplay(preset));
       btn.addEventListener('mouseleave', restorePresetNameDisplay);
       btn.addEventListener('click', e => {
