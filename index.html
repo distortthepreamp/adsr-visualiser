@@ -22,16 +22,19 @@
   *{box-sizing:border-box}
   body{
     margin:0;
-    min-height:100vh;
+    height:100vh;
     background:var(--bg);
     color:var(--fg);
     font-family:Arial, Helvetica, sans-serif;
     overflow:hidden;
+    display:flex;
+    flex-direction:column;
   }
   .stage{
-    height:68vh;
-    min-height:390px;
-    padding:34px 42px 8px;
+    flex:1;
+    min-height:0;
+    padding:8px 36px 0;
+    overflow:hidden;
   }
   svg{width:100%; height:100%; display:block; overflow:visible;}
   .axis,.grid{stroke:rgba(255,255,255,.35); stroke-width:2; vector-effect:non-scaling-stroke;}
@@ -47,84 +50,80 @@
   .label{fill:var(--fg); font-size:24px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;}
   .small-label{fill:var(--fg); font-size:17px; font-weight:700;}
   .ui{
-    height:32vh;
-    min-height:250px;
+    flex-shrink:0;
     display:grid;
     grid-template-columns: 1.6fr 1.15fr 1.15fr;
-    gap:14px;
-    padding:10px 18px 18px;
+    gap:8px;
+    padding:3px 14px 5px;
+    transform: scale(0.8);
+    transform-origin: top left;
+    width: 125%;
   }
   .panel{
     background:var(--panel);
     border:1px solid rgba(255,255,255,.35);
-    border-radius:18px;
-    padding:14px;
+    border-radius:12px;
+    padding:8px;
     backdrop-filter:blur(2px);
+    overflow:hidden;
   }
-  .knobs{display:grid; grid-template-columns:repeat(5,1fr); gap:12px; align-items:start;}
+  .knobs{display:grid; grid-template-columns:repeat(5,1fr); gap:6px; align-items:start;}
   .knobBox{text-align:center;}
-  .knobLabel{font-weight:900; font-size:14px; letter-spacing:.08em; margin-bottom:4px;}
+  .knobLabel{font-weight:900; font-size:11px; letter-spacing:.03em; margin-bottom:1px;}
   .knob{
-    width:72px; height:72px; margin:0 auto 6px; border-radius:50%;
-    background:radial-gradient(circle at 36% 30%, #666, #222 68%, #070707 100%);
+    width:56px; height:56px; margin:0 auto 2px; border-radius:50%;
+    background:radial-gradient(circle at 36% 30%, #8b2020, #4a0a0a 68%, #1a0000 100%);
     border:3px solid rgba(255,255,255,.8); position:relative;
   }
   .knob::after{
-    content:""; position:absolute; left:50%; top:7px; width:4px; height:27px; border-radius:4px;
-    background:var(--fg); transform-origin:50% 29px; transform:translateX(-50%) rotate(var(--deg, -135deg));
+    content:""; position:absolute; left:50%; top:5px; width:3px; height:21px; border-radius:3px;
+    background:var(--fg); transform-origin:50% 23px; transform:translateX(-50%) rotate(var(--deg, -135deg));
   }
-  input[type=range]{width:100%; accent-color:white;}
-  .readout{font-size:17px; font-weight:900; min-height:22px;}
-  .targetReadout{font-size:13px; font-weight:700; opacity:.9; min-height:18px;}
-  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:8px 0;}
+  input[type=range]{accent-color:white;}
+  .readout{font-size:13px; font-weight:900; min-height:14px;}
+  .targetReadout{font-size:11px; font-weight:700; opacity:.9; min-height:12px;}
+  .row{display:flex; gap:5px; flex-wrap:wrap; align-items:center; margin:4px 0;}
   button, .fakeButton{
     appearance:none; border:1px solid rgba(255,255,255,.8); background:var(--panel2); color:var(--fg);
-    border-radius:12px; padding:10px 13px; font-size:15px; font-weight:900; cursor:pointer;
+    border-radius:8px; padding:5px 9px; font-size:13px; font-weight:900; cursor:pointer;
   }
   button:hover{background:rgba(255,255,255,.22)}
-  button.primary{font-size:20px; padding:13px 18px; border-width:2px;}
-  label{font-size:14px; font-weight:800; letter-spacing:.02em;}
-  input[type=checkbox]{transform:scale(1.35); accent-color:white; margin-right:7px;}
-  input[type=color]{width:42px; height:32px; padding:0; border:1px solid white; background:transparent;}
-  input[type=number]{width:78px; border:1px solid white; background:rgba(0,0,0,.25); color:white; border-radius:8px; padding:7px; font-weight:800;}
-  .seg{display:flex; gap:7px; align-items:center; flex-wrap:wrap;}
+  button.primary{font-size:13px; padding:6px 12px; border-width:2px;}
+  label{font-size:13px; font-weight:800; letter-spacing:.01em;}
+  input[type=checkbox]{transform:scale(1.1); accent-color:white; margin-right:4px;}
+  input[type=color]{width:30px; height:22px; padding:0; border:1px solid white; background:transparent;}
+  input[type=number]{width:62px; border:1px solid white; background:rgba(0,0,0,.25); color:white; border-radius:6px; padding:3px 4px; font-size:13px; font-weight:800;}
+  .seg{display:flex; gap:4px; align-items:center; flex-wrap:wrap;}
   .seg input{display:none}
-  .seg span{display:inline-block; border:1px solid rgba(255,255,255,.75); border-radius:999px; padding:8px 12px; font-weight:900; cursor:pointer; background:rgba(0,0,0,.22)}
+  .seg span{display:inline-block; border:1px solid rgba(255,255,255,.75); border-radius:999px; padding:4px 8px; font-size:13px; font-weight:900; cursor:pointer; background:rgba(0,0,0,.22)}
   .seg input:checked + span{background:white; color:#111;}
-  .hint{font-size:13px; line-height:1.35; opacity:.88; margin-top:8px;}
+  .hint{font-size:11px; line-height:1.2; opacity:.88; margin-top:2px;}
+  hr{margin:3px 0;}
 
-  /* transport/action button overrides */
-  .transport button,
-  .actions button,
-  button#tap,
-  button#hold,
-  button#release,
-  button#clear,
-  #tapButton,
-  #holdButton,
-  #releaseButton,
-  #clearButton {
-    font-size: 18px !important;
-    padding: 10px 18px !important;
-    min-height: 42px !important;
+  /* compact transport buttons — 11px to fit 7 in one row */
+  #tap50Btn, #tap100Btn, #tap200Btn, #tapCustomBtn,
+  #holdBtn, #releaseBtn, #clearBtn, #tapGoBtn {
+    font-size: 11px !important;
+    padding: 4px 7px !important;
+    min-height: unset !important;
     line-height: 1.1 !important;
-    border-radius: 10px !important;
+    border-radius: 6px !important;
   }
-  .transport, .actions {gap: 10px !important;}
 
   /* numeric ms / value controls */
   .numeric-ms-control,
-  .numeric-value-control {margin-top: 4px; font-size: 12px; color: #fff;}
+  .numeric-value-control {margin-top: 1px; font-size: 11px; color: #fff;}
   .numeric-ms-control input,
   .numeric-value-control input {
-    width: 72px;
+    width: 58px;
     background: rgba(255,255,255,.14);
     color: #fff;
     border: 1px solid #fff;
-    border-radius: 5px;
-    padding: 3px 5px;
+    border-radius: 4px;
+    padding: 2px 4px;
     text-align: right;
     font-weight: 700;
+    font-size: 11px;
   }
 
   /* hide axis / reference lines */
@@ -167,8 +166,12 @@
 </style>
 </head>
 <body>
+  <div style="padding:6px 36px 0;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+    <span style="font-size:13px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#fff;opacity:.85">DTP — Model D Contour Visualiser and Animator</span>
+    <button id="helpBtn" title="Keyboard shortcuts" style="font-size:13px;font-weight:900;width:24px;height:24px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.6);background:rgba(0,0,0,.3);color:#fff;cursor:pointer;line-height:1;flex-shrink:0">?</button>
+  </div>
   <div class="stage">
-    <svg id="svg" viewBox="0 0 1200 520" preserveAspectRatio="xMidYMid meet" aria-label="ADSR envelope graph">
+    <svg id="svg" viewBox="0 0 1200 465" preserveAspectRatio="xMidYMid meet" aria-label="ADSR envelope graph">
       <g id="envSegments">
         <path id="attackOuter" class="env-outer" d="" />
         <path id="decayOuter" class="env-outer" d="" />
@@ -182,24 +185,26 @@
       <circle id="tapMarker" class="tap-marker" cx="80" cy="445" r="11" />
       <circle id="dot" class="env-dot" cx="80" cy="445" r="15" />
       <line id="floorBound"   x1="0" y1="445" x2="1200" y2="445" style="stroke:var(--boundsColor);stroke-width:7;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
-      <line id="ceilingBound" x1="0" y1="85"  x2="1200" y2="85"  style="stroke:var(--boundsColor);stroke-width:7;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
+      <line id="ceilingBound" x1="0" y1="30"  x2="1200" y2="30"  style="stroke:var(--boundsColor);stroke-width:7;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
 
-      <rect id="meterBox"  x="1145" y="85" width="40" height="360" style="fill:none;stroke:var(--line);stroke-width:7;stroke-opacity:1;vector-effect:non-scaling-stroke;" />
+      <rect id="meterBox"  x="1145" y="30" width="40" height="415" style="fill:none;stroke:var(--line);stroke-width:7;stroke-opacity:1;vector-effect:non-scaling-stroke;" />
       <rect id="meterFill" x="1145" y="445" width="40" height="0" style="fill:var(--line);stroke:none;" />
       <rect id="meterPeak" x="1145" y="443" width="40" height="3" style="fill:var(--line);stroke:none;display:none;" />
       <text id="meterLabelTitle" x="1165" y="72" text-anchor="middle" style="fill:var(--fg);font-size:14px;font-weight:700;display:none;">VOLUME</text>
-      <line id="meterSustainTick" x1="1133" y1="300" x2="1145" y2="300" style="stroke:var(--line);stroke-width:3;stroke-linecap:square;vector-effect:non-scaling-stroke;display:none;" />
-      <text id="meterSustainLabel" x="1131" y="304" text-anchor="end" style="fill:var(--fg);font-size:11px;font-weight:700;display:none;">SUSTAIN</text>
+
 
       <text id="sLabel" class="small-label" x="0" y="0">SUSTAIN</text>
 
-      <text id="mainReadout" class="label" x="80" y="38">ATTACK 10 ms · DECAY 200 ms · SUSTAIN 50%</text>
     </svg>
   </div>
 
   <div class="ui">
     <div class="panel">
-      <div id="presetBtns" style="display:grid;grid-template-columns:repeat(13,1fr);gap:4px;margin-bottom:8px"></div>
+      <div id="presetBtns" style="display:grid;grid-template-columns:repeat(13,1fr);gap:4px;margin-bottom:2px"></div>
+      <div class="row" style="gap:4px;margin:2px 0">
+        <button id="exportPresetsBtn" style="font-size:11px;padding:3px 6px">Export</button>
+        <button id="importPresetsBtn" style="font-size:11px;padding:3px 6px">Import</button>
+      </div>
       <div class="row" style="justify-content:space-between;margin-top:0">
         <div class="seg" title="Live means knobs update the graph immediately. Animate means knobs set targets.">
           <label><input type="radio" name="mode" value="live" checked><span>Live</span></label>
@@ -211,35 +216,35 @@
         <div class="knobBox">
           <div class="knobLabel">Attack</div>
           <div id="attackKnob" class="knob"></div>
-          <input id="attack" type="range" min="0" max="1000" value="80">
+          <input id="attack" type="range" min="0" max="1000" value="80" style="display:none">
           <div id="attackRead" class="readout"></div>
           <div id="attackTarget" class="targetReadout"></div>
         </div>
         <div class="knobBox">
           <div class="knobLabel">Decay</div>
           <div id="decayKnob" class="knob"></div>
-          <input id="decay" type="range" min="0" max="1000" value="250">
+          <input id="decay" type="range" min="0" max="1000" value="250" style="display:none">
           <div id="decayRead" class="readout"></div>
           <div id="decayTarget" class="targetReadout"></div>
         </div>
         <div class="knobBox">
           <div class="knobLabel">Sustain</div>
           <div id="sustainKnob" class="knob"></div>
-          <input id="sustain" type="range" min="0" max="1000" value="500">
+          <input id="sustain" type="range" min="0" max="1000" value="500" style="display:none">
           <div id="sustainRead" class="readout"></div>
           <div id="sustainTarget" class="targetReadout"></div>
         </div>
         <div id="floorKnobBox" class="knobBox">
           <div class="knobLabel">Cutoff</div>
           <div id="floorKnob" class="knob"></div>
-          <input id="floor" type="range" min="0" max="1000" value="0">
+          <input id="floor" type="range" min="0" max="1000" value="0" style="display:none">
           <div id="floorRead" class="readout"></div>
           <div id="floorTarget" class="targetReadout"></div>
         </div>
         <div id="scaleKnobBox" class="knobBox">
           <div class="knobLabel">Amount</div>
           <div id="scaleKnob" class="knob"></div>
-          <input id="scale" type="range" min="0" max="1000" value="1000">
+          <input id="scale" type="range" min="0" max="1000" value="1000" style="display:none">
           <div id="scaleRead" class="readout"></div>
           <div id="scaleTarget" class="targetReadout"></div>
         </div>
@@ -247,41 +252,75 @@
     </div>
 
     <div class="panel">
-      <div class="row"><label><input id="loudDecay" type="checkbox"> Loud Decay / Release</label></div>
-      <div class="row"><label><input id="drawReleaseWhenZero" type="checkbox"> Draw release when zero</label></div>
+      <div class="row"><label><input id="loudDecay" type="checkbox"> <span id="loudDecayLabel">Loud Decay</span></label></div>
+      <div class="row"><label><input id="drawReleaseWhenZero" type="checkbox"> Draw Release When Zero</label></div>
       <div class="row"><label><input id="showBounds" type="checkbox"> Show Full Range</label></div>
-      <div class="row"><label><input id="frequencyMode" type="checkbox"> Frequency Mode</label></div>
+      <div class="row"><label><input id="frequencyMode" type="checkbox"> Filter Mode</label></div>
       <div class="row"><label><input id="hpMode" type="checkbox"> LP / HP</label></div>
       <div class="row"><label><input id="keyboardControl" type="checkbox"> Mimic Model D Sustain (80%)</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
-      <div class="row"><strong>Transition</strong></div>
-      <div class="seg">
-        <label><input type="radio" name="transition" value="1" checked><span>1s</span></label>
-        <label><input type="radio" name="transition" value="2"><span>2s</span></label>
-        <label><input type="radio" name="transition" value="5"><span>5s</span></label>
-        <label><input type="radio" name="transition" value="custom"><span>Custom</span></label>
+      <div class="row" style="gap:5px">
+        <button id="trans1Btn">1s</button>
+        <button id="trans2Btn">2s</button>
+        <button id="trans5Btn">5s</button>
+        <button id="transCustomToggle">Custom</button>
       </div>
-      <div id="customTransitionRow" class="row" style="display:none"><label>Seconds <input id="customTransitionTime" type="number" min="0.1" max="60" step="0.1" value="3.0"></label></div>
-      <div class="row"><button id="transitionBtn" class="primary">Transition</button></div>
-      <div id="modeHint" class="hint">Live mode: knobs update the graph immediately.</div>
+      <div id="customTransitionRow" class="row" style="display:none"><label>Seconds <input id="customTransitionTime" type="number" min="0.1" max="60" step="0.1" value="3.0"></label> <button id="transitionBtn" class="primary">Transition</button></div>
+      <div id="modeHint" class="hint">Live Mode: Knobs Update The Graph Immediately.</div>
     </div>
 
     <div class="panel">
       <div class="row"><button id="tap50Btn">Tap 50</button><button id="tap100Btn">Tap 100</button><button id="tap200Btn">Tap 200</button><button id="tapCustomBtn">Tap Custom</button><button id="holdBtn">Hold</button><button id="releaseBtn">Release</button><button id="clearBtn">Clear</button></div>
       <div id="tapCustomRow" class="row" style="display:none"><label>ms <input id="tapCustomMs" type="number" min="20" max="5000" step="10" value="200"></label> <button id="tapGoBtn">Go</button></div>
-      <div class="row"><label><input id="keepTapMarker" type="checkbox" checked> Leave Tap marker</label></div>
+      <div class="row"><label><input id="keepTapMarker" type="checkbox" checked> Leave Tap Marker</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label></div>
       <div class="row"><label>Background <input id="bgColor" type="color" value="#00ff00"></label></div>
       <div class="row"><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#b57cff"></label><label>Bounds <input id="boundsColor" type="color" value="#ffffff"></label></div>
+      <hr style="border-color:rgba(255,255,255,.25)">
+      <div class="row" style="gap:10px;align-items:center;flex-wrap:wrap">
+        <label><input id="audioEnabled" type="checkbox"> Audio</label>
+        <select id="noteSelect" style="background:rgba(0,0,0,.25);color:#fff;border:1px solid rgba(255,255,255,.8);border-radius:8px;padding:5px 8px;font-weight:800;font-size:13px;max-width:80px"></select>
+        <label style="font-size:13px;font-weight:800">Vol <input id="masterVol" type="range" min="0" max="100" value="70" style="width:60px;vertical-align:middle;accent-color:white"></label>
+      </div>
       <div class="hint">Tap releases after the chosen gate time. Attack, Decay and Release are shown as white strokes with soft colour centres. Sustain is a chunky rightward dotted level guide.</div>
     </div>
   </div>
+
+<!-- Help modal -->
+<div id="helpOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;align-items:center;justify-content:center;">
+  <div id="helpModal" style="background:rgba(18,18,18,.97);border:1px solid rgba(255,255,255,.3);border-radius:14px;padding:22px 28px 24px;min-width:340px;color:#fff;font-family:Arial,Helvetica,sans-serif;position:relative;">
+    <button id="helpClose" style="position:absolute;top:10px;right:14px;background:none;border:none;color:rgba(255,255,255,.7);font-size:20px;font-weight:900;cursor:pointer;line-height:1;padding:0">×</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 28px;">
+      <div>
+        <div style="font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:10px">Transport</div>
+        <table style="border-collapse:collapse;width:100%">
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900;white-space:nowrap">Space</td><td style="padding:3px 0;font-size:13px">Tap 200ms</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900">1</td><td style="padding:3px 0;font-size:13px">Tap 50ms</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900">2</td><td style="padding:3px 0;font-size:13px">Tap 100ms</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900">3</td><td style="padding:3px 0;font-size:13px">Tap 200ms</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900">H</td><td style="padding:3px 0;font-size:13px">Hold</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900">R</td><td style="padding:3px 0;font-size:13px">Release</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900">C</td><td style="padding:3px 0;font-size:13px">Clear</td></tr>
+        </table>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:10px">Navigation</div>
+        <table style="border-collapse:collapse;width:100%">
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900">←</td><td style="padding:3px 0;font-size:13px">Previous Preset</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900">→</td><td style="padding:3px 0;font-size:13px">Next Preset</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:900">?</td><td style="padding:3px 0;font-size:13px">This Help</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="presets.js"></script>
 <script>
 
 let animationToken = 0;
+let currentTransitionSec = 1;
 
 const $ = id => document.getElementById(id);
 const curve = [
@@ -289,7 +328,7 @@ const curve = [
   {p:0.58,t:1.000}, {p:0.75,t:5.000}, {p:0.90,t:10.000}, {p:1.00,t:12.000}
 ];
 const state = { a:.08, d:.25, s:.5, floor:0, scale:1, target:{a:.08,d:.25,s:.5,floor:0,scale:1}, anim:null, dotAnim:null, held:false, dotLevel:0, currentPhase:'idle', peakY:null };
-const graph = { x0:80, y0:445, w:1045, h:360 };
+const graph = { x0:80, y0:445, w:1045, h:415 };
 
 function clamp(v,min=0,max=1){ return Math.max(min, Math.min(max, v)); }
 function easeInOut(t){ return t<0.5 ? 2*t*t : -1+(4-2*t)*t; }
@@ -314,6 +353,18 @@ function positionFromMs(ms){
   return curve[curve.length - 1].p;
 }
 function msFromPosition(p){ return Math.round(mapTime(p) * 1000); }
+const cutoffCurve = [
+  {p:0.00,f:10},{p:0.10,f:40},{p:0.20,f:140},{p:0.30,f:500},{p:0.40,f:1800},
+  {p:0.50,f:3500},{p:0.60,f:6000},{p:0.70,f:9000},{p:0.80,f:13000},{p:0.90,f:17000},{p:1.00,f:20000}
+];
+function mapCutoff(p){
+  p=clamp(p);
+  for(let i=0;i<cutoffCurve.length-1;i++){
+    const a=cutoffCurve[i],b=cutoffCurve[i+1];
+    if(p>=a.p&&p<=b.p){ const f=(p-a.p)/(b.p-a.p); return a.f+f*(b.f-a.f); }
+  }
+  return cutoffCurve[cutoffCurve.length-1].f;
+}
 function fmtTime(t){
   if(t < .001) return '0 ms';
   if(t < 1) return Math.round(t*1000)+' ms';
@@ -357,6 +408,17 @@ function computePoints(){
   return {p0,p1,pS,pEnd,e,aw,dwFull};
 }
 
+const KNOB_RED    = 'radial-gradient(circle at 36% 30%, #8b2020, #4a0a0a 68%, #1a0000 100%)';
+const KNOB_CYAN   = 'radial-gradient(circle at 36% 30%, #1a6b6b, #0a3a3a 68%, #001a1a 100%)';
+const KNOB_YELLOW = 'radial-gradient(circle at 36% 30%, #6b6b1a, #3a3a0a 68%, #1a1a00 100%)';
+
+function syncKnobColours(freqMode){
+  const adsBg = freqMode ? KNOB_CYAN : KNOB_RED;
+  ['attackKnob','decayKnob','sustainKnob'].forEach(id => { const k=$(id); if(k) k.style.background=adsBg; });
+  const fsBg = KNOB_YELLOW; // shown/hidden via opacity; always yellow when filter mode on
+  ['floorKnob','scaleKnob'].forEach(id => { const k=$(id); if(k) k.style.background = freqMode ? fsBg : KNOB_RED; });
+}
+
 function render(){
   const pts=computePoints();
   // Draw the envelope as separate A/D/R segments. Each segment is drawn twice:
@@ -390,7 +452,6 @@ function render(){
 
   $('sLabel').setAttribute('x',Math.min(markerEndX-105, pts.pS.x+28)); $('sLabel').setAttribute('y',pts.pS.y-18);
 
-  $('mainReadout').textContent = `ATTACK ${fmtTime(pts.e.aT)} · DECAY ${fmtTime(pts.e.dT)} · SUSTAIN ${Math.round(pts.e.s*100)}%` + (pts.e.releaseOn ? ` · RELEASE ${fmtTime(pts.e.rT)}` : ' · RELEASE OFF');
 
   // Bounds lines — fixed at absolute graph top/bottom, full SVG width
   const showBounds = $('showBounds') && $('showBounds').checked;
@@ -410,17 +471,16 @@ function render(){
   const isHP = $('hpMode') && $('hpMode').checked;
   const meterCX = meterX + meterW/2;
   const titleEl=$('meterLabelTitle');
-  if(titleEl){ titleEl.textContent=freqMode?'FREQUENCY':'VOLUME'; titleEl.setAttribute('x',meterCX); titleEl.setAttribute('y',meterAbsTop-10); titleEl.style.display=''; }
-  const sustainY=pts.pS.y;
-  const tickEl=$('meterSustainTick');
-  if(tickEl){ tickEl.setAttribute('x1',meterX-12); tickEl.setAttribute('y1',sustainY); tickEl.setAttribute('x2',meterX); tickEl.setAttribute('y2',sustainY); tickEl.style.display=''; }
-  const sustLblEl=$('meterSustainLabel');
-  if(sustLblEl){ sustLblEl.setAttribute('x',meterX-14); sustLblEl.setAttribute('y',sustainY+4); sustLblEl.style.display=''; }
-
-  // Cutoff/Amount knobs: active only in Frequency Mode
+  if(titleEl){ titleEl.textContent=freqMode?'FILTER':'VOLUME'; titleEl.setAttribute('x',meterCX); titleEl.setAttribute('y',meterAbsTop-10); titleEl.style.display=''; }
+  // Cutoff/Amount knobs: active only in Filter Mode
   const floorBox=$('floorKnobBox'), scaleBox=$('scaleKnobBox');
   if(floorBox) floorBox.style.opacity=freqMode?'':'0.35';
   if(scaleBox) scaleBox.style.opacity=freqMode?'':'0.35';
+  // Dynamic loud/filter decay label
+  const loudDecayLabel = $('loudDecayLabel');
+  if(loudDecayLabel) loudDecayLabel.textContent = freqMode ? 'Filter Decay' : 'Loud Decay';
+  // Knob colours
+  syncKnobColours(freqMode);
 
   // Keep resting meter fill in sync whenever no animation is running
   if(state.currentPhase === 'idle') hideDot();
@@ -447,7 +507,7 @@ function syncControls(){
   $('sustainTarget').textContent=mode==='animate' ? 'Target: '+Math.round(($('keyboardControl').checked?state.target.s*.8:state.target.s)*100)+'%' : '';
   $('floorTarget').textContent=mode==='animate' ? 'Target: '+formatSustainScale(state.target.floor) : '';
   $('scaleTarget').textContent=mode==='animate' ? 'Target: '+formatSustainScale(state.target.scale) : '';
-  $('modeHint').textContent = mode==='live' ? 'Live mode: knobs update the graph immediately.' : 'Animate mode: knobs set targets. Press Transition to morph the graph.';
+  $('modeHint').textContent = mode==='live' ? 'Live Mode: Knobs Update The Graph Immediately.' : 'Animate Mode: Knobs Set Targets. Press Transition To Morph The Graph.';
   patchSustainReadouts(); // keep sustain 0-10 scale display correct
 }
 
@@ -472,13 +532,13 @@ $('lineWidth').addEventListener('input',e=>document.documentElement.style.setPro
 $('innerLineWidth').addEventListener('input',e=>document.documentElement.style.setProperty('--innerLineWidth', e.target.value));
 $('boundsColor').addEventListener('input',e=>document.documentElement.style.setProperty('--boundsColor', e.target.value));
 
-function transition(){
+function transition(durSec){
   clearBlobAndMarker();
   animationToken++;
   const myAnimationToken = animationToken;
   hideTapMarker();
-  const selected=document.querySelector('input[name="transition"]:checked').value;
-  const dur=(selected==='custom' ? Number($('customTransitionTime').value)||3 : Number(selected))*1000;
+  if(durSec===undefined) durSec=Number($('customTransitionTime').value)||3;
+  const dur=durSec*1000;
   const start={a:state.a,d:state.d,s:state.s,floor:state.floor,scale:state.scale}, end={...state.target};
   const startAms=mapTime(start.a)*1000, endAms=mapTime(end.a)*1000;
   const startDms=mapTime(start.d)*1000, endDms=mapTime(end.d)*1000;
@@ -500,10 +560,23 @@ function transition(){
   }
   state.anim=requestAnimationFrame(step);
 }
-$('transitionBtn').addEventListener('click',transition);
-document.querySelectorAll('input[name="transition"]').forEach(el=>el.addEventListener('change',()=>{
-  $('customTransitionRow').style.display = document.querySelector('input[name="transition"]:checked').value==='custom' ? '' : 'none';
-}));
+const transBtnIds = ['trans1Btn','trans2Btn','trans5Btn','transCustomToggle'];
+function setTransMode(durSec, activeBtnId){
+  if(durSec !== null) currentTransitionSec = durSec;
+  transBtnIds.forEach(id => { const b=$(id); if(b){ b.style.background=''; b.style.color=''; } });
+  const b=$(activeBtnId); if(b){ b.style.background='#ffffff'; b.style.color='#111111'; }
+  const row=$('customTransitionRow');
+  if(row) row.style.display = activeBtnId==='transCustomToggle' ? '' : 'none';
+}
+$('trans1Btn').addEventListener('click',()=>{ setTransMode(1,'trans1Btn'); transition(1); });
+$('trans2Btn').addEventListener('click',()=>{ setTransMode(2,'trans2Btn'); transition(2); });
+$('trans5Btn').addEventListener('click',()=>{ setTransMode(5,'trans5Btn'); transition(5); });
+$('transCustomToggle').addEventListener('click',()=>{
+  const val=Number($('customTransitionTime').value)||3;
+  setTransMode(val,'transCustomToggle');
+});
+$('transitionBtn').addEventListener('click',()=>{ currentTransitionSec=Number($('customTransitionTime').value)||3; transition(currentTransitionSec); });
+$('customTransitionTime').addEventListener('input',()=>{ currentTransitionSec=Number($('customTransitionTime').value)||3; });
 
 function pointOnAttackDecay(ms){
   const pts=computePoints(), e=pts.e; const t=ms/1000;
@@ -610,6 +683,7 @@ function setTapMarker(pt){
 }
 
 function releaseFromCurrent(){
+  audioGateClose();
   // Bug fix: declare and capture token here so the inner step() guard works.
   animationToken++;
   const myAnimationToken = animationToken;
@@ -662,6 +736,7 @@ function updateButtonStates(){
 
 function clearBlobAndMarker(){
   cancelAnimationFrame(state.dotAnim);
+  audioCut();
   $('dot').style.animation='none';
   hideDot();
   hideTapMarker();
@@ -679,6 +754,7 @@ function tap(ms){
   const mPk=$('meterPeak'); if(mPk) mPk.style.display='none';
   hideDot();
   hideTapMarker();
+  if(audioEnabled()){ initAudio(); audioGateOpen(); }
   animationToken++;
   const myAnimationToken = animationToken;
   cancelAnimationFrame(state.dotAnim);
@@ -709,6 +785,7 @@ function tap(ms){
         releaseFromCurrent();
       } else {
         cancelAnimationFrame(state.dotAnim);
+        audioCut();
         hideDot();
         state.held=false;
         state.currentPhase='idle';
@@ -726,6 +803,7 @@ function hold(){
   animationToken++;
   const myAnimationToken = animationToken;
   hideTapMarker();
+  if(audioEnabled()){ initAudio(); audioGateOpen(); }
   cancelAnimationFrame(state.dotAnim);
   const pts=computePoints(), e=pts.e;
   const dur=(e.aT + e.dT*(1-e.s))*1000;
@@ -749,6 +827,38 @@ $('holdBtn').addEventListener('click',hold);
 $('releaseBtn').addEventListener('click',releaseFromCurrent);
 $('clearBtn').addEventListener('click',clearBlobAndMarker);
 $('keepTapMarker').addEventListener('change',()=>{ if(!$('keepTapMarker').checked) hideTapMarker(); });
+
+// ---- Help popup ----
+function showHelp(){ $('helpOverlay').style.display='flex'; }
+function hideHelp(){ $('helpOverlay').style.display='none'; }
+$('helpBtn').addEventListener('click', showHelp);
+$('helpClose').addEventListener('click', hideHelp);
+$('helpOverlay').addEventListener('click', e => { if(e.target===$('helpOverlay')) hideHelp(); });
+
+// ---- Keyboard shortcuts for transport ----
+document.addEventListener('keydown', e => {
+  const tag = document.activeElement ? document.activeElement.tagName : '';
+  if(['INPUT','SELECT','TEXTAREA'].includes(tag)) return;
+  // Modal open: only handle Escape
+  if($('helpOverlay').style.display !== 'none'){
+    if(e.key === 'Escape') hideHelp();
+    return;
+  }
+  if(e.key === 'Escape') return;
+  if(e.key === '?'){ showHelp(); return; }
+  if(e.key === ' '){
+    e.preventDefault();
+    const customActive = $('tapCustomRow') && $('tapCustomRow').style.display !== 'none';
+    tap(customActive ? (Number($('tapCustomMs').value) || 200) : 200);
+  } else if(e.key === '1'){ tap(50);
+  } else if(e.key === '2'){ tap(100);
+  } else if(e.key === '3'){ tap(200);
+  } else if(e.key === 'h' || e.key === 'H'){ hold();
+  } else if(e.key === 'r' || e.key === 'R'){
+    if(state.currentPhase === 'sustain' || state.currentPhase === 'hold') releaseFromCurrent();
+  } else if(e.key === 'c' || e.key === 'C'){ clearBlobAndMarker();
+  }
+});
 
 // ---- Numeric inputs for Attack / Decay / Sustain (formerly v29 script) ----
 
@@ -785,11 +895,11 @@ function ensureInputAfter(sliderId, inputId, label, attrs){
   return document.getElementById(inputId);
 }
 
-const attackInput  = ensureInputAfter('attack',  'attackMsInput',    'Attack ms', 'type="number" min="0" max="12000" step="1"');
-const decayInput   = ensureInputAfter('decay',   'decayMsInput',     'Decay ms',  'type="number" min="0" max="12000" step="1"');
-const sustainInput = ensureInputAfter('sustain', 'sustainScaleInput','Sustain',   'type="number" min="0" max="10" step="0.1"');
-const floorInput   = ensureInputAfter('floor',   'floorScaleInput',  'Floor',     'type="number" min="0" max="10" step="0.1"');
-const scaleInput   = ensureInputAfter('scale',   'scaleScaleInput',  'Scale',     'type="number" min="0" max="10" step="0.1"');
+const attackInput  = ensureInputAfter('attack',  'attackMsInput',    '', 'type="number" min="0" max="12000" step="1"');
+const decayInput   = ensureInputAfter('decay',   'decayMsInput',     '', 'type="number" min="0" max="12000" step="1"');
+const sustainInput = ensureInputAfter('sustain', 'sustainScaleInput','', 'type="number" min="0" max="10" step="0.1"');
+const floorInput   = ensureInputAfter('floor',   'floorScaleInput',  '', 'type="number" min="0" max="10" step="0.1"');
+const scaleInput   = ensureInputAfter('scale',   'scaleScaleInput',  '', 'type="number" min="0" max="10" step="0.1"');
 
 function commitTime(which, input){
   if (!input) return;
@@ -1022,65 +1132,353 @@ function addPointerFeedback(){
   });
 });
 
+// ---- Audio ----
+let audioCtx=null,osc=null,vcaGain=null,filter1=null,filter2=null,masterGain=null,audioReady=false;
+
+function audioEnabled(){ return !!($('audioEnabled')&&$('audioEnabled').checked); }
+function noteFreq(){ const s=$('noteSelect'); return s?Number(s.value)||440:440; }
+
+function initAudio(){
+  if(audioReady) return;
+  audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  osc=audioCtx.createOscillator(); osc.type='sawtooth'; osc.frequency.value=noteFreq();
+  vcaGain=audioCtx.createGain(); vcaGain.gain.value=0;
+  filter1=audioCtx.createBiquadFilter(); filter1.type='lowpass'; filter1.frequency.value=20000; filter1.Q.value=0;
+  filter2=audioCtx.createBiquadFilter(); filter2.type='lowpass'; filter2.frequency.value=20000; filter2.Q.value=0;
+  masterGain=audioCtx.createGain(); masterGain.gain.value=($('masterVol')?$('masterVol').value:70)/100;
+  osc.connect(vcaGain); vcaGain.connect(filter1); filter1.connect(filter2); filter2.connect(masterGain); masterGain.connect(audioCtx.destination);
+  osc.start();
+  audioReady=true;
+  syncAudioFilterType();
+}
+
+function syncAudioFilterType(){
+  if(!audioReady) return;
+  const freqMode=$('frequencyMode')&&$('frequencyMode').checked;
+  const isHP=$('hpMode')&&$('hpMode').checked;
+  if(freqMode){
+    filter1.type=isHP?'highpass':'lowpass'; filter2.type=isHP?'highpass':'lowpass';
+  } else {
+    filter1.type='lowpass'; filter1.frequency.value=20000; filter1.Q.value=0;
+    filter2.type='lowpass'; filter2.frequency.value=20000; filter2.Q.value=0;
+  }
+}
+
+function audioGateOpen(){
+  if(!audioEnabled()||!audioReady) return;
+  if(audioCtx.state==='suspended') audioCtx.resume();
+  const e=getEffective();
+  const freqMode=$('frequencyMode')&&$('frequencyMode').checked;
+  const now=audioCtx.currentTime;
+  if(!freqMode){
+    // Amplitude envelope, filter fully open
+    vcaGain.gain.cancelScheduledValues(now);
+    vcaGain.gain.setValueAtTime(0,now);
+    vcaGain.gain.linearRampToValueAtTime(1,now+Math.max(0.001,e.aT));
+    vcaGain.gain.linearRampToValueAtTime(Math.max(0.0001,e.s),now+Math.max(0.001,e.aT)+Math.max(0.001,e.dT));
+    filter1.type='lowpass'; filter1.frequency.cancelScheduledValues(now); filter1.frequency.setValueAtTime(20000,now); filter1.Q.value=0;
+    filter2.type='lowpass'; filter2.frequency.cancelScheduledValues(now); filter2.frequency.setValueAtTime(20000,now); filter2.Q.value=0;
+  } else {
+    // Filter envelope, VCA fully open
+    vcaGain.gain.cancelScheduledValues(now); vcaGain.gain.setValueAtTime(1,now);
+    const fFloor=mapCutoff(e.floor), fCeil=mapCutoff(e.floor+e.scale), fSus=mapCutoff(e.floor+e.s*e.scale);
+    filter1.frequency.cancelScheduledValues(now); filter2.frequency.cancelScheduledValues(now);
+    filter1.frequency.setValueAtTime(fFloor,now); filter2.frequency.setValueAtTime(fFloor,now);
+    filter1.frequency.linearRampToValueAtTime(fCeil,now+Math.max(0.001,e.aT));
+    filter2.frequency.linearRampToValueAtTime(fCeil,now+Math.max(0.001,e.aT));
+    filter1.frequency.linearRampToValueAtTime(fSus,now+Math.max(0.001,e.aT)+Math.max(0.001,e.dT));
+    filter2.frequency.linearRampToValueAtTime(fSus,now+Math.max(0.001,e.aT)+Math.max(0.001,e.dT));
+  }
+}
+
+function audioGateClose(){
+  if(!audioReady) return;
+  const e=getEffective();
+  const freqMode=$('frequencyMode')&&$('frequencyMode').checked;
+  const now=audioCtx.currentTime;
+  if(!freqMode){
+    if(e.releaseOn){
+      vcaGain.gain.cancelScheduledValues(now);
+      vcaGain.gain.setValueAtTime(vcaGain.gain.value,now);
+      vcaGain.gain.linearRampToValueAtTime(0,now+Math.max(0.001,e.rT));
+    } else {
+      vcaGain.gain.cancelScheduledValues(now); vcaGain.gain.setValueAtTime(0,now);
+    }
+  } else {
+    const fFloor=mapCutoff(e.floor), fSus=mapCutoff(e.floor+e.s*e.scale);
+    if(e.releaseOn){
+      filter1.frequency.cancelScheduledValues(now); filter2.frequency.cancelScheduledValues(now);
+      filter1.frequency.setValueAtTime(filter1.frequency.value,now); filter2.frequency.setValueAtTime(filter2.frequency.value,now);
+      filter1.frequency.linearRampToValueAtTime(fFloor,now+Math.max(0.001,e.rT));
+      filter2.frequency.linearRampToValueAtTime(fFloor,now+Math.max(0.001,e.rT));
+    } else {
+      filter1.frequency.cancelScheduledValues(now); filter1.frequency.setValueAtTime(fFloor,now);
+      filter2.frequency.cancelScheduledValues(now); filter2.frequency.setValueAtTime(fFloor,now);
+    }
+  }
+}
+
+function audioCut(){
+  if(!audioReady) return;
+  const now=audioCtx.currentTime;
+  vcaGain.gain.cancelScheduledValues(now); vcaGain.gain.setValueAtTime(0,now);
+  filter1.frequency.cancelScheduledValues(now); filter1.frequency.setValueAtTime(20000,now);
+  filter2.frequency.cancelScheduledValues(now); filter2.frequency.setValueAtTime(20000,now);
+}
+
+// Populate note selector
+(function(){
+  const sel=$('noteSelect'); if(!sel) return;
+  const N=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  for(let m=24;m<=108;m++){
+    const oct=Math.floor(m/12)-1, name=N[m%12]+oct;
+    const freq=440*Math.pow(2,(m-69)/12);
+    const opt=document.createElement('option');
+    opt.value=freq.toFixed(3); opt.textContent=name;
+    if(m===69) opt.selected=true; // A4
+    sel.appendChild(opt);
+  }
+})();
+$('noteSelect')&&$('noteSelect').addEventListener('change',()=>{ if(osc) osc.frequency.value=noteFreq(); });
+$('masterVol')&&$('masterVol').addEventListener('input',()=>{ if(masterGain) masterGain.gain.value=$('masterVol').value/100; });
+['frequencyMode','hpMode'].forEach(id=>{ const el=$(id); if(el) el.addEventListener('change',syncAudioFilterType); });
+
+// ---- Merge saved presets from localStorage over defaults ----
+(function(){
+  try {
+    const saved = localStorage.getItem('dtpPresets');
+    if(!saved) return;
+    const parsed = JSON.parse(saved);
+    if(!Array.isArray(parsed)) return;
+    parsed.forEach(p => {
+      const idx = PRESETS.findIndex(q => q.name === p.name);
+      if(idx >= 0) Object.assign(PRESETS[idx], p);
+      else PRESETS.push(p);
+    });
+  } catch(e){}
+})();
+
 // ---- Presets ----
 (function(){
   const container = $('presetBtns');
   let activeBtn = null;
+  let activePresetIndex = -1;
 
-  function setTransitionTime(t){
-    const fixed = document.querySelector(`input[name="transition"][value="${t}"]`);
-    if(fixed){
-      fixed.checked = true;
-      $('customTransitionRow').style.display = 'none';
-    } else {
-      document.querySelector('input[name="transition"][value="custom"]').checked = true;
-      $('customTransitionRow').style.display = '';
-      $('customTransitionTime').value = t;
-    }
+  function savePresetsToStorage(){
+    try { localStorage.setItem('dtpPresets', JSON.stringify(PRESETS)); } catch(e){}
   }
+  window.savePresetsToStorage = savePresetsToStorage;
+
+  function updatePresetNameDisplay(preset){
+    const el = $('presetName');
+    if(el && el.tagName === 'SPAN') el.textContent = `${preset.name}: ${preset.label}`;
+  }
+
+  function loadPreset(idx){
+    if(idx < 0 || idx >= PRESETS.length) return;
+    const preset = PRESETS[idx];
+    // Restore checkbox states if saved in preset
+    if(preset.loudDecay !== undefined) $('loudDecay').checked = preset.loudDecay;
+    if(preset.drawReleaseWhenZero !== undefined) $('drawReleaseWhenZero').checked = preset.drawReleaseWhenZero;
+    if(preset.filterMode !== undefined) $('frequencyMode').checked = preset.filterMode;
+    if(preset.lpHp !== undefined) $('hpMode').checked = preset.lpHp;
+    if(preset.keyboardControl !== undefined) $('keyboardControl').checked = preset.keyboardControl;
+    // Set target knob values
+    state.target.a = positionFromMs(preset.a);
+    state.target.d = positionFromMs(preset.d);
+    state.target.s = preset.s / 10;
+    state.target.floor = (preset.floor || 0) / 10;
+    state.target.scale = (preset.scale !== undefined ? preset.scale : 10) / 10;
+    // Highlight active button
+    if(activeBtn){ activeBtn.style.background = ''; activeBtn.style.color = ''; }
+    const btns = container.querySelectorAll('button');
+    activeBtn = btns[idx] || null;
+    if(activeBtn){ activeBtn.style.background = '#ffffff'; activeBtn.style.color = '#111111'; }
+    activePresetIndex = idx;
+    updatePresetNameDisplay(preset);
+    transition(currentTransitionSec);
+  }
+  window.loadPresetByIndex = loadPreset;
 
   window.clearPresetDisplay = function(){
     if(activeBtn){ activeBtn.style.background = ''; activeBtn.style.color = ''; activeBtn = null; }
-    $('presetName').textContent = '';
+    activePresetIndex = -1;
+    const el = $('presetName');
+    if(el) el.textContent = '';
   };
 
-  PRESETS.forEach(preset => {
-    const btn = document.createElement('button');
-    btn.textContent = preset.name;
-    btn.style.cssText = 'font-size:12px;padding:4px 7px';
+  function saveCurrentToPreset(idx){
+    if(idx < 0 || idx >= PRESETS.length) return;
+    const preset = PRESETS[idx];
+    const label = prompt('Preset name:', preset.label);
+    if(label === null) return; // cancelled
+    preset.label = label.trim() || preset.label;
+    preset.a = msFromPosition(state.a);
+    preset.d = msFromPosition(state.d);
+    preset.s = parseFloat((state.s * 10).toFixed(1));
+    preset.floor = parseFloat((state.floor * 10).toFixed(1));
+    preset.scale = parseFloat((state.scale * 10).toFixed(1));
+    preset.loudDecay = $('loudDecay').checked;
+    preset.drawReleaseWhenZero = $('drawReleaseWhenZero').checked;
+    preset.filterMode = $('frequencyMode').checked;
+    preset.lpHp = $('hpMode').checked;
+    preset.keyboardControl = $('keyboardControl').checked;
+    savePresetsToStorage();
+    // Flash green confirmation, then restore highlight state
+    const btn = btns[idx];
+    if(btn){
+      btn.style.background = '#00ff88';
+      btn.style.color = '#000';
+      setTimeout(() => {
+        if(activePresetIndex === idx){ btn.style.background = '#ffffff'; btn.style.color = '#111111'; }
+        else { btn.style.background = ''; btn.style.color = ''; }
+      }, 600);
+    }
+    if(activePresetIndex === idx) updatePresetNameDisplay(preset);
+  }
 
-    btn.addEventListener('click', () => {
-      // Set target values
-      state.target.a = positionFromMs(preset.a);
-      state.target.d = positionFromMs(preset.d);
-      state.target.s = preset.s / 10;
-      state.target.floor = (preset.floor || 0) / 10;
-      state.target.scale = (preset.scale !== undefined ? preset.scale : 10) / 10;
+  function restorePresetNameDisplay(){
+    const el = $('presetName');
+    if(!el || el.tagName !== 'SPAN') return;
+    el.textContent = activePresetIndex >= 0 && PRESETS[activePresetIndex]
+      ? `${PRESETS[activePresetIndex].name}: ${PRESETS[activePresetIndex].label}`
+      : '';
+  }
 
-      // Configure transition time
-      setTransitionTime(preset.t);
-
-      // Highlight active preset and show name
-      if(activeBtn){ activeBtn.style.background = ''; activeBtn.style.color = ''; }
-      btn.style.background = '#ffffff';
-      btn.style.color = '#111111';
-      activeBtn = btn;
-      $('presetName').textContent = `${preset.name}: ${preset.label}`;
-
-      transition();
+  function buildButtons(){
+    container.innerHTML = '';
+    PRESETS.forEach((preset, idx) => {
+      const btn = document.createElement('button');
+      btn.textContent = preset.name;
+      btn.style.cssText = 'font-size:11px;padding:3px 5px';
+      btn.addEventListener('mouseenter', () => updatePresetNameDisplay(preset));
+      btn.addEventListener('mouseleave', restorePresetNameDisplay);
+      btn.addEventListener('click', e => {
+        if(e.shiftKey){ saveCurrentToPreset(idx); return; }
+        loadPreset(idx);
+      });
+      container.appendChild(btn);
     });
+  }
+  buildButtons();
 
-    container.appendChild(btn);
+  window.refreshPresetButtons = function(){
+    activeBtn = null;
+    activePresetIndex = -1;
+    buildButtons();
+    const el = $('presetName');
+    if(el) el.textContent = '';
+  };
+
+  // Left/right arrow key navigation between presets
+  document.addEventListener('keydown', e => {
+    const tag = document.activeElement ? document.activeElement.tagName : '';
+    if(['INPUT','SELECT','TEXTAREA'].includes(tag)) return;
+    if($('helpOverlay') && $('helpOverlay').style.display !== 'none') return;
+    if(e.key === 'ArrowRight'){
+      e.preventDefault();
+      loadPreset((activePresetIndex + 1) % PRESETS.length);
+    } else if(e.key === 'ArrowLeft'){
+      e.preventDefault();
+      loadPreset((activePresetIndex - 1 + PRESETS.length) % PRESETS.length);
+    }
   });
+
+  // Click-to-edit preset name display
+  function attachNameEdit(){
+    const el = $('presetName');
+    if(!el || el.tagName !== 'SPAN') return;
+    el.style.cursor = 'text';
+    el.title = 'Click to rename';
+    el.onclick = () => {
+      if(activePresetIndex < 0) return;
+      const preset = PRESETS[activePresetIndex];
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.value = preset.label;
+      inp.style.cssText = 'font-size:13px;font-weight:700;background:rgba(0,0,0,.5);color:#fff;border:1px solid rgba(255,255,255,.7);border-radius:4px;padding:1px 5px;width:130px;outline:none';
+      el.replaceWith(inp);
+      inp.id = 'presetName';
+      inp.focus(); inp.select();
+      let committed = false;
+      function save(){
+        if(committed) return; committed = true;
+        const newLabel = inp.value.trim() || preset.label;
+        preset.label = newLabel;
+        savePresetsToStorage();
+        const span = document.createElement('span');
+        span.id = 'presetName';
+        span.style.cssText = 'font-size:13px;font-weight:700;opacity:.85';
+        span.textContent = `${preset.name}: ${newLabel}`;
+        inp.replaceWith(span);
+        attachNameEdit();
+      }
+      function revert(){
+        if(committed) return; committed = true;
+        const span = document.createElement('span');
+        span.id = 'presetName';
+        span.style.cssText = 'font-size:13px;font-weight:700;opacity:.85';
+        span.textContent = `${preset.name}: ${preset.label}`;
+        inp.replaceWith(span);
+        attachNameEdit();
+      }
+      inp.addEventListener('keydown', e => {
+        if(e.key === 'Enter'){ save(); e.preventDefault(); }
+        else if(e.key === 'Escape') revert();
+      });
+      inp.addEventListener('blur', save);
+    };
+  }
+  attachNameEdit();
+
+  // Export presets as JSON file
+  $('exportPresetsBtn').addEventListener('click', () => {
+    const json = JSON.stringify(PRESETS, null, 2);
+    const blob = new Blob([json], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'presets.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  // Import presets from JSON file
+  $('importPresetsBtn').addEventListener('click', () => {
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = '.json'; inp.style.display = 'none';
+    document.body.appendChild(inp);
+    inp.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if(!file){ document.body.removeChild(inp); return; }
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if(!Array.isArray(data)) throw new Error('Expected a JSON array');
+          data.forEach((p, i) => {
+            if(typeof p.name !== 'string') throw new Error(`Item ${i} missing "name"`);
+            if(typeof p.a !== 'number') throw new Error(`Item ${i} missing "a"`);
+          });
+          PRESETS.length = 0;
+          data.forEach(p => PRESETS.push(p));
+          savePresetsToStorage();
+          window.refreshPresetButtons();
+        } catch(err){ alert('Import failed: ' + err.message); }
+        document.body.removeChild(inp);
+      };
+      reader.readAsText(file);
+    });
+    inp.click();
+  });
+
 })();
 
 // ---- Init ----
-console.log('floorBound:', document.getElementById('floorBound'));
-console.log('ceilingBound:', document.getElementById('ceilingBound'));
 render();
 refreshNumericInputs();
 hideLikelyAxes();
 addPointerFeedback();
+setTransMode(1, 'trans1Btn');
 
 </script>
 </body>
