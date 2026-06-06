@@ -262,7 +262,7 @@
       <div class="row"><label><input id="frequencyMode" type="checkbox"> F — Filter Mode</label></div>
       <div class="row"><label><input id="hpMode" type="checkbox"> M — LP/HP Mode</label></div>
       <div class="row"><label><input id="keyboardControl" type="checkbox"> S — Mimic Model D Sustain (80%)</label></div>
-      <div class="row"><label><input id="showClipped" type="checkbox"> Show Clipped Shape</label></div>
+      <div class="row"><label><input id="showClipped" type="checkbox"> C — Show Clipped Shape</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:5px">
         <button id="trans1Btn">1s</button>
@@ -317,13 +317,12 @@
       <div>
         <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:10px">Transport</div>
         <table style="border-collapse:collapse;width:100%">
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">Space</td><td style="padding:3px 0;font-size:13px;font-weight:700">Fire current mode</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">1</td><td style="padding:3px 0;font-size:13px;font-weight:700">Select Tap 50ms</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">2</td><td style="padding:3px 0;font-size:13px;font-weight:700">Select Tap 100ms</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">3</td><td style="padding:3px 0;font-size:13px;font-weight:700">Select Tap 200ms</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">Space</td><td style="padding:3px 0;font-size:13px;font-weight:700">Fire selected mode</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">H</td><td style="padding:3px 0;font-size:13px;font-weight:700">Select Hold mode</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">R</td><td style="padding:3px 0;font-size:13px;font-weight:700">Release</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">C</td><td style="padding:3px 0;font-size:13px;font-weight:700">Clear</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">Opt+C</td><td style="padding:3px 0;font-size:13px;font-weight:700">Clear</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">←</td><td style="padding:3px 0;font-size:13px;font-weight:700">Previous preset</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">→</td><td style="padding:3px 0;font-size:13px;font-weight:700">Next preset</td></tr>
         </table>
       </div>
       <div>
@@ -331,19 +330,21 @@
         <table style="border-collapse:collapse;width:100%">
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">L</td><td style="padding:3px 0;font-size:13px;font-weight:700">Live/Animate</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">A</td><td style="padding:3px 0;font-size:13px;font-weight:700">Audio</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">D</td><td style="padding:3px 0;font-size:13px;font-weight:700">Loud Decay</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">D</td><td style="padding:3px 0;font-size:13px;font-weight:700">Loud/Filter Decay</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">Z</td><td style="padding:3px 0;font-size:13px;font-weight:700">Draw Release When Zero</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">T</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Top And Bottom</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">F</td><td style="padding:3px 0;font-size:13px;font-weight:700">Filter Mode</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">M</td><td style="padding:3px 0;font-size:13px;font-weight:700">LP/HP Mode</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">S</td><td style="padding:3px 0;font-size:13px;font-weight:700">Mimic Model D Sustain</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">S</td><td style="padding:3px 0;font-size:13px;font-weight:700">Mimic Model D Sustain (80%)</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">C</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Clipped Shape</td></tr>
         </table>
       </div>
       <div>
         <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:10px">Navigation</div>
         <table style="border-collapse:collapse;width:100%">
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">←</td><td style="padding:3px 0;font-size:13px;font-weight:700">Previous Preset</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">→</td><td style="padding:3px 0;font-size:13px;font-weight:700">Next Preset</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">1</td><td style="padding:3px 0;font-size:13px;font-weight:700">Select Tap 50ms</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">2</td><td style="padding:3px 0;font-size:13px;font-weight:700">Select Tap 100ms</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">3</td><td style="padding:3px 0;font-size:13px;font-weight:700">Select Tap 200ms</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">?</td><td style="padding:3px 0;font-size:13px;font-weight:700">This Help</td></tr>
         </table>
       </div>
@@ -643,6 +644,13 @@ $('sustain').addEventListener('input',()=>{ setFromSlider(); if(window.clearPres
 ['floor','scale'].forEach(id=>$(id).addEventListener('input',()=>{ setFromSlider(); if(window.clearPresetDisplay) clearPresetDisplay(); }));
 document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) state.target={a:state.a,d:state.d,s:state.s,floor:state.floor,scale:state.scale}; syncControls(); }));
 ['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','frequencyMode','hpMode','showClipped'].forEach(id=>$(id).addEventListener('change',render));
+function syncHpModeEnabled(){
+  const freqOn = $('frequencyMode') && $('frequencyMode').checked;
+  const hpLabel = $('hpMode') && $('hpMode').closest('label');
+  if(hpLabel){ hpLabel.style.opacity = freqOn ? '' : '0.35'; hpLabel.style.pointerEvents = freqOn ? '' : 'none'; }
+}
+$('frequencyMode').addEventListener('change', syncHpModeEnabled);
+syncHpModeEnabled();
 $('lineColor').addEventListener('input',e=>document.documentElement.style.setProperty('--line', e.target.value));
 $('bgColor').addEventListener('input',e=>document.documentElement.style.setProperty('--bg', e.target.value));
 $('attackColor').addEventListener('input',e=>document.documentElement.style.setProperty('--attackColor', e.target.value));
@@ -1012,7 +1020,8 @@ document.addEventListener('keydown', e => {
   } else if(e.key === 'h' || e.key === 'H'){ setTapMode('hold','tapModeHoldBtn');
   } else if(e.key === 'r' || e.key === 'R'){
     if(state.currentPhase === 'sustain' || state.currentPhase === 'hold') releaseFromCurrent();
-  } else if(e.key === 'c' || e.key === 'C'){ clearBlobAndMarker();
+  } else if((e.key === 'c' || e.key === 'C') && e.altKey){ clearBlobAndMarker();
+  } else if(e.key === 'c' || e.key === 'C'){ toggleCheckbox('showClipped');
   // Switches
   } else if(e.key === 'l' || e.key === 'L'){ toggleMode();
   } else if(e.key === 'a' || e.key === 'A'){ toggleCheckbox('audioEnabled');
