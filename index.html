@@ -468,8 +468,6 @@ function render(){
   const overrange = e.scale > 0.0001 && e.floor + e.scale > 1.0001;
   const showClipped = overrange && $('showClipped') && $('showClipped').checked;
 
-  console.log('[render] floor='+e.floor.toFixed(3)+' scale='+e.scale.toFixed(3)+' sum='+(e.floor+e.scale).toFixed(3)+' overrange='+overrange+' showClipped='+showClipped+' ceilY='+ceilY);
-
   const drawP1 = showClipped
     ? pts.p1
     : { x: pts.p1.x, y: Math.max(pts.p1.y, ceilY) };
@@ -489,8 +487,6 @@ function render(){
     ceilLeftPath = `M ${ceilAttackX} ${ceilY} L ${p1x} ${ceilY}`;
     ceilRightPath= `M ${p1x} ${ceilY} L ${ceilDecayX} ${ceilY}`;
     dPath        = `M ${ceilDecayX} ${ceilY} L ${drawPS.x} ${drawPS.y}`;
-    console.log('[render] CLIPPED — ceilAttackX='+ceilAttackX.toFixed(1)+' p1x='+p1x.toFixed(1)+' ceilDecayX='+ceilDecayX.toFixed(1));
-    console.log('[render] ceilLeftPath="'+ceilLeftPath+'" ceilRightPath="'+ceilRightPath+'"');
   } else {
     aPath         = `M ${pts.p0.x} ${pts.p0.y} L ${drawP1.x} ${drawP1.y}`;
     ceilLeftPath  = '';
@@ -510,12 +506,29 @@ function render(){
     el.setAttribute('d', i===0 ? ceilLeftPath : ceilRightPath);
     el.style.display = show;
   });
-  console.log('[render] ceilLeftOuter display='+show+' d="'+ceilLeftPath+'"');
   ['decayOuter','decayInner'].forEach(id => $(id).setAttribute('d', dPath));
 
   const drawZeroRelease = $('drawReleaseWhenZero').checked;
   const drawReleasePath = pts.e.releaseOn || drawZeroRelease;
-  const rEnd = pts.e.releaseOn ? pts.pEnd : {x:drawPS.x, y:pts.p0.y};
+  let rEnd;
+  if(overrange && e.releaseOn){
+    const f_attack = (1 - e.floor) / e.scale;
+    const ceilAttackX = pts.p0.x + (pts.p1.x - pts.p0.x) * f_attack;
+    const f_decay = (e.floor + e.scale - 1) / e.scale;
+    const ceilDecayX = pts.p1.x + (pts.pEnd.x - pts.p1.x) * f_decay;
+    const peakForSlope = (showClipped && overrange)
+      ? { x: ceilDecayX, y: yFor(1) }
+      : overrange
+        ? { x: pts.p1.x, y: yFor(1) }
+        : pts.p1;
+    const slopeX = pts.pS.x - peakForSlope.x;
+    const slopeY = pts.pS.y - peakForSlope.y;
+    const remainingY = yFor(e.floor) - pts.pS.y;
+    const t = (slopeY !== 0) ? remainingY / slopeY : 1;
+    rEnd = { x: pts.pS.x + slopeX * t, y: yFor(e.floor) };
+  } else {
+    rEnd = e.releaseOn ? pts.pEnd : { x: drawPS.x, y: pts.p0.y };
+  }
   const rPath = drawReleasePath ? `M ${drawPS.x} ${drawPS.y} L ${rEnd.x} ${rEnd.y}` : '';
   ['releaseOuter','releaseInner'].forEach(id => $(id).setAttribute('d', rPath));
 
@@ -755,12 +768,32 @@ function hideDot(){
     }
   }
 }
+function getYFromPath(pathEl, targetX){
+  const len = pathEl.getTotalLength();
+  if(len === 0) return null;
+  let lo = 0, hi = len;
+  for(let i = 0; i < 32; i++){
+    const mid = (lo + hi) / 2;
+    const p = pathEl.getPointAtLength(mid);
+    if(p.x < targetX) lo = mid; else hi = mid;
+  }
+  return pathEl.getPointAtLength((lo + hi) / 2).y;
+}
 function setDot(pt, visible=true){
   const dot=$('dot');
   if(!visible){ hideDot(); return; }
   dot.style.visibility='visible';
   dot.setAttribute('cx',pt.x);
-  dot.setAttribute('cy',pt.y);
+  let dotY = pt.y;
+  if(pt.phase === 'attack' || pt.phase === 'decay'){
+    const pathId = pt.phase === 'attack' ? 'attackOuter' : 'decayOuter';
+    const pathEl = document.getElementById(pathId);
+    if(pathEl){
+      const sampled = getYFromPath(pathEl, pt.x);
+      if(sampled !== null) dotY = sampled;
+    }
+  }
+  dot.setAttribute('cy', dotY);
   dot.style.opacity='1';
   state.dotLevel=pt.level;
   setMeterLevel(pt.level);
@@ -804,10 +837,27 @@ function releaseFromCurrent(){
   }
 
   // Loud Decay ON: snap start to the correct position on the decay curve for startLevel,
-  // then animate along the curve to pEnd.
+  // then animate along the curve to the computed release end point.
   startX = pts.p1.x + pts.dwFull * (1 - startLevel);
   startY = yFor(pts.e.floor + startLevel * pts.e.scale);
-  const end = {x:pts.pEnd.x, y:pts.pEnd.y, level:0};
+  const overrange = (getEffective().floor + getEffective().scale) > 1;
+  const showClipped = document.getElementById('showClipped').checked;
+  const f_attack = overrange ? (1 - pts.e.floor) / pts.e.scale : 0;
+  const ceilAttackX = pts.p0.x + (pts.p1.x - pts.p0.x) * f_attack;
+  const f_decay = overrange ? (pts.e.floor + pts.e.scale - 1) / pts.e.scale : 0;
+  const ceilDecayX = pts.p1.x + (pts.pEnd.x - pts.p1.x) * f_decay;
+  const peakForSlope = (showClipped && overrange)
+    ? { x: ceilDecayX, y: yFor(1) }
+    : overrange
+      ? { x: pts.p1.x, y: yFor(1) }
+      : pts.p1;
+  const slopeX = pts.pS.x - peakForSlope.x;
+  const slopeY = pts.pS.y - peakForSlope.y;
+  const floorY = yFor(pts.e.floor);
+  const remainingY = floorY - pts.pS.y;
+  const tSlope = (slopeY !== 0) ? remainingY / slopeY : 1;
+  const endX = pts.pS.x + slopeX * tSlope;
+  const end = { x: endX, y: floorY, level: 0 };
   const dur = Math.max(20, e.dT * startLevel * 1000);
   const t0=performance.now();
   state.currentPhase='release';
