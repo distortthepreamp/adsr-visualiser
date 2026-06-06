@@ -15,6 +15,7 @@
     --attackColor:#ff6b6b;
     --decayColor:#5fa8ff;
     --releaseColor:#b57cff;
+    --boundsColor:#ffffff;
     --panel:rgba(0,0,0,.28);
     --panel2:rgba(0,0,0,.42);
   }
@@ -35,8 +36,8 @@
   svg{width:100%; height:100%; display:block; overflow:visible;}
   .axis,.grid{stroke:rgba(255,255,255,.35); stroke-width:2; vector-effect:non-scaling-stroke;}
   .grid{display:none; opacity:0; stroke:transparent;}
-  .env-outer{fill:none; stroke:var(--line); stroke-width:var(--lineWidth); stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke;}
-  .env-inner{fill:none; stroke-width:var(--innerLineWidth); stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke;}
+  .env-outer{fill:none; stroke:var(--line); stroke-width:var(--lineWidth); stroke-linecap:square; stroke-linejoin:round; vector-effect:non-scaling-stroke;}
+  .env-inner{fill:none; stroke-width:var(--innerLineWidth); stroke-linecap:square; stroke-linejoin:round; vector-effect:non-scaling-stroke;}
   .attack-inner{stroke:var(--attackColor);}
   .decay-inner{stroke:var(--decayColor);}
   .release-inner{stroke:var(--releaseColor);}
@@ -60,17 +61,17 @@
     padding:14px;
     backdrop-filter:blur(2px);
   }
-  .knobs{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; align-items:start;}
+  .knobs{display:grid; grid-template-columns:repeat(5,1fr); gap:12px; align-items:start;}
   .knobBox{text-align:center;}
   .knobLabel{font-weight:900; font-size:14px; letter-spacing:.08em; margin-bottom:4px;}
   .knob{
-    width:92px; height:92px; margin:0 auto 6px; border-radius:50%;
+    width:72px; height:72px; margin:0 auto 6px; border-radius:50%;
     background:radial-gradient(circle at 36% 30%, #666, #222 68%, #070707 100%);
     border:3px solid rgba(255,255,255,.8); position:relative;
   }
   .knob::after{
-    content:""; position:absolute; left:50%; top:9px; width:5px; height:35px; border-radius:4px;
-    background:var(--fg); transform-origin:50% 37px; transform:translateX(-50%) rotate(var(--deg, -135deg));
+    content:""; position:absolute; left:50%; top:7px; width:4px; height:27px; border-radius:4px;
+    background:var(--fg); transform-origin:50% 29px; transform:translateX(-50%) rotate(var(--deg, -135deg));
   }
   input[type=range]{width:100%; accent-color:white;}
   .readout{font-size:17px; font-weight:900; min-height:22px;}
@@ -180,6 +181,15 @@
       <circle id="sustainPoint" class="tap-marker" cx="80" cy="445" r="8" style="opacity:.85" />
       <circle id="tapMarker" class="tap-marker" cx="80" cy="445" r="11" />
       <circle id="dot" class="env-dot" cx="80" cy="445" r="15" />
+      <line id="floorBound"   x1="0" y1="445" x2="1200" y2="445" style="stroke:var(--boundsColor);stroke-width:7;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
+      <line id="ceilingBound" x1="0" y1="85"  x2="1200" y2="85"  style="stroke:var(--boundsColor);stroke-width:7;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
+
+      <rect id="meterBox"  x="1145" y="85" width="40" height="360" style="fill:none;stroke:var(--line);stroke-width:7;stroke-opacity:1;vector-effect:non-scaling-stroke;" />
+      <rect id="meterFill" x="1145" y="445" width="40" height="0" style="fill:var(--line);stroke:none;" />
+      <rect id="meterPeak" x="1145" y="443" width="40" height="3" style="fill:var(--line);stroke:none;display:none;" />
+      <text id="meterLabelTitle" x="1165" y="72" text-anchor="middle" style="fill:var(--fg);font-size:14px;font-weight:700;display:none;">VOLUME</text>
+      <line id="meterSustainTick" x1="1133" y1="300" x2="1145" y2="300" style="stroke:var(--line);stroke-width:3;stroke-linecap:square;vector-effect:non-scaling-stroke;display:none;" />
+      <text id="meterSustainLabel" x="1131" y="304" text-anchor="end" style="fill:var(--fg);font-size:11px;font-weight:700;display:none;">SUSTAIN</text>
 
       <text id="sLabel" class="small-label" x="0" y="0">SUSTAIN</text>
 
@@ -219,12 +229,29 @@
           <div id="sustainRead" class="readout"></div>
           <div id="sustainTarget" class="targetReadout"></div>
         </div>
+        <div id="floorKnobBox" class="knobBox">
+          <div class="knobLabel">Cutoff</div>
+          <div id="floorKnob" class="knob"></div>
+          <input id="floor" type="range" min="0" max="1000" value="0">
+          <div id="floorRead" class="readout"></div>
+          <div id="floorTarget" class="targetReadout"></div>
+        </div>
+        <div id="scaleKnobBox" class="knobBox">
+          <div class="knobLabel">Amount</div>
+          <div id="scaleKnob" class="knob"></div>
+          <input id="scale" type="range" min="0" max="1000" value="1000">
+          <div id="scaleRead" class="readout"></div>
+          <div id="scaleTarget" class="targetReadout"></div>
+        </div>
       </div>
     </div>
 
     <div class="panel">
       <div class="row"><label><input id="loudDecay" type="checkbox"> Loud Decay / Release</label></div>
-      <div class="row"><label><input id="drawReleaseWhenZero" type="checkbox" checked> Draw release when zero</label></div>
+      <div class="row"><label><input id="drawReleaseWhenZero" type="checkbox"> Draw release when zero</label></div>
+      <div class="row"><label><input id="showBounds" type="checkbox"> Show Full Range</label></div>
+      <div class="row"><label><input id="frequencyMode" type="checkbox"> Frequency Mode</label></div>
+      <div class="row"><label><input id="hpMode" type="checkbox"> LP / HP</label></div>
       <div class="row"><label><input id="keyboardControl" type="checkbox"> Mimic Model D Sustain (80%)</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row"><strong>Transition</strong></div>
@@ -246,7 +273,7 @@
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label></div>
       <div class="row"><label>Background <input id="bgColor" type="color" value="#00ff00"></label></div>
-      <div class="row"><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#b57cff"></label></div>
+      <div class="row"><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#b57cff"></label><label>Bounds <input id="boundsColor" type="color" value="#ffffff"></label></div>
       <div class="hint">Tap releases after the chosen gate time. Attack, Decay and Release are shown as white strokes with soft colour centres. Sustain is a chunky rightward dotted level guide.</div>
     </div>
   </div>
@@ -261,7 +288,7 @@ const curve = [
   {p:0.00,t:0}, {p:0.08,t:0.010}, {p:0.25,t:0.200}, {p:0.42,t:0.600},
   {p:0.58,t:1.000}, {p:0.75,t:5.000}, {p:0.90,t:10.000}, {p:1.00,t:12.000}
 ];
-const state = { a:.08, d:.25, s:.5, target:{a:.08,d:.25,s:.5}, anim:null, dotAnim:null, held:false, dotLevel:0, currentPhase:'idle' };
+const state = { a:.08, d:.25, s:.5, floor:0, scale:1, target:{a:.08,d:.25,s:.5,floor:0,scale:1}, anim:null, dotAnim:null, held:false, dotLevel:0, currentPhase:'idle', peakY:null };
 const graph = { x0:80, y0:445, w:1045, h:360 };
 
 function clamp(v,min=0,max=1){ return Math.max(min, Math.min(max, v)); }
@@ -307,7 +334,10 @@ function getEffective(){
   const rawS=state.s;
   const s=$('keyboardControl').checked ? rawS*.8 : rawS;
   const releaseOn=$('loudDecay').checked;
-  return {aT,dT,s,rawS,releaseOn,rT:releaseOn?dT:0};
+  const freqMode = $('frequencyMode') && $('frequencyMode').checked;
+  const floor = freqMode ? clamp(state.floor,0,1) : 0;
+  const scale = freqMode ? clamp(state.scale,0,1-floor) : 1;
+  return {aT,dT,s,rawS,releaseOn,rT:releaseOn?dT:0,floor,scale};
 }
 function yFor(level){ return graph.y0 - level*graph.h; }
 function computePoints(){
@@ -320,10 +350,10 @@ function computePoints(){
   // Attack rises to peak, then there is one master downward decay/release
   // trajectory from 100% to 0%. Sustain is a level marker on that trajectory,
   // not a timed horizontal plateau.
-  const p0={x:x0,y:yFor(0),level:0};
-  const p1={x:x0+aw,y:yFor(1),level:1};
-  const pEnd={x:p1.x+dwFull,y:yFor(0),level:0};
-  const pS={x:p1.x+dwFull*(1-e.s),y:yFor(e.s),level:e.s};
+  const p0={x:x0,y:yFor(e.floor),level:0};
+  const p1={x:x0+aw,y:yFor(e.floor+e.scale),level:1};
+  const pEnd={x:p1.x+dwFull,y:yFor(e.floor),level:0};
+  const pS={x:p1.x+dwFull*(1-e.s),y:yFor(e.floor+e.s*e.scale),level:e.s};
   return {p0,p1,pS,pEnd,e,aw,dwFull};
 }
 
@@ -344,7 +374,13 @@ function render(){
   // Sustain as a horizontal level guide extending to the right from
   // the decay/release intersection. This reads as an indefinite held level,
   // rather than something that reaches back into the earlier decay phase.
-  const markerEndX = graph.x0 + graph.w;
+  // Meter geometry
+  const meterX = graph.x0 + graph.w + 20;  // = 1145
+  const meterW = 40;
+  const meterAbsTop = graph.y0 - graph.h;  // yFor(1) = 85
+  const meterAbsBottom = graph.y0;          // yFor(0) = 445
+
+  const markerEndX = meterX;
   $('sustainMarker').setAttribute('x1', pts.pS.x);
   $('sustainMarker').setAttribute('y1', pts.pS.y);
   $('sustainMarker').setAttribute('x2', markerEndX);
@@ -355,6 +391,40 @@ function render(){
   $('sLabel').setAttribute('x',Math.min(markerEndX-105, pts.pS.x+28)); $('sLabel').setAttribute('y',pts.pS.y-18);
 
   $('mainReadout').textContent = `ATTACK ${fmtTime(pts.e.aT)} · DECAY ${fmtTime(pts.e.dT)} · SUSTAIN ${Math.round(pts.e.s*100)}%` + (pts.e.releaseOn ? ` · RELEASE ${fmtTime(pts.e.rT)}` : ' · RELEASE OFF');
+
+  // Bounds lines — fixed at absolute graph top/bottom, full SVG width
+  const showBounds = $('showBounds') && $('showBounds').checked;
+  const floorBound=$('floorBound'), ceilingBound=$('ceilingBound');
+  if(floorBound){ floorBound.style.display = showBounds ? '' : 'none'; }
+  if(ceilingBound){ ceilingBound.style.display = showBounds ? '' : 'none'; }
+
+  // Meter box — fixed full graph height
+  const meterBox=$('meterBox');
+  if(meterBox){
+    meterBox.setAttribute('x',meterX); meterBox.setAttribute('y',meterAbsTop);
+    meterBox.setAttribute('width',meterW); meterBox.setAttribute('height',graph.h);
+  }
+
+  // Meter labels
+  const freqMode = $('frequencyMode') && $('frequencyMode').checked;
+  const isHP = $('hpMode') && $('hpMode').checked;
+  const meterCX = meterX + meterW/2;
+  const titleEl=$('meterLabelTitle');
+  if(titleEl){ titleEl.textContent=freqMode?'FREQUENCY':'VOLUME'; titleEl.setAttribute('x',meterCX); titleEl.setAttribute('y',meterAbsTop-10); titleEl.style.display=''; }
+  const sustainY=pts.pS.y;
+  const tickEl=$('meterSustainTick');
+  if(tickEl){ tickEl.setAttribute('x1',meterX-12); tickEl.setAttribute('y1',sustainY); tickEl.setAttribute('x2',meterX); tickEl.setAttribute('y2',sustainY); tickEl.style.display=''; }
+  const sustLblEl=$('meterSustainLabel');
+  if(sustLblEl){ sustLblEl.setAttribute('x',meterX-14); sustLblEl.setAttribute('y',sustainY+4); sustLblEl.style.display=''; }
+
+  // Cutoff/Amount knobs: active only in Frequency Mode
+  const floorBox=$('floorKnobBox'), scaleBox=$('scaleKnobBox');
+  if(floorBox) floorBox.style.opacity=freqMode?'':'0.35';
+  if(scaleBox) scaleBox.style.opacity=freqMode?'':'0.35';
+
+  // Keep resting meter fill in sync whenever no animation is running
+  if(state.currentPhase === 'idle') hideDot();
+
   syncControls();
   updateButtonStates();
   setTimeout(refreshNumericInputs, 0); // keep numeric inputs in sync after every render
@@ -364,13 +434,19 @@ function syncControls(){
   const mode=document.querySelector('input[name="mode"]:checked').value;
   const vals = mode==='live' ? state : state.target;
   $('attack').value=Math.round(vals.a*1000); $('decay').value=Math.round(vals.d*1000); $('sustain').value=Math.round(vals.s*1000);
+  $('floor').value=Math.round(vals.floor*1000); $('scale').value=Math.round(vals.scale*1000);
   $('attackKnob').style.setProperty('--deg', (-135 + vals.a*270)+'deg');
   $('decayKnob').style.setProperty('--deg', (-135 + vals.d*270)+'deg');
   $('sustainKnob').style.setProperty('--deg', (-135 + vals.s*270)+'deg');
+  $('floorKnob').style.setProperty('--deg', (-135 + vals.floor*270)+'deg');
+  $('scaleKnob').style.setProperty('--deg', (-135 + vals.scale*270)+'deg');
   $('attackRead').textContent=fmtTime(mapTime(state.a)); $('decayRead').textContent=fmtTime(mapTime(state.d)); $('sustainRead').textContent=Math.round(getEffective().s*100)+'%';
+  $('floorRead').textContent=formatSustainScale(state.floor); $('scaleRead').textContent=formatSustainScale(state.scale);
   $('attackTarget').textContent=mode==='animate' ? 'Target: '+fmtTime(mapTime(state.target.a)) : '';
   $('decayTarget').textContent=mode==='animate' ? 'Target: '+fmtTime(mapTime(state.target.d)) : '';
   $('sustainTarget').textContent=mode==='animate' ? 'Target: '+Math.round(($('keyboardControl').checked?state.target.s*.8:state.target.s)*100)+'%' : '';
+  $('floorTarget').textContent=mode==='animate' ? 'Target: '+formatSustainScale(state.target.floor) : '';
+  $('scaleTarget').textContent=mode==='animate' ? 'Target: '+formatSustainScale(state.target.scale) : '';
   $('modeHint').textContent = mode==='live' ? 'Live mode: knobs update the graph immediately.' : 'Animate mode: knobs set targets. Press Transition to morph the graph.';
   patchSustainReadouts(); // keep sustain 0-10 scale display correct
 }
@@ -379,12 +455,14 @@ function setFromSlider(){
   const mode=document.querySelector('input[name="mode"]:checked').value;
   const dest=mode==='live' ? state : state.target;
   dest.a=$('attack').value/1000; dest.d=$('decay').value/1000; dest.s=$('sustain').value/1000;
-  if(mode==='live') { state.target={a:state.a,d:state.d,s:state.s}; render(); } else syncControls();
+  dest.floor=$('floor').value/1000; dest.scale=$('scale').value/1000;
+  if(mode==='live') { state.target={a:state.a,d:state.d,s:state.s,floor:state.floor,scale:state.scale}; render(); } else syncControls();
 }
 ['attack','decay'].forEach(id=>$(id).addEventListener('input',()=>{ if(currentMode()==='live') clearBlobAndMarker(); setFromSlider(); if(window.clearPresetDisplay) clearPresetDisplay(); }));
 $('sustain').addEventListener('input',()=>{ setFromSlider(); if(window.clearPresetDisplay) clearPresetDisplay(); });
-document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) state.target={a:state.a,d:state.d,s:state.s}; syncControls(); }));
-['loudDecay','keyboardControl','drawReleaseWhenZero'].forEach(id=>$(id).addEventListener('change',render));
+['floor','scale'].forEach(id=>$(id).addEventListener('input',()=>{ setFromSlider(); if(window.clearPresetDisplay) clearPresetDisplay(); }));
+document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) state.target={a:state.a,d:state.d,s:state.s,floor:state.floor,scale:state.scale}; syncControls(); }));
+['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','frequencyMode','hpMode'].forEach(id=>$(id).addEventListener('change',render));
 $('lineColor').addEventListener('input',e=>document.documentElement.style.setProperty('--line', e.target.value));
 $('bgColor').addEventListener('input',e=>document.documentElement.style.setProperty('--bg', e.target.value));
 $('attackColor').addEventListener('input',e=>document.documentElement.style.setProperty('--attackColor', e.target.value));
@@ -392,6 +470,7 @@ $('decayColor').addEventListener('input',e=>document.documentElement.style.setPr
 $('releaseColor').addEventListener('input',e=>document.documentElement.style.setProperty('--releaseColor', e.target.value));
 $('lineWidth').addEventListener('input',e=>document.documentElement.style.setProperty('--lineWidth', e.target.value));
 $('innerLineWidth').addEventListener('input',e=>document.documentElement.style.setProperty('--innerLineWidth', e.target.value));
+$('boundsColor').addEventListener('input',e=>document.documentElement.style.setProperty('--boundsColor', e.target.value));
 
 function transition(){
   clearBlobAndMarker();
@@ -400,11 +479,11 @@ function transition(){
   hideTapMarker();
   const selected=document.querySelector('input[name="transition"]:checked').value;
   const dur=(selected==='custom' ? Number($('customTransitionTime').value)||3 : Number(selected))*1000;
-  const start={a:state.a,d:state.d,s:state.s}, end={...state.target};
+  const start={a:state.a,d:state.d,s:state.s,floor:state.floor,scale:state.scale}, end={...state.target};
   const startAms=mapTime(start.a)*1000, endAms=mapTime(end.a)*1000;
   const startDms=mapTime(start.d)*1000, endDms=mapTime(end.d)*1000;
   cancelAnimationFrame(state.anim);
-  state.a=start.a; state.d=start.d; state.s=start.s;
+  state.a=start.a; state.d=start.d; state.s=start.s; state.floor=start.floor; state.scale=start.scale;
   render();
   let t0=null;
   function step(now){
@@ -414,8 +493,10 @@ function transition(){
     state.a=positionFromMs(startAms+(endAms-startAms)*k);
     state.d=positionFromMs(startDms+(endDms-startDms)*k);
     state.s=start.s+(end.s-start.s)*k;
+    state.floor=start.floor+(end.floor-start.floor)*k;
+    state.scale=start.scale+(end.scale-start.scale)*k;
     render();
-    if(f<1) state.anim=requestAnimationFrame(step); else { state.a=end.a; state.d=end.d; state.s=end.s; render(); }
+    if(f<1) state.anim=requestAnimationFrame(step); else { state.a=end.a; state.d=end.d; state.s=end.s; state.floor=end.floor; state.scale=end.scale; render(); }
   }
   state.anim=requestAnimationFrame(step);
 }
@@ -436,7 +517,7 @@ function pointOnAttackDecay(ms){
   const f=e.dT<=.0005 ? 1 : clamp(after/e.dT);
   const level=1-f;
   const phase = level <= e.s + .0001 ? 'sustain' : 'decay';
-  return { x:pts.p1.x+(pts.pEnd.x-pts.p1.x)*f, y:yFor(level), level, phase };
+  return { x:pts.p1.x+(pts.pEnd.x-pts.p1.x)*f, y:yFor(e.floor+level*e.scale), level, phase };
 }
 
 // Gate-high behaviour: attack, then decay only until the sustain level.
@@ -450,10 +531,60 @@ function pointWhileGateHigh(ms){
   return pt;
 }
 
+function setMeterLevel(level){
+  const fill=$('meterFill'), peak=$('meterPeak');
+  if(!fill) return;
+  const e=getEffective();
+  const mx=graph.x0+graph.w+20, mw=40;
+  const bottomAbsY=graph.y0;           // yFor(0) = 445
+  const topAbsY=graph.y0-graph.h;      // yFor(1) = 85
+  const levelY=yFor(e.floor+level*e.scale);
+  const isHP=$('hpMode')&&$('hpMode').checked;
+  fill.setAttribute('x',mx); fill.setAttribute('width',mw);
+  if(!isHP){
+    // LP: fill from absolute bottom up to blob level
+    const h=Math.max(0,bottomAbsY-levelY);
+    fill.setAttribute('y',levelY); fill.setAttribute('height',h);
+  } else {
+    // HP: fill from absolute top down to blob level
+    const blobY = levelY;
+    const topY = yFor(1);
+    fill.setAttribute('y', String(topY));
+    fill.setAttribute('height', String(blobY - topY));
+  }
+  // Peak hold: LP tracks min Y (highest visual point); HP tracks max Y (lowest visual point)
+  const noPeak = state.peakY === null;
+  const movePeak = noPeak || (!isHP ? levelY < state.peakY : levelY > state.peakY);
+  if(peak && movePeak){
+    state.peakY = levelY;
+    peak.setAttribute('x',mx); peak.setAttribute('width',mw);
+    peak.setAttribute('y',Math.round(levelY)-1); peak.setAttribute('height',3);
+    peak.style.display='';
+  }
+}
+
 function hideDot(){
   const dot=$('dot');
   dot.style.opacity=0;
   dot.style.visibility='hidden';
+  const fill=$('meterFill');
+  if(fill){
+    const e=getEffective();
+    const mx=graph.x0+graph.w+20, mw=40;
+    const isHP=$('hpMode')&&$('hpMode').checked;
+    fill.setAttribute('x',mx); fill.setAttribute('width',mw);
+    if(!isHP){
+      // LP: show always-open region (absolute bottom up to floor level)
+      const floorY=yFor(e.floor), bottomAbsY=graph.y0;
+      fill.setAttribute('y',floorY); fill.setAttribute('height',Math.max(0,bottomAbsY-floorY));
+    } else {
+      // HP: show always-open region (absolute top down to ceiling level)
+      const blobY = yFor(e.floor + e.scale);
+      const topY = yFor(1);
+      fill.setAttribute('y', String(topY));
+      fill.setAttribute('height', String(blobY - topY));
+    }
+  }
 }
 function setDot(pt, visible=true){
   const dot=$('dot');
@@ -463,6 +594,7 @@ function setDot(pt, visible=true){
   dot.setAttribute('cy',pt.y);
   dot.style.opacity='1';
   state.dotLevel=pt.level;
+  setMeterLevel(pt.level);
 }
 function hideTapMarker(){
   const marker=$('tapMarker');
@@ -504,7 +636,7 @@ function releaseFromCurrent(){
   // Loud Decay ON: snap start to the correct position on the decay curve for startLevel,
   // then animate along the curve to pEnd.
   startX = pts.p1.x + pts.dwFull * (1 - startLevel);
-  startY = yFor(startLevel);
+  startY = yFor(pts.e.floor + startLevel * pts.e.scale);
   const end = {x:pts.pEnd.x, y:pts.pEnd.y, level:0};
   const dur = Math.max(20, e.dT * startLevel * 1000);
   const t0=performance.now();
@@ -536,11 +668,15 @@ function clearBlobAndMarker(){
   state.held=false;
   state.currentPhase='idle';
   state.dotLevel=0;
+  state.peakY=null;
+  const peak=$('meterPeak'); if(peak) peak.style.display='none';
   updateButtonStates();
 }
 
 function tap(ms){
   if(state.currentPhase === 'hold' || state.currentPhase === 'sustain') clearBlobAndMarker();
+  state.peakY=null;
+  const mPk=$('meterPeak'); if(mPk) mPk.style.display='none';
   hideDot();
   hideTapMarker();
   animationToken++;
@@ -559,6 +695,15 @@ function tap(ms){
       const landing=pointWhileGateHigh(tapMs);
       setDot(landing, true);
       setTapMarker(landing);
+      // Snap peak hold to landing Y — overrides any attack overshoot in LP, decay floor in HP
+      state.peakY = landing.y;
+      const pk=$('meterPeak');
+      if(pk){
+        const mx=graph.x0+graph.w+20;
+        pk.setAttribute('x',mx); pk.setAttribute('width',40);
+        pk.setAttribute('y',Math.round(landing.y)-1); pk.setAttribute('height',3);
+        pk.style.display='';
+      }
       const e=getEffective();
       if(e.releaseOn){
         releaseFromCurrent();
@@ -576,6 +721,8 @@ function tap(ms){
 }
 
 function hold(){
+  state.peakY=null;
+  const mPk=$('meterPeak'); if(mPk) mPk.style.display='none';
   animationToken++;
   const myAnimationToken = animationToken;
   hideTapMarker();
@@ -632,7 +779,7 @@ function ensureInputAfter(sliderId, inputId, label, attrs){
   let input = document.getElementById(inputId);
   if (input) return input;
   const wrap = document.createElement('div');
-  wrap.className = inputId === 'sustainScaleInput' ? 'numeric-value-control' : 'numeric-ms-control';
+  wrap.className = ['sustainScaleInput','floorScaleInput','scaleScaleInput'].includes(inputId) ? 'numeric-value-control' : 'numeric-ms-control';
   wrap.innerHTML = `<label>${label} <input id="${inputId}" ${attrs}></label>`;
   slider.insertAdjacentElement('afterend', wrap);
   return document.getElementById(inputId);
@@ -641,6 +788,8 @@ function ensureInputAfter(sliderId, inputId, label, attrs){
 const attackInput  = ensureInputAfter('attack',  'attackMsInput',    'Attack ms', 'type="number" min="0" max="12000" step="1"');
 const decayInput   = ensureInputAfter('decay',   'decayMsInput',     'Decay ms',  'type="number" min="0" max="12000" step="1"');
 const sustainInput = ensureInputAfter('sustain', 'sustainScaleInput','Sustain',   'type="number" min="0" max="10" step="0.1"');
+const floorInput   = ensureInputAfter('floor',   'floorScaleInput',  'Floor',     'type="number" min="0" max="10" step="0.1"');
+const scaleInput   = ensureInputAfter('scale',   'scaleScaleInput',  'Scale',     'type="number" min="0" max="10" step="0.1"');
 
 function commitTime(which, input){
   if (!input) return;
@@ -653,7 +802,7 @@ function commitTime(which, input){
   const obj = activeObject();
   obj[which] = positionFromMs(ms);
   if (m === 'live') {
-    state.target = { a: state.a, d: state.d, s: state.s };
+    state.target = { a: state.a, d: state.d, s: state.s, floor: state.floor, scale: state.scale };
     render();
   } else {
     syncControls();
@@ -669,7 +818,7 @@ function commitSustain(){
   const obj = activeObject();
   obj.s = scale / 10;
   if (currentMode() === 'live') {
-    state.target = { a: state.a, d: state.d, s: state.s };
+    state.target = { a: state.a, d: state.d, s: state.s, floor: state.floor, scale: state.scale };
     render();
   } else {
     syncControls();
@@ -690,6 +839,14 @@ function refreshNumericInputs(){
     const scale = obj.s * 10;
     sustainInput.value = Number.isInteger(scale) ? String(scale) : scale.toFixed(1).replace(/\.0$/, '');
   }
+  if (floorInput && document.activeElement !== floorInput) {
+    const v = obj.floor * 10;
+    floorInput.value = Number.isInteger(v) ? String(v) : v.toFixed(1).replace(/\.0$/, '');
+  }
+  if (scaleInput && document.activeElement !== scaleInput) {
+    const v = obj.scale * 10;
+    scaleInput.value = Number.isInteger(v) ? String(v) : v.toFixed(1).replace(/\.0$/, '');
+  }
   patchSustainReadouts();
 }
 
@@ -705,6 +862,34 @@ function patchSustainReadouts(){
   }
 }
 
+function commitFloor(){
+  if (!floorInput) return;
+  if(window.clearPresetDisplay) clearPresetDisplay();
+  const v = Math.max(0, Math.min(10, Number(floorInput.value) || 0));
+  floorInput.value = Number.isInteger(v) ? String(v) : v.toFixed(1).replace(/\.0$/, '');
+  const obj = activeObject();
+  obj.floor = v / 10;
+  if (currentMode() === 'live') {
+    state.target = { a: state.a, d: state.d, s: state.s, floor: state.floor, scale: state.scale };
+    render();
+  } else { syncControls(); }
+  requestAnimationFrame(refreshNumericInputs);
+}
+
+function commitScale(){
+  if (!scaleInput) return;
+  if(window.clearPresetDisplay) clearPresetDisplay();
+  const v = Math.max(0, Math.min(10, Number(scaleInput.value) || 0));
+  scaleInput.value = Number.isInteger(v) ? String(v) : v.toFixed(1).replace(/\.0$/, '');
+  const obj = activeObject();
+  obj.scale = v / 10;
+  if (currentMode() === 'live') {
+    state.target = { a: state.a, d: state.d, s: state.s, floor: state.floor, scale: state.scale };
+    render();
+  } else { syncControls(); }
+  requestAnimationFrame(refreshNumericInputs);
+}
+
 function clearTypedForSlider(which){
   typedDisplay[currentMode()][which] = null;
 }
@@ -712,6 +897,8 @@ function clearTypedForSlider(which){
 const attackSlider  = document.getElementById('attack');
 const decaySlider   = document.getElementById('decay');
 const sustainSlider = document.getElementById('sustain');
+const floorSlider   = document.getElementById('floor');
+const scaleSlider   = document.getElementById('scale');
 
 if (attackInput) {
   attackInput.addEventListener('change', () => commitTime('a', attackInput));
@@ -728,10 +915,22 @@ if (sustainInput) {
   sustainInput.addEventListener('blur',   commitSustain);
   sustainInput.addEventListener('keydown', e => { if (e.key === 'Enter') commitSustain(); });
 }
+if (floorInput) {
+  floorInput.addEventListener('change', commitFloor);
+  floorInput.addEventListener('blur',   commitFloor);
+  floorInput.addEventListener('keydown', e => { if (e.key === 'Enter') commitFloor(); });
+}
+if (scaleInput) {
+  scaleInput.addEventListener('change', commitScale);
+  scaleInput.addEventListener('blur',   commitScale);
+  scaleInput.addEventListener('keydown', e => { if (e.key === 'Enter') commitScale(); });
+}
 
 if (attackSlider)  attackSlider.addEventListener('input',  () => { clearTypedForSlider('a'); setTimeout(refreshNumericInputs, 0); });
 if (decaySlider)   decaySlider.addEventListener('input',   () => { clearTypedForSlider('d'); setTimeout(refreshNumericInputs, 0); });
 if (sustainSlider) sustainSlider.addEventListener('input', () => { setTimeout(refreshNumericInputs, 0); });
+if (floorSlider)   floorSlider.addEventListener('input',  () => { setTimeout(refreshNumericInputs, 0); });
+if (scaleSlider)   scaleSlider.addEventListener('input',  () => { setTimeout(refreshNumericInputs, 0); });
 
 document.querySelectorAll('input[name="mode"]').forEach(el => {
   el.addEventListener('change', () => setTimeout(refreshNumericInputs, 0));
@@ -793,6 +992,8 @@ function addPointerFeedback(){
   { knobId: 'attackKnob',  sliderId: 'attack'  },
   { knobId: 'decayKnob',   sliderId: 'decay'   },
   { knobId: 'sustainKnob', sliderId: 'sustain' },
+  { knobId: 'floorKnob',   sliderId: 'floor'   },
+  { knobId: 'scaleKnob',   sliderId: 'scale'   },
 ].forEach(({ knobId, sliderId }) => {
   const knob   = $(knobId);
   const slider = $(sliderId);
@@ -853,6 +1054,8 @@ function addPointerFeedback(){
       state.target.a = positionFromMs(preset.a);
       state.target.d = positionFromMs(preset.d);
       state.target.s = preset.s / 10;
+      state.target.floor = (preset.floor || 0) / 10;
+      state.target.scale = (preset.scale !== undefined ? preset.scale : 10) / 10;
 
       // Configure transition time
       setTransitionTime(preset.t);
@@ -872,6 +1075,8 @@ function addPointerFeedback(){
 })();
 
 // ---- Init ----
+console.log('floorBound:', document.getElementById('floorBound'));
+console.log('ceilingBound:', document.getElementById('ceilingBound'));
 render();
 refreshNumericInputs();
 hideLikelyAxes();
