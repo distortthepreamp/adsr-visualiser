@@ -102,8 +102,8 @@
   hr{margin:3px 0;}
 
   /* transport button layout */
-  #tap50Btn, #tap100Btn, #tap200Btn, #tapCustomBtn,
-  #holdBtn, #releaseBtn, #clearBtn, #tapGoBtn {
+  #tapMode50Btn, #tapMode100Btn, #tapMode200Btn, #tapModeCustomBtn,
+  #tapModeHoldBtn, #releaseBtn, #clearBtn {
     padding: 4px 7px;
     min-height: unset;
     line-height: 1.1;
@@ -187,8 +187,9 @@
 
       <rect id="meterBox"  x="1145" y="30" width="40" height="415" style="fill:none;stroke:var(--line);stroke-width:7;stroke-opacity:1;vector-effect:non-scaling-stroke;" />
       <rect id="meterFill" x="1145" y="445" width="40" height="0" style="fill:var(--line);stroke:none;" />
-      <rect id="meterPeak" x="1145" y="443" width="40" height="3" style="fill:var(--line);stroke:none;display:none;" />
-      <text id="meterLabelTitle" x="1165" y="72" text-anchor="middle" style="fill:var(--fg);font-size:14px;font-weight:700;display:none;">VOLUME</text>
+      <line id="floorLine" x1="80" y1="445" x2="1145" y2="445" style="stroke:var(--line);stroke-width:3.5;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
+      <line id="amountLine" x1="80" y1="30" x2="1145" y2="30" style="stroke:var(--line);stroke-width:3.5;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
+      <text id="meterLabelTitle" x="1165" y="72" text-anchor="middle" style="fill:var(--fg);font-size:17px;font-weight:700;display:none;">VOL</text>
 
 
       <text id="sLabel" class="small-label" x="0" y="0">SUSTAIN</text>
@@ -208,6 +209,7 @@
           <label><input type="radio" name="mode" value="live" checked><span>Live</span></label>
           <label><input type="radio" name="mode" value="animate"><span>Animate</span></label>
         </div>
+        <span style="opacity:.5;font-size:11px">L</span>
         <span id="presetName" style="opacity:.85"></span>
       </div>
       <div class="knobs">
@@ -250,12 +252,12 @@
     </div>
 
     <div class="panel">
-      <div class="row"><label><input id="loudDecay" type="checkbox"> <span id="loudDecayLabel">Loud Decay</span></label></div>
-      <div class="row"><label><input id="drawReleaseWhenZero" type="checkbox"> Draw Release When Zero</label></div>
-      <div class="row"><label><input id="showBounds" type="checkbox"> Show Top And Bottom</label></div>
-      <div class="row"><label><input id="frequencyMode" type="checkbox"> Filter Mode</label></div>
-      <div class="row"><label><input id="hpMode" type="checkbox"> LP/HP Mode</label></div>
-      <div class="row"><label><input id="keyboardControl" type="checkbox"> Mimic Model D Sustain (80%)</label></div>
+      <div class="row"><label><input id="loudDecay" type="checkbox"> D — <span id="loudDecayLabel">Loud Decay</span></label></div>
+      <div class="row"><label><input id="drawReleaseWhenZero" type="checkbox"> Z — Draw Release When Zero</label></div>
+      <div class="row"><label><input id="showBounds" type="checkbox" checked> T — Show Top And Bottom</label></div>
+      <div class="row"><label><input id="frequencyMode" type="checkbox"> F — Filter Mode</label></div>
+      <div class="row"><label><input id="hpMode" type="checkbox"> M — LP/HP Mode</label></div>
+      <div class="row"><label><input id="keyboardControl" type="checkbox"> S — Mimic Model D Sustain (80%)</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:5px">
         <button id="trans1Btn">1s</button>
@@ -268,18 +270,35 @@
     </div>
 
     <div class="panel">
-      <div class="row"><button id="tap50Btn">Tap 50</button><button id="tap100Btn">Tap 100</button><button id="tap200Btn">Tap 200</button><button id="tapCustomBtn">Tap Custom</button><button id="holdBtn">Hold</button><button id="releaseBtn">Release</button><button id="clearBtn">Clear</button></div>
-      <div id="tapCustomRow" class="row" style="display:none"><label>ms <input id="tapCustomMs" type="number" min="20" max="5000" step="10" value="200"></label> <button id="tapGoBtn">Go</button></div>
+      <div class="row">
+        <button id="tapMode50Btn">Tap 50</button>
+        <button id="tapMode100Btn">Tap 100</button>
+        <button id="tapMode200Btn">Tap 200</button>
+        <button id="tapModeCustomBtn">Custom</button>
+        <button id="tapModeHoldBtn">Hold</button>
+        <button id="releaseBtn">Release</button>
+        <button id="clearBtn">Clear</button>
+      </div>
+      <div id="tapCustomRow" class="row" style="display:none">
+        <label>ms <input id="tapCustomMs" type="number" min="20" max="5000" step="10" value="200"></label>
+      </div>
       <div class="row"><label><input id="keepTapMarker" type="checkbox" checked> Leave Tap Marker</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label></div>
-      <div class="row"><label>Background <input id="bgColor" type="color" value="#00ff00"></label></div>
-      <div class="row"><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#b57cff"></label><label>Bounds <input id="boundsColor" type="color" value="#ffffff"></label></div>
+      <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#b57cff"></label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:10px;align-items:center;flex-wrap:wrap">
-        <label><input id="audioEnabled" type="checkbox"> Audio</label>
-        <select id="noteSelect" style="background:rgba(0,0,0,.25);color:#fff;border:1px solid rgba(255,255,255,.8);border-radius:8px;padding:5px 8px;max-width:80px"></select>
-        <label>Vol <input id="masterVol" type="range" min="0" max="100" value="70" style="width:60px;vertical-align:middle;accent-color:white"></label>
+        <label><input id="audioEnabled" type="checkbox" checked> A — Audio</label>
+        <div id="noteRow" style="display:flex;gap:4px;align-items:center;flex-wrap:wrap">
+          <button id="noteE1Btn">E1</button>
+          <button id="noteE2Btn">E2</button>
+          <button id="noteC4Btn">C4</button>
+          <button id="noteA4Btn">A4</button>
+          <button id="noteCustomToggle">Custom</button>
+        </div>
+      </div>
+      <div id="noteCustomRow" style="display:none" class="row">
+        <label>Hz <input id="noteCustomHz" type="number" min="20" max="20000" step="0.1" value="440"></label>
       </div>
       <div class="hint">Tap releases after the chosen gate time. Attack, Decay and Release are shown as white strokes with soft colour centres. Sustain is a chunky rightward dotted level guide.</div>
     </div>
@@ -293,11 +312,11 @@
       <div>
         <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:10px">Transport</div>
         <table style="border-collapse:collapse;width:100%">
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">Space</td><td style="padding:3px 0;font-size:13px;font-weight:700">Tap 200ms</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">1</td><td style="padding:3px 0;font-size:13px;font-weight:700">Tap 50ms</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">2</td><td style="padding:3px 0;font-size:13px;font-weight:700">Tap 100ms</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">3</td><td style="padding:3px 0;font-size:13px;font-weight:700">Tap 200ms</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">H</td><td style="padding:3px 0;font-size:13px;font-weight:700">Hold</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">Space</td><td style="padding:3px 0;font-size:13px;font-weight:700">Fire current mode</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">1</td><td style="padding:3px 0;font-size:13px;font-weight:700">Select Tap 50ms</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">2</td><td style="padding:3px 0;font-size:13px;font-weight:700">Select Tap 100ms</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">3</td><td style="padding:3px 0;font-size:13px;font-weight:700">Select Tap 200ms</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">H</td><td style="padding:3px 0;font-size:13px;font-weight:700">Select Hold mode</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">R</td><td style="padding:3px 0;font-size:13px;font-weight:700">Release</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">C</td><td style="padding:3px 0;font-size:13px;font-weight:700">Clear</td></tr>
         </table>
@@ -305,7 +324,8 @@
       <div>
         <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:10px">Switches</div>
         <table style="border-collapse:collapse;width:100%">
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">A</td><td style="padding:3px 0;font-size:13px;font-weight:700">Live/Animate</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">L</td><td style="padding:3px 0;font-size:13px;font-weight:700">Live/Animate</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">A</td><td style="padding:3px 0;font-size:13px;font-weight:700">Audio</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">D</td><td style="padding:3px 0;font-size:13px;font-weight:700">Loud Decay</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">Z</td><td style="padding:3px 0;font-size:13px;font-weight:700">Draw Release When Zero</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">T</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Top And Bottom</td></tr>
@@ -337,7 +357,7 @@ const curve = [
   {p:0.00,t:0}, {p:0.08,t:0.010}, {p:0.25,t:0.200}, {p:0.42,t:0.600},
   {p:0.58,t:1.000}, {p:0.75,t:5.000}, {p:0.90,t:10.000}, {p:1.00,t:12.000}
 ];
-const state = { a:.08, d:.25, s:.5, floor:0, scale:1, target:{a:.08,d:.25,s:.5,floor:0,scale:1}, anim:null, dotAnim:null, held:false, dotLevel:0, currentPhase:'idle', peakY:null };
+const state = { a:.08, d:.25, s:.5, floor:0, scale:1, target:{a:.08,d:.25,s:.5,floor:0,scale:1}, anim:null, dotAnim:null, held:false, dotLevel:0, currentPhase:'idle' };
 const graph = { x0:80, y0:445, w:1045, h:415 };
 
 function clamp(v,min=0,max=1){ return Math.max(min, Math.min(max, v)); }
@@ -476,12 +496,33 @@ function render(){
     meterBox.setAttribute('width',meterW); meterBox.setAttribute('height',graph.h);
   }
 
+  // Floor line and Amount line
+  const meterLeftX = meterX; // = graph.x0 + graph.w + 20 = 1145
+  const floorLine = $('floorLine');
+  const amountLine = $('amountLine');
+  const floorY = yFor(pts.e.floor);
+  const amountY = yFor(pts.e.floor + pts.e.scale);
+  if(floorLine){
+    floorLine.setAttribute('x1', graph.x0);
+    floorLine.setAttribute('y1', floorY);
+    floorLine.setAttribute('x2', meterLeftX);
+    floorLine.setAttribute('y2', floorY);
+    floorLine.style.display = '';
+  }
+  if(amountLine){
+    amountLine.setAttribute('x1', pts.p1.x);
+    amountLine.setAttribute('y1', amountY);
+    amountLine.setAttribute('x2', meterLeftX);
+    amountLine.setAttribute('y2', amountY);
+    amountLine.style.display = '';
+  }
+
   // Meter labels
   const freqMode = $('frequencyMode') && $('frequencyMode').checked;
   const isHP = $('hpMode') && $('hpMode').checked;
   const meterCX = meterX + meterW/2;
   const titleEl=$('meterLabelTitle');
-  if(titleEl){ titleEl.textContent=freqMode?'FILTER':'VOLUME'; titleEl.setAttribute('x',meterCX); titleEl.setAttribute('y',meterAbsTop-10); titleEl.style.display=''; }
+  if(titleEl){ titleEl.textContent=freqMode?'FREQ':'VOL'; titleEl.setAttribute('x',meterCX); titleEl.setAttribute('y',meterAbsTop-18); titleEl.style.display=''; }
   // Cutoff/Amount knobs: active only in Filter Mode
   const floorBox=$('floorKnobBox'), scaleBox=$('scaleKnobBox');
   if(floorBox) floorBox.style.opacity=freqMode?'':'0.35';
@@ -540,7 +581,6 @@ $('decayColor').addEventListener('input',e=>document.documentElement.style.setPr
 $('releaseColor').addEventListener('input',e=>document.documentElement.style.setProperty('--releaseColor', e.target.value));
 $('lineWidth').addEventListener('input',e=>document.documentElement.style.setProperty('--lineWidth', e.target.value));
 $('innerLineWidth').addEventListener('input',e=>document.documentElement.style.setProperty('--innerLineWidth', e.target.value));
-$('boundsColor').addEventListener('input',e=>document.documentElement.style.setProperty('--boundsColor', e.target.value));
 
 function transition(durSec){
   clearBlobAndMarker();
@@ -615,7 +655,7 @@ function pointWhileGateHigh(ms){
 }
 
 function setMeterLevel(level){
-  const fill=$('meterFill'), peak=$('meterPeak');
+  const fill=$('meterFill');
   if(!fill) return;
   const e=getEffective();
   const mx=graph.x0+graph.w+20, mw=40;
@@ -630,19 +670,9 @@ function setMeterLevel(level){
     fill.setAttribute('y',levelY); fill.setAttribute('height',h);
   } else {
     // HP: fill from absolute top down to blob level
-    const blobY = levelY;
     const topY = yFor(1);
     fill.setAttribute('y', String(topY));
-    fill.setAttribute('height', String(blobY - topY));
-  }
-  // Peak hold: LP tracks min Y (highest visual point); HP tracks max Y (lowest visual point)
-  const noPeak = state.peakY === null;
-  const movePeak = noPeak || (!isHP ? levelY < state.peakY : levelY > state.peakY);
-  if(peak && movePeak){
-    state.peakY = levelY;
-    peak.setAttribute('x',mx); peak.setAttribute('width',mw);
-    peak.setAttribute('y',Math.round(levelY)-1); peak.setAttribute('height',3);
-    peak.style.display='';
+    fill.setAttribute('height', String(levelY - topY));
   }
 }
 
@@ -661,11 +691,11 @@ function hideDot(){
       const floorY=yFor(e.floor), bottomAbsY=graph.y0;
       fill.setAttribute('y',floorY); fill.setAttribute('height',Math.max(0,bottomAbsY-floorY));
     } else {
-      // HP: show always-open region (absolute top down to ceiling level)
-      const blobY = yFor(e.floor + e.scale);
+      // HP: show always-open region (absolute top down to floor level)
+      const floorY = yFor(e.floor);
       const topY = yFor(1);
       fill.setAttribute('y', String(topY));
-      fill.setAttribute('height', String(blobY - topY));
+      fill.setAttribute('height', String(floorY - topY));
     }
   }
 }
@@ -729,7 +759,7 @@ function releaseFromCurrent(){
     if (myAnimationToken !== animationToken) return;
     const f=clamp((now-t0)/dur);
     setDot({x:startX+(end.x-startX)*f, y:startY+(end.y-startY)*f, level:startLevel*(1-f)}, true);
-    if(f<1) state.dotAnim=requestAnimationFrame(step); else { setDot(end,false); state.held=false; state.currentPhase='idle'; updateButtonStates(); }
+    if(f<1) state.dotAnim=requestAnimationFrame(step); else { setDot(end,false); audioCut(); state.held=false; state.currentPhase='idle'; updateButtonStates(); }
   }
   requestAnimationFrame(step);
 }
@@ -739,9 +769,6 @@ function updateButtonStates(){
   const releaseActive = phase === 'sustain' || phase === 'hold';
   $('releaseBtn').style.opacity = releaseActive ? '' : '0.35';
   $('releaseBtn').style.pointerEvents = releaseActive ? '' : 'none';
-  const holdActive = phase !== 'hold' && phase !== 'sustain';
-  $('holdBtn').style.opacity = holdActive ? '' : '0.35';
-  $('holdBtn').style.pointerEvents = holdActive ? '' : 'none';
 }
 
 function clearBlobAndMarker(){
@@ -753,15 +780,11 @@ function clearBlobAndMarker(){
   state.held=false;
   state.currentPhase='idle';
   state.dotLevel=0;
-  state.peakY=null;
-  const peak=$('meterPeak'); if(peak) peak.style.display='none';
   updateButtonStates();
 }
 
 function tap(ms){
   if(state.currentPhase === 'hold' || state.currentPhase === 'sustain') clearBlobAndMarker();
-  state.peakY=null;
-  const mPk=$('meterPeak'); if(mPk) mPk.style.display='none';
   hideDot();
   hideTapMarker();
   if(audioEnabled()){ initAudio(); audioGateOpen(); }
@@ -781,15 +804,6 @@ function tap(ms){
       const landing=pointWhileGateHigh(tapMs);
       setDot(landing, true);
       setTapMarker(landing);
-      // Snap peak hold to landing Y — overrides any attack overshoot in LP, decay floor in HP
-      state.peakY = landing.y;
-      const pk=$('meterPeak');
-      if(pk){
-        const mx=graph.x0+graph.w+20;
-        pk.setAttribute('x',mx); pk.setAttribute('width',40);
-        pk.setAttribute('y',Math.round(landing.y)-1); pk.setAttribute('height',3);
-        pk.style.display='';
-      }
       const e=getEffective();
       if(e.releaseOn){
         releaseFromCurrent();
@@ -808,8 +822,6 @@ function tap(ms){
 }
 
 function hold(){
-  state.peakY=null;
-  const mPk=$('meterPeak'); if(mPk) mPk.style.display='none';
   animationToken++;
   const myAnimationToken = animationToken;
   hideTapMarker();
@@ -827,13 +839,23 @@ function hold(){
   requestAnimationFrame(step);
 }
 
-$('tap50Btn').addEventListener('click',()=>tap(50));
-$('tap100Btn').addEventListener('click',()=>tap(100));
-$('tap200Btn').addEventListener('click',()=>tap(200));
-$('tapCustomBtn').addEventListener('click',()=>{ $('tapCustomRow').style.display=''; });
-$('tapGoBtn').addEventListener('click',()=>tap(Number($('tapCustomMs').value)||200));
-$('tapCustomMs').addEventListener('keydown',e=>{ if(e.key==='Enter') tap(Number($('tapCustomMs').value)||200); });
-$('holdBtn').addEventListener('click',hold);
+// Transport modal state
+let tapMode = 'tap200';
+const tapModeBtns = ['tapMode50Btn','tapMode100Btn','tapMode200Btn','tapModeCustomBtn','tapModeHoldBtn'];
+
+function setTapMode(mode, btnId){
+  tapMode = mode;
+  tapModeBtns.forEach(id => { const b=$(id); if(b){ b.style.background=''; b.style.color=''; } });
+  const b=$(btnId); if(b){ b.style.background='#ffffff'; b.style.color='#111111'; }
+  const customRow=$('tapCustomRow');
+  if(customRow) customRow.style.display = mode==='tapCustom' ? '' : 'none';
+}
+
+$('tapMode50Btn').addEventListener('click', () => setTapMode('tap50','tapMode50Btn'));
+$('tapMode100Btn').addEventListener('click', () => setTapMode('tap100','tapMode100Btn'));
+$('tapMode200Btn').addEventListener('click', () => setTapMode('tap200','tapMode200Btn'));
+$('tapModeCustomBtn').addEventListener('click', () => setTapMode('tapCustom','tapModeCustomBtn'));
+$('tapModeHoldBtn').addEventListener('click', () => setTapMode('hold','tapModeHoldBtn'));
 $('releaseBtn').addEventListener('click',releaseFromCurrent);
 $('clearBtn').addEventListener('click',clearBlobAndMarker);
 $('keepTapMarker').addEventListener('change',()=>{ if(!$('keepTapMarker').checked) hideTapMarker(); });
@@ -871,17 +893,23 @@ document.addEventListener('keydown', e => {
   // Transport
   if(e.key === ' '){
     e.preventDefault();
-    const customActive = $('tapCustomRow') && $('tapCustomRow').style.display !== 'none';
-    tap(customActive ? (Number($('tapCustomMs').value) || 200) : 200);
-  } else if(e.key === '1'){ tap(50);
-  } else if(e.key === '2'){ tap(100);
-  } else if(e.key === '3'){ tap(200);
-  } else if(e.key === 'h' || e.key === 'H'){ hold();
+    if(tapMode === 'hold'){
+      if(state.currentPhase === 'hold' || state.currentPhase === 'sustain'){ releaseFromCurrent(); }
+      else { hold(); }
+    } else {
+      const ms = tapMode === 'tap50' ? 50 : tapMode === 'tap100' ? 100 : tapMode === 'tapCustom' ? (Number($('tapCustomMs').value)||200) : 200;
+      tap(ms);
+    }
+  } else if(e.key === '1'){ setTapMode('tap50','tapMode50Btn');
+  } else if(e.key === '2'){ setTapMode('tap100','tapMode100Btn');
+  } else if(e.key === '3'){ setTapMode('tap200','tapMode200Btn');
+  } else if(e.key === 'h' || e.key === 'H'){ setTapMode('hold','tapModeHoldBtn');
   } else if(e.key === 'r' || e.key === 'R'){
     if(state.currentPhase === 'sustain' || state.currentPhase === 'hold') releaseFromCurrent();
   } else if(e.key === 'c' || e.key === 'C'){ clearBlobAndMarker();
   // Switches
-  } else if(e.key === 'a' || e.key === 'A'){ toggleMode();
+  } else if(e.key === 'l' || e.key === 'L'){ toggleMode();
+  } else if(e.key === 'a' || e.key === 'A'){ toggleCheckbox('audioEnabled');
   } else if(e.key === 'd' || e.key === 'D'){ toggleCheckbox('loudDecay');
   } else if(e.key === 'z' || e.key === 'Z'){ toggleCheckbox('drawReleaseWhenZero');
   } else if(e.key === 't' || e.key === 'T'){ toggleCheckbox('showBounds');
@@ -1167,7 +1195,27 @@ function addPointerFeedback(){
 let audioCtx=null,osc=null,vcaGain=null,filter1=null,filter2=null,masterGain=null,audioReady=false;
 
 function audioEnabled(){ return !!($('audioEnabled')&&$('audioEnabled').checked); }
-function noteFreq(){ const s=$('noteSelect'); return s?Number(s.value)||440:440; }
+
+const noteFreqs = { noteE1Btn: 41.2, noteE2Btn: 82.4, noteC4Btn: 261.6, noteA4Btn: 440 };
+const noteBtnIds = ['noteE1Btn','noteE2Btn','noteC4Btn','noteA4Btn','noteCustomToggle'];
+
+function setNoteMode(btnId, freq){
+  noteBtnIds.forEach(id => { const b=$(id); if(b){ b.style.background=''; b.style.color=''; } });
+  const b=$(btnId); if(b){ b.style.background='#ffffff'; b.style.color='#111111'; }
+  const customRow=$('noteCustomRow');
+  if(customRow) customRow.style.display = btnId==='noteCustomToggle' ? '' : 'none';
+  if(freq !== null && osc) osc.frequency.value = freq;
+}
+
+function noteFreq(){
+  const customActive = $('noteCustomRow') && $('noteCustomRow').style.display !== 'none';
+  if(customActive) return Number($('noteCustomHz').value) || 440;
+  for(const [btnId, freq] of Object.entries(noteFreqs)){
+    const b=$(btnId);
+    if(b && b.style.background === 'rgb(255, 255, 255)') return freq;
+  }
+  return 440;
+}
 
 function initAudio(){
   if(audioReady) return;
@@ -1176,7 +1224,7 @@ function initAudio(){
   vcaGain=audioCtx.createGain(); vcaGain.gain.value=0;
   filter1=audioCtx.createBiquadFilter(); filter1.type='lowpass'; filter1.frequency.value=20000; filter1.Q.value=0;
   filter2=audioCtx.createBiquadFilter(); filter2.type='lowpass'; filter2.frequency.value=20000; filter2.Q.value=0;
-  masterGain=audioCtx.createGain(); masterGain.gain.value=($('masterVol')?$('masterVol').value:70)/100;
+  masterGain=audioCtx.createGain(); masterGain.gain.value=0.7;
   osc.connect(vcaGain); vcaGain.connect(filter1); filter1.connect(filter2); filter2.connect(masterGain); masterGain.connect(audioCtx.destination);
   osc.start();
   audioReady=true;
@@ -1233,7 +1281,7 @@ function audioGateClose(){
       vcaGain.gain.setValueAtTime(vcaGain.gain.value,now);
       vcaGain.gain.linearRampToValueAtTime(0,now+Math.max(0.001,e.rT));
     } else {
-      vcaGain.gain.cancelScheduledValues(now); vcaGain.gain.setValueAtTime(0,now);
+      vcaGain.gain.cancelScheduledValues(now); vcaGain.gain.setTargetAtTime(0,now,0.005);
     }
   } else {
     const fFloor=mapCutoff(e.floor), fSus=mapCutoff(e.floor+e.s*e.scale);
@@ -1252,26 +1300,27 @@ function audioGateClose(){
 function audioCut(){
   if(!audioReady) return;
   const now=audioCtx.currentTime;
-  vcaGain.gain.cancelScheduledValues(now); vcaGain.gain.setValueAtTime(0,now);
-  filter1.frequency.cancelScheduledValues(now); filter1.frequency.setValueAtTime(20000,now);
-  filter2.frequency.cancelScheduledValues(now); filter2.frequency.setValueAtTime(20000,now);
+  const minFreq=mapCutoff(0); // 10 Hz
+  vcaGain.gain.cancelScheduledValues(now); vcaGain.gain.setTargetAtTime(0,now,0.005);
+  filter1.frequency.cancelScheduledValues(now); filter1.frequency.setTargetAtTime(minFreq,now,0.005);
+  filter2.frequency.cancelScheduledValues(now); filter2.frequency.setTargetAtTime(minFreq,now,0.005);
 }
 
-// Populate note selector
-(function(){
-  const sel=$('noteSelect'); if(!sel) return;
-  const N=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-  for(let m=24;m<=108;m++){
-    const oct=Math.floor(m/12)-1, name=N[m%12]+oct;
-    const freq=440*Math.pow(2,(m-69)/12);
-    const opt=document.createElement('option');
-    opt.value=freq.toFixed(3); opt.textContent=name;
-    if(m===69) opt.selected=true; // A4
-    sel.appendChild(opt);
+// Note mode buttons
+Object.entries(noteFreqs).forEach(([btnId, freq]) => {
+  const btn = $(btnId);
+  if(btn) btn.addEventListener('click', () => { setNoteMode(btnId, freq); });
+});
+$('noteCustomToggle') && $('noteCustomToggle').addEventListener('click', () => {
+  const hz = Number($('noteCustomHz').value) || 440;
+  setNoteMode('noteCustomToggle', hz);
+});
+$('noteCustomHz') && $('noteCustomHz').addEventListener('input', () => {
+  if($('noteCustomRow') && $('noteCustomRow').style.display !== 'none'){
+    const hz = Number($('noteCustomHz').value) || 440;
+    if(osc) osc.frequency.value = hz;
   }
-})();
-$('noteSelect')&&$('noteSelect').addEventListener('change',()=>{ if(osc) osc.frequency.value=noteFreq(); });
-$('masterVol')&&$('masterVol').addEventListener('input',()=>{ if(masterGain) masterGain.gain.value=$('masterVol').value/100; });
+});
 ['frequencyMode','hpMode'].forEach(id=>{ const el=$(id); if(el) el.addEventListener('change',syncAudioFilterType); });
 
 // ---- Merge saved presets from localStorage over defaults ----
@@ -1510,6 +1559,8 @@ refreshNumericInputs();
 hideLikelyAxes();
 addPointerFeedback();
 setTransMode(1, 'trans1Btn');
+setTapMode('tap200','tapMode200Btn');
+setNoteMode('noteA4Btn', 440);
 
 </script>
 </body>
