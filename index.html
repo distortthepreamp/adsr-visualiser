@@ -170,6 +170,7 @@
   </div>
   <div class="stage">
     <svg id="svg" viewBox="0 0 1200 465" preserveAspectRatio="xMidYMid meet" aria-label="ADSR envelope graph">
+      <line id="amountLine" x1="80" y1="30" x2="1145" y2="30" style="stroke:var(--line);stroke-width:3.5;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <g id="envSegments">
         <path id="attackOuter" class="env-outer" d="" />
         <path id="decayOuter" class="env-outer" d="" />
@@ -184,11 +185,14 @@
       <circle id="dot" class="env-dot" cx="80" cy="445" r="15" />
       <line id="floorBound"   x1="0" y1="445" x2="1200" y2="445" style="stroke:var(--boundsColor);stroke-width:7;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <line id="ceilingBound" x1="0" y1="30"  x2="1200" y2="30"  style="stroke:var(--boundsColor);stroke-width:7;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
+      <path id="ceilLeftOuter" class="env-outer" d="" style="display:none" />
+      <path id="ceilRightOuter" class="env-outer" d="" style="display:none" />
+      <path id="ceilLeftInner" class="env-inner attack-inner" d="" style="display:none" />
+      <path id="ceilRightInner" class="env-inner decay-inner" d="" style="display:none" />
 
       <rect id="meterBox"  x="1145" y="30" width="40" height="415" style="fill:none;stroke:var(--line);stroke-width:7;stroke-opacity:1;vector-effect:non-scaling-stroke;" />
       <rect id="meterFill" x="1145" y="445" width="40" height="0" style="fill:var(--line);stroke:none;" />
       <line id="floorLine" x1="80" y1="445" x2="1145" y2="445" style="stroke:var(--line);stroke-width:3.5;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
-      <line id="amountLine" x1="80" y1="30" x2="1145" y2="30" style="stroke:var(--line);stroke-width:3.5;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <text id="meterLabelTitle" x="1165" y="72" text-anchor="middle" style="fill:var(--fg);font-size:17px;font-weight:700;display:none;">VOL</text>
 
 
@@ -258,6 +262,7 @@
       <div class="row"><label><input id="frequencyMode" type="checkbox"> F — Filter Mode</label></div>
       <div class="row"><label><input id="hpMode" type="checkbox"> M — LP/HP Mode</label></div>
       <div class="row"><label><input id="keyboardControl" type="checkbox"> S — Mimic Model D Sustain (80%)</label></div>
+      <div class="row"><label><input id="showClipped" type="checkbox"> Show Clipped Shape</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:5px">
         <button id="trans1Btn">1s</button>
@@ -417,7 +422,7 @@ function getEffective(){
   const releaseOn=$('loudDecay').checked;
   const freqMode = $('frequencyMode') && $('frequencyMode').checked;
   const floor = freqMode ? clamp(state.floor,0,1) : 0;
-  const scale = freqMode ? clamp(state.scale,0,1-floor) : 1;
+  const scale = freqMode ? clamp(state.scale,0,1) : 1;
   return {aT,dT,s,rawS,releaseOn,rT:releaseOn?dT:0,floor,scale};
 }
 function yFor(level){ return graph.y0 - level*graph.h; }
@@ -453,14 +458,60 @@ function render(){
   const pts=computePoints();
   // Draw the envelope as separate A/D/R segments. Each segment is drawn twice:
   // a thick white outer stroke, then a softer coloured inner stroke.
-  const aPath = `M ${pts.p0.x} ${pts.p0.y} L ${pts.p1.x} ${pts.p1.y}`;
-  const dPath = `M ${pts.p1.x} ${pts.p1.y} L ${pts.pS.x} ${pts.pS.y}`;
+  const e = pts.e;
+  const ceilY = yFor(1);
+  const overrange = e.scale > 0.0001 && e.floor + e.scale > 1.0001;
+  const showClipped = overrange && $('showClipped') && $('showClipped').checked;
+
+  console.log('[render] floor='+e.floor.toFixed(3)+' scale='+e.scale.toFixed(3)+' sum='+(e.floor+e.scale).toFixed(3)+' overrange='+overrange+' showClipped='+showClipped+' ceilY='+ceilY);
+
+  const drawP1 = showClipped
+    ? pts.p1
+    : { x: pts.p1.x, y: Math.max(pts.p1.y, ceilY) };
+
+  const drawPS = overrange
+    ? { x: pts.pS.x, y: Math.max(pts.pS.y, yFor(1)), level: pts.pS.level }
+    : pts.pS;
+
+  let aPath, dPath, ceilLeftPath, ceilRightPath;
+  if(showClipped){
+    const f_a = (1 - e.floor) / e.scale;           // attack fraction at ceiling crossing
+    const f_d = (e.floor + e.scale - 1) / e.scale; // decay fraction at ceiling crossing
+    const ceilAttackX = pts.p0.x + (pts.p1.x - pts.p0.x) * f_a;
+    const ceilDecayX  = pts.p1.x + (pts.pEnd.x - pts.p1.x) * f_d;
+    const p1x = pts.p1.x; // unconstrained peak x — divides the two ceiling halves
+    aPath        = `M ${pts.p0.x} ${pts.p0.y} L ${ceilAttackX} ${ceilY}`;
+    ceilLeftPath = `M ${ceilAttackX} ${ceilY} L ${p1x} ${ceilY}`;
+    ceilRightPath= `M ${p1x} ${ceilY} L ${ceilDecayX} ${ceilY}`;
+    dPath        = `M ${ceilDecayX} ${ceilY} L ${drawPS.x} ${drawPS.y}`;
+    console.log('[render] CLIPPED — ceilAttackX='+ceilAttackX.toFixed(1)+' p1x='+p1x.toFixed(1)+' ceilDecayX='+ceilDecayX.toFixed(1));
+    console.log('[render] ceilLeftPath="'+ceilLeftPath+'" ceilRightPath="'+ceilRightPath+'"');
+  } else {
+    aPath         = `M ${pts.p0.x} ${pts.p0.y} L ${drawP1.x} ${drawP1.y}`;
+    ceilLeftPath  = '';
+    ceilRightPath = '';
+    dPath         = `M ${drawP1.x} ${drawP1.y} L ${drawPS.x} ${drawPS.y}`;
+  }
+
+  const show = showClipped ? '' : 'none';
+  ['attackOuter','attackInner'].forEach(id => $(id).setAttribute('d', aPath));
+  ['ceilLeftOuter','ceilRightOuter'].forEach((id,i) => {
+    const el=$(id); if(!el) return;
+    el.setAttribute('d', i===0 ? ceilLeftPath : ceilRightPath);
+    el.style.display = show;
+  });
+  ['ceilLeftInner','ceilRightInner'].forEach((id,i) => {
+    const el=$(id); if(!el) return;
+    el.setAttribute('d', i===0 ? ceilLeftPath : ceilRightPath);
+    el.style.display = show;
+  });
+  console.log('[render] ceilLeftOuter display='+show+' d="'+ceilLeftPath+'"');
+  ['decayOuter','decayInner'].forEach(id => $(id).setAttribute('d', dPath));
+
   const drawZeroRelease = $('drawReleaseWhenZero').checked;
   const drawReleasePath = pts.e.releaseOn || drawZeroRelease;
-  const rEnd = pts.e.releaseOn ? pts.pEnd : {x:pts.pS.x, y:pts.p0.y};
-  const rPath = drawReleasePath ? `M ${pts.pS.x} ${pts.pS.y} L ${rEnd.x} ${rEnd.y}` : '';
-  ['attackOuter','attackInner'].forEach(id => $(id).setAttribute('d', aPath));
-  ['decayOuter','decayInner'].forEach(id => $(id).setAttribute('d', dPath));
+  const rEnd = pts.e.releaseOn ? pts.pEnd : {x:drawPS.x, y:pts.p0.y};
+  const rPath = drawReleasePath ? `M ${drawPS.x} ${drawPS.y} L ${rEnd.x} ${rEnd.y}` : '';
   ['releaseOuter','releaseInner'].forEach(id => $(id).setAttribute('d', rPath));
 
   // Sustain as a horizontal level guide extending to the right from
@@ -473,14 +524,14 @@ function render(){
   const meterAbsBottom = graph.y0;          // yFor(0) = 445
 
   const markerEndX = meterX;
-  $('sustainMarker').setAttribute('x1', pts.pS.x);
-  $('sustainMarker').setAttribute('y1', pts.pS.y);
+  $('sustainMarker').setAttribute('x1', drawPS.x);
+  $('sustainMarker').setAttribute('y1', drawPS.y);
   $('sustainMarker').setAttribute('x2', markerEndX);
-  $('sustainMarker').setAttribute('y2', pts.pS.y);
-  $('sustainPoint').setAttribute('cx', pts.pS.x);
-  $('sustainPoint').setAttribute('cy', pts.pS.y);
+  $('sustainMarker').setAttribute('y2', drawPS.y);
+  $('sustainPoint').setAttribute('cx', drawPS.x);
+  $('sustainPoint').setAttribute('cy', drawPS.y);
 
-  $('sLabel').setAttribute('x',Math.min(markerEndX-105, pts.pS.x+28)); $('sLabel').setAttribute('y',pts.pS.y-18);
+  $('sLabel').setAttribute('x',Math.min(markerEndX-105, drawPS.x+28)); $('sLabel').setAttribute('y',drawPS.y-18);
 
 
   // Bounds lines — fixed at absolute graph top/bottom, full SVG width
@@ -501,7 +552,7 @@ function render(){
   const floorLine = $('floorLine');
   const amountLine = $('amountLine');
   const floorY = yFor(pts.e.floor);
-  const amountY = yFor(pts.e.floor + pts.e.scale);
+  const amountY = Math.max(yFor(pts.e.floor + pts.e.scale), yFor(1));
   if(floorLine){
     floorLine.setAttribute('x1', graph.x0);
     floorLine.setAttribute('y1', floorY);
@@ -573,7 +624,7 @@ function setFromSlider(){
 $('sustain').addEventListener('input',()=>{ setFromSlider(); if(window.clearPresetDisplay) clearPresetDisplay(); });
 ['floor','scale'].forEach(id=>$(id).addEventListener('input',()=>{ setFromSlider(); if(window.clearPresetDisplay) clearPresetDisplay(); }));
 document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) state.target={a:state.a,d:state.d,s:state.s,floor:state.floor,scale:state.scale}; syncControls(); }));
-['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','frequencyMode','hpMode'].forEach(id=>$(id).addEventListener('change',render));
+['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','frequencyMode','hpMode','showClipped'].forEach(id=>$(id).addEventListener('change',render));
 $('lineColor').addEventListener('input',e=>document.documentElement.style.setProperty('--line', e.target.value));
 $('bgColor').addEventListener('input',e=>document.documentElement.style.setProperty('--bg', e.target.value));
 $('attackColor').addEventListener('input',e=>document.documentElement.style.setProperty('--attackColor', e.target.value));
