@@ -1,0 +1,882 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Model D ADSR Visualiser - Sustain Marker v17</title>
+<!-- v17: sustain-marker model with thick white A/D/R strokes and soft coloured centre lines. -->
+<style>
+  :root{
+    --bg:#00ff00;
+    --fg:#ffffff;
+    --line:#ffffff;
+    --lineWidth:14;
+    --innerLineWidth:6;
+    --attackColor:#ff6b6b;
+    --decayColor:#5fa8ff;
+    --releaseColor:#b57cff;
+    --panel:rgba(0,0,0,.28);
+    --panel2:rgba(0,0,0,.42);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:Arial, Helvetica, sans-serif;
+    overflow:hidden;
+  }
+  .stage{
+    height:68vh;
+    min-height:390px;
+    padding:34px 42px 8px;
+  }
+  svg{width:100%; height:100%; display:block; overflow:visible;}
+  .axis,.grid{stroke:rgba(255,255,255,.35); stroke-width:2; vector-effect:non-scaling-stroke;}
+  .grid{display:none; opacity:0; stroke:transparent;}
+  .env-outer{fill:none; stroke:var(--line); stroke-width:var(--lineWidth); stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke;}
+  .env-inner{fill:none; stroke-width:var(--innerLineWidth); stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke;}
+  .attack-inner{stroke:var(--attackColor);}
+  .decay-inner{stroke:var(--decayColor);}
+  .release-inner{stroke:var(--releaseColor);}
+  .env-dot{fill:var(--line); stroke:none; opacity:0;}
+  @keyframes blobPulse{from{opacity:1} to{opacity:.4}}
+  .tap-marker{fill:var(--line); stroke:none; opacity:0;}
+  .label{fill:var(--fg); font-size:24px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;}
+  .small-label{fill:var(--fg); font-size:17px; font-weight:700;}
+  .ui{
+    height:32vh;
+    min-height:250px;
+    display:grid;
+    grid-template-columns: 1.6fr 1.15fr 1.15fr;
+    gap:14px;
+    padding:10px 18px 18px;
+  }
+  .panel{
+    background:var(--panel);
+    border:1px solid rgba(255,255,255,.35);
+    border-radius:18px;
+    padding:14px;
+    backdrop-filter:blur(2px);
+  }
+  .knobs{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; align-items:start;}
+  .knobBox{text-align:center;}
+  .knobLabel{font-weight:900; font-size:14px; letter-spacing:.08em; margin-bottom:4px;}
+  .knob{
+    width:92px; height:92px; margin:0 auto 6px; border-radius:50%;
+    background:radial-gradient(circle at 36% 30%, #666, #222 68%, #070707 100%);
+    border:3px solid rgba(255,255,255,.8); position:relative;
+  }
+  .knob::after{
+    content:""; position:absolute; left:50%; top:9px; width:5px; height:35px; border-radius:4px;
+    background:var(--fg); transform-origin:50% 37px; transform:translateX(-50%) rotate(var(--deg, -135deg));
+  }
+  input[type=range]{width:100%; accent-color:white;}
+  .readout{font-size:17px; font-weight:900; min-height:22px;}
+  .targetReadout{font-size:13px; font-weight:700; opacity:.9; min-height:18px;}
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:8px 0;}
+  button, .fakeButton{
+    appearance:none; border:1px solid rgba(255,255,255,.8); background:var(--panel2); color:var(--fg);
+    border-radius:12px; padding:10px 13px; font-size:15px; font-weight:900; cursor:pointer;
+  }
+  button:hover{background:rgba(255,255,255,.22)}
+  button.primary{font-size:20px; padding:13px 18px; border-width:2px;}
+  label{font-size:14px; font-weight:800; letter-spacing:.02em;}
+  input[type=checkbox]{transform:scale(1.35); accent-color:white; margin-right:7px;}
+  input[type=color]{width:42px; height:32px; padding:0; border:1px solid white; background:transparent;}
+  input[type=number]{width:78px; border:1px solid white; background:rgba(0,0,0,.25); color:white; border-radius:8px; padding:7px; font-weight:800;}
+  .seg{display:flex; gap:7px; align-items:center; flex-wrap:wrap;}
+  .seg input{display:none}
+  .seg span{display:inline-block; border:1px solid rgba(255,255,255,.75); border-radius:999px; padding:8px 12px; font-weight:900; cursor:pointer; background:rgba(0,0,0,.22)}
+  .seg input:checked + span{background:white; color:#111;}
+  .hint{font-size:13px; line-height:1.35; opacity:.88; margin-top:8px;}
+
+  /* transport/action button overrides */
+  .transport button,
+  .actions button,
+  button#tap,
+  button#hold,
+  button#release,
+  button#clear,
+  #tapButton,
+  #holdButton,
+  #releaseButton,
+  #clearButton {
+    font-size: 18px !important;
+    padding: 10px 18px !important;
+    min-height: 42px !important;
+    line-height: 1.1 !important;
+    border-radius: 10px !important;
+  }
+  .transport, .actions {gap: 10px !important;}
+
+  /* numeric ms / value controls */
+  .numeric-ms-control,
+  .numeric-value-control {margin-top: 4px; font-size: 12px; color: #fff;}
+  .numeric-ms-control input,
+  .numeric-value-control input {
+    width: 72px;
+    background: rgba(255,255,255,.14);
+    color: #fff;
+    border: 1px solid #fff;
+    border-radius: 5px;
+    padding: 3px 5px;
+    text-align: right;
+    font-weight: 700;
+  }
+
+  /* hide axis / reference lines */
+  .axis,
+  .x-axis,
+  .y-axis,
+  .axis-line,
+  .axisLabel,
+  .axis-label,
+  .zero-line,
+  .reference-line,
+  .guide-axis,
+  #xAxis,
+  #yAxis,
+  #x-axis,
+  #y-axis,
+  #axisX,
+  #axisY {
+    display: none !important;
+    opacity: 0 !important;
+  }
+
+  /* click / press feedback */
+  button.v27-clicked,
+  .button.v27-clicked,
+  button.v28-pressed,
+  .button.v28-pressed {
+    background: #ffffff !important;
+    color: #008000 !important;
+    border-color: #ffffff !important;
+    transform: scale(0.97);
+  }
+
+  /* hide A/D/R labels */
+  #aLabel, #dLabel, #rLabel,
+  .a-label, .d-label, .r-label {
+    display: none !important;
+    opacity: 0 !important;
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <svg id="svg" viewBox="0 0 1200 520" preserveAspectRatio="xMidYMid meet" aria-label="ADSR envelope graph">
+      <g id="envSegments">
+        <path id="attackOuter" class="env-outer" d="" />
+        <path id="decayOuter" class="env-outer" d="" />
+        <path id="releaseOuter" class="env-outer" d="" />
+        <path id="attackInner" class="env-inner attack-inner" d="" />
+        <path id="decayInner" class="env-inner decay-inner" d="" />
+        <path id="releaseInner" class="env-inner release-inner" d="" />
+      </g>
+      <line id="sustainMarker" x1="80" y1="445" x2="80" y2="445" style="stroke:var(--line);stroke-opacity:.9;stroke-width:11;stroke-linecap:round;stroke-dasharray:1 24;vector-effect:non-scaling-stroke;" />
+      <circle id="sustainPoint" class="tap-marker" cx="80" cy="445" r="8" style="opacity:.85" />
+      <circle id="tapMarker" class="tap-marker" cx="80" cy="445" r="11" />
+      <circle id="dot" class="env-dot" cx="80" cy="445" r="15" />
+
+      <text id="sLabel" class="small-label" x="0" y="0">SUSTAIN</text>
+
+      <text id="mainReadout" class="label" x="80" y="38">ATTACK 10 ms · DECAY 200 ms · SUSTAIN 50%</text>
+    </svg>
+  </div>
+
+  <div class="ui">
+    <div class="panel">
+      <div id="presetBtns" style="display:grid;grid-template-columns:repeat(13,1fr);gap:4px;margin-bottom:8px"></div>
+      <div class="row" style="justify-content:space-between;margin-top:0">
+        <div class="seg" title="Live means knobs update the graph immediately. Animate means knobs set targets.">
+          <label><input type="radio" name="mode" value="live" checked><span>Live</span></label>
+          <label><input type="radio" name="mode" value="animate"><span>Animate</span></label>
+        </div>
+        <span id="presetName" style="font-size:13px;font-weight:700;opacity:.85"></span>
+      </div>
+      <div class="knobs">
+        <div class="knobBox">
+          <div class="knobLabel">Attack</div>
+          <div id="attackKnob" class="knob"></div>
+          <input id="attack" type="range" min="0" max="1000" value="80">
+          <div id="attackRead" class="readout"></div>
+          <div id="attackTarget" class="targetReadout"></div>
+        </div>
+        <div class="knobBox">
+          <div class="knobLabel">Decay</div>
+          <div id="decayKnob" class="knob"></div>
+          <input id="decay" type="range" min="0" max="1000" value="250">
+          <div id="decayRead" class="readout"></div>
+          <div id="decayTarget" class="targetReadout"></div>
+        </div>
+        <div class="knobBox">
+          <div class="knobLabel">Sustain</div>
+          <div id="sustainKnob" class="knob"></div>
+          <input id="sustain" type="range" min="0" max="1000" value="500">
+          <div id="sustainRead" class="readout"></div>
+          <div id="sustainTarget" class="targetReadout"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="row"><label><input id="loudDecay" type="checkbox"> Loud Decay / Release</label></div>
+      <div class="row"><label><input id="drawReleaseWhenZero" type="checkbox" checked> Draw release when zero</label></div>
+      <div class="row"><label><input id="keyboardControl" type="checkbox"> Mimic Model D Sustain (80%)</label></div>
+      <hr style="border-color:rgba(255,255,255,.25)">
+      <div class="row"><strong>Transition</strong></div>
+      <div class="seg">
+        <label><input type="radio" name="transition" value="1" checked><span>1s</span></label>
+        <label><input type="radio" name="transition" value="2"><span>2s</span></label>
+        <label><input type="radio" name="transition" value="5"><span>5s</span></label>
+        <label><input type="radio" name="transition" value="custom"><span>Custom</span></label>
+      </div>
+      <div id="customTransitionRow" class="row" style="display:none"><label>Seconds <input id="customTransitionTime" type="number" min="0.1" max="60" step="0.1" value="3.0"></label></div>
+      <div class="row"><button id="transitionBtn" class="primary">Transition</button></div>
+      <div id="modeHint" class="hint">Live mode: knobs update the graph immediately.</div>
+    </div>
+
+    <div class="panel">
+      <div class="row"><button id="tap50Btn">Tap 50</button><button id="tap100Btn">Tap 100</button><button id="tap200Btn">Tap 200</button><button id="tapCustomBtn">Tap Custom</button><button id="holdBtn">Hold</button><button id="releaseBtn">Release</button><button id="clearBtn">Clear</button></div>
+      <div id="tapCustomRow" class="row" style="display:none"><label>ms <input id="tapCustomMs" type="number" min="20" max="5000" step="10" value="200"></label> <button id="tapGoBtn">Go</button></div>
+      <div class="row"><label><input id="keepTapMarker" type="checkbox" checked> Leave Tap marker</label></div>
+      <hr style="border-color:rgba(255,255,255,.25)">
+      <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label></div>
+      <div class="row"><label>Background <input id="bgColor" type="color" value="#00ff00"></label></div>
+      <div class="row"><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#b57cff"></label></div>
+      <div class="hint">Tap releases after the chosen gate time. Attack, Decay and Release are shown as white strokes with soft colour centres. Sustain is a chunky rightward dotted level guide.</div>
+    </div>
+  </div>
+
+<script src="presets.js"></script>
+<script>
+
+let animationToken = 0;
+
+const $ = id => document.getElementById(id);
+const curve = [
+  {p:0.00,t:0}, {p:0.08,t:0.010}, {p:0.25,t:0.200}, {p:0.42,t:0.600},
+  {p:0.58,t:1.000}, {p:0.75,t:5.000}, {p:0.90,t:10.000}, {p:1.00,t:12.000}
+];
+const state = { a:.08, d:.25, s:.5, target:{a:.08,d:.25,s:.5}, anim:null, dotAnim:null, held:false, dotLevel:0, currentPhase:'idle' };
+const graph = { x0:80, y0:445, w:1045, h:360 };
+
+function clamp(v,min=0,max=1){ return Math.max(min, Math.min(max, v)); }
+function easeInOut(t){ return t<0.5 ? 2*t*t : -1+(4-2*t)*t; }
+function mapTime(p){
+  p = clamp(p);
+  for(let i=0;i<curve.length-1;i++){
+    const a=curve[i], b=curve[i+1];
+    if(p>=a.p && p<=b.p){ const f=(p-a.p)/(b.p-a.p); return a.t + f*(b.t-a.t); }
+  }
+  return curve[curve.length-1].t;
+}
+function positionFromMs(ms){
+  const sec = Math.max(0, Number(ms) || 0) / 1000;
+  if (sec <= curve[0].t) return curve[0].p;
+  for (let i = 0; i < curve.length - 1; i++){
+    const a = curve[i], b = curve[i+1];
+    if (sec >= a.t && sec <= b.t){
+      const f = (sec - a.t) / (b.t - a.t || 1);
+      return a.p + (b.p - a.p) * f;
+    }
+  }
+  return curve[curve.length - 1].p;
+}
+function msFromPosition(p){ return Math.round(mapTime(p) * 1000); }
+function fmtTime(t){
+  if(t < .001) return '0 ms';
+  if(t < 1) return Math.round(t*1000)+' ms';
+  if(t < 10) return (Math.round(t*10)/10).toString().replace('.0','')+' s';
+  return Math.round(t)+' s';
+}
+function displayTimeWidth(t){
+  // presentation scale: visible short values, compressed long values.
+  // True zero is zero-width, but the short-value boost eases in smoothly
+  // to avoid an initial jump when transitioning away from zero.
+  t = Math.max(0, t);
+  if(t === 0) return 0;
+  const shortBoost = 38 * (1 - Math.exp(-t / 0.012));
+  return shortBoost + 245 * Math.log10(1 + 6.5 * t);
+}
+function getEffective(){
+  const aT=mapTime(state.a), dT=mapTime(state.d);
+  const rawS=state.s;
+  const s=$('keyboardControl').checked ? rawS*.8 : rawS;
+  const releaseOn=$('loudDecay').checked;
+  return {aT,dT,s,rawS,releaseOn,rT:releaseOn?dT:0};
+}
+function yFor(level){ return graph.y0 - level*graph.h; }
+function computePoints(){
+  const e=getEffective();
+  const aw=displayTimeWidth(e.aT);
+  const dwFull=displayTimeWidth(e.dT);
+  const x0=graph.x0;
+
+  // Experimental sustain-marker model:
+  // Attack rises to peak, then there is one master downward decay/release
+  // trajectory from 100% to 0%. Sustain is a level marker on that trajectory,
+  // not a timed horizontal plateau.
+  const p0={x:x0,y:yFor(0),level:0};
+  const p1={x:x0+aw,y:yFor(1),level:1};
+  const pEnd={x:p1.x+dwFull,y:yFor(0),level:0};
+  const pS={x:p1.x+dwFull*(1-e.s),y:yFor(e.s),level:e.s};
+  return {p0,p1,pS,pEnd,e,aw,dwFull};
+}
+
+function render(){
+  const pts=computePoints();
+  // Draw the envelope as separate A/D/R segments. Each segment is drawn twice:
+  // a thick white outer stroke, then a softer coloured inner stroke.
+  const aPath = `M ${pts.p0.x} ${pts.p0.y} L ${pts.p1.x} ${pts.p1.y}`;
+  const dPath = `M ${pts.p1.x} ${pts.p1.y} L ${pts.pS.x} ${pts.pS.y}`;
+  const drawZeroRelease = $('drawReleaseWhenZero').checked;
+  const drawReleasePath = pts.e.releaseOn || drawZeroRelease;
+  const rEnd = pts.e.releaseOn ? pts.pEnd : {x:pts.pS.x, y:pts.p0.y};
+  const rPath = drawReleasePath ? `M ${pts.pS.x} ${pts.pS.y} L ${rEnd.x} ${rEnd.y}` : '';
+  ['attackOuter','attackInner'].forEach(id => $(id).setAttribute('d', aPath));
+  ['decayOuter','decayInner'].forEach(id => $(id).setAttribute('d', dPath));
+  ['releaseOuter','releaseInner'].forEach(id => $(id).setAttribute('d', rPath));
+
+  // Sustain as a horizontal level guide extending to the right from
+  // the decay/release intersection. This reads as an indefinite held level,
+  // rather than something that reaches back into the earlier decay phase.
+  const markerEndX = graph.x0 + graph.w;
+  $('sustainMarker').setAttribute('x1', pts.pS.x);
+  $('sustainMarker').setAttribute('y1', pts.pS.y);
+  $('sustainMarker').setAttribute('x2', markerEndX);
+  $('sustainMarker').setAttribute('y2', pts.pS.y);
+  $('sustainPoint').setAttribute('cx', pts.pS.x);
+  $('sustainPoint').setAttribute('cy', pts.pS.y);
+
+  $('sLabel').setAttribute('x',Math.min(markerEndX-105, pts.pS.x+28)); $('sLabel').setAttribute('y',pts.pS.y-18);
+
+  $('mainReadout').textContent = `ATTACK ${fmtTime(pts.e.aT)} · DECAY ${fmtTime(pts.e.dT)} · SUSTAIN ${Math.round(pts.e.s*100)}%` + (pts.e.releaseOn ? ` · RELEASE ${fmtTime(pts.e.rT)}` : ' · RELEASE OFF');
+  syncControls();
+  updateButtonStates();
+  setTimeout(refreshNumericInputs, 0); // keep numeric inputs in sync after every render
+}
+
+function syncControls(){
+  const mode=document.querySelector('input[name="mode"]:checked').value;
+  const vals = mode==='live' ? state : state.target;
+  $('attack').value=Math.round(vals.a*1000); $('decay').value=Math.round(vals.d*1000); $('sustain').value=Math.round(vals.s*1000);
+  $('attackKnob').style.setProperty('--deg', (-135 + vals.a*270)+'deg');
+  $('decayKnob').style.setProperty('--deg', (-135 + vals.d*270)+'deg');
+  $('sustainKnob').style.setProperty('--deg', (-135 + vals.s*270)+'deg');
+  $('attackRead').textContent=fmtTime(mapTime(state.a)); $('decayRead').textContent=fmtTime(mapTime(state.d)); $('sustainRead').textContent=Math.round(getEffective().s*100)+'%';
+  $('attackTarget').textContent=mode==='animate' ? 'Target: '+fmtTime(mapTime(state.target.a)) : '';
+  $('decayTarget').textContent=mode==='animate' ? 'Target: '+fmtTime(mapTime(state.target.d)) : '';
+  $('sustainTarget').textContent=mode==='animate' ? 'Target: '+Math.round(($('keyboardControl').checked?state.target.s*.8:state.target.s)*100)+'%' : '';
+  $('modeHint').textContent = mode==='live' ? 'Live mode: knobs update the graph immediately.' : 'Animate mode: knobs set targets. Press Transition to morph the graph.';
+  patchSustainReadouts(); // keep sustain 0-10 scale display correct
+}
+
+function setFromSlider(){
+  const mode=document.querySelector('input[name="mode"]:checked').value;
+  const dest=mode==='live' ? state : state.target;
+  dest.a=$('attack').value/1000; dest.d=$('decay').value/1000; dest.s=$('sustain').value/1000;
+  if(mode==='live') { state.target={a:state.a,d:state.d,s:state.s}; render(); } else syncControls();
+}
+['attack','decay'].forEach(id=>$(id).addEventListener('input',()=>{ if(currentMode()==='live') clearBlobAndMarker(); setFromSlider(); if(window.clearPresetDisplay) clearPresetDisplay(); }));
+$('sustain').addEventListener('input',()=>{ setFromSlider(); if(window.clearPresetDisplay) clearPresetDisplay(); });
+document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) state.target={a:state.a,d:state.d,s:state.s}; syncControls(); }));
+['loudDecay','keyboardControl','drawReleaseWhenZero'].forEach(id=>$(id).addEventListener('change',render));
+$('lineColor').addEventListener('input',e=>document.documentElement.style.setProperty('--line', e.target.value));
+$('bgColor').addEventListener('input',e=>document.documentElement.style.setProperty('--bg', e.target.value));
+$('attackColor').addEventListener('input',e=>document.documentElement.style.setProperty('--attackColor', e.target.value));
+$('decayColor').addEventListener('input',e=>document.documentElement.style.setProperty('--decayColor', e.target.value));
+$('releaseColor').addEventListener('input',e=>document.documentElement.style.setProperty('--releaseColor', e.target.value));
+$('lineWidth').addEventListener('input',e=>document.documentElement.style.setProperty('--lineWidth', e.target.value));
+$('innerLineWidth').addEventListener('input',e=>document.documentElement.style.setProperty('--innerLineWidth', e.target.value));
+
+function transition(){
+  clearBlobAndMarker();
+  animationToken++;
+  const myAnimationToken = animationToken;
+  hideTapMarker();
+  const selected=document.querySelector('input[name="transition"]:checked').value;
+  const dur=(selected==='custom' ? Number($('customTransitionTime').value)||3 : Number(selected))*1000;
+  const start={a:state.a,d:state.d,s:state.s}, end={...state.target};
+  const startAms=mapTime(start.a)*1000, endAms=mapTime(end.a)*1000;
+  const startDms=mapTime(start.d)*1000, endDms=mapTime(end.d)*1000;
+  cancelAnimationFrame(state.anim);
+  state.a=start.a; state.d=start.d; state.s=start.s;
+  render();
+  let t0=null;
+  function step(now){
+    if (myAnimationToken !== animationToken) return;
+    if(t0===null) t0=now;
+    const f=clamp((now-t0)/dur); const k=easeInOut(f);
+    state.a=positionFromMs(startAms+(endAms-startAms)*k);
+    state.d=positionFromMs(startDms+(endDms-startDms)*k);
+    state.s=start.s+(end.s-start.s)*k;
+    render();
+    if(f<1) state.anim=requestAnimationFrame(step); else { state.a=end.a; state.d=end.d; state.s=end.s; render(); }
+  }
+  state.anim=requestAnimationFrame(step);
+}
+$('transitionBtn').addEventListener('click',transition);
+document.querySelectorAll('input[name="transition"]').forEach(el=>el.addEventListener('change',()=>{
+  $('customTransitionRow').style.display = document.querySelector('input[name="transition"]:checked').value==='custom' ? '' : 'none';
+}));
+
+function pointOnAttackDecay(ms){
+  const pts=computePoints(), e=pts.e; const t=ms/1000;
+
+  if(e.aT > .0005 && t <= e.aT){
+    const f=clamp(t/e.aT);
+    return { x:pts.p0.x+(pts.p1.x-pts.p0.x)*f, y:pts.p0.y+(pts.p1.y-pts.p0.y)*f, level:f, phase:'attack' };
+  }
+
+  const after = e.aT <= .0005 ? t : t-e.aT;
+  const f=e.dT<=.0005 ? 1 : clamp(after/e.dT);
+  const level=1-f;
+  const phase = level <= e.s + .0001 ? 'sustain' : 'decay';
+  return { x:pts.p1.x+(pts.pEnd.x-pts.p1.x)*f, y:yFor(level), level, phase };
+}
+
+// Gate-high behaviour: attack, then decay only until the sustain level.
+// If the gate is still high after that, the blob parks at the sustain intersection.
+function pointWhileGateHigh(ms){
+  const pts=computePoints(), e=pts.e;
+  const pt = pointOnAttackDecay(ms);
+  if(pt.phase === 'sustain' || (pt.phase !== 'attack' && pt.level <= e.s + .0001)){
+    return { x:pts.pS.x, y:pts.pS.y, level:e.s, phase:'sustain' };
+  }
+  return pt;
+}
+
+function hideDot(){
+  const dot=$('dot');
+  dot.style.opacity=0;
+  dot.style.visibility='hidden';
+}
+function setDot(pt, visible=true){
+  const dot=$('dot');
+  if(!visible){ hideDot(); return; }
+  dot.style.visibility='visible';
+  dot.setAttribute('cx',pt.x);
+  dot.setAttribute('cy',pt.y);
+  dot.style.opacity='1';
+  state.dotLevel=pt.level;
+}
+function hideTapMarker(){
+  const marker=$('tapMarker');
+  if(marker) marker.style.opacity=0;
+}
+function setTapMarker(pt){
+  const marker=$('tapMarker');
+  if(!marker) return;
+  if(!$('keepTapMarker') || !$('keepTapMarker').checked){ hideTapMarker(); return; }
+  marker.setAttribute('cx',pt.x);
+  marker.setAttribute('cy',pt.y);
+  marker.style.opacity=1;
+}
+
+function releaseFromCurrent(){
+  // Bug fix: declare and capture token here so the inner step() guard works.
+  animationToken++;
+  const myAnimationToken = animationToken;
+  const dot=$('dot'); dot.style.animation='none'; dot.style.opacity='1';
+  cancelAnimationFrame(state.dotAnim);
+  const e=getEffective();
+
+  // Loud Decay OFF: no release phase — blob vanishes instantly.
+  if(!e.releaseOn){ clearBlobAndMarker(); return; }
+
+  const pts=computePoints();
+  let startLevel, startX, startY;
+  if(state.held && state.currentPhase === 'sustain'){
+    startLevel = pts.e.s;
+    startX = pts.pS.x;
+    startY = pts.pS.y;
+    setDot({x:startX, y:startY, level:startLevel}, true);
+  } else {
+    startLevel = state.dotLevel;
+    startX = Number($('dot').getAttribute('cx'));
+    startY = Number($('dot').getAttribute('cy'));
+  }
+
+  // Loud Decay ON: snap start to the correct position on the decay curve for startLevel,
+  // then animate along the curve to pEnd.
+  startX = pts.p1.x + pts.dwFull * (1 - startLevel);
+  startY = yFor(startLevel);
+  const end = {x:pts.pEnd.x, y:pts.pEnd.y, level:0};
+  const dur = Math.max(20, e.dT * startLevel * 1000);
+  const t0=performance.now();
+  state.currentPhase='release';
+  function step(now){
+    if (myAnimationToken !== animationToken) return;
+    const f=clamp((now-t0)/dur);
+    setDot({x:startX+(end.x-startX)*f, y:startY+(end.y-startY)*f, level:startLevel*(1-f)}, true);
+    if(f<1) state.dotAnim=requestAnimationFrame(step); else { setDot(end,false); state.held=false; state.currentPhase='idle'; updateButtonStates(); }
+  }
+  requestAnimationFrame(step);
+}
+
+function updateButtonStates(){
+  const phase = state.currentPhase;
+  const releaseActive = phase === 'sustain' || phase === 'hold';
+  $('releaseBtn').style.opacity = releaseActive ? '' : '0.35';
+  $('releaseBtn').style.pointerEvents = releaseActive ? '' : 'none';
+  const holdActive = phase !== 'hold' && phase !== 'sustain';
+  $('holdBtn').style.opacity = holdActive ? '' : '0.35';
+  $('holdBtn').style.pointerEvents = holdActive ? '' : 'none';
+}
+
+function clearBlobAndMarker(){
+  cancelAnimationFrame(state.dotAnim);
+  $('dot').style.animation='none';
+  hideDot();
+  hideTapMarker();
+  state.held=false;
+  state.currentPhase='idle';
+  state.dotLevel=0;
+  updateButtonStates();
+}
+
+function tap(ms){
+  if(state.currentPhase === 'hold' || state.currentPhase === 'sustain') clearBlobAndMarker();
+  hideDot();
+  hideTapMarker();
+  animationToken++;
+  const myAnimationToken = animationToken;
+  cancelAnimationFrame(state.dotAnim);
+  const tapMs=Number(ms)||200;
+  const t0=performance.now();
+  state.held=false;
+  state.currentPhase='tap';
+  updateButtonStates();
+  function step(now){
+    if (myAnimationToken !== animationToken) return;
+    const elapsed=now-t0;
+    if(elapsed < tapMs){ setDot(pointWhileGateHigh(elapsed), true); state.dotAnim=requestAnimationFrame(step); }
+    else {
+      const landing=pointWhileGateHigh(tapMs);
+      setDot(landing, true);
+      setTapMarker(landing);
+      const e=getEffective();
+      if(e.releaseOn){
+        releaseFromCurrent();
+      } else {
+        cancelAnimationFrame(state.dotAnim);
+        hideDot();
+        state.held=false;
+        state.currentPhase='idle';
+        state.dotLevel=landing.level;
+        updateButtonStates();
+      }
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+function hold(){
+  animationToken++;
+  const myAnimationToken = animationToken;
+  hideTapMarker();
+  cancelAnimationFrame(state.dotAnim);
+  const pts=computePoints(), e=pts.e;
+  const dur=(e.aT + e.dT*(1-e.s))*1000;
+  const t0=performance.now();
+  hideDot(); state.held=true; state.currentPhase='hold'; updateButtonStates();
+  function step(now){
+    if (myAnimationToken !== animationToken) return;
+    const elapsed=now-t0; setDot(pointWhileGateHigh(elapsed), true);
+    if(elapsed < dur) state.dotAnim=requestAnimationFrame(step); else { setDot(pts.pS,true); $('dot').style.animation='blobPulse 0.8s ease-in-out infinite alternate'; state.currentPhase='sustain'; updateButtonStates(); }
+  }
+  requestAnimationFrame(step);
+}
+
+$('tap50Btn').addEventListener('click',()=>tap(50));
+$('tap100Btn').addEventListener('click',()=>tap(100));
+$('tap200Btn').addEventListener('click',()=>tap(200));
+$('tapCustomBtn').addEventListener('click',()=>{ $('tapCustomRow').style.display=''; });
+$('tapGoBtn').addEventListener('click',()=>tap(Number($('tapCustomMs').value)||200));
+$('tapCustomMs').addEventListener('keydown',e=>{ if(e.key==='Enter') tap(Number($('tapCustomMs').value)||200); });
+$('holdBtn').addEventListener('click',hold);
+$('releaseBtn').addEventListener('click',releaseFromCurrent);
+$('clearBtn').addEventListener('click',clearBlobAndMarker);
+$('keepTapMarker').addEventListener('change',()=>{ if(!$('keepTapMarker').checked) hideTapMarker(); });
+
+// ---- Numeric inputs for Attack / Decay / Sustain (formerly v29 script) ----
+
+const typedDisplay = {
+  live: { a: null, d: null },
+  animate: { a: null, d: null }
+};
+
+function currentMode(){
+  const el = document.querySelector('input[name="mode"]:checked');
+  return el ? el.value : 'live';
+}
+
+function activeObject(){
+  return currentMode() === 'animate' ? state.target : state;
+}
+
+function formatSustainScale(v){
+  const pct = Math.round(v * 100);
+  const scale = v * 10;
+  const scaleText = Number.isInteger(scale) ? String(scale) : scale.toFixed(1).replace(/\.0$/, '');
+  return `${scaleText} (${pct}%)`;
+}
+
+function ensureInputAfter(sliderId, inputId, label, attrs){
+  const slider = document.getElementById(sliderId);
+  if (!slider) return null;
+  let input = document.getElementById(inputId);
+  if (input) return input;
+  const wrap = document.createElement('div');
+  wrap.className = inputId === 'sustainScaleInput' ? 'numeric-value-control' : 'numeric-ms-control';
+  wrap.innerHTML = `<label>${label} <input id="${inputId}" ${attrs}></label>`;
+  slider.insertAdjacentElement('afterend', wrap);
+  return document.getElementById(inputId);
+}
+
+const attackInput  = ensureInputAfter('attack',  'attackMsInput',    'Attack ms', 'type="number" min="0" max="12000" step="1"');
+const decayInput   = ensureInputAfter('decay',   'decayMsInput',     'Decay ms',  'type="number" min="0" max="12000" step="1"');
+const sustainInput = ensureInputAfter('sustain', 'sustainScaleInput','Sustain',   'type="number" min="0" max="10" step="0.1"');
+
+function commitTime(which, input){
+  if (!input) return;
+  if(currentMode()==='live') clearBlobAndMarker();
+  if(window.clearPresetDisplay) clearPresetDisplay();
+  const ms = Math.max(0, Math.min(12000, Math.round(Number(input.value) || 0)));
+  input.value = ms;
+  const m = currentMode();
+  typedDisplay[m][which] = ms;
+  const obj = activeObject();
+  obj[which] = positionFromMs(ms);
+  if (m === 'live') {
+    state.target = { a: state.a, d: state.d, s: state.s };
+    render();
+  } else {
+    syncControls();
+  }
+  requestAnimationFrame(refreshNumericInputs);
+}
+
+function commitSustain(){
+  if (!sustainInput) return;
+  if(window.clearPresetDisplay) clearPresetDisplay();
+  const scale = Math.max(0, Math.min(10, Number(sustainInput.value) || 0));
+  sustainInput.value = Number.isInteger(scale) ? String(scale) : scale.toFixed(1).replace(/\.0$/, '');
+  const obj = activeObject();
+  obj.s = scale / 10;
+  if (currentMode() === 'live') {
+    state.target = { a: state.a, d: state.d, s: state.s };
+    render();
+  } else {
+    syncControls();
+  }
+  requestAnimationFrame(refreshNumericInputs);
+}
+
+function refreshNumericInputs(){
+  const m = currentMode();
+  const obj = activeObject();
+  if (attackInput && document.activeElement !== attackInput) {
+    attackInput.value = typedDisplay[m].a !== null ? typedDisplay[m].a : msFromPosition(obj.a);
+  }
+  if (decayInput && document.activeElement !== decayInput) {
+    decayInput.value = typedDisplay[m].d !== null ? typedDisplay[m].d : msFromPosition(obj.d);
+  }
+  if (sustainInput && document.activeElement !== sustainInput) {
+    const scale = obj.s * 10;
+    sustainInput.value = Number.isInteger(scale) ? String(scale) : scale.toFixed(1).replace(/\.0$/, '');
+  }
+  patchSustainReadouts();
+}
+
+function patchSustainReadouts(){
+  const eff = getEffective();
+  const formatted = formatSustainScale(eff.s);
+  const sustainRead = document.getElementById('sustainRead');
+  if (sustainRead) sustainRead.textContent = formatted;
+  const sustainTarget = document.getElementById('sustainTarget');
+  if (sustainTarget && currentMode() === 'animate') {
+    const targetS = document.getElementById('keyboardControl').checked ? state.target.s * 0.8 : state.target.s;
+    sustainTarget.textContent = 'Target: ' + formatSustainScale(targetS);
+  }
+}
+
+function clearTypedForSlider(which){
+  typedDisplay[currentMode()][which] = null;
+}
+
+const attackSlider  = document.getElementById('attack');
+const decaySlider   = document.getElementById('decay');
+const sustainSlider = document.getElementById('sustain');
+
+if (attackInput) {
+  attackInput.addEventListener('change', () => commitTime('a', attackInput));
+  attackInput.addEventListener('blur',   () => commitTime('a', attackInput));
+  attackInput.addEventListener('keydown', e => { if (e.key === 'Enter') commitTime('a', attackInput); });
+}
+if (decayInput) {
+  decayInput.addEventListener('change', () => commitTime('d', decayInput));
+  decayInput.addEventListener('blur',   () => commitTime('d', decayInput));
+  decayInput.addEventListener('keydown', e => { if (e.key === 'Enter') commitTime('d', decayInput); });
+}
+if (sustainInput) {
+  sustainInput.addEventListener('change', commitSustain);
+  sustainInput.addEventListener('blur',   commitSustain);
+  sustainInput.addEventListener('keydown', e => { if (e.key === 'Enter') commitSustain(); });
+}
+
+if (attackSlider)  attackSlider.addEventListener('input',  () => { clearTypedForSlider('a'); setTimeout(refreshNumericInputs, 0); });
+if (decaySlider)   decaySlider.addEventListener('input',   () => { clearTypedForSlider('d'); setTimeout(refreshNumericInputs, 0); });
+if (sustainSlider) sustainSlider.addEventListener('input', () => { setTimeout(refreshNumericInputs, 0); });
+
+document.querySelectorAll('input[name="mode"]').forEach(el => {
+  el.addEventListener('change', () => setTimeout(refreshNumericInputs, 0));
+});
+['loudDecay','keyboardControl'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('change', () => setTimeout(refreshNumericInputs, 0));
+});
+
+// ---- Pointer feedback and axis cleanup (formerly v28 script) ----
+
+function hideLikelyAxes(){
+  document.querySelectorAll('svg line, svg path, svg text').forEach(el => {
+    const idClass = ((el.id || '') + ' ' + (el.getAttribute('class') || '')).toLowerCase();
+    const text = (el.textContent || '').trim();
+
+    if (/axis|xaxis|yaxis|baseline|zero-line|reference-line/.test(idClass)) {
+      el.style.display = 'none';
+      el.style.opacity = '0';
+      return;
+    }
+
+    if (el.tagName.toLowerCase() === 'text') {
+      if (text === 'TIME' || text === 'AMPLITUDE' || text === '0' || text === '1.0') {
+        el.style.display = 'none';
+        el.style.opacity = '0';
+      }
+    }
+
+    if (el.tagName.toLowerCase() === 'line') {
+      const stroke = (el.getAttribute('stroke') || '').toLowerCase();
+      const op = Number(el.getAttribute('opacity') || el.style.opacity || 1);
+      if ((stroke === '#ffffff' || stroke === 'white' || stroke === '#fff') && op < 0.45) {
+        el.style.display = 'none';
+        el.style.opacity = '0';
+      }
+    }
+  });
+}
+
+function addPointerFeedback(){
+  document.querySelectorAll('button').forEach(btn => {
+    if (btn.__v28PointerFeedback) return;
+    btn.__v28PointerFeedback = true;
+    function press(){ btn.classList.add('v28-pressed'); }
+    function release(){ setTimeout(() => btn.classList.remove('v28-pressed'), 120); }
+    btn.addEventListener('pointerdown', press, true);
+    btn.addEventListener('mousedown', press, true);
+    btn.addEventListener('pointerup', release, true);
+    btn.addEventListener('mouseup', release, true);
+    btn.addEventListener('pointercancel', release, true);
+    btn.addEventListener('mouseleave', release, true);
+    btn.addEventListener('blur', release, true);
+  });
+}
+
+// ---- Knob drag interaction ----
+[
+  { knobId: 'attackKnob',  sliderId: 'attack'  },
+  { knobId: 'decayKnob',   sliderId: 'decay'   },
+  { knobId: 'sustainKnob', sliderId: 'sustain' },
+].forEach(({ knobId, sliderId }) => {
+  const knob   = $(knobId);
+  const slider = $(sliderId);
+  knob.style.cursor = 'ns-resize';
+
+  let startY, startVal;
+
+  knob.addEventListener('pointerdown', e => {
+    startY   = e.clientY;
+    startVal = Number(slider.value);
+    knob.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+
+  knob.addEventListener('pointermove', e => {
+    if (!knob.hasPointerCapture(e.pointerId)) return;
+    const delta = startY - e.clientY;            // up = positive
+    const range = Number(slider.max) - Number(slider.min);
+    const newVal = Math.round(clamp(startVal + delta * (range / 200), Number(slider.min), Number(slider.max)));
+    slider.value = newVal;
+    slider.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+
+  knob.addEventListener('pointerup', e => {
+    knob.releasePointerCapture(e.pointerId);
+  });
+});
+
+// ---- Presets ----
+(function(){
+  const container = $('presetBtns');
+  let activeBtn = null;
+
+  function setTransitionTime(t){
+    const fixed = document.querySelector(`input[name="transition"][value="${t}"]`);
+    if(fixed){
+      fixed.checked = true;
+      $('customTransitionRow').style.display = 'none';
+    } else {
+      document.querySelector('input[name="transition"][value="custom"]').checked = true;
+      $('customTransitionRow').style.display = '';
+      $('customTransitionTime').value = t;
+    }
+  }
+
+  window.clearPresetDisplay = function(){
+    if(activeBtn){ activeBtn.style.background = ''; activeBtn.style.color = ''; activeBtn = null; }
+    $('presetName').textContent = '';
+  };
+
+  PRESETS.forEach(preset => {
+    const btn = document.createElement('button');
+    btn.textContent = preset.name;
+    btn.style.cssText = 'font-size:12px;padding:4px 7px';
+
+    btn.addEventListener('click', () => {
+      // Set target values
+      state.target.a = positionFromMs(preset.a);
+      state.target.d = positionFromMs(preset.d);
+      state.target.s = preset.s / 10;
+
+      // Configure transition time
+      setTransitionTime(preset.t);
+
+      // Highlight active preset and show name
+      if(activeBtn){ activeBtn.style.background = ''; activeBtn.style.color = ''; }
+      btn.style.background = '#ffffff';
+      btn.style.color = '#111111';
+      activeBtn = btn;
+      $('presetName').textContent = `${preset.name}: ${preset.label}`;
+
+      transition();
+    });
+
+    container.appendChild(btn);
+  });
+})();
+
+// ---- Init ----
+render();
+refreshNumericInputs();
+hideLikelyAxes();
+addPointerFeedback();
+
+</script>
+</body>
+</html>
