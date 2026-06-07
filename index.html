@@ -48,7 +48,7 @@
   @keyframes blobPulse{from{opacity:1} to{opacity:.4}}
   .tap-marker{fill:var(--line); stroke:none; opacity:0;}
   .label{fill:var(--fg); font-size:24px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;}
-  .small-label{fill:var(--fg); font-size:17px; font-weight:700;}
+  .small-label{fill:var(--fg); font-size:17px; font-weight:800;}
   .ui{
     flex-shrink:0;
     display:grid;
@@ -164,8 +164,8 @@
 </style>
 </head>
 <body>
-  <div style="padding:6px 36px 0;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
-    <span style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;opacity:.85">DTP — Model D Contour Visualiser and Animator</span>
+  <div style="background:rgba(0,0,0,0.7);padding:4px 12px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+    <span style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#ffffff">DTP — Model D Contour Visualiser and Animator</span>
     <button id="helpBtn" title="Keyboard shortcuts" style="font-size:13px;font-weight:800;width:24px;height:24px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.6);background:rgba(0,0,0,.3);color:#fff;cursor:pointer;line-height:1;flex-shrink:0">?</button>
   </div>
   <div class="stage">
@@ -193,7 +193,7 @@
       <rect id="meterBox"  x="1145" y="30" width="40" height="415" style="fill:none;stroke:var(--line);stroke-width:7;stroke-opacity:1;vector-effect:non-scaling-stroke;" />
       <rect id="meterFill" x="1145" y="445" width="40" height="0" style="fill:var(--line);stroke:none;" />
       <line id="floorLine" x1="80" y1="445" x2="1145" y2="445" style="stroke:var(--line);stroke-width:3.5;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
-      <text id="meterLabelTitle" x="1165" y="72" text-anchor="middle" style="fill:var(--fg);font-size:17px;font-weight:700;display:none;">VOL</text>
+      <text id="meterLabelTitle" x="1165" y="72" text-anchor="middle" style="fill:var(--fg);font-size:17px;font-weight:800;display:none;">VOL</text>
 
 
       <text id="sLabel" class="small-label" x="0" y="0">SUSTAIN</text>
@@ -258,12 +258,13 @@
     <div class="panel">
       <div class="row"><label><input id="loudDecay" type="checkbox"> D — <span id="loudDecayLabel">Loud Decay</span></label></div>
       <div class="row"><label><input id="drawReleaseWhenZero" type="checkbox"> Z — Draw Release When Zero</label></div>
-      <div class="row"><label><input id="showBounds" type="checkbox" checked> T — Show Top And Bottom</label></div>
+      <div class="row"><label><input id="showBounds" type="checkbox"> T — Show Top And Bottom</label></div>
       <div class="row"><label><input id="frequencyMode" type="checkbox"> F — Filter Mode</label></div>
       <div class="row"><label><input id="hpMode" type="checkbox"> M — LP/HP Mode</label></div>
       <div class="row"><label><input id="keyboardControl" type="checkbox"> S — Mimic Model D Sustain (80%)</label></div>
       <div class="row"><label><input id="showClipped" type="checkbox"> C — Show Clipped Shape</label></div>
-      <div class="row" style="align-items:center;gap:6px"><label><input id="linearTime" type="checkbox"> Linear Time</label><input id="linearTimeScale" type="number" min="1" max="15" step="1" value="6" style="width:42px;text-align:center;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.3);border-radius:5px;color:#fff;font-size:13px;padding:2px 4px"><label id="linearTimeScaleLabel" for="linearTimeScale" style="font-size:13px">s</label></div>
+      <div class="row" style="align-items:center;gap:6px"><label><input id="linearTime" type="checkbox"> X — Linear Time</label><input id="linearTimeScale" type="number" min="1" max="15" step="1" value="6" style="width:42px;text-align:center;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.3);border-radius:5px;color:#fff;font-size:13px;padding:2px 4px"><label id="linearTimeScaleLabel" for="linearTimeScale" style="font-size:13px">s</label></div>
+      <div class="row" style="align-items:center;gap:6px"><label><input id="analogueCurve" type="checkbox"> B — Analogue Curve</label><input id="curveAmount" type="range" min="0" max="100" value="40" style="width:80px;opacity:0.35"><span id="curveAmountVal" style="font-size:13px;min-width:20px;text-align:right;opacity:0.35">40</span></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:5px">
         <button id="trans1Btn">1s</button>
@@ -338,6 +339,8 @@
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">M</td><td style="padding:3px 0;font-size:13px;font-weight:700">LP/HP Mode</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">S</td><td style="padding:3px 0;font-size:13px;font-weight:700">Mimic Model D Sustain (80%)</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">C</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Clipped Shape</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">X</td><td style="padding:3px 0;font-size:13px;font-weight:700">Linear Time</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">B</td><td style="padding:3px 0;font-size:13px;font-weight:700">Analogue Curve</td></tr>
         </table>
       </div>
       <div>
@@ -476,6 +479,21 @@ function syncKnobColours(freqMode){
   ['floorKnob','scaleKnob'].forEach(id => { const k=$(id); if(k) k.style.background = freqMode ? fsBg : KNOB_RED; });
 }
 
+function buildPath(x0, y0, x1, y1, curve, scaleFactor, hStartOverride, hEndOverride){
+  if(!curve){
+    return `M ${x0} ${y0} L ${x1} ${y1}`;
+  }
+  const h = curve * Math.abs(y1 - y0) * 0.5 * (scaleFactor !== undefined ? scaleFactor : 1);
+  const hs = (hStartOverride !== undefined) ? hStartOverride : h;
+  const he = (hEndOverride   !== undefined) ? hEndOverride   : h;
+  if(y1 < y0){
+    // attack: start handle vertical up, end handle horizontal left
+    return `M ${x0} ${y0} C ${x0} ${y0-hs} ${x1-he} ${y1} ${x1} ${y1}`;
+  } else {
+    // decay / release: start handle horizontal right, end handle horizontal left
+    return `M ${x0} ${y0} C ${x0+hs} ${y0} ${x1-he} ${y1} ${x1} ${y1}`;
+  }
+}
 function render(){
   const pts=computePoints();
   // Draw the envelope as separate A/D/R segments. Each segment is drawn twice:
@@ -493,22 +511,33 @@ function render(){
     ? { x: pts.pS.x, y: Math.max(pts.pS.y, yFor(1)), level: pts.pS.level }
     : pts.pS;
 
+  const analogueOn = $('analogueCurve') && $('analogueCurve').checked;
+  const curveAmt = analogueOn ? (Number($('curveAmount').value) / 100) : 0;
+
+  const linearTimeOn = $('linearTime') && $('linearTime').checked;
+  const aSF = linearTimeOn
+    ? Math.min(1, pts.aw / (graph.w * 0.3))
+    : Math.min(1, e.aT * 1000 / 500);
+  const dSF = linearTimeOn
+    ? Math.min(1, pts.dwFull / (graph.w * 0.3))
+    : Math.min(1, e.dT * 1000 / 500);
+
   let aPath, dPath, ceilLeftPath, ceilRightPath;
   if(showClipped){
     const f_a = (1 - e.floor) / e.scale;           // attack fraction at ceiling crossing
     const f_d = (e.floor + e.scale - 1) / e.scale; // decay fraction at ceiling crossing
     const ceilAttackX = pts.p0.x + (pts.p1.x - pts.p0.x) * f_a;
     const ceilDecayX  = pts.p1.x + (pts.pEnd.x - pts.p1.x) * f_d;
-    const p1x = pts.p1.x; // unconstrained peak x — divides the two ceiling halves
-    aPath        = `M ${pts.p0.x} ${pts.p0.y} L ${ceilAttackX} ${ceilY}`;
+    const p1x = pts.p1.x;
+    aPath        = buildPath(pts.p0.x, pts.p0.y, ceilAttackX, ceilY, curveAmt, aSF);
     ceilLeftPath = `M ${ceilAttackX} ${ceilY} L ${p1x} ${ceilY}`;
     ceilRightPath= `M ${p1x} ${ceilY} L ${ceilDecayX} ${ceilY}`;
-    dPath        = `M ${ceilDecayX} ${ceilY} L ${drawPS.x} ${drawPS.y}`;
+    dPath        = buildPath(ceilDecayX, ceilY, drawPS.x, drawPS.y, curveAmt, dSF);
   } else {
-    aPath         = `M ${pts.p0.x} ${pts.p0.y} L ${drawP1.x} ${drawP1.y}`;
+    aPath         = buildPath(pts.p0.x, pts.p0.y, drawP1.x, drawP1.y, curveAmt, aSF);
     ceilLeftPath  = '';
     ceilRightPath = '';
-    dPath         = `M ${drawP1.x} ${drawP1.y} L ${drawPS.x} ${drawPS.y}`;
+    dPath         = buildPath(drawP1.x, drawP1.y, drawPS.x, drawPS.y, curveAmt, dSF);
   }
 
   const show = showClipped ? '' : 'none';
@@ -546,7 +575,42 @@ function render(){
   } else {
     rEnd = e.releaseOn ? pts.pEnd : { x: drawPS.x, y: pts.p0.y };
   }
-  const rPath = drawReleasePath ? `M ${drawPS.x} ${drawPS.y} L ${rEnd.x} ${rEnd.y}` : '';
+  const rSF = linearTimeOn
+    ? Math.min(1, (rEnd.x - drawPS.x) / (graph.w * 0.3))
+    : Math.min(1, e.rT * 1000 / 500);
+
+  // C1 continuity at pS using natural decay slope
+  const dPeakY = showClipped ? ceilY : drawP1.y;
+  const h_decay   = curveAmt * Math.abs(drawPS.y - dPeakY)   * 0.5 * dSF;
+  const h_release = curveAmt * Math.abs(rEnd.y   - drawPS.y) * 0.5 * rSF;
+  const maxH      = (drawPS.x - pts.p1.x) * 0.3;
+  const h_join    = Math.min(h_decay, h_release, maxH);
+  // Slope vector from p1 to pS (natural decay direction)
+  const slopeDX = drawPS.x - pts.p1.x;
+  const slopeDY = drawPS.y - pts.p1.y;
+  const slopeLen = Math.sqrt(slopeDX * slopeDX + slopeDY * slopeDY) || 1;
+  const decayEndHandle   = { x: drawPS.x - (slopeDX / slopeLen) * h_join,
+                              y: drawPS.y - (slopeDY / slopeLen) * h_join };
+  const releaseStartHandle = { x: drawPS.x + (slopeDX / slopeLen) * h_join,
+                                y: drawPS.y + (slopeDY / slopeLen) * h_join };
+  // Rebuild dPath with natural-slope end handle
+  const dStartX = showClipped
+    ? pts.p1.x + (pts.pEnd.x - pts.p1.x) * ((e.floor + e.scale - 1) / e.scale)
+    : drawP1.x;
+  const dStartY = showClipped ? ceilY : drawP1.y;
+  if(curveAmt){
+    dPath = `M ${dStartX} ${dStartY} C ${dStartX + h_decay} ${dStartY} ${decayEndHandle.x} ${decayEndHandle.y} ${drawPS.x} ${drawPS.y}`;
+  } else {
+    dPath = `M ${dStartX} ${dStartY} L ${drawPS.x} ${drawPS.y}`;
+  }
+  ['decayOuter','decayInner'].forEach(id => $(id).setAttribute('d', dPath));
+  // Release with mirrored start handle and horizontal end handle
+  const releaseEndHandle = { x: rEnd.x - h_release, y: rEnd.y };
+  const rPath = drawReleasePath
+    ? (curveAmt
+        ? `M ${drawPS.x} ${drawPS.y} C ${releaseStartHandle.x} ${releaseStartHandle.y} ${releaseEndHandle.x} ${releaseEndHandle.y} ${rEnd.x} ${rEnd.y}`
+        : `M ${drawPS.x} ${drawPS.y} L ${rEnd.x} ${rEnd.y}`)
+    : '';
   ['releaseOuter','releaseInner'].forEach(id => $(id).setAttribute('d', rPath));
 
   // Sustain as a horizontal level guide extending to the right from
@@ -677,6 +741,16 @@ function syncLinearTimeScale(){
 $('linearTime').addEventListener('change', syncLinearTimeScale);
 $('linearTimeScale').addEventListener('input', render);
 syncLinearTimeScale();
+function syncAnalogueCurve(){
+  const on = $('analogueCurve') && $('analogueCurve').checked;
+  const opacity = on ? '' : '0.35';
+  const sl = $('curveAmount'), val = $('curveAmountVal');
+  if(sl)  sl.style.opacity  = opacity;
+  if(val){ val.style.opacity = opacity; val.textContent = sl ? sl.value : '40'; }
+}
+$('analogueCurve').addEventListener('change', () => { syncAnalogueCurve(); render(); });
+$('curveAmount').addEventListener('input', () => { syncAnalogueCurve(); render(); });
+syncAnalogueCurve();
 $('lineColor').addEventListener('input',e=>document.documentElement.style.setProperty('--line', e.target.value));
 $('bgColor').addEventListener('input',e=>document.documentElement.style.setProperty('--bg', e.target.value));
 $('attackColor').addEventListener('input',e=>document.documentElement.style.setProperty('--attackColor', e.target.value));
@@ -819,8 +893,8 @@ function setDot(pt, visible=true){
   dot.style.visibility='visible';
   dot.setAttribute('cx',pt.x);
   let dotY = pt.y;
-  if(pt.phase === 'attack' || pt.phase === 'decay'){
-    const pathId = pt.phase === 'attack' ? 'attackOuter' : 'decayOuter';
+  if(pt.phase === 'attack' || pt.phase === 'decay' || pt.phase === 'release'){
+    const pathId = pt.phase === 'attack' ? 'attackOuter' : pt.phase === 'decay' ? 'decayOuter' : 'releaseOuter';
     const pathEl = document.getElementById(pathId);
     if(pathEl){
       const sampled = getYFromPath(pathEl, pt.x);
@@ -898,7 +972,12 @@ function releaseFromCurrent(){
   function step(now){
     if (myAnimationToken !== animationToken) return;
     const f=clamp((now-t0)/dur);
-    setDot({x:startX+(end.x-startX)*f, y:startY+(end.y-startY)*f, level:startLevel*(1-f)}, true);
+    const dotX = startX + (end.x - startX) * f;
+    const linearY = startY + (end.y - startY) * f;
+    const releasePathEl = document.getElementById('releaseOuter');
+    const sampledY = releasePathEl ? getYFromPath(releasePathEl, dotX) : null;
+    const dotY = (sampledY !== null) ? sampledY : linearY;
+    setDot({x:dotX, y:dotY, level:startLevel*(1-f), phase:'release'}, true);
     if(f<1) state.dotAnim=requestAnimationFrame(step); else { setDot(end,false); audioCut(); state.held=false; state.currentPhase='idle'; updateButtonStates(); }
   }
   requestAnimationFrame(step);
@@ -1057,6 +1136,8 @@ document.addEventListener('keydown', e => {
   } else if(e.key === 'f' || e.key === 'F'){ toggleCheckbox('frequencyMode');
   } else if(e.key === 'm' || e.key === 'M'){ toggleCheckbox('hpMode');
   } else if(e.key === 's' || e.key === 'S'){ toggleCheckbox('keyboardControl');
+  } else if(e.key === 'x' || e.key === 'X'){ toggleCheckbox('linearTime');
+  } else if(e.key === 'b' || e.key === 'B'){ toggleCheckbox('analogueCurve');
   }
 });
 
