@@ -263,6 +263,7 @@
       <div class="row"><label><input id="hpMode" type="checkbox"> M — LP/HP Mode</label></div>
       <div class="row"><label><input id="keyboardControl" type="checkbox"> S — Mimic Model D Sustain (80%)</label></div>
       <div class="row"><label><input id="showClipped" type="checkbox"> C — Show Clipped Shape</label></div>
+      <div class="row" style="align-items:center;gap:6px"><label><input id="linearTime" type="checkbox"> Linear Time</label><input id="linearTimeScale" type="number" min="1" max="15" step="1" value="6" style="width:42px;text-align:center;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.3);border-radius:5px;color:#fff;font-size:13px;padding:2px 4px"><label id="linearTimeScaleLabel" for="linearTimeScale" style="font-size:13px">s</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:5px">
         <button id="trans1Btn">1s</button>
@@ -429,8 +430,23 @@ function getEffective(){
 function yFor(level){ return graph.y0 - level*graph.h; }
 function computePoints(){
   const e=getEffective();
-  const aw=displayTimeWidth(e.aT);
-  const dwFull=displayTimeWidth(e.dT);
+  const linearTimeEl = document.getElementById('linearTime');
+  const linearTime = linearTimeEl && linearTimeEl.checked;
+  let aw, dwFull;
+  if(linearTime){
+    const scaleEl = document.getElementById('linearTimeScale');
+    const totalMs = Math.max(1, Number(scaleEl ? scaleEl.value : 6)) * 1000;
+    const pxPerMs = graph.w / totalMs;
+    aw     = e.aT * 1000 * pxPerMs;
+    dwFull = e.dT * 1000 * pxPerMs;
+    // Clip: decay end cannot exceed graph right edge
+    const maxX = graph.x0 + graph.w;
+    if(graph.x0 + aw > maxX) aw = graph.w;
+    if(graph.x0 + aw + dwFull > maxX) dwFull = maxX - (graph.x0 + aw);
+  } else {
+    aw = displayTimeWidth(e.aT);
+    dwFull = displayTimeWidth(e.dT);
+  }
   const x0=graph.x0;
 
   // Experimental sustain-marker model:
@@ -643,7 +659,7 @@ function setFromSlider(){
 $('sustain').addEventListener('input',()=>{ setFromSlider(); if(window.clearPresetDisplay) clearPresetDisplay(); });
 ['floor','scale'].forEach(id=>$(id).addEventListener('input',()=>{ setFromSlider(); if(window.clearPresetDisplay) clearPresetDisplay(); }));
 document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) state.target={a:state.a,d:state.d,s:state.s,floor:state.floor,scale:state.scale}; syncControls(); }));
-['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','frequencyMode','hpMode','showClipped'].forEach(id=>$(id).addEventListener('change',render));
+['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','frequencyMode','hpMode','showClipped','linearTime'].forEach(id=>$(id).addEventListener('change',render));
 function syncHpModeEnabled(){
   const freqOn = $('frequencyMode') && $('frequencyMode').checked;
   const hpLabel = $('hpMode') && $('hpMode').closest('label');
@@ -651,6 +667,16 @@ function syncHpModeEnabled(){
 }
 $('frequencyMode').addEventListener('change', syncHpModeEnabled);
 syncHpModeEnabled();
+function syncLinearTimeScale(){
+  const on = $('linearTime') && $('linearTime').checked;
+  const inp = $('linearTimeScale'), lbl = $('linearTimeScaleLabel');
+  const opacity = on ? '' : '0.35';
+  if(inp) inp.style.opacity = opacity;
+  if(lbl) lbl.style.opacity = opacity;
+}
+$('linearTime').addEventListener('change', syncLinearTimeScale);
+$('linearTimeScale').addEventListener('input', render);
+syncLinearTimeScale();
 $('lineColor').addEventListener('input',e=>document.documentElement.style.setProperty('--line', e.target.value));
 $('bgColor').addEventListener('input',e=>document.documentElement.style.setProperty('--bg', e.target.value));
 $('attackColor').addEventListener('input',e=>document.documentElement.style.setProperty('--attackColor', e.target.value));
