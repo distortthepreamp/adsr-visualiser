@@ -182,13 +182,13 @@
       <line id="sustainMarker" x1="80" y1="445" x2="80" y2="445" style="stroke:var(--line);stroke-opacity:.9;stroke-width:11;stroke-linecap:round;stroke-dasharray:1 24;vector-effect:non-scaling-stroke;" />
       <circle id="sustainPoint" class="tap-marker" cx="80" cy="445" r="8" style="opacity:.85" />
       <circle id="tapMarker" class="tap-marker" cx="80" cy="445" r="11" />
-      <circle id="dot" class="env-dot" cx="80" cy="445" r="15" />
       <line id="floorBound"   x1="0" y1="445" x2="1200" y2="445" style="stroke:var(--boundsColor);stroke-width:7;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <line id="ceilingBound" x1="0" y1="30"  x2="1200" y2="30"  style="stroke:var(--boundsColor);stroke-width:7;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <path id="ceilLeftOuter" class="env-outer" d="" style="display:none" />
       <path id="ceilRightOuter" class="env-outer" d="" style="display:none" />
       <path id="ceilLeftInner" class="env-inner attack-inner" d="" style="display:none" />
       <path id="ceilRightInner" class="env-inner decay-inner" d="" style="display:none" />
+      <circle id="dot" class="env-dot" cx="80" cy="445" r="15" />
 
       <rect id="meterBox"  x="1145" y="30" width="40" height="415" style="fill:none;stroke:var(--line);stroke-width:7;stroke-opacity:1;vector-effect:non-scaling-stroke;" />
       <rect id="meterFill" x="1145" y="445" width="40" height="0" style="fill:var(--line);stroke:none;" />
@@ -764,7 +764,7 @@ function setMeterLevel(level){
   const mx=graph.x0+graph.w+20, mw=40;
   const bottomAbsY=graph.y0;           // yFor(0) = 445
   const topAbsY=graph.y0-graph.h;      // yFor(1) = 85
-  const levelY=yFor(e.floor+level*e.scale);
+  const levelY = Math.max(yFor(e.floor+level*e.scale), yFor(1));
   const isHP=$('hpMode')&&$('hpMode').checked;
   fill.setAttribute('x',mx); fill.setAttribute('width',mw);
   if(!isHP){
@@ -775,7 +775,7 @@ function setMeterLevel(level){
     // HP: fill from absolute top down to blob level
     const topY = yFor(1);
     fill.setAttribute('y', String(topY));
-    fill.setAttribute('height', String(levelY - topY));
+    fill.setAttribute('height', String(Math.max(0, levelY - topY)));
   }
 }
 
