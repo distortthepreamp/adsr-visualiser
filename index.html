@@ -37,8 +37,7 @@
     overflow:hidden;
   }
   svg{width:100%; height:100%; display:block; overflow:visible;}
-  .axis,.grid{stroke:rgba(255,255,255,.35); stroke-width:2; vector-effect:non-scaling-stroke;}
-  .grid{display:none; opacity:0; stroke:transparent;}
+  .axis{stroke:rgba(255,255,255,.35); stroke-width:2; vector-effect:non-scaling-stroke;}
   .env-outer{fill:none; stroke:var(--line); stroke-width:var(--lineWidth); stroke-linecap:square; stroke-linejoin:round; vector-effect:non-scaling-stroke;}
   .env-inner{fill:none; stroke-width:var(--innerLineWidth); stroke-linecap:square; stroke-linejoin:round; vector-effect:non-scaling-stroke;}
   .attack-inner{stroke:var(--attackColor);}
@@ -125,29 +124,7 @@
     text-align: right;
   }
 
-  /* hide axis / reference lines */
-  .axis,
-  .x-axis,
-  .y-axis,
-  .axis-line,
-  .axisLabel,
-  .axis-label,
-  .zero-line,
-  .reference-line,
-  .guide-axis,
-  #xAxis,
-  #yAxis,
-  #x-axis,
-  #y-axis,
-  #axisX,
-  #axisY {
-    display: none !important;
-    opacity: 0 !important;
-  }
-
   /* click / press feedback */
-  button.v27-clicked,
-  .button.v27-clicked,
   button.v28-pressed,
   .button.v28-pressed {
     background: #ffffff !important;
@@ -936,7 +913,6 @@ function setTapMarker(pt){
 
 function releaseFromCurrent(){
   audioGateClose();
-  // Bug fix: declare and capture token here so the inner step() guard works.
   animationToken++;
   const myAnimationToken = animationToken;
   const dot=$('dot'); dot.style.animation='none'; dot.style.opacity='1';
@@ -962,10 +938,8 @@ function releaseFromCurrent(){
     releaseStartPoint = { x: startX, y: startY, level: startLevel };
     state.releaseFromDecay = (startLevel > pts.e.s);
   }
-  const overrange = (getEffective().floor + getEffective().scale) > 1;
+  const overrange = e.floor + e.scale > 1;
   const showClipped = document.getElementById('showClipped').checked;
-  const f_attack = overrange ? (1 - pts.e.floor) / pts.e.scale : 0;
-  const ceilAttackX = pts.p0.x + (pts.p1.x - pts.p0.x) * f_attack;
   const f_decay = overrange ? (pts.e.floor + pts.e.scale - 1) / pts.e.scale : 0;
   const ceilDecayX = pts.p1.x + (pts.pEnd.x - pts.p1.x) * f_decay;
   const peakForSlope = (showClipped && overrange)
@@ -983,9 +957,7 @@ function releaseFromCurrent(){
   const dur = Math.max(20, e.dT * startLevel * 1000);
   const t0=performance.now();
   state.currentPhase='release';
-  console.log('releaseFromCurrent — startX:', startX, 'startY:', startY, 'startLevel:', startLevel, 'dot cx:', $('dot').getAttribute('cx'), 'dot cy:', $('dot').getAttribute('cy'));
   function step(now){
-    console.log('step called', now - t0);
     if (myAnimationToken !== animationToken) return;
     const f=clamp((now-t0)/dur);
     const dotX = startX + (end.x - startX) * f;
@@ -1683,7 +1655,7 @@ $('noteCustomHz') && $('noteCustomHz').addEventListener('input', () => {
     preset.keyboardControl = $('keyboardControl').checked;
     savePresetsToStorage();
     // Flash green confirmation, then restore highlight state
-    const btn = btns[idx];
+    const btn = container.querySelectorAll('button')[idx];
     if(btn){
       btn.style.background = '#00ff88';
       btn.style.color = '#000';
