@@ -182,8 +182,8 @@
       <text id="segFilterMode" class="mode-label" x="280" y="0" text-anchor="start" style="display:none">FILTER MODE: LO</text>
       <text id="segDecay"      class="mode-label" x="80"  y="0" text-anchor="start">LOUD DECAY: OFF</text>
       <text id="segDisplay"    class="mode-label" x="480" y="0" text-anchor="start">DISPLAY: SCHEMATIC</text>
-      <text id="segSustain"    class="mode-label" x="700" y="0" text-anchor="start" style="display:none">SUSTAIN CORRECTED</text>
-      <text id="segClipping"   class="mode-label" x="900" y="0" text-anchor="start" style="display:none">CONTOUR PEAK CORRECTED</text>
+      <text id="segSustain"    class="mode-label" x="700" y="0" text-anchor="start">SUSTAIN: SCHEMATIC</text>
+      <text id="segClipping"   class="mode-label" x="900" y="0" text-anchor="start">CONTOUR PEAK: SCHEMATIC</text>
 
       <text id="sLabel" class="small-label" x="0" y="0">SUSTAIN</text>
 
@@ -367,6 +367,8 @@
 <script src="configs.js"></script>
 <script src="default-config.js"></script>
 <script>
+
+const STATUS_DIM_OPACITY = 0.65;
 
 let animationToken = 0;
 let currentTransitionSec = 1;
@@ -701,15 +703,15 @@ function render(){
   if(modeLabelEl){ modeLabelEl.textContent=freqMode?'FILTER CONTOUR':'LOUDNESS CONTOUR'; modeLabelEl.setAttribute('x',graph.x0); modeLabelEl.setAttribute('y',yFor(1)-90); }
   const segY = yFor(1) - 60;
   const segFilterModeEl=$('segFilterMode');
-  if(segFilterModeEl){ segFilterModeEl.setAttribute('y',segY); segFilterModeEl.style.display=freqMode?'':'none'; segFilterModeEl.textContent=isHP?'FILTER MODE: HI':'FILTER MODE: LO'; }
+  if(segFilterModeEl){ segFilterModeEl.setAttribute('y',segY); segFilterModeEl.style.display=freqMode?'':'none'; segFilterModeEl.textContent=isHP?'FILTER MODE: HI':'FILTER MODE: LO'; segFilterModeEl.style.opacity=1; }
   const segDecayEl=$('segDecay');
-  if(segDecayEl){ const ldOn=$('loudDecay')&&$('loudDecay').checked; segDecayEl.setAttribute('y',segY); segDecayEl.style.display=''; segDecayEl.textContent=(freqMode?'FILTER DECAY':'LOUD DECAY')+(ldOn?': ON':': OFF'); }
+  if(segDecayEl){ const ldOn=$('loudDecay')&&$('loudDecay').checked; segDecayEl.setAttribute('y',segY); segDecayEl.style.display=''; segDecayEl.textContent=(freqMode?'FILTER DECAY':'LOUD DECAY')+(ldOn?': ON':': OFF'); segDecayEl.style.opacity=ldOn?1:STATUS_DIM_OPACITY; }
   const segDisplayEl=$('segDisplay');
-  if(segDisplayEl){ segDisplayEl.setAttribute('y',segY); segDisplayEl.style.display=''; segDisplayEl.textContent=analogueOn?'DISPLAY: RC MODELLED':'DISPLAY: SCHEMATIC'; }
+  if(segDisplayEl){ segDisplayEl.setAttribute('y',segY); segDisplayEl.style.display=''; segDisplayEl.textContent=analogueOn?'DISPLAY: RC MODELLED':'DISPLAY: SCHEMATIC'; segDisplayEl.style.opacity=analogueOn?1:STATUS_DIM_OPACITY; }
   const segSustainEl=$('segSustain');
-  if(segSustainEl){ segSustainEl.setAttribute('y',segY); segSustainEl.style.display=$('keyboardControl')&&$('keyboardControl').checked?'':'none'; }
+  if(segSustainEl){ const kcOn=$('keyboardControl')&&$('keyboardControl').checked; segSustainEl.setAttribute('y',segY); segSustainEl.style.display=''; segSustainEl.textContent=kcOn?'SUSTAIN: CORRECTED':'SUSTAIN: SCHEMATIC'; segSustainEl.style.opacity=kcOn?1:STATUS_DIM_OPACITY; }
   const segClippingEl=$('segClipping');
-  if(segClippingEl){ segClippingEl.setAttribute('y',segY); segClippingEl.style.display=(e.floor+e.scale>1)?'':'none'; }
+  if(segClippingEl){ const clipCorrected=(e.floor+e.scale>1)&&$('showClipped')&&$('showClipped').checked; segClippingEl.setAttribute('y',segY); segClippingEl.style.display=freqMode?'':'none'; segClippingEl.textContent=clipCorrected?'CONTOUR PEAK: CORRECTED':'CONTOUR PEAK: SCHEMATIC'; segClippingEl.style.opacity=clipCorrected?1:STATUS_DIM_OPACITY; }
   // Cutoff/Amount knobs: active only in Filter Mode
   const floorBox=$('floorKnobBox'), scaleBox=$('scaleKnobBox');
   if(floorBox) floorBox.style.opacity=freqMode?'':'0.35';
