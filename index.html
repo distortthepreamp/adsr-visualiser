@@ -6,12 +6,19 @@
 <title>Model D ADSR Visualiser - Sustain Marker v17</title>
 <!-- v17: sustain-marker model with thick white A/D/R strokes and soft coloured centre lines. -->
 <style>
+  @font-face {
+    font-family: 'UniversCondensed';
+    src: url('fonts/UniversCondensedBQ-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+  }
   :root{
     --bg:#00ff00;
     --fg:#ffffff;
     --line:#ffffff;
     --lineWidth:14;
     --innerLineWidth:6;
+    --labelSize:17;
     --attackColor:#ff6b6b;
     --decayColor:#5fa8ff;
     --releaseColor:#5fa8ff;
@@ -46,9 +53,9 @@
   .env-dot{fill:var(--line); stroke:none; opacity:0;}
   @keyframes blobPulse{from{opacity:1} to{opacity:.4}}
   .tap-marker{fill:var(--line); stroke:none; opacity:0;}
-  .label{fill:var(--fg); font-size:24px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;}
-  .small-label{fill:var(--fg); font-size:17px; font-weight:800;}
-  .mode-label{fill:var(--fg); font-size:17px; font-weight:700;}
+  .label{fill:var(--fg); font-size:24px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; font-family:'UniversCondensed',Arial,Helvetica,sans-serif;}
+  .small-label{fill:var(--fg); font-size:calc(var(--labelSize) * 1px); font-weight:800; font-family:'UniversCondensed',Arial,Helvetica,sans-serif;}
+  .mode-label{fill:var(--fg); font-size:calc(var(--labelSize) * 1px); font-weight:700; font-family:'UniversCondensed',Arial,Helvetica,sans-serif;}
   .ui{
     flex-shrink:0;
     display:grid;
@@ -143,7 +150,7 @@
 </head>
 <body>
   <div style="background:rgba(0,0,0,0.7);padding:4px 12px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
-    <span style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#ffffff">DTP — Model D Contour Visualiser and Animator</span>
+    <span style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#ffffff;font-family:'UniversCondensed',Arial,Helvetica,sans-serif">DTP — Model D Contour Visualiser and Animator</span>
     <button id="helpBtn" title="Keyboard shortcuts" style="font-size:13px;font-weight:800;width:24px;height:24px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.6);background:rgba(0,0,0,.3);color:#fff;cursor:pointer;line-height:1;flex-shrink:0">?</button>
   </div>
   <div class="stage">
@@ -155,23 +162,23 @@
       <g id="envSegments">
         <path id="releaseOuter" class="env-outer" d="" />
         <path id="decayOuter" class="env-outer" d="" />
+        <path id="ceilLeftOuter" class="env-outer" d="" style="display:none" />
+        <path id="ceilRightOuter" class="env-outer" d="" style="display:none" />
         <path id="attackOuter" class="env-outer" d="" />
         <path id="releaseInner" class="env-inner release-inner" d="" />
         <path id="decayInner" class="env-inner decay-inner" d="" />
+        <path id="ceilLeftInner" class="env-inner attack-inner" d="" style="display:none" />
+        <path id="ceilRightInner" class="env-inner decay-inner" d="" style="display:none" />
         <path id="attackInner" class="env-inner attack-inner" d="" />
       </g>
       <circle id="tapMarker" class="tap-marker" cx="80" cy="445" r="11" />
       <line id="floorBound"   x1="0" y1="445" x2="1200" y2="445" style="stroke:var(--boundsColor);stroke-width:7;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <line id="ceilingBound" x1="0" y1="30"  x2="1200" y2="30"  style="stroke:var(--boundsColor);stroke-width:7;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
-      <path id="ceilLeftOuter" class="env-outer" d="" style="display:none" />
-      <path id="ceilRightOuter" class="env-outer" d="" style="display:none" />
-      <path id="ceilLeftInner" class="env-inner attack-inner" d="" style="display:none" />
-      <path id="ceilRightInner" class="env-inner decay-inner" d="" style="display:none" />
       <circle id="dot" class="env-dot" cx="80" cy="445" r="15" />
 
       <rect id="meterBox"  x="1145" y="30" width="40" height="415" style="fill:none;stroke:var(--line);stroke-width:7;stroke-opacity:1;vector-effect:non-scaling-stroke;" />
       <rect id="meterFill" x="1145" y="445" width="40" height="0" style="fill:var(--line);stroke:none;" />
-      <text id="meterLabelTitle" x="1165" y="72" text-anchor="middle" style="fill:var(--fg);font-size:17px;font-weight:800;display:none;">VOL</text>
+      <text id="meterLabelTitle" x="1165" y="72" text-anchor="middle" style="fill:var(--fg);font-size:calc(var(--labelSize) * 1px);font-weight:800;font-family:'UniversCondensed',Arial,Helvetica,sans-serif;display:none;">VOL</text>
       <text id="modeLabel" class="mode-label" x="80" y="0" text-anchor="start">LOUDNESS CONTOUR</text>
 
 
@@ -271,7 +278,7 @@
       </div>
       <div class="row"><label><input id="keepTapMarker" type="checkbox" checked> Leave Tap Marker</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
-      <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label></div>
+      <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Label <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label></div>
       <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#5fa8ff"></label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:10px;align-items:center;flex-wrap:wrap">
@@ -288,6 +295,15 @@
         <label>Hz <input id="noteCustomHz" type="number" min="20" max="20000" step="0.1" value="440"></label>
       </div>
       <div class="hint">Tap releases after the chosen gate time. Attack, Decay and Release are shown as white strokes with soft colour centres. Sustain is a chunky rightward dotted level guide.</div>
+      <hr style="border-color:rgba(255,255,255,.25)">
+      <div id="configBtns" style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:2px"></div>
+      <div class="row" style="gap:4px;margin:2px 0">
+        <button id="exportConfigsBtn" style="padding:3px 6px">Export</button>
+        <button id="importConfigsBtn" style="padding:3px 6px">Import</button>
+      </div>
+      <div class="row" style="justify-content:space-between;margin-top:0">
+        <span id="configName" style="font-size:13px;font-weight:700;opacity:.85"></span>
+      </div>
     </div>
   </div>
 
@@ -344,11 +360,15 @@
 </div>
 
 <script src="presets.js"></script>
+<script src="configs.js"></script>
+<script src="default-config.js"></script>
 <script>
 
 let animationToken = 0;
 let currentTransitionSec = 1;
+let activeTransBtn = 'trans1Btn';
 let releaseStartPoint = null;
+let noteMode = 'noteA4Btn';
 
 const $ = id => document.getElementById(id);
 const curve = [
@@ -711,9 +731,9 @@ function setFromSlider(){
   dest.floor=$('floor').value/1000; dest.scale=$('scale').value/1000;
   if(mode==='live') { state.target={a:state.a,d:state.d,s:state.s,floor:state.floor,scale:state.scale}; render(); } else syncControls();
 }
-['attack','decay'].forEach(id=>$(id).addEventListener('input',()=>{ if(currentMode()==='live') clearBlobAndMarker(); setFromSlider(); if(window.clearPresetDisplay) clearPresetDisplay(); }));
-$('sustain').addEventListener('input',()=>{ setFromSlider(); if(window.clearPresetDisplay) clearPresetDisplay(); });
-['floor','scale'].forEach(id=>$(id).addEventListener('input',()=>{ setFromSlider(); if(window.clearPresetDisplay) clearPresetDisplay(); }));
+['attack','decay'].forEach(id=>$(id).addEventListener('input',()=>{ if(currentMode()==='live') clearBlobAndMarker(); setFromSlider(); if(window.markPresetDirty) markPresetDirty(); }));
+$('sustain').addEventListener('input',()=>{ setFromSlider(); if(window.markPresetDirty) markPresetDirty(); });
+['floor','scale'].forEach(id=>$(id).addEventListener('input',()=>{ setFromSlider(); if(window.markPresetDirty) markPresetDirty(); }));
 document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) state.target={a:state.a,d:state.d,s:state.s,floor:state.floor,scale:state.scale}; syncControls(); }));
 ['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','frequencyMode','hpMode','showClipped','linearTime'].forEach(id=>$(id).addEventListener('change',render));
 function syncHpModeEnabled(){
@@ -750,6 +770,7 @@ $('decayColor').addEventListener('input',e=>document.documentElement.style.setPr
 $('releaseColor').addEventListener('input',e=>document.documentElement.style.setProperty('--releaseColor', e.target.value));
 $('lineWidth').addEventListener('input',e=>document.documentElement.style.setProperty('--lineWidth', e.target.value));
 $('innerLineWidth').addEventListener('input',e=>document.documentElement.style.setProperty('--innerLineWidth', e.target.value));
+$('labelSize').addEventListener('input',e=>document.documentElement.style.setProperty('--labelSize', e.target.value));
 
 function transition(durSec){
   clearBlobAndMarker();
@@ -782,6 +803,7 @@ function transition(durSec){
 const transBtnIds = ['trans1Btn','trans2Btn','trans5Btn','transCustomToggle'];
 function setTransMode(durSec, activeBtnId){
   if(durSec !== null) currentTransitionSec = durSec;
+  activeTransBtn = activeBtnId;
   transBtnIds.forEach(id => { const b=$(id); if(b){ b.style.background=''; b.style.color=''; } });
   const b=$(activeBtnId); if(b){ b.style.background='#ffffff'; b.style.color='#111111'; }
   const row=$('customTransitionRow');
@@ -1145,27 +1167,27 @@ document.addEventListener('keydown', e => {
     const newS = Math.min(1, Math.round(state.target.s * 10 + 1) / 10);
     state.target.s = newS; $('sustain').value = Math.round(newS * 1000);
     if(currentMode() === 'live'){ state.s = newS; render(); } else { transition(); }
-    if(window.clearPresetDisplay) clearPresetDisplay();
+    if(window.markPresetDirty) markPresetDirty();
   } else if(e.key === 'ArrowDown'){
     e.preventDefault();
     const newS = Math.max(0, Math.round(state.target.s * 10 - 1) / 10);
     state.target.s = newS; $('sustain').value = Math.round(newS * 1000);
     if(currentMode() === 'live'){ state.s = newS; render(); } else { transition(); }
-    if(window.clearPresetDisplay) clearPresetDisplay();
+    if(window.markPresetDirty) markPresetDirty();
   // Quick Set — Shift+0-8 attack presets
   } else if(e.shiftKey && e.code >= 'Digit0' && e.code <= 'Digit8'){
     const attackMs = [0,10,50,100,200,500,1000,2000,4000][Number(e.code.replace('Digit',''))];
     const p = positionFromMs(attackMs);
     if(currentMode() === 'live'){ state.a = p; state.target.a = p; $('attack').value = Math.round(p * 1000); render(); }
     else { state.target.a = p; $('attack').value = Math.round(p * 1000); transition(); }
-    if(window.clearPresetDisplay) clearPresetDisplay();
+    if(window.markPresetDirty) markPresetDirty();
   // Quick Set — Opt/Alt+0-8 decay presets
   } else if(e.altKey && e.code >= 'Digit0' && e.code <= 'Digit8'){
     const decayMs = [0,10,50,100,200,500,1000,2000,4000][Number(e.code.replace('Digit',''))];
     const p = positionFromMs(decayMs);
     if(currentMode() === 'live'){ state.d = p; state.target.d = p; $('decay').value = Math.round(p * 1000); render(); }
     else { state.target.d = p; $('decay').value = Math.round(p * 1000); transition(); }
-    if(window.clearPresetDisplay) clearPresetDisplay();
+    if(window.markPresetDirty) markPresetDirty();
   }
 });
 
@@ -1213,7 +1235,7 @@ const scaleInput   = ensureInputAfter('scale',   'scaleScaleInput',  '', 'type="
 function commitTime(which, input){
   if (!input) return;
   if(currentMode()==='live') clearBlobAndMarker();
-  if(window.clearPresetDisplay) clearPresetDisplay();
+  if(window.markPresetDirty) markPresetDirty();
   const ms = Math.max(0, Math.min(12000, Math.round(Number(input.value) || 0)));
   input.value = ms;
   const m = currentMode();
@@ -1231,7 +1253,7 @@ function commitTime(which, input){
 
 function commitSustain(){
   if (!sustainInput) return;
-  if(window.clearPresetDisplay) clearPresetDisplay();
+  if(window.markPresetDirty) markPresetDirty();
   const scale = Math.max(0, Math.min(10, Number(sustainInput.value) || 0));
   sustainInput.value = Number.isInteger(scale) ? String(scale) : scale.toFixed(1).replace(/\.0$/, '');
   const obj = activeObject();
@@ -1283,7 +1305,7 @@ function patchSustainReadouts(){
 
 function commitFloor(){
   if (!floorInput) return;
-  if(window.clearPresetDisplay) clearPresetDisplay();
+  if(window.markPresetDirty) markPresetDirty();
   const v = Math.max(0, Math.min(10, Number(floorInput.value) || 0));
   floorInput.value = Number.isInteger(v) ? String(v) : v.toFixed(1).replace(/\.0$/, '');
   const obj = activeObject();
@@ -1297,7 +1319,7 @@ function commitFloor(){
 
 function commitScale(){
   if (!scaleInput) return;
-  if(window.clearPresetDisplay) clearPresetDisplay();
+  if(window.markPresetDirty) markPresetDirty();
   const v = Math.max(0, Math.min(10, Number(scaleInput.value) || 0));
   scaleInput.value = Number.isInteger(v) ? String(v) : v.toFixed(1).replace(/\.0$/, '');
   const obj = activeObject();
@@ -1450,6 +1472,7 @@ const noteFreqs = { noteE1Btn: 41.2, noteE2Btn: 82.4, noteC4Btn: 261.6, noteA4Bt
 const noteBtnIds = ['noteE1Btn','noteE2Btn','noteC4Btn','noteA4Btn','noteCustomToggle'];
 
 function setNoteMode(btnId, freq){
+  noteMode = btnId;
   noteBtnIds.forEach(id => { const b=$(id); if(b){ b.style.background=''; b.style.color=''; } });
   const b=$(btnId); if(b){ b.style.background='#ffffff'; b.style.color='#111111'; }
   const customRow=$('noteCustomRow');
@@ -1593,6 +1616,13 @@ $('noteCustomHz') && $('noteCustomHz').addEventListener('input', () => {
   const container = $('presetBtns');
   let activeBtn = null;
   let activePresetIndex = -1;
+  window.presetDirtyState = 'none';
+
+  window.markPresetDirty = function(){
+    if(window.presetDirtyState !== 'clean') return;
+    window.presetDirtyState = 'dirty';
+    if(activeBtn){ activeBtn.style.background = 'rgba(255,255,255,0.35)'; activeBtn.style.color = '#ffffff'; }
+  };
 
   function savePresetsToStorage(){
     try { localStorage.setItem('dtpPresets', JSON.stringify(PRESETS)); } catch(e){}
@@ -1625,6 +1655,7 @@ $('noteCustomHz') && $('noteCustomHz').addEventListener('input', () => {
     activeBtn = btns[idx] || null;
     if(activeBtn){ activeBtn.style.background = '#ffffff'; activeBtn.style.color = '#111111'; }
     activePresetIndex = idx;
+    window.presetDirtyState = 'clean';
     updatePresetNameDisplay(preset);
     transition(currentTransitionSec);
   }
@@ -1633,8 +1664,29 @@ $('noteCustomHz') && $('noteCustomHz').addEventListener('input', () => {
   window.clearPresetDisplay = function(){
     if(activeBtn){ activeBtn.style.background = ''; activeBtn.style.color = ''; activeBtn = null; }
     activePresetIndex = -1;
+    window.presetDirtyState = 'none';
     const el = $('presetName');
     if(el) el.textContent = '';
+  };
+
+  window.getActivePresetIndex = function(){ return activePresetIndex; };
+
+  window.restorePresetHighlight = function(idx, dirtyState){
+    if(activeBtn){ activeBtn.style.background = ''; activeBtn.style.color = ''; activeBtn = null; }
+    window.presetDirtyState = dirtyState || 'none';
+    activePresetIndex = idx;
+    if(idx >= 0 && idx < PRESETS.length){
+      const btns = container.querySelectorAll('button');
+      activeBtn = btns[idx] || null;
+      if(activeBtn){
+        if(dirtyState === 'dirty'){ activeBtn.style.background = 'rgba(255,255,255,0.35)'; activeBtn.style.color = '#ffffff'; }
+        else { activeBtn.style.background = '#ffffff'; activeBtn.style.color = '#111111'; }
+      }
+      updatePresetNameDisplay(PRESETS[idx]);
+    } else {
+      const el = $('presetName');
+      if(el) el.textContent = '';
+    }
   };
 
   function saveCurrentToPreset(idx){
@@ -1803,7 +1855,294 @@ $('noteCustomHz') && $('noteCustomHz').addEventListener('input', () => {
 
 })();
 
+// ---- Save / Load Config ----
+
+function buildConfigSnapshot(){
+  return {
+    dtpConfig: true,
+    version: 1,
+    a: state.a, d: state.d, s: state.s, floor: state.floor, scale: state.scale,
+    loudDecay: $('loudDecay').checked,
+    drawReleaseWhenZero: $('drawReleaseWhenZero').checked,
+    showBounds: $('showBounds').checked,
+    showContour: $('showContour').checked,
+    frequencyMode: $('frequencyMode').checked,
+    hpMode: $('hpMode').checked,
+    keyboardControl: $('keyboardControl').checked,
+    showClipped: $('showClipped').checked,
+    linearTime: $('linearTime').checked,
+    analogueCurve: $('analogueCurve').checked,
+    linearTimeScale: Number($('linearTimeScale').value),
+    curveAmount: Number($('curveAmount').value),
+    audioEnabled: $('audioEnabled').checked,
+    tapMode: tapMode,
+    tapCustomMs: Number($('tapCustomMs').value),
+    noteMode: noteMode,
+    noteCustomHz: Number($('noteCustomHz').value),
+    transitionSec: currentTransitionSec,
+    activeTransBtn: activeTransBtn,
+    liveAnimate: (document.querySelector('input[name="mode"]:checked') || {}).value || 'live',
+    lineColor: $('lineColor').value,
+    bgColor: $('bgColor').value,
+    attackColor: $('attackColor').value,
+    decayColor: $('decayColor').value,
+    releaseColor: $('releaseColor').value,
+    lineWidth: Number($('lineWidth').value),
+    innerLineWidth: Number($('innerLineWidth').value),
+    labelSize: Number($('labelSize').value),
+    activePresetIndex: window.getActivePresetIndex ? window.getActivePresetIndex() : -1,
+    presetDirtyState: window.presetDirtyState || 'none'
+  };
+}
+
+
+function loadConfigObject(cfg){
+
+  // State
+  state.a = cfg.a; state.d = cfg.d; state.s = cfg.s; state.floor = cfg.floor; state.scale = cfg.scale;
+  state.target.a = cfg.a; state.target.d = cfg.d; state.target.s = cfg.s; state.target.floor = cfg.floor; state.target.scale = cfg.scale;
+
+  // Checkboxes
+  ['loudDecay','drawReleaseWhenZero','showBounds','showContour','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve'].forEach(id => {
+    if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
+  });
+  syncHpModeEnabled();
+  syncAnalogueCurve();
+
+  // Numeric inputs
+  if($('linearTimeScale') && cfg.linearTimeScale !== undefined) $('linearTimeScale').value = cfg.linearTimeScale;
+  if($('tapCustomMs') && cfg.tapCustomMs !== undefined) $('tapCustomMs').value = cfg.tapCustomMs;
+  if($('noteCustomHz') && cfg.noteCustomHz !== undefined) $('noteCustomHz').value = cfg.noteCustomHz;
+  if($('curveAmount') && cfg.curveAmount !== undefined){
+    $('curveAmount').value = cfg.curveAmount;
+    const val = $('curveAmountVal'); if(val) val.textContent = cfg.curveAmount;
+  }
+  if($('customTransitionTime') && cfg.transitionSec !== undefined) $('customTransitionTime').value = cfg.transitionSec;
+
+  // Audio enabled
+  if($('audioEnabled') && cfg.audioEnabled !== undefined) $('audioEnabled').checked = cfg.audioEnabled;
+
+  // Tap mode
+  const tapBtnMap = {tap50:'tapMode50Btn', tap100:'tapMode100Btn', tap200:'tapMode200Btn', tapCustom:'tapModeCustomBtn', hold:'tapModeHoldBtn'};
+  if(cfg.tapMode && tapBtnMap[cfg.tapMode]) setTapMode(cfg.tapMode, tapBtnMap[cfg.tapMode]);
+
+  // Note mode
+  if(cfg.noteMode){
+    const freq = noteFreqs[cfg.noteMode] !== undefined ? noteFreqs[cfg.noteMode] : null;
+    setNoteMode(cfg.noteMode, freq);
+  }
+
+  // Transition
+  if(cfg.activeTransBtn) setTransMode(cfg.transitionSec !== undefined ? cfg.transitionSec : 1, cfg.activeTransBtn);
+
+  // Live/Animate mode
+  if(cfg.liveAnimate){
+    const radio = document.querySelector(`input[name="mode"][value="${cfg.liveAnimate}"]`);
+    if(radio) radio.checked = true;
+  }
+
+  // Colours (dispatch input to update CSS variables)
+  ['lineColor','bgColor','attackColor','decayColor','releaseColor'].forEach(id => {
+    if($(id) && cfg[id]){ $(id).value = cfg[id]; $(id).dispatchEvent(new Event('input')); }
+  });
+
+  // Line widths
+  if($('lineWidth') && cfg.lineWidth !== undefined){ $('lineWidth').value = cfg.lineWidth; $('lineWidth').dispatchEvent(new Event('input')); }
+  if($('innerLineWidth') && cfg.innerLineWidth !== undefined){ $('innerLineWidth').value = cfg.innerLineWidth; $('innerLineWidth').dispatchEvent(new Event('input')); }
+  if($('labelSize') && cfg.labelSize !== undefined){ $('labelSize').value = cfg.labelSize; $('labelSize').dispatchEvent(new Event('input')); }
+
+  // Preset highlight
+  if(window.restorePresetHighlight){
+    window.restorePresetHighlight(cfg.activePresetIndex !== undefined ? cfg.activePresetIndex : -1, cfg.presetDirtyState || 'none');
+  }
+
+  render();
+  refreshNumericInputs();
+  syncControls();
+}
+
+window.loadConfigObject = loadConfigObject;
+
+// ---- Merge saved configs from localStorage over defaults ----
+(function(){
+  try {
+    const saved = localStorage.getItem('dtpConfigs');
+    if(!saved) return;
+    const parsed = JSON.parse(saved);
+    if(!Array.isArray(parsed)) return;
+    parsed.forEach(c => {
+      const idx = CONFIGS.findIndex(q => q.name === c.name);
+      if(idx >= 0) Object.assign(CONFIGS[idx], c);
+      else CONFIGS.push(c);
+    });
+  } catch(e){}
+})();
+
+// ---- Configs ----
+(function(){
+  const container = $('configBtns');
+  let activeConfigBtn = null;
+  let activeConfigIndex = -1;
+
+  function saveConfigsToStorage(){
+    try { localStorage.setItem('dtpConfigs', JSON.stringify(CONFIGS)); } catch(e){}
+  }
+
+  function updateConfigNameDisplay(cfg){
+    const el = $('configName');
+    if(el && el.tagName === 'SPAN') el.textContent = `${cfg.name}: ${cfg.label}`;
+  }
+
+  function restoreConfigNameDisplay(){
+    const el = $('configName');
+    if(!el || el.tagName !== 'SPAN') return;
+    el.textContent = activeConfigIndex >= 0 && CONFIGS[activeConfigIndex]
+      ? `${CONFIGS[activeConfigIndex].name}: ${CONFIGS[activeConfigIndex].label}`
+      : '';
+  }
+
+  function loadConfig(idx){
+    if(idx < 0 || idx >= CONFIGS.length) return;
+    const cfg = CONFIGS[idx];
+    if(activeConfigBtn){ activeConfigBtn.style.background = ''; activeConfigBtn.style.color = ''; }
+    const btns = container.querySelectorAll('button');
+    activeConfigBtn = btns[idx] || null;
+    if(activeConfigBtn){ activeConfigBtn.style.background = '#ffffff'; activeConfigBtn.style.color = '#111111'; }
+    activeConfigIndex = idx;
+    updateConfigNameDisplay(cfg);
+    loadConfigObject(cfg);
+  }
+  window.loadConfigByIndex = loadConfig;
+
+  function saveCurrentToConfig(idx){
+    if(idx < 0 || idx >= CONFIGS.length) return;
+    const cfg = CONFIGS[idx];
+    const label = prompt('Config name:', cfg.label);
+    if(label === null) return;
+    const snapshot = buildConfigSnapshot();
+    snapshot.name = cfg.name;
+    snapshot.label = label.trim() || cfg.label;
+    Object.assign(cfg, snapshot);
+    saveConfigsToStorage();
+    const btn = container.querySelectorAll('button')[idx];
+    if(btn){
+      btn.style.background = '#00ff88'; btn.style.color = '#000';
+      setTimeout(() => {
+        if(activeConfigIndex === idx){ btn.style.background = '#ffffff'; btn.style.color = '#111111'; }
+        else { btn.style.background = ''; btn.style.color = ''; }
+      }, 600);
+    }
+    if(activeConfigIndex === idx) updateConfigNameDisplay(cfg);
+  }
+
+  function buildButtons(){
+    container.innerHTML = '';
+    CONFIGS.forEach((cfg, idx) => {
+      const btn = document.createElement('button');
+      btn.textContent = cfg.name;
+      btn.style.padding = '3px 5px';
+      btn.addEventListener('mouseenter', () => updateConfigNameDisplay(cfg));
+      btn.addEventListener('mouseleave', restoreConfigNameDisplay);
+      btn.addEventListener('click', e => {
+        if(e.shiftKey){ saveCurrentToConfig(idx); return; }
+        loadConfig(idx);
+      });
+      container.appendChild(btn);
+    });
+  }
+  buildButtons();
+
+  function attachConfigNameEdit(){
+    const el = $('configName');
+    if(!el || el.tagName !== 'SPAN') return;
+    el.style.cursor = 'text';
+    el.title = 'Click to rename';
+    el.onclick = () => {
+      if(activeConfigIndex < 0) return;
+      const cfg = CONFIGS[activeConfigIndex];
+      const inp = document.createElement('input');
+      inp.type = 'text'; inp.value = cfg.label;
+      inp.style.cssText = 'font-size:13px;font-weight:700;background:rgba(0,0,0,.5);color:#fff;border:1px solid rgba(255,255,255,.7);border-radius:4px;padding:1px 5px;width:130px;outline:none';
+      el.replaceWith(inp); inp.id = 'configName'; inp.focus(); inp.select();
+      let committed = false;
+      function save(){
+        if(committed) return; committed = true;
+        const newLabel = inp.value.trim() || cfg.label;
+        cfg.label = newLabel; saveConfigsToStorage();
+        const span = document.createElement('span');
+        span.id = 'configName'; span.style.cssText = 'font-size:13px;font-weight:700;opacity:.85';
+        span.textContent = `${cfg.name}: ${newLabel}`; inp.replaceWith(span); attachConfigNameEdit();
+      }
+      function revert(){
+        if(committed) return; committed = true;
+        const span = document.createElement('span');
+        span.id = 'configName'; span.style.cssText = 'font-size:13px;font-weight:700;opacity:.85';
+        span.textContent = `${cfg.name}: ${cfg.label}`; inp.replaceWith(span); attachConfigNameEdit();
+      }
+      inp.addEventListener('keydown', e => { if(e.key==='Enter'){save();e.preventDefault();} else if(e.key==='Escape') revert(); });
+      inp.addEventListener('blur', save);
+    };
+  }
+  attachConfigNameEdit();
+
+  $('exportConfigsBtn').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(CONFIGS, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'configs-export.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  $('importConfigsBtn').addEventListener('click', () => {
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = '.json'; inp.style.display = 'none';
+    document.body.appendChild(inp);
+    inp.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if(!file){ document.body.removeChild(inp); return; }
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if(!Array.isArray(data)) throw new Error('Expected a JSON array');
+          data.forEach((c, i) => {
+            if(typeof c.name !== 'string') throw new Error(`Item ${i} missing "name"`);
+            if(!c.dtpConfig) throw new Error(`Item ${i} missing dtpConfig`);
+          });
+          CONFIGS.length = 0; data.forEach(c => CONFIGS.push(c));
+          saveConfigsToStorage();
+          activeConfigBtn = null; activeConfigIndex = -1;
+          buildButtons();
+          const el = $('configName'); if(el) el.textContent = '';
+        } catch(err){ alert('Import failed: ' + err.message); }
+        document.body.removeChild(inp);
+      };
+      reader.readAsText(file);
+    });
+    inp.click();
+  });
+
+})();
+
 // ---- Init ----
+
+// Default mode: Animate
+document.querySelector('input[name="mode"][value="animate"]').checked = true;
+
+// Default: Linear Time enabled
+$('linearTime').checked = true;
+
+// Default: Preset A — set state and target directly so no animation occurs
+(function(){
+  const pa = PRESETS[0];
+  const a = positionFromMs(pa.a), d = positionFromMs(pa.d);
+  const s = pa.s / 10, floor = (pa.floor || 0) / 10, scale = (pa.scale !== undefined ? pa.scale : 10) / 10;
+  state.a = a; state.d = d; state.s = s; state.floor = floor; state.scale = scale;
+  state.target.a = a; state.target.d = d; state.target.s = s; state.target.floor = floor; state.target.scale = scale;
+  if(window.loadPresetByIndex) window.loadPresetByIndex(0); // highlights button A and sets preset name; transition is no-op since state === target
+})();
+
 render();
 refreshNumericInputs();
 hideLikelyAxes();
@@ -1811,6 +2150,8 @@ addPointerFeedback();
 setTransMode(1, 'trans1Btn');
 setTapMode('tap200','tapMode200Btn');
 setNoteMode('noteA4Btn', 440);
+
+if(window.loadConfigByIndex) window.loadConfigByIndex(0);
 
 </script>
 </body>
