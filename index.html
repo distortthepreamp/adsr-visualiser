@@ -29,6 +29,7 @@
   *{box-sizing:border-box}
   body{
     margin:0;
+    padding:0;
     height:100vh;
     background:var(--bg);
     color:var(--fg);
@@ -40,7 +41,7 @@
   .stage{
     flex:1;
     min-height:0;
-    padding:8px 36px 0;
+    padding:8px 36px;
     overflow:hidden;
   }
   svg{width:100%; height:100%; display:block; overflow:visible;}
@@ -62,9 +63,7 @@
     grid-template-columns: 1.6fr 1.15fr 1.15fr;
     gap:8px;
     padding:3px 14px 5px;
-    transform: scale(0.8);
     transform-origin: top left;
-    width: 125%;
   }
   .ui * { font-size:12px; font-weight:700; }
   .panel{
@@ -154,10 +153,10 @@
     <button id="helpBtn" title="Keyboard shortcuts" style="font-size:13px;font-weight:800;width:24px;height:24px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.6);background:rgba(0,0,0,.3);color:#fff;cursor:pointer;line-height:1;flex-shrink:0">?</button>
   </div>
   <div class="stage">
-    <svg id="svg" viewBox="0 -30 1200 495" preserveAspectRatio="xMidYMid meet" aria-label="ADSR envelope graph">
+    <svg id="svg" viewBox="0 -110 1200 575" preserveAspectRatio="xMidYMid meet" aria-label="ADSR envelope graph">
       <line id="amountLine" x1="80" y1="30" x2="1145" y2="30" style="stroke:var(--line);stroke-width:3.5;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <line id="floorLine" x1="80" y1="445" x2="1145" y2="445" style="stroke:var(--line);stroke-width:3.5;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
-      <line id="sustainMarker" x1="80" y1="445" x2="80" y2="445" style="stroke:var(--line);stroke-opacity:.9;stroke-width:11;stroke-linecap:round;stroke-dasharray:1 24;vector-effect:non-scaling-stroke;" />
+      <line id="sustainMarker" x1="80" y1="445" x2="80" y2="445" style="stroke:var(--line);stroke-opacity:1;stroke-linecap:round;stroke-dasharray:1 24;vector-effect:non-scaling-stroke;" />
       <circle id="sustainPoint" class="tap-marker" cx="80" cy="445" style="opacity:.85" />
       <g id="envSegments">
         <path id="releaseOuter" class="env-outer" d="" />
@@ -180,7 +179,11 @@
       <rect id="meterFill" x="1145" y="445" width="40" height="0" style="fill:var(--line);stroke:none;" />
       <text id="meterLabelTitle" x="1165" y="72" text-anchor="middle" style="fill:var(--fg);font-size:calc(var(--labelSize) * 1px);font-weight:800;font-family:'UniversCondensed',Arial,Helvetica,sans-serif;display:none;">VOL</text>
       <text id="modeLabel" class="mode-label" x="80" y="0" text-anchor="start">LOUDNESS CONTOUR</text>
-
+      <text id="segFilterMode" class="mode-label" x="80"  y="0" text-anchor="start" style="display:none">FILTER MODE: LO</text>
+      <text id="segDecay"      class="mode-label" x="280" y="0" text-anchor="start">LOUD DECAY: OFF</text>
+      <text id="segDisplay"    class="mode-label" x="480" y="0" text-anchor="start">DISPLAY: SCHEMATIC</text>
+      <text id="segSustain"    class="mode-label" x="700" y="0" text-anchor="start" style="display:none">SUSTAIN CORRECTED</text>
+      <text id="segClipping"   class="mode-label" x="900" y="0" text-anchor="start" style="display:none">CONTOUR PEAK CORRECTED</text>
 
       <text id="sLabel" class="small-label" x="0" y="0">SUSTAIN</text>
 
@@ -278,7 +281,7 @@
       </div>
       <div class="row"><label><input id="keepTapMarker" type="checkbox" checked> Leave Tap Marker</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
-      <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Label <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label></div>
+      <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Label <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label><label>Console <input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></label></div>
       <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#5fa8ff"></label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:10px;align-items:center;flex-wrap:wrap">
@@ -317,6 +320,7 @@
         <table style="border-collapse:collapse;width:100%">
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">Space</td><td style="padding:3px 0;font-size:13px;font-weight:700">Fire selected mode</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">H</td><td style="padding:3px 0;font-size:13px;font-weight:700">Select Hold mode</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">Enter</td><td style="padding:3px 0;font-size:13px;font-weight:700">Transition</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">R</td><td style="padding:3px 0;font-size:13px;font-weight:700">Release</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">Opt+C</td><td style="padding:3px 0;font-size:13px;font-weight:700">Clear</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">←</td><td style="padding:3px 0;font-size:13px;font-weight:700">Previous preset</td></tr>
@@ -507,6 +511,8 @@ function syncRadii(){
   document.getElementById('dot').setAttribute('r', Math.round(lw * 1.0));
   document.getElementById('tapMarker').setAttribute('r', Math.round(lw * 0.8));
   document.getElementById('sustainPoint').setAttribute('r', Math.round(lw * 0.57));
+  const ilw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--innerLineWidth')) || 6;
+  document.getElementById('sustainMarker').style.strokeWidth = ilw;
 }
 
 function render(){
@@ -692,7 +698,18 @@ function render(){
   const titleEl=$('meterLabelTitle');
   if(titleEl){ titleEl.textContent=freqMode?'FREQ':'VOL'; titleEl.setAttribute('x',meterCX); titleEl.setAttribute('y',meterAbsTop-18); titleEl.style.display=''; }
   const modeLabelEl=$('modeLabel');
-  if(modeLabelEl){ modeLabelEl.textContent=freqMode?'FILTER CONTOUR':'LOUDNESS CONTOUR'; modeLabelEl.setAttribute('x',graph.x0); modeLabelEl.setAttribute('y',yFor(1)-35); }
+  if(modeLabelEl){ modeLabelEl.textContent=freqMode?'FILTER CONTOUR':'LOUDNESS CONTOUR'; modeLabelEl.setAttribute('x',graph.x0); modeLabelEl.setAttribute('y',yFor(1)-90); }
+  const segY = yFor(1) - 60;
+  const segFilterModeEl=$('segFilterMode');
+  if(segFilterModeEl){ segFilterModeEl.setAttribute('y',segY); segFilterModeEl.style.display=freqMode?'':'none'; segFilterModeEl.textContent=isHP?'FILTER MODE: HI':'FILTER MODE: LO'; }
+  const segDecayEl=$('segDecay');
+  if(segDecayEl){ const ldOn=$('loudDecay')&&$('loudDecay').checked; segDecayEl.setAttribute('y',segY); segDecayEl.style.display=''; segDecayEl.textContent=(freqMode?'FILTER DECAY':'LOUD DECAY')+(ldOn?': ON':': OFF'); }
+  const segDisplayEl=$('segDisplay');
+  if(segDisplayEl){ segDisplayEl.setAttribute('y',segY); segDisplayEl.style.display=''; segDisplayEl.textContent=analogueOn?'DISPLAY: RC MODELLED':'DISPLAY: SCHEMATIC'; }
+  const segSustainEl=$('segSustain');
+  if(segSustainEl){ segSustainEl.setAttribute('y',segY); segSustainEl.style.display=$('keyboardControl')&&$('keyboardControl').checked?'':'none'; }
+  const segClippingEl=$('segClipping');
+  if(segClippingEl){ segClippingEl.setAttribute('y',segY); segClippingEl.style.display=(e.floor+e.scale>1)?'':'none'; }
   // Cutoff/Amount knobs: active only in Filter Mode
   const floorBox=$('floorKnobBox'), scaleBox=$('scaleKnobBox');
   if(floorBox) floorBox.style.opacity=freqMode?'':'0.35';
@@ -777,8 +794,15 @@ $('attackColor').addEventListener('input',e=>document.documentElement.style.setP
 $('decayColor').addEventListener('input',e=>document.documentElement.style.setProperty('--decayColor', e.target.value));
 $('releaseColor').addEventListener('input',e=>document.documentElement.style.setProperty('--releaseColor', e.target.value));
 $('lineWidth').addEventListener('input',e=>{ document.documentElement.style.setProperty('--lineWidth', e.target.value); syncRadii(); });
-$('innerLineWidth').addEventListener('input',e=>document.documentElement.style.setProperty('--innerLineWidth', e.target.value));
+$('innerLineWidth').addEventListener('input',e=>{ document.documentElement.style.setProperty('--innerLineWidth', e.target.value); syncRadii(); });
 $('labelSize').addEventListener('input',e=>document.documentElement.style.setProperty('--labelSize', e.target.value));
+function syncConsoleScale(){
+  const s = Number($('consoleScale').value) || 0.7;
+  const uiEl = document.querySelector('.ui');
+  if(uiEl){ uiEl.style.transform = `scale(${s})`; uiEl.style.width = `${(1/s)*100}%`; }
+}
+$('consoleScale').addEventListener('input', syncConsoleScale);
+syncConsoleScale();
 
 function transition(durSec){
   clearBlobAndMarker();
@@ -1161,6 +1185,9 @@ document.addEventListener('keydown', e => {
   } else if(e.key === '2'){ setTapMode('tap100','tapMode100Btn');
   } else if(e.key === '3'){ setTapMode('tap200','tapMode200Btn');
   } else if(e.key === 'h' || e.key === 'H'){ setTapMode('hold','tapModeHoldBtn');
+  } else if(e.key === 'Enter'){
+    e.preventDefault();
+    transition(currentTransitionSec);
   } else if(e.key === 'r' || e.key === 'R'){
     if(state.currentPhase === 'sustain' || state.currentPhase === 'hold') releaseFromCurrent();
   } else if((e.key === 'c' || e.key === 'C') && e.altKey){ clearBlobAndMarker();
@@ -1182,27 +1209,27 @@ document.addEventListener('keydown', e => {
     e.preventDefault();
     const newS = Math.min(1, Math.round(state.target.s * 10 + 1) / 10);
     state.target.s = newS; $('sustain').value = Math.round(newS * 1000);
-    if(currentMode() === 'live'){ state.s = newS; render(); } else { transition(); }
+    transition(currentTransitionSec);
     if(window.markPresetDirty) markPresetDirty();
   } else if(e.key === 'ArrowDown'){
     e.preventDefault();
     const newS = Math.max(0, Math.round(state.target.s * 10 - 1) / 10);
     state.target.s = newS; $('sustain').value = Math.round(newS * 1000);
-    if(currentMode() === 'live'){ state.s = newS; render(); } else { transition(); }
+    transition(currentTransitionSec);
     if(window.markPresetDirty) markPresetDirty();
   // Quick Set — Shift+0-8 attack presets
   } else if(e.shiftKey && e.code >= 'Digit0' && e.code <= 'Digit8'){
     const attackMs = [0,10,50,100,200,500,1000,2000,4000][Number(e.code.replace('Digit',''))];
     const p = positionFromMs(attackMs);
-    if(currentMode() === 'live'){ state.a = p; state.target.a = p; $('attack').value = Math.round(p * 1000); render(); }
-    else { state.target.a = p; $('attack').value = Math.round(p * 1000); transition(); }
+    state.target.a = p; $('attack').value = Math.round(p * 1000);
+    transition(currentTransitionSec);
     if(window.markPresetDirty) markPresetDirty();
   // Quick Set — Opt/Alt+0-8 decay presets
   } else if(e.altKey && e.code >= 'Digit0' && e.code <= 'Digit8'){
     const decayMs = [0,10,50,100,200,500,1000,2000,4000][Number(e.code.replace('Digit',''))];
     const p = positionFromMs(decayMs);
-    if(currentMode() === 'live'){ state.d = p; state.target.d = p; $('decay').value = Math.round(p * 1000); render(); }
-    else { state.target.d = p; $('decay').value = Math.round(p * 1000); transition(); }
+    state.target.d = p; $('decay').value = Math.round(p * 1000);
+    transition(currentTransitionSec);
     if(window.markPresetDirty) markPresetDirty();
   }
 });
@@ -1906,6 +1933,7 @@ function buildConfigSnapshot(){
     lineWidth: Number($('lineWidth').value),
     innerLineWidth: Number($('innerLineWidth').value),
     labelSize: Number($('labelSize').value),
+    consoleScale: Number($('consoleScale').value),
     activePresetIndex: window.getActivePresetIndex ? window.getActivePresetIndex() : -1,
     presetDirtyState: window.presetDirtyState || 'none'
   };
@@ -1966,6 +1994,7 @@ function loadConfigObject(cfg){
   if($('lineWidth') && cfg.lineWidth !== undefined){ $('lineWidth').value = cfg.lineWidth; $('lineWidth').dispatchEvent(new Event('input')); }
   if($('innerLineWidth') && cfg.innerLineWidth !== undefined){ $('innerLineWidth').value = cfg.innerLineWidth; $('innerLineWidth').dispatchEvent(new Event('input')); }
   if($('labelSize') && cfg.labelSize !== undefined){ $('labelSize').value = cfg.labelSize; $('labelSize').dispatchEvent(new Event('input')); }
+  if($('consoleScale') && cfg.consoleScale !== undefined){ $('consoleScale').value = cfg.consoleScale; syncConsoleScale(); }
 
   // Preset highlight
   if(window.restorePresetHighlight){
