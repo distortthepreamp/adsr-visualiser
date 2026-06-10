@@ -712,6 +712,7 @@ function render(){
   $('sustainMarker').style.display = textbookAdsr ? 'none' : '';
   $('sustainPoint').setAttribute('cx', drawPS.x);
   $('sustainPoint').setAttribute('cy', drawPS.y);
+  $('sustainPoint').style.display = textbookAdsr ? 'none' : '';
 
   $('sLabel').setAttribute('x',Math.min(markerEndX-105, drawPS.x+28)); $('sLabel').setAttribute('y',drawPS.y-18); $('sLabel').style.display = textbookAdsr ? 'none' : '';
 
@@ -951,6 +952,58 @@ function sampledSustainPoint(pt){
   return { x: pt.x, y: sampledY, level: pt.level, phase: 'sustain' };
 }
 
+// Textbook ADSR animation geometry — mirrors render()'s textbook coordinate logic.
+function tbComputeAnimPoints(){
+  const e=getEffective();
+  const linearTimeOn=$('linearTime')&&$('linearTime').checked;
+  let aw,dwFull,rwFull;
+  if(linearTimeOn){
+    const totalMs=Math.max(1,Number($('linearTimeScale').value))*1000;
+    aw=e.aT*1000*(graph.w/totalMs);
+    dwFull=e.dT*1000*(graph.w/totalMs);
+    rwFull=mapTime(state.r)*1000*(graph.w/totalMs);
+  } else {
+    aw=displayTimeWidth(e.aT);
+    dwFull=displayTimeWidth(e.dT);
+    rwFull=displayTimeWidth(mapTime(state.r));
+  }
+  const sustainGap=graph.w*0.15;
+  const floorY=yFor(e.floor);
+  const peakY=yFor(e.floor+e.scale);
+  const sustainY=yFor(e.floor+e.s*e.scale);
+  const decayEndX=graph.x0+aw+dwFull;
+  const sustainEndX=decayEndX+sustainGap;
+  const releaseEndX=sustainEndX+rwFull;
+  return {
+    tbAttackEnd: {x:graph.x0+aw,   y:peakY},
+    tbDecayEnd:  {x:decayEndX,      y:sustainY},
+    tbSustainEnd:{x:sustainEndX,    y:sustainY},
+    tbReleaseEnd:{x:releaseEndX,    y:floorY},
+    e
+  };
+}
+
+// Gate-high point for textbook mode: attack to peak, decay to sustain level (not floor).
+function pointWhileGateHighTextbook(ms){
+  const tb=tbComputeAnimPoints();
+  const e=tb.e;
+  const t=ms/1000;
+  const floorY=yFor(e.floor);
+  if(e.aT>.0005 && t<=e.aT){
+    const f=clamp(t/e.aT);
+    return {x:graph.x0+(tb.tbAttackEnd.x-graph.x0)*f, y:floorY+(tb.tbAttackEnd.y-floorY)*f, level:f, phase:'attack'};
+  }
+  const afterAttack=e.aT<=.0005?t:t-e.aT;
+  const f=e.dT<=.0005?1:clamp(afterAttack/e.dT);
+  if(f>=1) return {x:tb.tbDecayEnd.x, y:tb.tbDecayEnd.y, level:e.s, phase:'sustain'};
+  const level=1-f*(1-e.s);
+  return {
+    x:tb.tbAttackEnd.x+(tb.tbDecayEnd.x-tb.tbAttackEnd.x)*f,
+    y:tb.tbAttackEnd.y+(tb.tbDecayEnd.y-tb.tbAttackEnd.y)*f,
+    level, phase:'decay'
+  };
+}
+
 function setMeterLevel(level){
   const fill=$('meterFill');
   if(!fill) return;
@@ -1065,6 +1118,37 @@ function releaseFromCurrent(){
     releaseStartPoint = { x: startX, y: startY, level: startLevel };
     state.releaseFromDecay = (startLevel > pts.e.s);
   }
+  if($('textbookAdsr') && $('textbookAdsr').checked){
+    const tb=tbComputeAnimPoints();
+    const sY=tb.tbSustainEnd.y, fY=tb.tbReleaseEnd.y;
+    // If blob is at or below sustain level (attack hasn't reached sustain yet, or below),
+    // interpolate the x start position on the release slope at startY.
+    // If blob is above sustain level (decay/sustain phase), snap to top of slope as before.
+    let tbStart;
+    if(startY >= sY && (fY - sY) > 0){
+      const f0=clamp((startY - sY) / (fY - sY));
+      tbStart={x: tb.tbSustainEnd.x + f0*(tb.tbReleaseEnd.x - tb.tbSustainEnd.x), y: startY};
+    } else {
+      tbStart={x: tb.tbSustainEnd.x, y: sY};
+    }
+    const end={x:tb.tbReleaseEnd.x, y:fY, level:0};
+    const dur=Math.max(20,e.rT*1000);
+    const t0=performance.now();
+    state.currentPhase='release';
+    setDot({x:tbStart.x, y:tbStart.y, level:startLevel, phase:'sustain'}, true);
+    function tbReleaseStep(now){
+      if(myAnimationToken !== animationToken) return;
+      const f=clamp((now-t0)/dur);
+      const dotX=tbStart.x+(end.x-tbStart.x)*f;
+      const linearY=tbStart.y+(end.y-tbStart.y)*f;
+      const pt={x:dotX, y:linearY, level:startLevel*(1-f), phase:'release'};
+      setDot(pt,true);
+      if(f<1) state.dotAnim=requestAnimationFrame(tbReleaseStep);
+      else { setDot(end,false); audioCut(); state.held=false; state.currentPhase='idle'; updateButtonStates(); }
+    }
+    requestAnimationFrame(tbReleaseStep);
+    return;
+  }
   const overrange = e.floor + e.scale > 1;
   const showClipped = document.getElementById('showClipped').checked;
   const f_decay = overrange ? (pts.e.floor + pts.e.scale - 1) / pts.e.scale : 0;
@@ -1141,6 +1225,24 @@ function tap(ms){
   state.held=false;
   state.currentPhase='tap';
   updateButtonStates();
+  if($('textbookAdsr') && $('textbookAdsr').checked){
+    function tbTapStep(now){
+      if(myAnimationToken !== animationToken) return;
+      const elapsed=now-t0;
+      if(elapsed < tapMs){
+        const pt=pointWhileGateHighTextbook(elapsed);
+        setDot(pt.phase==='sustain'?{x:pt.x,y:pt.y,level:pt.level,phase:'decay'}:pt, true);
+        state.dotAnim=requestAnimationFrame(tbTapStep);
+      } else {
+        const landing=pointWhileGateHighTextbook(tapMs);
+        const landPt=landing.phase==='sustain'?{x:landing.x,y:landing.y,level:landing.level,phase:'decay'}:landing;
+        setDot(landPt, true);
+        releaseFromCurrent();
+      }
+    }
+    requestAnimationFrame(tbTapStep);
+    return;
+  }
   function step(now){
     if (myAnimationToken !== animationToken) return;
     const elapsed=now-t0;
@@ -1177,6 +1279,26 @@ function hold(){
   const dur=(e.aT + e.dT*(1-e.s))*1000;
   const t0=performance.now();
   hideDot(); state.held=true; state.currentPhase='hold'; updateButtonStates();
+  if($('textbookAdsr') && $('textbookAdsr').checked){
+    const tbDur=(e.aT+e.dT)*1000;
+    function tbHoldStep(now){
+      if(myAnimationToken !== animationToken) return;
+      const elapsed=now-t0;
+      const pt=pointWhileGateHighTextbook(elapsed);
+      setDot(pt.phase==='sustain'?{x:pt.x,y:pt.y,level:pt.level,phase:'decay'}:pt, true);
+      if(elapsed < tbDur){ state.dotAnim=requestAnimationFrame(tbHoldStep); }
+      else {
+        const tb=tbComputeAnimPoints();
+        const decayPathEl=document.getElementById('decayOuter');
+        const sampledY=decayPathEl?getYFromPath(decayPathEl,tb.tbDecayEnd.x):tb.tbDecayEnd.y;
+        setDot({x:tb.tbDecayEnd.x,y:sampledY,level:tb.e.s,phase:'decay'},true);
+        $('dot').style.animation='blobPulse 0.8s ease-in-out infinite alternate';
+        state.currentPhase='sustain'; updateButtonStates();
+      }
+    }
+    requestAnimationFrame(tbHoldStep);
+    return;
+  }
   function step(now){
     if (myAnimationToken !== animationToken) return;
     const elapsed=now-t0; setDot(sampledSustainPoint(pointWhileGateHigh(elapsed)), true);
