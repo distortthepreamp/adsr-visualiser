@@ -292,6 +292,7 @@
       <div class="row"><label><input id="keepTapMarker" type="checkbox" checked> Leave Tap Marker</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Label <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label><label>Console <input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></label></div>
+      <div class="row"><label><input id="showOuterLine" type="checkbox" checked> Show Outer Line</label></div>
       <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#5fa8ff"></label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:10px;align-items:center;flex-wrap:wrap">
@@ -695,6 +696,12 @@ function render(){
     ['releaseOuter','releaseInner'].forEach(id => $(id).setAttribute('d', tbRPath));
   }
 
+  // Show/hide outer lines based on showOuterLine checkbox
+  const showOuterLine = !$('showOuterLine') || $('showOuterLine').checked;
+  ['attackOuter','decayOuter','releaseOuter','sustainSegOuter','ceilLeftOuter','ceilRightOuter'].forEach(id => {
+    const el = $(id); if(el) el.style.opacity = showOuterLine ? '' : '0';
+  });
+
   // Sustain as a horizontal level guide extending to the right from
   // the decay/release intersection. This reads as an indefinite held level,
   // rather than something that reaches back into the earlier decay phase.
@@ -826,7 +833,7 @@ function setFromSlider(){
 $('sustain').addEventListener('input',()=>{ setFromSlider(); if(window.markPresetDirty) markPresetDirty(); });
 ['floor','scale'].forEach(id=>$(id).addEventListener('input',()=>{ setFromSlider(); if(window.markPresetDirty) markPresetDirty(); }));
 document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) state.target={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale}; syncControls(); }));
-['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr'].forEach(id=>$(id).addEventListener('change',render));
+['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','showOuterLine'].forEach(id=>$(id).addEventListener('change',render));
 function syncHpModeEnabled(){
   const freqOn = $('frequencyMode') && $('frequencyMode').checked;
   const hpLabel = $('hpMode') && $('hpMode').closest('label');
@@ -2109,6 +2116,7 @@ function buildConfigSnapshot(){
     linearTime: $('linearTime').checked,
     analogueCurve: $('analogueCurve').checked,
     textbookAdsr: $('textbookAdsr').checked,
+    showOuterLine: $('showOuterLine') ? $('showOuterLine').checked : true,
     linearTimeScale: Number($('linearTimeScale').value),
     curveAmount: Number($('curveAmount').value),
     audioEnabled: $('audioEnabled').checked,
@@ -2141,7 +2149,7 @@ function loadConfigObject(cfg){
   state.target.a = cfg.a; state.target.d = cfg.d; state.target.s = cfg.s; state.target.r = state.r; state.target.floor = cfg.floor; state.target.scale = cfg.scale;
 
   // Checkboxes
-  ['loudDecay','drawReleaseWhenZero','showBounds','showContour','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr'].forEach(id => {
+  ['loudDecay','drawReleaseWhenZero','showBounds','showContour','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','showOuterLine'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
   syncHpModeEnabled();

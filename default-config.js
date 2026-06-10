@@ -16,6 +16,7 @@ var DEFAULT_CONFIG = {
   "showClipped": false,
   "linearTime": true,
   "analogueCurve": false,
+  "showOuterLine": true,
   "linearTimeScale": 6,
   "curveAmount": 40,
   "audioEnabled": true,
