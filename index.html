@@ -681,8 +681,16 @@ function render(){
     const tbSusEnd = { x: pts.pEnd.x + sustainGap, y: drawPS.y };
     const tbSusPath = drawReleasePath ? `M ${pts.pEnd.x} ${drawPS.y} L ${tbSusEnd.x} ${drawPS.y}` : '';
     ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d', tbSusPath); el.style.display=''; } });
-    // Release: starts from end of sustain segment
-    const tbREnd = { x: tbSusEnd.x + (rEnd.x - pts.pEnd.x), y: yFor(e.floor) };
+    // Release: starts from end of sustain segment, spans rwFull to the right
+    const rT_r2 = mapTime(state.r);
+    let rwFull2;
+    if(linearTimeOn){
+      const totalMs2 = Math.max(1, Number($('linearTimeScale').value)) * 1000;
+      rwFull2 = rT_r2 * 1000 * (graph.w / totalMs2);
+    } else {
+      rwFull2 = displayTimeWidth(rT_r2);
+    }
+    const tbREnd = { x: tbSusEnd.x + rwFull2, y: yFor(e.floor) };
     const tbRPath = drawReleasePath ? buildPath(tbSusEnd.x, tbSusEnd.y, tbREnd.x, tbREnd.y, curveAmt, rSF) : '';
     ['releaseOuter','releaseInner'].forEach(id => $(id).setAttribute('d', tbRPath));
   }
