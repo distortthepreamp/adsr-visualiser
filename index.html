@@ -74,7 +74,7 @@
     backdrop-filter:blur(2px);
     overflow:hidden;
   }
-  .knobs{display:grid; grid-template-columns:repeat(5,1fr); gap:6px; align-items:start;}
+  .knobs{display:grid; grid-template-columns:repeat(6,1fr); gap:6px; align-items:start;}
   .knobBox{text-align:center;}
   .knobLabel{letter-spacing:.03em; margin-bottom:1px;}
   .knob{
@@ -159,11 +159,13 @@
       <line id="sustainMarker" x1="80" y1="445" x2="80" y2="445" style="stroke:var(--line);stroke-opacity:1;stroke-linecap:round;stroke-dasharray:1 24;vector-effect:non-scaling-stroke;" />
       <circle id="sustainPoint" class="tap-marker" cx="80" cy="445" style="opacity:.85" />
       <g id="envSegments">
+        <path id="sustainSegOuter" class="env-outer" d="" style="display:none" />
         <path id="releaseOuter" class="env-outer" d="" />
         <path id="decayOuter" class="env-outer" d="" />
         <path id="ceilLeftOuter" class="env-outer" d="" style="display:none" />
         <path id="ceilRightOuter" class="env-outer" d="" style="display:none" />
         <path id="attackOuter" class="env-outer" d="" />
+        <path id="sustainSegInner" class="env-inner decay-inner" d="" style="display:none" />
         <path id="releaseInner" class="env-inner release-inner" d="" />
         <path id="decayInner" class="env-inner decay-inner" d="" />
         <path id="ceilLeftInner" class="env-inner attack-inner" d="" style="display:none" />
@@ -227,6 +229,13 @@
           <div id="sustainRead" class="readout"></div>
           <div id="sustainTarget" class="targetReadout"></div>
         </div>
+        <div id="releaseKnobBox" class="knobBox">
+          <div class="knobLabel">Release</div>
+          <div id="releaseKnob" class="knob"></div>
+          <input id="release" type="range" min="0" max="1000" value="500" style="display:none">
+          <div id="releaseRead" class="readout"></div>
+          <div id="releaseTarget" class="targetReadout"></div>
+        </div>
         <div id="floorKnobBox" class="knobBox">
           <div class="knobLabel">Cutoff</div>
           <div id="floorKnob" class="knob"></div>
@@ -245,16 +254,17 @@
     </div>
 
     <div class="panel">
-      <div class="row"><label><input id="loudDecay" type="checkbox"> D — <span id="loudDecayLabel">Loud Decay</span></label></div>
+      <div id="loudDecayRow" class="row"><label><input id="loudDecay" type="checkbox"> D — <span id="loudDecayLabel">Loud Decay</span></label></div>
       <div class="row"><label><input id="drawReleaseWhenZero" type="checkbox"> Z — Draw Release When Zero</label></div>
       <div class="row"><label><input id="showBounds" type="checkbox"> , — Show Max Min Lines</label></div>
       <div class="row"><label><input id="showContour" type="checkbox" checked> . — Show Contour Top And Bottom</label></div>
       <div class="row"><label><input id="frequencyMode" type="checkbox"> F — Filter Mode</label></div>
       <div class="row"><label><input id="hpMode" type="checkbox"> M — LP/HP Mode</label></div>
       <div class="row"><label><input id="keyboardControl" type="checkbox"> S — Mimic Model D Sustain (80%)</label></div>
-      <div class="row"><label><input id="showClipped" type="checkbox"> C — Show Clipped Shape</label></div>
+      <div id="showClippedRow" class="row"><label><input id="showClipped" type="checkbox"> C — Show Clipped Shape</label></div>
       <div class="row" style="align-items:center;gap:6px"><label><input id="linearTime" type="checkbox"> X — Linear Time</label><input id="linearTimeScale" type="number" min="1" max="15" step="1" value="6" style="width:42px;text-align:center;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.3);border-radius:5px;color:#fff;font-size:13px;padding:2px 4px"><label id="linearTimeScaleLabel" for="linearTimeScale" style="font-size:13px">s</label></div>
-      <div class="row" style="align-items:center;gap:6px"><label><input id="analogueCurve" type="checkbox"> B — Analogue Curve</label><input id="curveAmount" type="range" min="0" max="100" value="40" style="width:80px;opacity:0.35"><span id="curveAmountVal" style="font-size:13px;min-width:20px;text-align:right;opacity:0.35">40</span></div>
+      <div class="row"><label><input id="textbookAdsr" type="checkbox"> T — Textbook ADSR</label></div>
+      <div id="analogueCurveRow" class="row" style="align-items:center;gap:6px"><label><input id="analogueCurve" type="checkbox"> B — Analogue Curve</label><input id="curveAmount" type="range" min="0" max="100" value="40" style="width:80px;opacity:0.35"><span id="curveAmountVal" style="font-size:13px;min-width:20px;text-align:right;opacity:0.35">40</span></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:5px">
         <button id="trans1Btn">1s</button>
@@ -381,7 +391,7 @@ const curve = [
   {p:0.00,t:0}, {p:0.08,t:0.010}, {p:0.25,t:0.200}, {p:0.42,t:0.600},
   {p:0.58,t:1.000}, {p:0.75,t:5.000}, {p:0.90,t:10.000}, {p:1.00,t:12.000}
 ];
-const state = { a:.08, d:.25, s:.5, floor:0, scale:1, target:{a:.08,d:.25,s:.5,floor:0,scale:1}, anim:null, dotAnim:null, held:false, dotLevel:0, currentPhase:'idle', releaseFromDecay:false };
+const state = { a:.08, d:.25, s:.5, r:.5, floor:0, scale:1, target:{a:.08,d:.25,s:.5,r:.5,floor:0,scale:1}, anim:null, dotAnim:null, held:false, dotLevel:0, currentPhase:'idle', releaseFromDecay:false };
 const graph = { x0:80, y0:445, w:1045, h:415 };
 
 function clamp(v,min=0,max=1){ return Math.max(min, Math.min(max, v)); }
@@ -438,11 +448,12 @@ function getEffective(){
   const aT=mapTime(state.a), dT=mapTime(state.d);
   const rawS=state.s;
   const s=$('keyboardControl').checked ? rawS*.8 : rawS;
-  const releaseOn=$('loudDecay').checked;
+  const textbookOn = $('textbookAdsr') && $('textbookAdsr').checked;
+  const releaseOn = textbookOn ? true : $('loudDecay').checked;
   const freqMode = $('frequencyMode') && $('frequencyMode').checked;
   const floor = freqMode ? clamp(state.floor,0,1) : 0;
   const scale = freqMode ? clamp(state.scale,0,1) : 1;
-  return {aT,dT,s,rawS,releaseOn,rT:releaseOn?dT:0,floor,scale};
+  return {aT,dT,s,rawS,releaseOn,rT:releaseOn?(textbookOn?mapTime(state.r):dT):0,floor,scale};
 }
 function yFor(level){ return graph.y0 - level*graph.h; }
 function computePoints(){
@@ -488,7 +499,7 @@ const KNOB_YELLOW = 'radial-gradient(circle at 36% 30%, #ccaa00, #886600 68%, #2
 
 function syncKnobColours(freqMode){
   const adsBg = freqMode ? KNOB_CYAN : KNOB_RED;
-  ['attackKnob','decayKnob','sustainKnob'].forEach(id => { const k=$(id); if(k) k.style.background=adsBg; });
+  ['attackKnob','decayKnob','sustainKnob','releaseKnob'].forEach(id => { const k=$(id); if(k) k.style.background=adsBg; });
   const fsBg = KNOB_YELLOW; // shown/hidden via opacity; always yellow when filter mode on
   ['floorKnob','scaleKnob'].forEach(id => { const k=$(id); if(k) k.style.background = freqMode ? fsBg : KNOB_RED; });
 }
@@ -525,7 +536,8 @@ function render(){
   const e = pts.e;
   const ceilY = yFor(1);
   const overrange = e.scale > 0.0001 && e.floor + e.scale > 1.0001;
-  const showClipped = overrange && $('showClipped') && $('showClipped').checked;
+  const textbookAdsr = $('textbookAdsr') && $('textbookAdsr').checked;
+  const showClipped = !textbookAdsr && overrange && $('showClipped') && $('showClipped').checked;
 
   const drawP1 = showClipped
     ? pts.p1
@@ -535,7 +547,16 @@ function render(){
     ? { x: pts.pS.x, y: Math.max(pts.pS.y, yFor(1)), level: pts.pS.level }
     : pts.pS;
 
-  const analogueOn = $('analogueCurve') && $('analogueCurve').checked;
+  const releaseR = state.r; // reserved for future use
+  const releaseBox = $('releaseKnobBox');
+  if(releaseBox){ releaseBox.style.opacity = textbookAdsr ? '1' : '0.35'; releaseBox.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
+  const loudDecayRow = $('loudDecayRow');
+  if(loudDecayRow){ loudDecayRow.style.opacity = textbookAdsr ? '0.35' : '1'; loudDecayRow.style.pointerEvents = textbookAdsr ? 'none' : 'auto'; }
+  const showClippedRow = $('showClippedRow');
+  if(showClippedRow){ showClippedRow.style.opacity = textbookAdsr ? '0.35' : '1'; showClippedRow.style.pointerEvents = textbookAdsr ? 'none' : 'auto'; }
+  const analogueCurveRow = $('analogueCurveRow');
+  if(analogueCurveRow){ analogueCurveRow.style.opacity = textbookAdsr ? '0.35' : '1'; analogueCurveRow.style.pointerEvents = textbookAdsr ? 'none' : 'auto'; }
+  const analogueOn = !textbookAdsr && $('analogueCurve') && $('analogueCurve').checked;
   const curveAmt = analogueOn ? (Number($('curveAmount').value) / 100) : 0;
 
   const linearTimeOn = $('linearTime') && $('linearTime').checked;
@@ -597,46 +618,74 @@ function render(){
     const t = (slopeY !== 0) ? remainingY / slopeY : 1;
     rEnd = { x: pts.pS.x + slopeX * t, y: yFor(e.floor) };
   } else {
-    rEnd = e.releaseOn ? pts.pEnd : { x: drawPS.x, y: pts.p0.y };
+    let pEndForRelease = pts.pEnd;
+    if(textbookAdsr && e.releaseOn){
+      const rT_r = mapTime(state.r);
+      let rwFull;
+      if(linearTimeOn){
+        const totalMs = Math.max(1, Number($('linearTimeScale').value)) * 1000;
+        rwFull = rT_r * 1000 * (graph.w / totalMs);
+      } else {
+        rwFull = displayTimeWidth(rT_r);
+      }
+      pEndForRelease = { x: pts.pEnd.x + rwFull, y: yFor(e.floor) };
+    }
+    rEnd = e.releaseOn ? pEndForRelease : { x: drawPS.x, y: pts.p0.y };
   }
   const rSF = linearTimeOn
     ? Math.min(1, (rEnd.x - drawPS.x) / (graph.w * 0.3))
     : Math.min(1, e.rT * 1000 / 500);
 
-  // C1 continuity at pS using natural decay slope
-  const dPeakY = showClipped ? ceilY : drawP1.y;
-  const h_decay   = curveAmt * Math.abs(drawPS.y - dPeakY)   * 0.5 * dSF;
-  const h_release = curveAmt * Math.abs(rEnd.y   - drawPS.y) * 0.5 * rSF;
-  const maxH      = (drawPS.x - pts.p1.x) * 0.3;
-  const h_join    = Math.min(h_decay, h_release, maxH);
-  // Slope vector from p1 to pS (natural decay direction)
-  const slopeDX = drawPS.x - pts.p1.x;
-  const slopeDY = drawPS.y - pts.p1.y;
-  const slopeLen = Math.sqrt(slopeDX * slopeDX + slopeDY * slopeDY) || 1;
-  const decayEndHandle   = { x: drawPS.x - (slopeDX / slopeLen) * h_join,
-                              y: drawPS.y - (slopeDY / slopeLen) * h_join };
-  const releaseStartHandle = { x: drawPS.x + (slopeDX / slopeLen) * h_join,
-                                y: drawPS.y + (slopeDY / slopeLen) * h_join };
-  // Rebuild dPath with natural-slope end handle
-  const dStartX = showClipped
-    ? pts.p1.x + (pts.pEnd.x - pts.p1.x) * ((e.floor + e.scale - 1) / e.scale)
-    : drawP1.x;
-  const dStartY = showClipped ? ceilY : drawP1.y;
-  if(curveAmt){
-    dPath = `M ${dStartX} ${dStartY} C ${dStartX + h_decay} ${dStartY} ${decayEndHandle.x} ${decayEndHandle.y} ${drawPS.x} ${drawPS.y}`;
+  if(!textbookAdsr){
+    // Model D: C1 continuity at pS using natural decay slope
+    const dPeakY = showClipped ? ceilY : drawP1.y;
+    const h_decay   = curveAmt * Math.abs(drawPS.y - dPeakY)   * 0.5 * dSF;
+    const h_release = curveAmt * Math.abs(rEnd.y   - drawPS.y) * 0.5 * rSF;
+    const maxH      = (drawPS.x - pts.p1.x) * 0.3;
+    const h_join    = Math.min(h_decay, h_release, maxH);
+    const slopeDX = drawPS.x - pts.p1.x;
+    const slopeDY = drawPS.y - pts.p1.y;
+    const slopeLen = Math.sqrt(slopeDX * slopeDX + slopeDY * slopeDY) || 1;
+    const decayEndHandle   = { x: drawPS.x - (slopeDX / slopeLen) * h_join,
+                                y: drawPS.y - (slopeDY / slopeLen) * h_join };
+    const releaseStartHandle = { x: drawPS.x + (slopeDX / slopeLen) * h_join,
+                                  y: drawPS.y + (slopeDY / slopeLen) * h_join };
+    const dStartX = showClipped
+      ? pts.p1.x + (pts.pEnd.x - pts.p1.x) * ((e.floor + e.scale - 1) / e.scale)
+      : drawP1.x;
+    const dStartY = showClipped ? ceilY : drawP1.y;
+    if(curveAmt){
+      dPath = `M ${dStartX} ${dStartY} C ${dStartX + h_decay} ${dStartY} ${decayEndHandle.x} ${decayEndHandle.y} ${drawPS.x} ${drawPS.y}`;
+    } else {
+      dPath = `M ${dStartX} ${dStartY} L ${drawPS.x} ${drawPS.y}`;
+    }
+    ['decayOuter','decayInner'].forEach(id => $(id).setAttribute('d', dPath));
+    const releaseEndHandle = { x: rEnd.x - h_release, y: rEnd.y };
+    const rStart = state.releaseFromDecay ? pts.p1 : (releaseStartPoint || drawPS);
+    const rPath = drawReleasePath
+      ? (curveAmt
+          ? `M ${rStart.x} ${rStart.y} C ${releaseStartHandle.x} ${releaseStartHandle.y} ${releaseEndHandle.x} ${releaseEndHandle.y} ${rEnd.x} ${rEnd.y}`
+          : `M ${rStart.x} ${rStart.y} L ${rEnd.x} ${rEnd.y}`)
+      : '';
+    ['releaseOuter','releaseInner'].forEach(id => $(id).setAttribute('d', rPath));
+    ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d',''); el.style.display='none'; } });
   } else {
-    dPath = `M ${dStartX} ${dStartY} L ${drawPS.x} ${drawPS.y}`;
+    // Textbook ADSR: decay ends at fixed x (pts.pEnd.x), y-only varies with sustain level
+    const tbDecayEnd = { x: pts.pEnd.x, y: drawPS.y };
+    const tbDPath = showClipped
+      ? buildPath(pts.p1.x + (pts.pEnd.x - pts.p1.x) * ((e.floor + e.scale - 1) / e.scale), ceilY, tbDecayEnd.x, tbDecayEnd.y, curveAmt, dSF)
+      : buildPath(drawP1.x, drawP1.y, tbDecayEnd.x, tbDecayEnd.y, curveAmt, dSF);
+    ['decayOuter','decayInner'].forEach(id => $(id).setAttribute('d', tbDPath));
+    // Sustain segment: fixed-width horizontal line (15% of graph width) at sustain level y
+    const sustainGap = graph.w * 0.15;
+    const tbSusEnd = { x: pts.pEnd.x + sustainGap, y: drawPS.y };
+    const tbSusPath = drawReleasePath ? `M ${pts.pEnd.x} ${drawPS.y} L ${tbSusEnd.x} ${drawPS.y}` : '';
+    ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d', tbSusPath); el.style.display=''; } });
+    // Release: starts from end of sustain segment
+    const tbREnd = { x: tbSusEnd.x + (rEnd.x - pts.pEnd.x), y: yFor(e.floor) };
+    const tbRPath = drawReleasePath ? buildPath(tbSusEnd.x, tbSusEnd.y, tbREnd.x, tbREnd.y, curveAmt, rSF) : '';
+    ['releaseOuter','releaseInner'].forEach(id => $(id).setAttribute('d', tbRPath));
   }
-  ['decayOuter','decayInner'].forEach(id => $(id).setAttribute('d', dPath));
-  // Release with mirrored start handle and horizontal end handle
-  const releaseEndHandle = { x: rEnd.x - h_release, y: rEnd.y };
-  const rStart = state.releaseFromDecay ? pts.p1 : (releaseStartPoint || drawPS);
-  const rPath = drawReleasePath
-    ? (curveAmt
-        ? `M ${rStart.x} ${rStart.y} C ${releaseStartHandle.x} ${releaseStartHandle.y} ${releaseEndHandle.x} ${releaseEndHandle.y} ${rEnd.x} ${rEnd.y}`
-        : `M ${rStart.x} ${rStart.y} L ${rEnd.x} ${rEnd.y}`)
-    : '';
-  ['releaseOuter','releaseInner'].forEach(id => $(id).setAttribute('d', rPath));
 
   // Sustain as a horizontal level guide extending to the right from
   // the decay/release intersection. This reads as an indefinite held level,
@@ -652,10 +701,11 @@ function render(){
   $('sustainMarker').setAttribute('y1', drawPS.y);
   $('sustainMarker').setAttribute('x2', markerEndX);
   $('sustainMarker').setAttribute('y2', drawPS.y);
+  $('sustainMarker').style.display = textbookAdsr ? 'none' : '';
   $('sustainPoint').setAttribute('cx', drawPS.x);
   $('sustainPoint').setAttribute('cy', drawPS.y);
 
-  $('sLabel').setAttribute('x',Math.min(markerEndX-105, drawPS.x+28)); $('sLabel').setAttribute('y',drawPS.y-18);
+  $('sLabel').setAttribute('x',Math.min(markerEndX-105, drawPS.x+28)); $('sLabel').setAttribute('y',drawPS.y-18); $('sLabel').style.display = textbookAdsr ? 'none' : '';
 
 
   // Bounds lines — fixed at absolute graph top/bottom, full SVG width
@@ -707,11 +757,11 @@ function render(){
   const segDecayEl=$('segDecay');
   if(segDecayEl){ const ldOn=$('loudDecay')&&$('loudDecay').checked; segDecayEl.setAttribute('y',segY); segDecayEl.style.display=''; segDecayEl.textContent=(freqMode?'FILTER DECAY':'LOUD DECAY')+(ldOn?': ON':': OFF'); segDecayEl.style.opacity=ldOn?1:STATUS_DIM_OPACITY; }
   const segDisplayEl=$('segDisplay');
-  if(segDisplayEl){ segDisplayEl.setAttribute('y',segY); segDisplayEl.style.display=''; segDisplayEl.textContent=analogueOn?'DISPLAY: RC MODELLED':'DISPLAY: SCHEMATIC'; segDisplayEl.style.opacity=analogueOn?1:STATUS_DIM_OPACITY; }
+  if(segDisplayEl){ segDisplayEl.setAttribute('y',segY); segDisplayEl.style.display=''; segDisplayEl.textContent=textbookAdsr?'DISPLAY: TEXTBOOK ADSR':analogueOn?'DISPLAY: RC MODELLED':'DISPLAY: SCHEMATIC'; segDisplayEl.style.opacity=(textbookAdsr||analogueOn)?1:STATUS_DIM_OPACITY; }
   const segSustainEl=$('segSustain');
   if(segSustainEl){ const kcOn=$('keyboardControl')&&$('keyboardControl').checked; segSustainEl.setAttribute('y',segY); segSustainEl.style.display=''; segSustainEl.textContent=kcOn?'SUSTAIN: CORRECTED':'SUSTAIN: SCHEMATIC'; segSustainEl.style.opacity=kcOn?1:STATUS_DIM_OPACITY; }
   const segClippingEl=$('segClipping');
-  if(segClippingEl){ const clipCorrected=(e.floor+e.scale>1)&&$('showClipped')&&$('showClipped').checked; segClippingEl.setAttribute('y',segY); segClippingEl.style.display=freqMode?'':'none'; segClippingEl.textContent=clipCorrected?'CONTOUR PEAK: CORRECTED':'CONTOUR PEAK: SCHEMATIC'; segClippingEl.style.opacity=clipCorrected?1:STATUS_DIM_OPACITY; }
+  if(segClippingEl){ const clipCorrected=showClipped; segClippingEl.setAttribute('y',segY); segClippingEl.style.display=freqMode?'':'none'; segClippingEl.textContent=clipCorrected?'CONTOUR PEAK: CORRECTED':'CONTOUR PEAK: SCHEMATIC'; segClippingEl.style.opacity=clipCorrected?1:STATUS_DIM_OPACITY; }
   // Cutoff/Amount knobs: active only in Filter Mode
   const floorBox=$('floorKnobBox'), scaleBox=$('scaleKnobBox');
   if(floorBox) floorBox.style.opacity=freqMode?'':'0.35';
@@ -734,17 +784,21 @@ function syncControls(){
   const mode=document.querySelector('input[name="mode"]:checked').value;
   const vals = mode==='live' ? state : state.target;
   $('attack').value=Math.round(vals.a*1000); $('decay').value=Math.round(vals.d*1000); $('sustain').value=Math.round(vals.s*1000);
+  $('release').value=Math.round(vals.r*1000);
   $('floor').value=Math.round(vals.floor*1000); $('scale').value=Math.round(vals.scale*1000);
   $('attackKnob').style.setProperty('--deg', (-135 + vals.a*270)+'deg');
   $('decayKnob').style.setProperty('--deg', (-135 + vals.d*270)+'deg');
   $('sustainKnob').style.setProperty('--deg', (-135 + vals.s*270)+'deg');
+  $('releaseKnob').style.setProperty('--deg', (-135 + vals.r*270)+'deg');
   $('floorKnob').style.setProperty('--deg', (-135 + vals.floor*270)+'deg');
   $('scaleKnob').style.setProperty('--deg', (-135 + vals.scale*270)+'deg');
   $('attackRead').textContent=fmtTime(mapTime(state.a)); $('decayRead').textContent=fmtTime(mapTime(state.d)); $('sustainRead').textContent=Math.round(getEffective().s*100)+'%';
+  $('releaseRead').textContent=fmtTime(mapTime(state.r));
   $('floorRead').textContent=formatSustainScale(state.floor); $('scaleRead').textContent=formatSustainScale(state.scale);
   $('attackTarget').textContent=mode==='animate' ? 'Target: '+fmtTime(mapTime(state.target.a)) : '';
   $('decayTarget').textContent=mode==='animate' ? 'Target: '+fmtTime(mapTime(state.target.d)) : '';
   $('sustainTarget').textContent=mode==='animate' ? 'Target: '+Math.round(($('keyboardControl').checked?state.target.s*.8:state.target.s)*100)+'%' : '';
+  $('releaseTarget').textContent=mode==='animate' ? 'Target: '+fmtTime(mapTime(state.target.r)) : '';
   $('floorTarget').textContent=mode==='animate' ? 'Target: '+formatSustainScale(state.target.floor) : '';
   $('scaleTarget').textContent=mode==='animate' ? 'Target: '+formatSustainScale(state.target.scale) : '';
   $('modeHint').textContent = mode==='live' ? 'Live Mode: Knobs Update The Graph Immediately.' : 'Animate Mode: Knobs Set Targets. Press Transition To Morph The Graph.';
@@ -755,14 +809,15 @@ function setFromSlider(){
   const mode=document.querySelector('input[name="mode"]:checked').value;
   const dest=mode==='live' ? state : state.target;
   dest.a=$('attack').value/1000; dest.d=$('decay').value/1000; dest.s=$('sustain').value/1000;
+  dest.r=$('release').value/1000;
   dest.floor=$('floor').value/1000; dest.scale=$('scale').value/1000;
-  if(mode==='live') { state.target={a:state.a,d:state.d,s:state.s,floor:state.floor,scale:state.scale}; render(); } else syncControls();
+  if(mode==='live') { state.target={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale}; render(); } else syncControls();
 }
-['attack','decay'].forEach(id=>$(id).addEventListener('input',()=>{ if(currentMode()==='live') clearBlobAndMarker(); setFromSlider(); if(window.markPresetDirty) markPresetDirty(); }));
+['attack','decay','release'].forEach(id=>$(id).addEventListener('input',()=>{ if(currentMode()==='live') clearBlobAndMarker(); setFromSlider(); if(window.markPresetDirty) markPresetDirty(); }));
 $('sustain').addEventListener('input',()=>{ setFromSlider(); if(window.markPresetDirty) markPresetDirty(); });
 ['floor','scale'].forEach(id=>$(id).addEventListener('input',()=>{ setFromSlider(); if(window.markPresetDirty) markPresetDirty(); }));
-document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) state.target={a:state.a,d:state.d,s:state.s,floor:state.floor,scale:state.scale}; syncControls(); }));
-['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','frequencyMode','hpMode','showClipped','linearTime'].forEach(id=>$(id).addEventListener('change',render));
+document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) state.target={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale}; syncControls(); }));
+['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr'].forEach(id=>$(id).addEventListener('change',render));
 function syncHpModeEnabled(){
   const freqOn = $('frequencyMode') && $('frequencyMode').checked;
   const hpLabel = $('hpMode') && $('hpMode').closest('label');
@@ -1205,6 +1260,7 @@ document.addEventListener('keydown', e => {
   } else if(e.key === 'm' || e.key === 'M'){ toggleCheckbox('hpMode');
   } else if(e.key === 's' || e.key === 'S'){ toggleCheckbox('keyboardControl');
   } else if(e.key === 'x' || e.key === 'X'){ toggleCheckbox('linearTime');
+  } else if(e.key === 't' || e.key === 'T'){ toggleCheckbox('textbookAdsr');
   } else if(e.key === 'b' || e.key === 'B'){ toggleCheckbox('analogueCurve');
   // Quick Set — Up/Down arrows adjust sustain
   } else if(e.key === 'ArrowUp'){
@@ -1288,7 +1344,7 @@ function commitTime(which, input){
   const obj = activeObject();
   obj[which] = positionFromMs(ms);
   if (m === 'live') {
-    state.target = { a: state.a, d: state.d, s: state.s, floor: state.floor, scale: state.scale };
+    state.target = { a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale };
     render();
   } else {
     syncControls();
@@ -1304,7 +1360,7 @@ function commitSustain(){
   const obj = activeObject();
   obj.s = scale / 10;
   if (currentMode() === 'live') {
-    state.target = { a: state.a, d: state.d, s: state.s, floor: state.floor, scale: state.scale };
+    state.target = { a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale };
     render();
   } else {
     syncControls();
@@ -1356,7 +1412,7 @@ function commitFloor(){
   const obj = activeObject();
   obj.floor = v / 10;
   if (currentMode() === 'live') {
-    state.target = { a: state.a, d: state.d, s: state.s, floor: state.floor, scale: state.scale };
+    state.target = { a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale };
     render();
   } else { syncControls(); }
   requestAnimationFrame(refreshNumericInputs);
@@ -1370,7 +1426,7 @@ function commitScale(){
   const obj = activeObject();
   obj.scale = v / 10;
   if (currentMode() === 'live') {
-    state.target = { a: state.a, d: state.d, s: state.s, floor: state.floor, scale: state.scale };
+    state.target = { a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale };
     render();
   } else { syncControls(); }
   requestAnimationFrame(refreshNumericInputs);
@@ -1478,6 +1534,7 @@ function addPointerFeedback(){
   { knobId: 'attackKnob',  sliderId: 'attack'  },
   { knobId: 'decayKnob',   sliderId: 'decay'   },
   { knobId: 'sustainKnob', sliderId: 'sustain' },
+  { knobId: 'releaseKnob', sliderId: 'release' },
   { knobId: 'floorKnob',   sliderId: 'floor'   },
   { knobId: 'scaleKnob',   sliderId: 'scale'   },
 ].forEach(({ knobId, sliderId }) => {
@@ -1688,10 +1745,12 @@ $('noteCustomHz') && $('noteCustomHz').addEventListener('input', () => {
     if(preset.filterMode !== undefined) $('frequencyMode').checked = preset.filterMode;
     if(preset.lpHp !== undefined) $('hpMode').checked = preset.lpHp;
     if(preset.keyboardControl !== undefined) $('keyboardControl').checked = preset.keyboardControl;
+    if(preset.textbookAdsr !== undefined) $('textbookAdsr').checked = preset.textbookAdsr;
     // Set target knob values
     state.target.a = positionFromMs(preset.a);
     state.target.d = positionFromMs(preset.d);
     state.target.s = preset.s / 10;
+    state.target.r = positionFromMs(preset.r !== undefined ? preset.r : 500);
     state.target.floor = (preset.floor || 0) / 10;
     state.target.scale = (preset.scale !== undefined ? preset.scale : 10) / 10;
     // Highlight active button
@@ -1743,6 +1802,7 @@ $('noteCustomHz') && $('noteCustomHz').addEventListener('input', () => {
     preset.a = msFromPosition(state.a);
     preset.d = msFromPosition(state.d);
     preset.s = parseFloat((state.s * 10).toFixed(1));
+    preset.r = msFromPosition(state.r);
     preset.floor = parseFloat((state.floor * 10).toFixed(1));
     preset.scale = parseFloat((state.scale * 10).toFixed(1));
     preset.loudDecay = $('loudDecay').checked;
@@ -1750,6 +1810,7 @@ $('noteCustomHz') && $('noteCustomHz').addEventListener('input', () => {
     preset.filterMode = $('frequencyMode').checked;
     preset.lpHp = $('hpMode').checked;
     preset.keyboardControl = $('keyboardControl').checked;
+    preset.textbookAdsr = $('textbookAdsr').checked;
     savePresetsToStorage();
     // Flash green confirmation, then restore highlight state
     const btn = container.querySelectorAll('button')[idx];
@@ -1906,7 +1967,7 @@ function buildConfigSnapshot(){
   return {
     dtpConfig: true,
     version: 1,
-    a: state.a, d: state.d, s: state.s, floor: state.floor, scale: state.scale,
+    a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale,
     loudDecay: $('loudDecay').checked,
     drawReleaseWhenZero: $('drawReleaseWhenZero').checked,
     showBounds: $('showBounds').checked,
@@ -1917,6 +1978,7 @@ function buildConfigSnapshot(){
     showClipped: $('showClipped').checked,
     linearTime: $('linearTime').checked,
     analogueCurve: $('analogueCurve').checked,
+    textbookAdsr: $('textbookAdsr').checked,
     linearTimeScale: Number($('linearTimeScale').value),
     curveAmount: Number($('curveAmount').value),
     audioEnabled: $('audioEnabled').checked,
@@ -1945,11 +2007,11 @@ function buildConfigSnapshot(){
 function loadConfigObject(cfg){
 
   // State
-  state.a = cfg.a; state.d = cfg.d; state.s = cfg.s; state.floor = cfg.floor; state.scale = cfg.scale;
-  state.target.a = cfg.a; state.target.d = cfg.d; state.target.s = cfg.s; state.target.floor = cfg.floor; state.target.scale = cfg.scale;
+  state.a = cfg.a; state.d = cfg.d; state.s = cfg.s; state.r = cfg.r !== undefined ? cfg.r : 0.5; state.floor = cfg.floor; state.scale = cfg.scale;
+  state.target.a = cfg.a; state.target.d = cfg.d; state.target.s = cfg.s; state.target.r = state.r; state.target.floor = cfg.floor; state.target.scale = cfg.scale;
 
   // Checkboxes
-  ['loudDecay','drawReleaseWhenZero','showBounds','showContour','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve'].forEach(id => {
+  ['loudDecay','drawReleaseWhenZero','showBounds','showContour','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
   syncHpModeEnabled();
@@ -2184,9 +2246,10 @@ $('linearTime').checked = true;
 (function(){
   const pa = PRESETS[0];
   const a = positionFromMs(pa.a), d = positionFromMs(pa.d);
+  const r = positionFromMs(pa.r !== undefined ? pa.r : 500);
   const s = pa.s / 10, floor = (pa.floor || 0) / 10, scale = (pa.scale !== undefined ? pa.scale : 10) / 10;
-  state.a = a; state.d = d; state.s = s; state.floor = floor; state.scale = scale;
-  state.target.a = a; state.target.d = d; state.target.s = s; state.target.floor = floor; state.target.scale = scale;
+  state.a = a; state.d = d; state.s = s; state.r = r; state.floor = floor; state.scale = scale;
+  state.target.a = a; state.target.d = d; state.target.s = s; state.target.r = r; state.target.floor = floor; state.target.scale = scale;
   if(window.loadPresetByIndex) window.loadPresetByIndex(0); // highlights button A and sets preset name; transition is no-op since state === target
 })();
 
