@@ -30,6 +30,8 @@
     --releaseColor:#5fa8ff;
     --meterFill:#00ff00;
     --boundsColor:#ffffff;
+    --timeAxisEffectiveColor:#ffffff;
+    --timeAxisStatedColor:#aaaaaa;
     --panel:rgba(0,0,0,.28);
     --panel2:rgba(0,0,0,.42);
   }
@@ -146,6 +148,19 @@
     transform: scale(0.97);
   }
 
+  .timeAxisEffective {
+    font-family: 'Univers55', 'UniversCondensed', Arial, sans-serif;
+    font-size: calc(var(--labelSize) * 1px);
+    fill: var(--timeAxisEffectiveColor);
+    opacity: 1;
+  }
+  .timeAxisStated {
+    font-family: 'Univers55', 'UniversCondensed', Arial, sans-serif;
+    font-size: calc(var(--labelSize) * 1px);
+    fill: var(--timeAxisStatedColor);
+    opacity: 1;
+  }
+
   /* hide A/D/R labels */
   #aLabel, #dLabel, #rLabel,
   .a-label, .d-label, .r-label {
@@ -204,7 +219,8 @@
       <rect id="meterBox"  x="1145" y="30" width="40" height="415" style="fill:none;stroke:var(--line);stroke-width:7;stroke-opacity:1;vector-effect:non-scaling-stroke;" />
       <text id="meterLabelTitle" x="1165" y="72" text-anchor="middle" style="fill:var(--fg);font-size:calc(var(--labelSize) * 1px);font-weight:800;font-family:'UniversCondensed',Arial,Helvetica,sans-serif;display:none;">VOL</text>
       <text id="modeLabel" class="mode-label" x="80" y="0" text-anchor="start">LOUDNESS CONTOUR</text>
-      <text id="timeAxis0" x="80" y="465" text-anchor="middle" style="fill:var(--fg);font-size:calc(var(--labelSize)*1px);font-family:'UniversCondensed',Arial,sans-serif;display:none;">0</text>
+      <text id="timeAxis0" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;">0</text>
+      <text id="timeAxisAttack" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;"></text>
       <text id="segFilterMode" class="mode-label" x="280" y="0" text-anchor="start" style="display:none">FILTER MODE: LO</text>
       <text id="segDecay"      class="mode-label" x="80"  y="0" text-anchor="start">LOUD DECAY: OFF</text>
       <text id="segDisplay"    class="mode-label" x="480" y="0" text-anchor="start">DISPLAY: SCHEMATIC</text>
@@ -318,7 +334,7 @@
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Label <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label><label>Console <input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></label><label>Meter <input id="meterWidth" type="number" min="10" max="80" step="1" value="40"></label><label>Meter Stroke <input id="meterStrokeWidth" type="number" min="1" max="20" step="1" value="7"></label></div>
       <div class="row"><label><input id="showOuterLine" type="checkbox" checked> Show Outer Line</label><label><input id="meterGlow" type="checkbox" checked> Meter Glow</label><label>Glow <input id="meterGlowRadius" type="number" min="0" max="60" step="1" value="5"></label><label><input id="meterScanlinesVisible" type="checkbox" checked> Scanlines</label><label><input id="blobGlowEnabled" type="checkbox" checked> Blob Glow</label><label>Blob Glow R <input id="blobGlowRadius" type="number" min="0" max="30" step="1" value="8"></label></div>
-      <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#5fa8ff"></label><label>Meter <input id="meterFillColor" type="color" value="#00ff00"></label><label>Meter F <input id="meterFillColorFilter" type="color" value="#00ffff"></label></div>
+      <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#5fa8ff"></label><label>Meter L <input id="meterFillColor" type="color" value="#00ff00"></label><label>Meter F <input id="meterFillColorFilter" type="color" value="#00ffff"></label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:10px;align-items:center;flex-wrap:wrap">
         <label><input id="audioEnabled" type="checkbox" checked> A — Audio</label>
@@ -810,7 +826,27 @@ function render(){
   const modeLabelEl=$('modeLabel');
   if(modeLabelEl){ modeLabelEl.textContent=freqMode?'FILTER CONTOUR':'LOUDNESS CONTOUR'; modeLabelEl.setAttribute('x',graph.x0); modeLabelEl.setAttribute('y',yFor(1)-90); }
   const timeAxis0El=$('timeAxis0');
-  if(timeAxis0El){ const showTA=$('showTimeAxis')&&$('showTimeAxis').checked; timeAxis0El.setAttribute('x',graph.x0); timeAxis0El.setAttribute('y',graph.y0+30); timeAxis0El.style.display=showTA?'':'none'; timeAxis0El.style.opacity=showTA?'1':''; }
+  const showTA=$('showTimeAxis')&&$('showTimeAxis').checked;
+  const taY=graph.y0+30;
+  if(timeAxis0El){ timeAxis0El.setAttribute('x',graph.x0); timeAxis0El.setAttribute('y',taY); timeAxis0El.style.display=showTA?'':'none'; timeAxis0El.style.opacity=showTA?'1':''; }
+  const timeAxisAttackEl=$('timeAxisAttack');
+  if(timeAxisAttackEl){
+    let taAttackX, taAttackMs;
+    if(textbookAdsr){
+      taAttackX=pts.p1.x;
+      taAttackMs=Math.round(e.aT*1000);
+    } else if(freqMode && showClipped && overrange){
+      const f_a=(1-e.floor)/e.scale;
+      taAttackX=pts.p0.x+(pts.p1.x-pts.p0.x)*f_a;
+      taAttackMs=Math.round(e.aT*f_a*1000);
+    } else {
+      taAttackX=pts.p1.x;
+      taAttackMs=Math.round(e.aT*1000);
+    }
+    timeAxisAttackEl.setAttribute('x',taAttackX); timeAxisAttackEl.setAttribute('y',taY);
+    timeAxisAttackEl.textContent=taAttackMs;
+    timeAxisAttackEl.style.display=showTA?'':'none'; timeAxisAttackEl.style.opacity=showTA?'1':'';
+  }
   const segY = yFor(1) - 60;
   const segFilterModeEl=$('segFilterMode');
   if(segFilterModeEl){ segFilterModeEl.setAttribute('y',segY); segFilterModeEl.style.display=freqMode?'':'none'; segFilterModeEl.textContent=isHP?'FILTER MODE: HI':'FILTER MODE: LO'; segFilterModeEl.style.opacity=1; }
@@ -1746,7 +1782,7 @@ document.querySelectorAll('input[name="mode"]').forEach(el => {
 
 function hideLikelyAxes(){
   document.querySelectorAll('svg line, svg path, svg text').forEach(el => {
-    if (el.id === 'timeAxis0') return;
+    if (el.id === 'timeAxis0' || el.id === 'timeAxisAttack') return;
     const idClass = ((el.id || '') + ' ' + (el.getAttribute('class') || '')).toLowerCase();
     const text = (el.textContent || '').trim();
 
