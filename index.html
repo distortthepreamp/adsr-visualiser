@@ -22,6 +22,7 @@
     --attackColor:#ff6b6b;
     --decayColor:#5fa8ff;
     --releaseColor:#5fa8ff;
+    --meterFill:#00ff00;
     --boundsColor:#ffffff;
     --panel:rgba(0,0,0,.28);
     --panel2:rgba(0,0,0,.42);
@@ -177,8 +178,8 @@
       <line id="ceilingBound" x1="0" y1="30"  x2="1200" y2="30"  style="stroke:var(--boundsColor);stroke-width:7;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <circle id="dot" class="env-dot" cx="80" cy="445" />
 
+      <rect id="meterFill" x="1145" y="445" width="40" height="0" style="fill:var(--meterFill,var(--line));stroke:none;" />
       <rect id="meterBox"  x="1145" y="30" width="40" height="415" style="fill:none;stroke:var(--line);stroke-width:7;stroke-opacity:1;vector-effect:non-scaling-stroke;" />
-      <rect id="meterFill" x="1145" y="445" width="40" height="0" style="fill:var(--line);stroke:none;" />
       <text id="meterLabelTitle" x="1165" y="72" text-anchor="middle" style="fill:var(--fg);font-size:calc(var(--labelSize) * 1px);font-weight:800;font-family:'UniversCondensed',Arial,Helvetica,sans-serif;display:none;">VOL</text>
       <text id="modeLabel" class="mode-label" x="80" y="0" text-anchor="start">LOUDNESS CONTOUR</text>
       <text id="segFilterMode" class="mode-label" x="280" y="0" text-anchor="start" style="display:none">FILTER MODE: LO</text>
@@ -291,9 +292,9 @@
       </div>
       <div class="row"><label><input id="keepTapMarker" type="checkbox" checked> Leave Tap Marker</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
-      <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Label <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label><label>Console <input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></label></div>
+      <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Label <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label><label>Console <input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></label><label>Meter <input id="meterWidth" type="number" min="10" max="80" step="1" value="40"></label><label>Meter Stroke <input id="meterStrokeWidth" type="number" min="1" max="20" step="1" value="7"></label></div>
       <div class="row"><label><input id="showOuterLine" type="checkbox" checked> Show Outer Line</label></div>
-      <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#5fa8ff"></label></div>
+      <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#5fa8ff"></label><label>Meter <input id="meterFillColor" type="color" value="#00ff00"></label><label>Meter F <input id="meterFillColorFilter" type="color" value="#00ffff"></label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:10px;align-items:center;flex-wrap:wrap">
         <label><input id="audioEnabled" type="checkbox" checked> A — Audio</label>
@@ -380,6 +381,8 @@
 <script>
 
 const STATUS_DIM_OPACITY = 0.65;
+let METER_W = 40;
+let METER_STROKE_W = 7;
 
 let animationToken = 0;
 let currentTransitionSec = 1;
@@ -707,7 +710,7 @@ function render(){
   // rather than something that reaches back into the earlier decay phase.
   // Meter geometry
   const meterX = graph.x0 + graph.w + 20;  // = 1145
-  const meterW = 40;
+  const meterW = METER_W;
   const meterAbsTop = graph.y0 - graph.h;  // yFor(1) = 85
   const meterAbsBottom = graph.y0;          // yFor(0) = 445
 
@@ -735,6 +738,7 @@ function render(){
   if(meterBox){
     meterBox.setAttribute('x',meterX); meterBox.setAttribute('y',meterAbsTop);
     meterBox.setAttribute('width',meterW); meterBox.setAttribute('height',graph.h);
+    meterBox.style.strokeWidth = METER_STROKE_W;
   }
 
   // Floor line and Amount line
@@ -863,6 +867,8 @@ $('curveAmount').addEventListener('input', () => { syncAnalogueCurve(); render()
 syncAnalogueCurve();
 $('lineColor').addEventListener('input',e=>document.documentElement.style.setProperty('--line', e.target.value));
 $('bgColor').addEventListener('input',e=>document.documentElement.style.setProperty('--bg', e.target.value));
+$('meterFillColor').addEventListener('input',e=>document.documentElement.style.setProperty('--meterFill', e.target.value));
+$('meterFillColorFilter').addEventListener('input',e=>document.documentElement.style.setProperty('--meterFillFilter', e.target.value));
 $('attackColor').addEventListener('input',e=>document.documentElement.style.setProperty('--attackColor', e.target.value));
 $('decayColor').addEventListener('input',e=>document.documentElement.style.setProperty('--decayColor', e.target.value));
 $('releaseColor').addEventListener('input',e=>document.documentElement.style.setProperty('--releaseColor', e.target.value));
@@ -876,6 +882,8 @@ function syncConsoleScale(){
 }
 $('consoleScale').addEventListener('input', syncConsoleScale);
 syncConsoleScale();
+$('meterWidth').addEventListener('input', e => { METER_W = Math.max(10, Math.min(80, Number(e.target.value) || 40)); render(); });
+$('meterStrokeWidth').addEventListener('input', e => { METER_STROKE_W = Math.max(1, Math.min(20, Number(e.target.value) || 7)); render(); });
 
 function transition(durSec){
   clearBlobAndMarker();
@@ -1015,11 +1023,16 @@ function setMeterLevel(level){
   const fill=$('meterFill');
   if(!fill) return;
   const e=getEffective();
-  const mx=graph.x0+graph.w+20, mw=40;
+  const mx=graph.x0+graph.w+20, mw=METER_W;
   const bottomAbsY=graph.y0;           // yFor(0) = 445
   const topAbsY=graph.y0-graph.h;      // yFor(1) = 85
   const levelY = Math.max(yFor(e.floor+level*e.scale), yFor(1));
   const isHP=$('hpMode')&&$('hpMode').checked;
+  const freqModeOn=$('frequencyMode')&&$('frequencyMode').checked;
+  const fillColor=freqModeOn
+    ? (getComputedStyle(document.documentElement).getPropertyValue('--meterFillFilter').trim()||'#00ffff')
+    : (getComputedStyle(document.documentElement).getPropertyValue('--meterFill').trim()||'#00ff00');
+  fill.style.fill=fillColor;
   fill.setAttribute('x',mx); fill.setAttribute('width',mw);
   if(!isHP){
     // LP: fill from absolute bottom up to blob level
@@ -1040,7 +1053,7 @@ function hideDot(){
   const fill=$('meterFill');
   if(fill){
     const e=getEffective();
-    const mx=graph.x0+graph.w+20, mw=40;
+    const mx=graph.x0+graph.w+20, mw=METER_W;
     const isHP=$('hpMode')&&$('hpMode').checked;
     fill.setAttribute('x',mx); fill.setAttribute('width',mw);
     if(!isHP){
@@ -1173,6 +1186,14 @@ function releaseFromCurrent(){
   const endX = pts.pS.x + slopeX * tSlope;
   const end = { x: endX, y: floorY, level: 0 };
   const dur = Math.max(20, e.dT * startLevel * 1000);
+  // If gate ended before the release slope (mid-attack or before sustain), snap the
+  // start position to the equivalent point on the release slope at startLevel.
+  // This prevents the blob from traversing the attack or decay paths during release.
+  if (startX < pts.pS.x) {
+    const tEntry = (slopeY !== 0) ? (startY - pts.pS.y) / slopeY : 0;
+    startX = pts.pS.x + slopeX * tEntry;
+    releaseStartPoint.x = startX;
+  }
   const t0=performance.now();
   state.currentPhase='release';
   function step(now){
@@ -1181,7 +1202,10 @@ function releaseFromCurrent(){
     const dotX = startX + (end.x - startX) * f;
     const linearY = startY + (end.y - startY) * f;
     let sampledY = null;
-    if(state.releaseFromDecay && dotX < pts.pS.x){
+    if(dotX < pts.p1.x){
+      const attackPathEl = document.getElementById('attackOuter');
+      sampledY = attackPathEl ? getYFromPath(attackPathEl, dotX) : null;
+    } else if(dotX < pts.pS.x){
       const decayPathEl = document.getElementById('decayOuter');
       sampledY = decayPathEl ? getYFromPath(decayPathEl, dotX) : null;
     } else {
@@ -1190,7 +1214,7 @@ function releaseFromCurrent(){
     }
     const dotY = (sampledY !== null) ? sampledY : linearY;
     const currentLevel = startLevel*(1-f);
-    const dotPhase = (state.releaseFromDecay && dotX < pts.pS.x) ? 'decay' : 'release';
+    const dotPhase = dotX < pts.pS.x ? (dotX < pts.p1.x ? 'attack' : 'decay') : 'release';
     setDot({x:dotX, y:dotY, level:currentLevel, phase:dotPhase}, true);
     if(f<1) state.dotAnim=requestAnimationFrame(step); else { setDot(end,false); audioCut(); state.held=false; state.currentPhase='idle'; updateButtonStates(); }
   }
@@ -1257,8 +1281,8 @@ function tap(ms){
     else {
       const landing=sampledSustainPoint(pointWhileGateHigh(tapMs));
       setDot(landing, true);
-      setTapMarker({x: Number($('dot').getAttribute('cx')), y: Number($('dot').getAttribute('cy')), level: landing.level});
       const e=getEffective();
+      if(!e.releaseOn){ setTapMarker({x: Number($('dot').getAttribute('cx')), y: Number($('dot').getAttribute('cy')), level: landing.level}); }
       if(e.releaseOn){
         releaseFromCurrent();
       } else {
@@ -1432,8 +1456,8 @@ document.addEventListener('keydown', e => {
 // ---- Numeric inputs for Attack / Decay / Sustain (formerly v29 script) ----
 
 const typedDisplay = {
-  live: { a: null, d: null },
-  animate: { a: null, d: null }
+  live: { a: null, d: null, r: null },
+  animate: { a: null, d: null, r: null }
 };
 
 function currentMode(){
@@ -1466,6 +1490,7 @@ function ensureInputAfter(sliderId, inputId, label, attrs){
 
 const attackInput  = ensureInputAfter('attack',  'attackMsInput',    '', 'type="number" min="0" max="12000" step="1"');
 const decayInput   = ensureInputAfter('decay',   'decayMsInput',     '', 'type="number" min="0" max="12000" step="1"');
+const releaseInput = ensureInputAfter('release', 'releaseMsInput',   '', 'type="number" min="0" max="12000" step="1"');
 const sustainInput = ensureInputAfter('sustain', 'sustainScaleInput','', 'type="number" min="0" max="10" step="0.1"');
 const floorInput   = ensureInputAfter('floor',   'floorScaleInput',  '', 'type="number" min="0" max="10" step="0.1"');
 const scaleInput   = ensureInputAfter('scale',   'scaleScaleInput',  '', 'type="number" min="0" max="10" step="0.1"');
@@ -1513,6 +1538,9 @@ function refreshNumericInputs(){
   }
   if (decayInput && document.activeElement !== decayInput) {
     decayInput.value = typedDisplay[m].d !== null ? typedDisplay[m].d : msFromPosition(obj.d);
+  }
+  if (releaseInput && document.activeElement !== releaseInput) {
+    releaseInput.value = typedDisplay[m].r !== null ? typedDisplay[m].r : msFromPosition(obj.r);
   }
   if (sustainInput && document.activeElement !== sustainInput) {
     const scale = obj.s * 10;
@@ -1589,6 +1617,11 @@ if (decayInput) {
   decayInput.addEventListener('blur',   () => commitTime('d', decayInput));
   decayInput.addEventListener('keydown', e => { if (e.key === 'Enter') commitTime('d', decayInput); });
 }
+if (releaseInput) {
+  releaseInput.addEventListener('change', () => commitTime('r', releaseInput));
+  releaseInput.addEventListener('blur',   () => commitTime('r', releaseInput));
+  releaseInput.addEventListener('keydown', e => { if (e.key === 'Enter') commitTime('r', releaseInput); });
+}
 if (sustainInput) {
   sustainInput.addEventListener('change', commitSustain);
   sustainInput.addEventListener('blur',   commitSustain);
@@ -1607,6 +1640,8 @@ if (scaleInput) {
 
 if (attackSlider)  attackSlider.addEventListener('input',  () => { clearTypedForSlider('a'); setTimeout(refreshNumericInputs, 0); });
 if (decaySlider)   decaySlider.addEventListener('input',   () => { clearTypedForSlider('d'); setTimeout(refreshNumericInputs, 0); });
+const releaseSlider = document.getElementById('release');
+if (releaseSlider) releaseSlider.addEventListener('input', () => { clearTypedForSlider('r'); setTimeout(refreshNumericInputs, 0); });
 if (sustainSlider) sustainSlider.addEventListener('input', () => { setTimeout(refreshNumericInputs, 0); });
 if (floorSlider)   floorSlider.addEventListener('input',  () => { setTimeout(refreshNumericInputs, 0); });
 if (scaleSlider)   scaleSlider.addEventListener('input',  () => { setTimeout(refreshNumericInputs, 0); });
@@ -2132,10 +2167,14 @@ function buildConfigSnapshot(){
     attackColor: $('attackColor').value,
     decayColor: $('decayColor').value,
     releaseColor: $('releaseColor').value,
+    meterFillColor: $('meterFillColor').value,
+    meterFillColorFilter: $('meterFillColorFilter').value,
     lineWidth: Number($('lineWidth').value),
     innerLineWidth: Number($('innerLineWidth').value),
     labelSize: Number($('labelSize').value),
     consoleScale: Number($('consoleScale').value),
+    meterWidth: Number($('meterWidth').value),
+    meterStrokeWidth: Number($('meterStrokeWidth').value),
     activePresetIndex: window.getActivePresetIndex ? window.getActivePresetIndex() : -1,
     presetDirtyState: window.presetDirtyState || 'none'
   };
@@ -2188,7 +2227,7 @@ function loadConfigObject(cfg){
   }
 
   // Colours (dispatch input to update CSS variables)
-  ['lineColor','bgColor','attackColor','decayColor','releaseColor'].forEach(id => {
+  ['lineColor','bgColor','attackColor','decayColor','releaseColor','meterFillColor','meterFillColorFilter'].forEach(id => {
     if($(id) && cfg[id]){ $(id).value = cfg[id]; $(id).dispatchEvent(new Event('input')); }
   });
 
@@ -2197,6 +2236,8 @@ function loadConfigObject(cfg){
   if($('innerLineWidth') && cfg.innerLineWidth !== undefined){ $('innerLineWidth').value = cfg.innerLineWidth; $('innerLineWidth').dispatchEvent(new Event('input')); }
   if($('labelSize') && cfg.labelSize !== undefined){ $('labelSize').value = cfg.labelSize; $('labelSize').dispatchEvent(new Event('input')); }
   if($('consoleScale') && cfg.consoleScale !== undefined){ $('consoleScale').value = cfg.consoleScale; syncConsoleScale(); }
+  if($('meterWidth') && cfg.meterWidth !== undefined){ $('meterWidth').value = cfg.meterWidth; METER_W = Math.max(10, Math.min(80, Number(cfg.meterWidth) || 40)); }
+  if($('meterStrokeWidth') && cfg.meterStrokeWidth !== undefined){ $('meterStrokeWidth').value = cfg.meterStrokeWidth; METER_STROKE_W = Math.max(1, Math.min(20, Number(cfg.meterStrokeWidth) || 7)); }
 
   // Preset highlight
   if(window.restorePresetHighlight){
