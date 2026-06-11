@@ -193,7 +193,8 @@
       </defs>
       <line id="amountLine" x1="80" y1="30" x2="1145" y2="30" style="stroke:var(--line);stroke-width:3.5;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <line id="floorLine" x1="80" y1="445" x2="1145" y2="445" style="stroke:var(--line);stroke-width:3.5;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
-      <line id="sustainMarker" x1="80" y1="445" x2="80" y2="445" style="stroke:var(--line);stroke-opacity:1;stroke-linecap:round;stroke-dasharray:1 24;vector-effect:non-scaling-stroke;" />
+      <line id="sustainMarker" x1="80" y1="445" x2="80" y2="445" style="stroke:var(--line);stroke-opacity:1;stroke-linecap:round;stroke-dasharray:1 14;vector-effect:non-scaling-stroke;" />
+      <line id="tbSustainMarker" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
       <circle id="sustainPoint" class="tap-marker" cx="80" cy="445" style="opacity:.85" />
       <g id="envSegments">
         <path id="sustainSegOuter" class="env-outer" d="" style="display:none" />
@@ -220,7 +221,16 @@
       <text id="meterLabelTitle" x="1165" y="72" text-anchor="middle" style="fill:var(--fg);font-size:calc(var(--labelSize) * 1px);font-weight:800;font-family:'UniversCondensed',Arial,Helvetica,sans-serif;display:none;">VOL</text>
       <text id="modeLabel" class="mode-label" x="80" y="0" text-anchor="start">LOUDNESS CONTOUR</text>
       <text id="timeAxis0" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;">0</text>
+      <text id="timeAxis0Stated" x="80" y="465" text-anchor="middle" class="timeAxisStated" style="display:none;">0</text>
       <text id="timeAxisAttack" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;"></text>
+      <text id="timeAxisAttackStated" x="80" y="465" text-anchor="middle" class="timeAxisStated" style="display:none;"></text>
+      <text id="timeAxisDecayStart" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;"></text>
+      <text id="timeAxisDecayEnd" x="80" y="465" text-anchor="middle" class="timeAxisStated" style="display:none;"></text>
+      <text id="timeAxisDecayEndEffective" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;"></text>
+      <text id="timeAxisReleaseEnd" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;"></text>
+      <text id="timeAxisReleaseEndStated" x="80" y="465" text-anchor="middle" class="timeAxisStated" style="display:none;"></text>
+      <text id="timeAxisReleaseStart" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;"></text>
+      <text id="timeAxisReleaseStartStated" x="80" y="465" text-anchor="middle" class="timeAxisStated" style="display:none;"></text>
       <text id="segFilterMode" class="mode-label" x="280" y="0" text-anchor="start" style="display:none">FILTER MODE: LO</text>
       <text id="segDecay"      class="mode-label" x="80"  y="0" text-anchor="start">LOUD DECAY: OFF</text>
       <text id="segDisplay"    class="mode-label" x="480" y="0" text-anchor="start">DISPLAY: SCHEMATIC</text>
@@ -298,13 +308,15 @@
       <div class="row"><label><input id="drawReleaseWhenZero" type="checkbox"> Z — Draw Release When Zero</label></div>
       <div class="row"><label><input id="showBounds" type="checkbox"> , — Show Max Min Lines</label></div>
       <div class="row"><label><input id="showContour" type="checkbox" checked> . — Show Contour Top And Bottom</label></div>
-      <div class="row"><label><input id="showTimeAxis" type="checkbox"> / — Show Time Axis</label></div>
+      <div class="row"><label><input id="showEffectiveTimes" type="checkbox"> ' — Show Effective Times</label></div>
+      <div class="row"><label><input id="showStatedTimes" type="checkbox"> ; — Show Stated Times</label></div>
       <div class="row"><label><input id="frequencyMode" type="checkbox"> F — Filter Mode</label></div>
       <div class="row"><label><input id="hpMode" type="checkbox"> M — LP/HP Mode</label></div>
       <div class="row"><label><input id="keyboardControl" type="checkbox"> S — Mimic Model D Sustain (80%)</label></div>
       <div id="showClippedRow" class="row"><label><input id="showClipped" type="checkbox"> C — Show Clipped Shape</label></div>
       <div class="row" style="align-items:center;gap:6px"><label><input id="linearTime" type="checkbox"> X — Linear Time</label><input id="linearTimeScale" type="number" min="1" max="15" step="1" value="6" style="width:42px;text-align:center;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.3);border-radius:5px;color:#fff;font-size:13px;padding:2px 4px"><label id="linearTimeScaleLabel" for="linearTimeScale" style="font-size:13px">s</label></div>
       <div class="row"><label><input id="textbookAdsr" type="checkbox"> T — Textbook ADSR</label></div>
+      <div id="tbSustainDottedRow" class="row"><label><input id="tbSustainDotted" type="checkbox" checked> Dotted Sustain (textbook)</label></div>
       <div id="analogueCurveRow" class="row" style="align-items:center;gap:6px"><label><input id="analogueCurve" type="checkbox"> B — Analogue Curve</label><input id="curveAmount" type="range" min="0" max="100" value="40" style="width:80px;opacity:0.35"><span id="curveAmountVal" style="font-size:13px;min-width:20px;text-align:right;opacity:0.35">40</span></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:5px">
@@ -334,7 +346,7 @@
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Label <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label><label>Console <input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></label><label>Meter <input id="meterWidth" type="number" min="10" max="80" step="1" value="40"></label><label>Meter Stroke <input id="meterStrokeWidth" type="number" min="1" max="20" step="1" value="7"></label></div>
       <div class="row"><label><input id="showOuterLine" type="checkbox" checked> Show Outer Line</label><label><input id="meterGlow" type="checkbox" checked> Meter Glow</label><label>Glow <input id="meterGlowRadius" type="number" min="0" max="60" step="1" value="5"></label><label><input id="meterScanlinesVisible" type="checkbox" checked> Scanlines</label><label><input id="blobGlowEnabled" type="checkbox" checked> Blob Glow</label><label>Blob Glow R <input id="blobGlowRadius" type="number" min="0" max="30" step="1" value="8"></label></div>
-      <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#5fa8ff"></label><label>Meter L <input id="meterFillColor" type="color" value="#00ff00"></label><label>Meter F <input id="meterFillColorFilter" type="color" value="#00ffff"></label></div>
+      <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#5fa8ff"></label><label>Meter L <input id="meterFillColor" type="color" value="#00ff00"></label><label>Meter F <input id="meterFillColorFilter" type="color" value="#00ffff"></label><label>Stated <input id="timeAxisStatedColor" type="color" value="#aaaaaa"></label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:10px;align-items:center;flex-wrap:wrap">
         <label><input id="audioEnabled" type="checkbox" checked> A — Audio</label>
@@ -394,7 +406,8 @@
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">C</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Clipped Shape</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">X</td><td style="padding:3px 0;font-size:13px;font-weight:700">Linear Time</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">B</td><td style="padding:3px 0;font-size:13px;font-weight:700">Analogue Curve</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">/</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Time Axis</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">'</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Effective Times</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">;</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Stated Times</td></tr>
         </table>
       </div>
       <div>
@@ -588,9 +601,13 @@ function render(){
     ? pts.p1
     : { x: pts.p1.x, y: Math.max(pts.p1.y, ceilY) };
 
-  const drawPS = overrange
+  let drawPS = overrange
     ? { x: pts.pS.x, y: Math.max(pts.pS.y, yFor(1)), level: pts.pS.level }
     : pts.pS;
+  if (showClipped) {
+    const cDX = pts.p1.x + (pts.pEnd.x - pts.p1.x) * (e.floor + e.scale - 1) / e.scale;
+    if (drawPS.x < cDX) drawPS = { x: cDX, y: ceilY, level: drawPS.level };
+  }
 
   const releaseR = state.r; // reserved for future use
   const releaseBox = $('releaseKnobBox');
@@ -601,6 +618,8 @@ function render(){
   if(showClippedRow){ showClippedRow.style.opacity = textbookAdsr ? '0.35' : '1'; showClippedRow.style.pointerEvents = textbookAdsr ? 'none' : 'auto'; }
   const analogueCurveRow = $('analogueCurveRow');
   if(analogueCurveRow){ analogueCurveRow.style.opacity = textbookAdsr ? '0.35' : '1'; analogueCurveRow.style.pointerEvents = textbookAdsr ? 'none' : 'auto'; }
+  const tbSustainDottedRow = $('tbSustainDottedRow');
+  if(tbSustainDottedRow){ tbSustainDottedRow.style.opacity = textbookAdsr ? '1' : '0.35'; tbSustainDottedRow.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
   const analogueOn = !textbookAdsr && $('analogueCurve') && $('analogueCurve').checked;
   const curveAmt = analogueOn ? (Number($('curveAmount').value) / 100) : 0;
 
@@ -617,7 +636,8 @@ function render(){
     const f_a = (1 - e.floor) / e.scale;           // attack fraction at ceiling crossing
     const f_d = (e.floor + e.scale - 1) / e.scale; // decay fraction at ceiling crossing
     const ceilAttackX = pts.p0.x + (pts.p1.x - pts.p0.x) * f_a;
-    const ceilDecayX  = pts.p1.x + (pts.pEnd.x - pts.p1.x) * f_d;
+    let ceilDecayX  = pts.p1.x + (pts.pEnd.x - pts.p1.x) * f_d;
+    if (ceilDecayX > pts.pS.x) ceilDecayX = pts.pS.x;
     const p1x = pts.p1.x;
     aPath        = buildPath(pts.p0.x, pts.p0.y, ceilAttackX, ceilY, curveAmt, aSF);
     ceilLeftPath = `M ${ceilAttackX} ${ceilY} L ${p1x} ${ceilY}`;
@@ -651,7 +671,8 @@ function render(){
     const f_attack = (1 - e.floor) / e.scale;
     const ceilAttackX = pts.p0.x + (pts.p1.x - pts.p0.x) * f_attack;
     const f_decay = (e.floor + e.scale - 1) / e.scale;
-    const ceilDecayX = pts.p1.x + (pts.pEnd.x - pts.p1.x) * f_decay;
+    let ceilDecayX = pts.p1.x + (pts.pEnd.x - pts.p1.x) * f_decay;
+    if (ceilDecayX > pts.pS.x) ceilDecayX = pts.pS.x;
     const peakForSlope = (showClipped && overrange)
       ? { x: ceilDecayX, y: yFor(1) }
       : overrange
@@ -714,6 +735,7 @@ function render(){
       : '';
     ['releaseOuter','releaseInner'].forEach(id => $(id).setAttribute('d', rPath));
     ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d',''); el.style.display='none'; } });
+    const tbSusMarkerMD=$('tbSustainMarker'); if(tbSusMarkerMD) tbSusMarkerMD.style.display='none';
   } else {
     // Textbook ADSR: decay ends at fixed x (pts.pEnd.x), y-only varies with sustain level
     const tbDecayEnd = { x: pts.pEnd.x, y: drawPS.y };
@@ -724,8 +746,32 @@ function render(){
     // Sustain segment: fixed-width horizontal line (15% of graph width) at sustain level y
     const sustainGap = graph.w * 0.15;
     const tbSusEnd = { x: pts.pEnd.x + sustainGap, y: drawPS.y };
-    const tbSusPath = drawReleasePath ? `M ${pts.pEnd.x} ${drawPS.y} L ${tbSusEnd.x} ${drawPS.y}` : '';
-    ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d', tbSusPath); el.style.display=''; } });
+    const tbSusDotted = $('tbSustainDotted') && $('tbSustainDotted').checked;
+    if(tbSusDotted){
+      ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d',''); el.style.display='none'; } });
+      const tbSusMarker=$('tbSustainMarker');
+      if(tbSusMarker){
+        const smSrc=$('sustainMarker');
+        if(smSrc){
+          tbSusMarker.style.stroke         = smSrc.style.stroke;
+          tbSusMarker.style.strokeWidth    = smSrc.style.strokeWidth;
+          tbSusMarker.style.strokeDasharray= smSrc.style.strokeDasharray;
+          tbSusMarker.style.strokeLinecap  = smSrc.style.strokeLinecap;
+          tbSusMarker.style.strokeOpacity  = smSrc.style.strokeOpacity;
+        }
+        if(drawReleasePath){
+          tbSusMarker.setAttribute('x1',pts.pEnd.x); tbSusMarker.setAttribute('y1',drawPS.y);
+          tbSusMarker.setAttribute('x2',tbSusEnd.x);  tbSusMarker.setAttribute('y2',drawPS.y);
+          tbSusMarker.style.display='';
+        } else {
+          tbSusMarker.style.display='none';
+        }
+      }
+    } else {
+      const tbSusPath = drawReleasePath ? `M ${pts.pEnd.x} ${drawPS.y} L ${tbSusEnd.x} ${drawPS.y}` : '';
+      ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d', tbSusPath); el.style.display=''; } });
+      const tbSusMarker=$('tbSustainMarker'); if(tbSusMarker) tbSusMarker.style.display='none';
+    }
     // Release: starts from end of sustain segment, spans rwFull to the right
     const rT_r2 = mapTime(state.r);
     let rwFull2;
@@ -826,9 +872,12 @@ function render(){
   const modeLabelEl=$('modeLabel');
   if(modeLabelEl){ modeLabelEl.textContent=freqMode?'FILTER CONTOUR':'LOUDNESS CONTOUR'; modeLabelEl.setAttribute('x',graph.x0); modeLabelEl.setAttribute('y',yFor(1)-90); }
   const timeAxis0El=$('timeAxis0');
-  const showTA=$('showTimeAxis')&&$('showTimeAxis').checked;
+  const showEffective=!!($('showEffectiveTimes')&&$('showEffectiveTimes').checked);
+  const showStated=!!($('showStatedTimes')&&$('showStatedTimes').checked);
   const taY=graph.y0+30;
-  if(timeAxis0El){ timeAxis0El.setAttribute('x',graph.x0); timeAxis0El.setAttribute('y',taY); timeAxis0El.style.display=showTA?'':'none'; timeAxis0El.style.opacity=showTA?'1':''; }
+  if(timeAxis0El){ timeAxis0El.setAttribute('x',graph.x0); timeAxis0El.setAttribute('y',taY); timeAxis0El.style.display=showEffective?'':'none'; timeAxis0El.style.opacity=showEffective?'1':''; }
+  const timeAxis0StatedEl=$('timeAxis0Stated');
+  if(timeAxis0StatedEl){ timeAxis0StatedEl.setAttribute('x',graph.x0); timeAxis0StatedEl.setAttribute('y',graph.y0+50); timeAxis0StatedEl.style.display=showStated?'':'none'; timeAxis0StatedEl.style.opacity=showStated?'1':''; }
   const timeAxisAttackEl=$('timeAxisAttack');
   if(timeAxisAttackEl){
     let taAttackX, taAttackMs;
@@ -845,7 +894,115 @@ function render(){
     }
     timeAxisAttackEl.setAttribute('x',taAttackX); timeAxisAttackEl.setAttribute('y',taY);
     timeAxisAttackEl.textContent=taAttackMs;
-    timeAxisAttackEl.style.display=showTA?'':'none'; timeAxisAttackEl.style.opacity=showTA?'1':'';
+    timeAxisAttackEl.style.display=showEffective?'':'none'; timeAxisAttackEl.style.opacity=showEffective?'1':'';
+  }
+  const timeAxisAttackStatedEl=$('timeAxisAttackStated');
+  if(timeAxisAttackStatedEl){
+    if(showStated){
+      timeAxisAttackStatedEl.setAttribute('x',pts.p1.x); timeAxisAttackStatedEl.setAttribute('y',graph.y0+50);
+      timeAxisAttackStatedEl.textContent=Math.round(e.aT*1000);
+      timeAxisAttackStatedEl.style.display=''; timeAxisAttackStatedEl.style.opacity='1';
+    } else {
+      timeAxisAttackStatedEl.style.display='none'; timeAxisAttackStatedEl.style.opacity='';
+    }
+  }
+  const taDecayStartEl=$('timeAxisDecayStart');
+  const taDecayEndEl=$('timeAxisDecayEnd');
+  if(taDecayStartEl&&taDecayEndEl){
+    const showClipLabels=showEffective&&freqMode&&showClipped&&overrange;
+    // timeAxisDecayStart: clipping mode only — right edge of flat top (effective row)
+    if(showClipLabels){
+      const f_a=(1-e.floor)/e.scale;
+      const f_d=(e.floor+e.scale-1)/e.scale;
+      const ceilDecayX=pts.p1.x+(pts.pEnd.x-pts.p1.x)*f_d;
+      taDecayStartEl.setAttribute('x',ceilDecayX); taDecayStartEl.setAttribute('y',taY);
+      taDecayStartEl.textContent=Math.round((e.aT*f_a+e.dT*f_d)*1000);
+      taDecayStartEl.style.display=''; taDecayStartEl.style.opacity='1';
+    } else {
+      taDecayStartEl.style.display='none'; taDecayStartEl.style.opacity='';
+    }
+    // timeAxisDecayEnd: stated row — textbook always; Model D only when Loud Decay ON
+    const showDecayEnd=showStated&&(textbookAdsr||e.releaseOn);
+    if(showDecayEnd){
+      const decayEndX=pts.pEnd.x;
+      taDecayEndEl.setAttribute('x',decayEndX); taDecayEndEl.setAttribute('y',graph.y0+50);
+      taDecayEndEl.textContent=Math.round((e.aT+e.dT)*1000);
+      taDecayEndEl.style.display=''; taDecayEndEl.style.opacity='1';
+    } else {
+      taDecayEndEl.style.display='none'; taDecayEndEl.style.opacity='';
+    }
+  }
+  // timeAxisDecayEndEffective: effective row, drawPS.x in Model D, pts.pEnd.x in textbook
+  const taDecayEndEffEl=$('timeAxisDecayEndEffective');
+  if(taDecayEndEffEl){
+    const showDecayEndEff=showEffective&&(textbookAdsr||e.releaseOn);
+    if(showDecayEndEff){
+      const effDecayEndX=textbookAdsr?pts.pEnd.x:drawPS.x;
+      const effDecayFraction=textbookAdsr?1:Math.max(0,(drawPS.x-pts.p1.x)/(pts.dwFull||1));
+      const effDecayEndMs=Math.round((e.aT+e.dT*effDecayFraction)*1000);
+      taDecayEndEffEl.setAttribute('x',effDecayEndX); taDecayEndEffEl.setAttribute('y',taY);
+      taDecayEndEffEl.textContent=effDecayEndMs;
+      taDecayEndEffEl.style.display=''; taDecayEndEffEl.style.opacity='1';
+    } else {
+      taDecayEndEffEl.style.display='none'; taDecayEndEffEl.style.opacity='';
+    }
+  }
+  const taReleaseEndEl=$('timeAxisReleaseEnd');
+  const taReleaseEndStatedEl=$('timeAxisReleaseEndStated');
+  {
+    let releaseEndX, releaseEndMs;
+    if(textbookAdsr){
+      const sustainGap=graph.w*0.15;
+      const tbSusEndX=pts.pEnd.x+sustainGap;
+      const rT_r=mapTime(state.r);
+      let rwFull;
+      if(linearTimeOn){
+        const totalMs=Math.max(1,Number($('linearTimeScale').value))*1000;
+        rwFull=rT_r*1000*(graph.w/totalMs);
+      } else {
+        rwFull=displayTimeWidth(rT_r);
+      }
+      releaseEndX=tbSusEndX+rwFull;
+      releaseEndMs=Math.round((e.aT+e.dT+rT_r)*1000);
+    } else {
+      releaseEndX=pts.pEnd.x;
+      releaseEndMs=Math.round((e.aT+e.dT)*1000);
+    }
+    if(taReleaseEndEl){
+      const showReleaseEnd=showEffective&&(textbookAdsr||e.releaseOn);
+      if(showReleaseEnd){
+        taReleaseEndEl.setAttribute('x',releaseEndX); taReleaseEndEl.setAttribute('y',taY);
+        taReleaseEndEl.textContent=releaseEndMs;
+        taReleaseEndEl.style.display=''; taReleaseEndEl.style.opacity='1';
+      } else { taReleaseEndEl.style.display='none'; taReleaseEndEl.style.opacity=''; }
+    }
+    if(taReleaseEndStatedEl){
+      if(showStated&&textbookAdsr){
+        taReleaseEndStatedEl.setAttribute('x',releaseEndX); taReleaseEndStatedEl.setAttribute('y',graph.y0+50);
+        taReleaseEndStatedEl.textContent=releaseEndMs;
+        taReleaseEndStatedEl.style.display=''; taReleaseEndStatedEl.style.opacity='1';
+      } else { taReleaseEndStatedEl.style.display='none'; taReleaseEndStatedEl.style.opacity=''; }
+    }
+  }
+  const taReleaseStartEl=$('timeAxisReleaseStart');
+  const taReleaseStartStatedEl=$('timeAxisReleaseStartStated');
+  if(taReleaseStartEl||taReleaseStartStatedEl){
+    const tbSusEndX=textbookAdsr ? pts.pEnd.x+graph.w*0.15 : 0;
+    const releaseStartMs=Math.round((e.aT+e.dT)*1000);
+    if(taReleaseStartEl){
+      if(showEffective&&textbookAdsr){
+        taReleaseStartEl.setAttribute('x',tbSusEndX); taReleaseStartEl.setAttribute('y',taY);
+        taReleaseStartEl.textContent=releaseStartMs;
+        taReleaseStartEl.style.display=''; taReleaseStartEl.style.opacity='1';
+      } else { taReleaseStartEl.style.display='none'; taReleaseStartEl.style.opacity=''; }
+    }
+    if(taReleaseStartStatedEl){
+      if(showStated&&textbookAdsr){
+        taReleaseStartStatedEl.setAttribute('x',tbSusEndX); taReleaseStartStatedEl.setAttribute('y',graph.y0+50);
+        taReleaseStartStatedEl.textContent=releaseStartMs;
+        taReleaseStartStatedEl.style.display=''; taReleaseStartStatedEl.style.opacity='1';
+      } else { taReleaseStartStatedEl.style.display='none'; taReleaseStartStatedEl.style.opacity=''; }
+    }
   }
   const segY = yFor(1) - 60;
   const segFilterModeEl=$('segFilterMode');
@@ -913,7 +1070,7 @@ function setFromSlider(){
 $('sustain').addEventListener('input',()=>{ setFromSlider(); if(window.markPresetDirty) markPresetDirty(); });
 ['floor','scale'].forEach(id=>$(id).addEventListener('input',()=>{ setFromSlider(); if(window.markPresetDirty) markPresetDirty(); }));
 document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) state.target={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale}; syncControls(); }));
-['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','showTimeAxis','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','showOuterLine'].forEach(id=>$(id).addEventListener('change',render));
+['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','showEffectiveTimes','showStatedTimes','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','showOuterLine'].forEach(id=>$(id).addEventListener('change',render));
 $('meterGlow').addEventListener('change', () => setMeterLevel(state.dotLevel));
 $('meterGlowRadius').addEventListener('input', () => setMeterLevel(state.dotLevel));
 $('meterScanlinesVisible').addEventListener('change', render);
@@ -950,6 +1107,7 @@ $('lineColor').addEventListener('input',e=>document.documentElement.style.setPro
 $('bgColor').addEventListener('input',e=>document.documentElement.style.setProperty('--bg', e.target.value));
 $('meterFillColor').addEventListener('input',e=>document.documentElement.style.setProperty('--meterFill', e.target.value));
 $('meterFillColorFilter').addEventListener('input',e=>document.documentElement.style.setProperty('--meterFillFilter', e.target.value));
+$('timeAxisStatedColor').addEventListener('input',e=>document.documentElement.style.setProperty('--timeAxisStatedColor', e.target.value));
 $('attackColor').addEventListener('input',e=>document.documentElement.style.setProperty('--attackColor', e.target.value));
 $('decayColor').addEventListener('input',e=>document.documentElement.style.setProperty('--decayColor', e.target.value));
 $('releaseColor').addEventListener('input',e=>document.documentElement.style.setProperty('--releaseColor', e.target.value));
@@ -1540,7 +1698,8 @@ document.addEventListener('keydown', e => {
   } else if(e.key === 'z' || e.key === 'Z'){ toggleCheckbox('drawReleaseWhenZero');
   } else if(e.key === ','){ toggleCheckbox('showBounds');
   } else if(e.key === '.'){ toggleCheckbox('showContour');
-  } else if(e.key === '/'){ e.preventDefault(); document.getElementById('showTimeAxis').click();
+  } else if(e.key === "'"){ toggleCheckbox('showEffectiveTimes');
+  } else if(e.key === ';'){ toggleCheckbox('showStatedTimes');
   } else if(e.key === 'f' || e.key === 'F'){ toggleCheckbox('frequencyMode');
   } else if(e.key === 'm' || e.key === 'M'){ toggleCheckbox('hpMode');
   } else if(e.key === 's' || e.key === 'S'){ toggleCheckbox('keyboardControl');
@@ -1782,7 +1941,7 @@ document.querySelectorAll('input[name="mode"]').forEach(el => {
 
 function hideLikelyAxes(){
   document.querySelectorAll('svg line, svg path, svg text').forEach(el => {
-    if (el.id === 'timeAxis0' || el.id === 'timeAxisAttack') return;
+    if (el.id === 'timeAxis0' || el.id === 'timeAxis0Stated' || el.id === 'timeAxisAttack' || el.id === 'timeAxisAttackStated' || el.id === 'timeAxisDecayStart' || el.id === 'timeAxisDecayEnd' || el.id === 'timeAxisDecayEndEffective' || el.id === 'timeAxisReleaseEnd' || el.id === 'timeAxisReleaseEndStated' || el.id === 'timeAxisReleaseStart' || el.id === 'timeAxisReleaseStartStated') return;
     const idClass = ((el.id || '') + ' ' + (el.getAttribute('class') || '')).toLowerCase();
     const text = (el.textContent || '').trim();
 
@@ -2276,8 +2435,10 @@ function buildConfigSnapshot(){
     linearTime: $('linearTime').checked,
     analogueCurve: $('analogueCurve').checked,
     textbookAdsr: $('textbookAdsr').checked,
+    tbSustainDotted: $('tbSustainDotted') ? $('tbSustainDotted').checked : true,
     showOuterLine: $('showOuterLine') ? $('showOuterLine').checked : true,
-    showTimeAxis: $('showTimeAxis') ? $('showTimeAxis').checked : false,
+    showEffectiveTimes: $('showEffectiveTimes') ? $('showEffectiveTimes').checked : false,
+    showStatedTimes: $('showStatedTimes') ? $('showStatedTimes').checked : false,
     meterGlow: $('meterGlow') ? $('meterGlow').checked : true,
     meterGlowRadius: Number($('meterGlowRadius') ? $('meterGlowRadius').value : 5),
     meterScanlinesVisible: $('meterScanlinesVisible') ? $('meterScanlinesVisible').checked : true,
@@ -2300,6 +2461,7 @@ function buildConfigSnapshot(){
     releaseColor: $('releaseColor').value,
     meterFillColor: $('meterFillColor').value,
     meterFillColorFilter: $('meterFillColorFilter').value,
+    timeAxisStatedColor: $('timeAxisStatedColor').value,
     lineWidth: Number($('lineWidth').value),
     innerLineWidth: Number($('innerLineWidth').value),
     labelSize: Number($('labelSize').value),
@@ -2319,7 +2481,7 @@ function loadConfigObject(cfg){
   state.target.a = cfg.a; state.target.d = cfg.d; state.target.s = cfg.s; state.target.r = state.r; state.target.floor = cfg.floor; state.target.scale = cfg.scale;
 
   // Checkboxes
-  ['loudDecay','drawReleaseWhenZero','showBounds','showContour','showTimeAxis','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','showOuterLine','meterGlow','meterScanlinesVisible','blobGlowEnabled'].forEach(id => {
+  ['loudDecay','drawReleaseWhenZero','showBounds','showContour','showEffectiveTimes','showStatedTimes','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','tbSustainDotted','showOuterLine','meterGlow','meterScanlinesVisible','blobGlowEnabled'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
   syncHpModeEnabled();
@@ -2358,7 +2520,7 @@ function loadConfigObject(cfg){
   }
 
   // Colours (dispatch input to update CSS variables)
-  ['lineColor','bgColor','attackColor','decayColor','releaseColor','meterFillColor','meterFillColorFilter'].forEach(id => {
+  ['lineColor','bgColor','attackColor','decayColor','releaseColor','meterFillColor','meterFillColorFilter','timeAxisStatedColor'].forEach(id => {
     if($(id) && cfg[id]){ $(id).value = cfg[id]; $(id).dispatchEvent(new Event('input')); }
   });
 
