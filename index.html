@@ -195,6 +195,7 @@
       <line id="floorLine" x1="80" y1="445" x2="1145" y2="445" style="stroke:var(--line);stroke-width:3.5;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <line id="sustainMarker" x1="80" y1="445" x2="80" y2="445" style="stroke:var(--line);stroke-opacity:1;stroke-linecap:round;stroke-dasharray:1 14;vector-effect:non-scaling-stroke;" />
       <line id="tbSustainMarker" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
+      <line id="tbModelDSustainLine" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
       <circle id="sustainPoint" class="tap-marker" cx="80" cy="445" style="opacity:.85" />
       <g id="envSegments">
         <path id="sustainSegOuter" class="env-outer" d="" style="display:none" />
@@ -238,6 +239,7 @@
       <text id="segClipping"   class="mode-label" x="900" y="0" text-anchor="start">CONTOUR PEAK: SCHEMATIC</text>
 
       <text id="sLabel" class="small-label" x="0" y="0">SUSTAIN</text>
+      <text id="tbSustainLabel" class="small-label" x="0" y="0" style="display:none;">SUSTAIN</text>
 
     </svg>
   </div>
@@ -308,15 +310,17 @@
       <div class="row"><label><input id="drawReleaseWhenZero" type="checkbox"> Z — Draw Release When Zero</label></div>
       <div class="row"><label><input id="showBounds" type="checkbox"> , — Show Max Min Lines</label></div>
       <div class="row"><label><input id="showContour" type="checkbox" checked> . — Show Contour Top And Bottom</label></div>
-      <div class="row"><label><input id="showEffectiveTimes" type="checkbox"> ' — Show Effective Times</label></div>
-      <div class="row"><label><input id="showStatedTimes" type="checkbox"> ; — Show Stated Times</label></div>
+      <div class="row"><label><input id="showEffectiveTimes" type="checkbox"> ; — Show Effective Times</label></div>
+      <div class="row"><label><input id="showStatedTimes" type="checkbox"> ' — Show Stated Times</label></div>
       <div class="row"><label><input id="frequencyMode" type="checkbox"> F — Filter Mode</label></div>
       <div class="row"><label><input id="hpMode" type="checkbox"> M — LP/HP Mode</label></div>
       <div class="row"><label><input id="keyboardControl" type="checkbox"> S — Mimic Model D Sustain (80%)</label></div>
       <div id="showClippedRow" class="row"><label><input id="showClipped" type="checkbox"> C — Show Clipped Shape</label></div>
       <div class="row" style="align-items:center;gap:6px"><label><input id="linearTime" type="checkbox"> X — Linear Time</label><input id="linearTimeScale" type="number" min="1" max="15" step="1" value="6" style="width:42px;text-align:center;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.3);border-radius:5px;color:#fff;font-size:13px;padding:2px 4px"><label id="linearTimeScaleLabel" for="linearTimeScale" style="font-size:13px">s</label></div>
       <div class="row"><label><input id="textbookAdsr" type="checkbox"> T — Textbook ADSR</label></div>
-      <div id="tbSustainDottedRow" class="row"><label><input id="tbSustainDotted" type="checkbox" checked> Dotted Sustain (textbook)</label></div>
+      <div id="tbSustainDottedRow" class="row"><label><input id="tbSustainDotted" type="checkbox" checked> [ — Dotted Textbook ADSR Sustain</label></div>
+      <div id="tbSustainCollapseRow" class="row"><label><input id="tbSustainCollapse" type="checkbox"> ] — Collapse Textbook ADSR Sustain</label></div>
+      <div id="tbShowModelDSustainRow" class="row"><label><input id="tbShowModelDSustain" type="checkbox"> \ — Show Model D Sustain (textbook)</label></div>
       <div id="analogueCurveRow" class="row" style="align-items:center;gap:6px"><label><input id="analogueCurve" type="checkbox"> B — Analogue Curve</label><input id="curveAmount" type="range" min="0" max="100" value="40" style="width:80px;opacity:0.35"><span id="curveAmountVal" style="font-size:13px;min-width:20px;text-align:right;opacity:0.35">40</span></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:5px">
@@ -344,7 +348,7 @@
       </div>
       <div class="row"><label><input id="keepTapMarker" type="checkbox" checked> Leave Tap Marker</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
-      <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Label <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label><label>Console <input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></label><label>Meter <input id="meterWidth" type="number" min="10" max="80" step="1" value="40"></label><label>Meter Stroke <input id="meterStrokeWidth" type="number" min="1" max="20" step="1" value="7"></label></div>
+      <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Label <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label><label>Console <input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></label><label>Meter <input id="meterWidth" type="number" min="10" max="80" step="1" value="40"></label><label>Meter Stroke <input id="meterStrokeWidth" type="number" min="1" max="20" step="1" value="7"></label><label>TB Sustain Max <input id="tbSustainGapMax" type="number" min="15" max="30" step="1" value="15">%</label></div>
       <div class="row"><label><input id="showOuterLine" type="checkbox" checked> Show Outer Line</label><label><input id="meterGlow" type="checkbox" checked> Meter Glow</label><label>Glow <input id="meterGlowRadius" type="number" min="0" max="60" step="1" value="5"></label><label><input id="meterScanlinesVisible" type="checkbox" checked> Scanlines</label><label><input id="blobGlowEnabled" type="checkbox" checked> Blob Glow</label><label>Blob Glow R <input id="blobGlowRadius" type="number" min="0" max="30" step="1" value="8"></label></div>
       <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#5fa8ff"></label><label>Meter L <input id="meterFillColor" type="color" value="#00ff00"></label><label>Meter F <input id="meterFillColorFilter" type="color" value="#00ffff"></label><label>Stated <input id="timeAxisStatedColor" type="color" value="#aaaaaa"></label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
@@ -406,8 +410,11 @@
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">C</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Clipped Shape</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">X</td><td style="padding:3px 0;font-size:13px;font-weight:700">Linear Time</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">B</td><td style="padding:3px 0;font-size:13px;font-weight:700">Analogue Curve</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">'</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Effective Times</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">;</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Stated Times</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">[</td><td style="padding:3px 0;font-size:13px;font-weight:700">Dotted Textbook ADSR Sustain</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">]</td><td style="padding:3px 0;font-size:13px;font-weight:700">Collapse Textbook ADSR Sustain</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">\</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Model D Sustain (textbook)</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">;</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Effective Times</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">'</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Stated Times</td></tr>
         </table>
       </div>
       <div>
@@ -437,6 +444,7 @@
 const STATUS_DIM_OPACITY = 0.65;
 let METER_W = 40;
 let METER_STROKE_W = 7;
+let SUSTAIN_GAP_MAX = 0.15;
 
 let animationToken = 0;
 let currentTransitionSec = 1;
@@ -449,7 +457,7 @@ const curve = [
   {p:0.00,t:0}, {p:0.08,t:0.010}, {p:0.25,t:0.200}, {p:0.42,t:0.600},
   {p:0.58,t:1.000}, {p:0.75,t:5.000}, {p:0.90,t:10.000}, {p:1.00,t:12.000}
 ];
-const state = { a:.08, d:.25, s:.5, r:.5, floor:0, scale:1, target:{a:.08,d:.25,s:.5,r:.5,floor:0,scale:1}, anim:null, dotAnim:null, held:false, dotLevel:0, currentPhase:'idle', releaseFromDecay:false };
+const state = { a:.08, d:.25, s:.5, r:.5, floor:0, scale:1, tbSustainGap:SUSTAIN_GAP_MAX, target:{a:.08,d:.25,s:.5,r:.5,floor:0,scale:1,tbSustainGap:SUSTAIN_GAP_MAX}, anim:null, dotAnim:null, held:false, dotLevel:0, currentPhase:'idle', releaseFromDecay:false };
 const graph = { x0:80, y0:445, w:1045, h:415 };
 
 function clamp(v,min=0,max=1){ return Math.max(min, Math.min(max, v)); }
@@ -620,6 +628,14 @@ function render(){
   if(analogueCurveRow){ analogueCurveRow.style.opacity = textbookAdsr ? '0.35' : '1'; analogueCurveRow.style.pointerEvents = textbookAdsr ? 'none' : 'auto'; }
   const tbSustainDottedRow = $('tbSustainDottedRow');
   if(tbSustainDottedRow){ tbSustainDottedRow.style.opacity = textbookAdsr ? '1' : '0.35'; tbSustainDottedRow.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
+  const tbSustainCollapseRow = $('tbSustainCollapseRow');
+  if(tbSustainCollapseRow){ tbSustainCollapseRow.style.opacity = textbookAdsr ? '1' : '0.35'; tbSustainCollapseRow.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
+  const tbShowModelDSustainRow = $('tbShowModelDSustainRow');
+  if(tbShowModelDSustainRow){ tbShowModelDSustainRow.style.opacity = textbookAdsr ? '1' : '0.35'; tbShowModelDSustainRow.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
+  if(textbookAdsr){
+    const collapse = $('tbSustainCollapse') && $('tbSustainCollapse').checked;
+    state.target.tbSustainGap = collapse ? 0 : SUSTAIN_GAP_MAX;
+  }
   const analogueOn = !textbookAdsr && $('analogueCurve') && $('analogueCurve').checked;
   const curveAmt = analogueOn ? (Number($('curveAmount').value) / 100) : 0;
 
@@ -736,6 +752,7 @@ function render(){
     ['releaseOuter','releaseInner'].forEach(id => $(id).setAttribute('d', rPath));
     ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d',''); el.style.display='none'; } });
     const tbSusMarkerMD=$('tbSustainMarker'); if(tbSusMarkerMD) tbSusMarkerMD.style.display='none';
+    const tbMDLineMD=$('tbModelDSustainLine'); if(tbMDLineMD) tbMDLineMD.style.display='none';
   } else {
     // Textbook ADSR: decay ends at fixed x (pts.pEnd.x), y-only varies with sustain level
     const tbDecayEnd = { x: pts.pEnd.x, y: drawPS.y };
@@ -743,8 +760,8 @@ function render(){
       ? buildPath(pts.p1.x + (pts.pEnd.x - pts.p1.x) * ((e.floor + e.scale - 1) / e.scale), ceilY, tbDecayEnd.x, tbDecayEnd.y, curveAmt, dSF)
       : buildPath(drawP1.x, drawP1.y, tbDecayEnd.x, tbDecayEnd.y, curveAmt, dSF);
     ['decayOuter','decayInner'].forEach(id => $(id).setAttribute('d', tbDPath));
-    // Sustain segment: fixed-width horizontal line (15% of graph width) at sustain level y
-    const sustainGap = graph.w * 0.15;
+    // Sustain segment: fixed-width horizontal line at sustain level y
+    const sustainGap = graph.w * state.tbSustainGap;
     const tbSusEnd = { x: pts.pEnd.x + sustainGap, y: drawPS.y };
     const tbSusDotted = $('tbSustainDotted') && $('tbSustainDotted').checked;
     if(tbSusDotted){
@@ -784,6 +801,25 @@ function render(){
     const tbREnd = { x: tbSusEnd.x + rwFull2, y: yFor(e.floor) };
     const tbRPath = drawReleasePath ? buildPath(tbSusEnd.x, tbSusEnd.y, tbREnd.x, tbREnd.y, curveAmt, rSF) : '';
     ['releaseOuter','releaseInner'].forEach(id => $(id).setAttribute('d', tbRPath));
+    // Model D style sustain line in textbook mode
+    const tbMDLine=$('tbModelDSustainLine');
+    if(tbMDLine){
+      if($('tbShowModelDSustain')&&$('tbShowModelDSustain').checked){
+        const smSrc=$('sustainMarker');
+        if(smSrc){
+          tbMDLine.style.stroke         = smSrc.style.stroke;
+          tbMDLine.style.strokeWidth    = smSrc.style.strokeWidth;
+          tbMDLine.style.strokeDasharray= smSrc.style.strokeDasharray;
+          tbMDLine.style.strokeLinecap  = smSrc.style.strokeLinecap;
+          tbMDLine.style.strokeOpacity  = smSrc.style.strokeOpacity;
+        }
+        tbMDLine.setAttribute('x1',tbSusEnd.x); tbMDLine.setAttribute('y1',drawPS.y);
+        tbMDLine.setAttribute('x2',graph.x0+graph.w); tbMDLine.setAttribute('y2',drawPS.y);
+        tbMDLine.style.display='';
+      } else {
+        tbMDLine.style.display='none';
+      }
+    }
   }
 
   // Show/hide outer lines based on showOuterLine checkbox
@@ -812,6 +848,17 @@ function render(){
   $('sustainPoint').style.display = textbookAdsr ? 'none' : '';
 
   $('sLabel').setAttribute('x',Math.min(markerEndX-105, drawPS.x+28)); $('sLabel').setAttribute('y',drawPS.y-18); $('sLabel').style.display = textbookAdsr ? 'none' : '';
+  const tbSustainLabelEl=$('tbSustainLabel');
+  if(tbSustainLabelEl){
+    if(textbookAdsr&&$('tbShowModelDSustain')&&$('tbShowModelDSustain').checked){
+      const sustainGap=graph.w*state.tbSustainGap;
+      const tbSusEndX=pts.pEnd.x+sustainGap;
+      tbSustainLabelEl.setAttribute('x',tbSusEndX+28); tbSustainLabelEl.setAttribute('y',drawPS.y-18);
+      tbSustainLabelEl.style.display='';
+    } else {
+      tbSustainLabelEl.style.display='none';
+    }
+  }
 
 
   // Bounds lines — fixed at absolute graph top/bottom, full SVG width
@@ -952,7 +999,7 @@ function render(){
   {
     let releaseEndX, releaseEndMs;
     if(textbookAdsr){
-      const sustainGap=graph.w*0.15;
+      const sustainGap=graph.w*state.tbSustainGap;
       const tbSusEndX=pts.pEnd.x+sustainGap;
       const rT_r=mapTime(state.r);
       let rwFull;
@@ -977,7 +1024,7 @@ function render(){
       } else { taReleaseEndEl.style.display='none'; taReleaseEndEl.style.opacity=''; }
     }
     if(taReleaseEndStatedEl){
-      if(showStated&&textbookAdsr){
+      if(showStated){
         taReleaseEndStatedEl.setAttribute('x',releaseEndX); taReleaseEndStatedEl.setAttribute('y',graph.y0+50);
         taReleaseEndStatedEl.textContent=releaseEndMs;
         taReleaseEndStatedEl.style.display=''; taReleaseEndStatedEl.style.opacity='1';
@@ -987,7 +1034,7 @@ function render(){
   const taReleaseStartEl=$('timeAxisReleaseStart');
   const taReleaseStartStatedEl=$('timeAxisReleaseStartStated');
   if(taReleaseStartEl||taReleaseStartStatedEl){
-    const tbSusEndX=textbookAdsr ? pts.pEnd.x+graph.w*0.15 : 0;
+    const tbSusEndX=textbookAdsr ? pts.pEnd.x+graph.w*state.tbSustainGap : 0;
     const releaseStartMs=Math.round((e.aT+e.dT)*1000);
     if(taReleaseStartEl){
       if(showEffective&&textbookAdsr){
@@ -1064,18 +1111,22 @@ function setFromSlider(){
   dest.a=$('attack').value/1000; dest.d=$('decay').value/1000; dest.s=$('sustain').value/1000;
   dest.r=$('release').value/1000;
   dest.floor=$('floor').value/1000; dest.scale=$('scale').value/1000;
-  if(mode==='live') { state.target={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale}; render(); } else syncControls();
+  if(mode==='live') { state.target={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale,tbSustainGap:state.tbSustainGap}; render(); } else syncControls();
 }
 ['attack','decay','release'].forEach(id=>$(id).addEventListener('input',()=>{ if(currentMode()==='live') clearBlobAndMarker(); setFromSlider(); if(window.markPresetDirty) markPresetDirty(); }));
 $('sustain').addEventListener('input',()=>{ setFromSlider(); if(window.markPresetDirty) markPresetDirty(); });
 ['floor','scale'].forEach(id=>$(id).addEventListener('input',()=>{ setFromSlider(); if(window.markPresetDirty) markPresetDirty(); }));
-document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) state.target={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale}; syncControls(); }));
-['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','showEffectiveTimes','showStatedTimes','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','showOuterLine'].forEach(id=>$(id).addEventListener('change',render));
+document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) state.target={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale,tbSustainGap:state.tbSustainGap}; syncControls(); }));
+['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','showEffectiveTimes','showStatedTimes','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine'].forEach(id=>$(id).addEventListener('change',render));
+$('tbSustainCollapse').addEventListener('change', () => {
+  state.target.tbSustainGap = $('tbSustainCollapse').checked ? 0 : SUSTAIN_GAP_MAX;
+  transition(currentTransitionSec);
+});
 $('meterGlow').addEventListener('change', () => setMeterLevel(state.dotLevel));
-$('meterGlowRadius').addEventListener('input', () => setMeterLevel(state.dotLevel));
+$('meterGlowRadius').addEventListener('input', e => { const inp=e.target,c=Math.min(60,Math.max(0,isNaN(parseInt(inp.value))?5:parseInt(inp.value))); inp.value=c; setMeterLevel(state.dotLevel); });
 $('meterScanlinesVisible').addEventListener('change', render);
 $('blobGlowEnabled').addEventListener('change', () => { applyBlobGlow(); if(state.currentPhase==='sustain') startGlowPulse(); else stopGlowPulse(); });
-$('blobGlowRadius').addEventListener('input', () => { applyBlobGlow(); if(state.currentPhase==='sustain') startGlowPulse(); });
+$('blobGlowRadius').addEventListener('input', e => { const inp=e.target,c=Math.min(30,Math.max(0,isNaN(parseInt(inp.value))?8:parseInt(inp.value))); inp.value=c; applyBlobGlow(); if(state.currentPhase==='sustain') startGlowPulse(); });
 function syncHpModeEnabled(){
   const freqOn = $('frequencyMode') && $('frequencyMode').checked;
   const hpLabel = $('hpMode') && $('hpMode').closest('label');
@@ -1111,18 +1162,19 @@ $('timeAxisStatedColor').addEventListener('input',e=>document.documentElement.st
 $('attackColor').addEventListener('input',e=>document.documentElement.style.setProperty('--attackColor', e.target.value));
 $('decayColor').addEventListener('input',e=>document.documentElement.style.setProperty('--decayColor', e.target.value));
 $('releaseColor').addEventListener('input',e=>document.documentElement.style.setProperty('--releaseColor', e.target.value));
-$('lineWidth').addEventListener('input',e=>{ document.documentElement.style.setProperty('--lineWidth', e.target.value); syncRadii(); });
-$('innerLineWidth').addEventListener('input',e=>{ document.documentElement.style.setProperty('--innerLineWidth', e.target.value); syncRadii(); });
-$('labelSize').addEventListener('input',e=>document.documentElement.style.setProperty('--labelSize', e.target.value));
+$('lineWidth').addEventListener('input',e=>{ const inp=e.target,c=Math.min(30,Math.max(4,isNaN(parseInt(inp.value))?14:parseInt(inp.value))); inp.value=c; document.documentElement.style.setProperty('--lineWidth',c); syncRadii(); });
+$('innerLineWidth').addEventListener('input',e=>{ const inp=e.target,c=Math.min(18,Math.max(1,isNaN(parseInt(inp.value))?6:parseInt(inp.value))); inp.value=c; document.documentElement.style.setProperty('--innerLineWidth',c); syncRadii(); });
+$('labelSize').addEventListener('input',e=>{ const inp=e.target,c=Math.min(72,Math.max(10,isNaN(parseInt(inp.value))?17:parseInt(inp.value))); inp.value=c; document.documentElement.style.setProperty('--labelSize',c); });
 function syncConsoleScale(){
   const s = Number($('consoleScale').value) || 0.7;
   const uiEl = document.querySelector('.ui');
   if(uiEl){ uiEl.style.transform = `scale(${s})`; uiEl.style.width = `${(1/s)*100}%`; }
 }
-$('consoleScale').addEventListener('input', syncConsoleScale);
+$('consoleScale').addEventListener('input', e => { const inp=e.target,raw=parseFloat(inp.value),c=Math.min(1.0,Math.max(0.5,isNaN(raw)?0.7:raw)); inp.value=c; syncConsoleScale(); });
 syncConsoleScale();
-$('meterWidth').addEventListener('input', e => { METER_W = Math.max(10, Math.min(80, Number(e.target.value) || 40)); render(); });
-$('meterStrokeWidth').addEventListener('input', e => { METER_STROKE_W = Math.max(1, Math.min(20, Number(e.target.value) || 7)); render(); });
+$('meterWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(80,Math.max(10,isNaN(parseInt(inp.value))?40:parseInt(inp.value))); inp.value=c; METER_W=c; render(); });
+$('meterStrokeWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(20,Math.max(1,isNaN(parseInt(inp.value))?7:parseInt(inp.value))); inp.value=c; METER_STROKE_W=c; render(); });
+$('tbSustainGapMax').addEventListener('input', e => { const inp=e.target,c=Math.min(30,Math.max(15,isNaN(parseInt(inp.value))?15:parseInt(inp.value))); inp.value=c; SUSTAIN_GAP_MAX=c/100; render(); });
 
 function transition(durSec){
   clearBlobAndMarker();
@@ -1131,11 +1183,11 @@ function transition(durSec){
   hideTapMarker();
   if(durSec===undefined) durSec=currentTransitionSec;
   const dur=durSec*1000;
-  const start={a:state.a,d:state.d,s:state.s,floor:state.floor,scale:state.scale}, end={...state.target};
+  const start={a:state.a,d:state.d,s:state.s,floor:state.floor,scale:state.scale,tbSustainGap:state.tbSustainGap}, end={...state.target};
   const startAms=mapTime(start.a)*1000, endAms=mapTime(end.a)*1000;
   const startDms=mapTime(start.d)*1000, endDms=mapTime(end.d)*1000;
   cancelAnimationFrame(state.anim);
-  state.a=start.a; state.d=start.d; state.s=start.s; state.floor=start.floor; state.scale=start.scale;
+  state.a=start.a; state.d=start.d; state.s=start.s; state.floor=start.floor; state.scale=start.scale; state.tbSustainGap=start.tbSustainGap;
   render();
   let t0=null;
   function step(now){
@@ -1147,8 +1199,9 @@ function transition(durSec){
     state.s=start.s+(end.s-start.s)*k;
     state.floor=start.floor+(end.floor-start.floor)*k;
     state.scale=start.scale+(end.scale-start.scale)*k;
+    state.tbSustainGap=start.tbSustainGap+(end.tbSustainGap-start.tbSustainGap)*k;
     render();
-    if(f<1) state.anim=requestAnimationFrame(step); else { state.a=end.a; state.d=end.d; state.s=end.s; state.floor=end.floor; state.scale=end.scale; render(); }
+    if(f<1) state.anim=requestAnimationFrame(step); else { state.a=end.a; state.d=end.d; state.s=end.s; state.floor=end.floor; state.scale=end.scale; state.tbSustainGap=end.tbSustainGap; render(); }
   }
   state.anim=requestAnimationFrame(step);
 }
@@ -1221,7 +1274,7 @@ function tbComputeAnimPoints(){
     dwFull=displayTimeWidth(e.dT);
     rwFull=displayTimeWidth(mapTime(state.r));
   }
-  const sustainGap=graph.w*0.15;
+  const sustainGap=graph.w*state.tbSustainGap;
   const floorY=yFor(e.floor);
   const peakY=yFor(e.floor+e.scale);
   const sustainY=yFor(e.floor+e.s*e.scale);
@@ -1698,13 +1751,16 @@ document.addEventListener('keydown', e => {
   } else if(e.key === 'z' || e.key === 'Z'){ toggleCheckbox('drawReleaseWhenZero');
   } else if(e.key === ','){ toggleCheckbox('showBounds');
   } else if(e.key === '.'){ toggleCheckbox('showContour');
-  } else if(e.key === "'"){ toggleCheckbox('showEffectiveTimes');
-  } else if(e.key === ';'){ toggleCheckbox('showStatedTimes');
+  } else if(e.key === ';'){ toggleCheckbox('showEffectiveTimes');
+  } else if(e.key === "'"){ toggleCheckbox('showStatedTimes');
   } else if(e.key === 'f' || e.key === 'F'){ toggleCheckbox('frequencyMode');
   } else if(e.key === 'm' || e.key === 'M'){ toggleCheckbox('hpMode');
   } else if(e.key === 's' || e.key === 'S'){ toggleCheckbox('keyboardControl');
   } else if(e.key === 'x' || e.key === 'X'){ toggleCheckbox('linearTime');
   } else if(e.key === 't' || e.key === 'T'){ toggleCheckbox('textbookAdsr');
+  } else if(e.key === '['){ toggleCheckbox('tbSustainDotted');
+  } else if(e.key === ']'){ toggleCheckbox('tbSustainCollapse');
+  } else if(e.key === '\\'){ toggleCheckbox('tbShowModelDSustain');
   } else if(e.key === 'b' || e.key === 'B'){ toggleCheckbox('analogueCurve');
   // Quick Set — Up/Down arrows adjust sustain
   } else if(e.key === 'ArrowUp'){
@@ -2436,6 +2492,8 @@ function buildConfigSnapshot(){
     analogueCurve: $('analogueCurve').checked,
     textbookAdsr: $('textbookAdsr').checked,
     tbSustainDotted: $('tbSustainDotted') ? $('tbSustainDotted').checked : true,
+    tbSustainCollapse: $('tbSustainCollapse') ? $('tbSustainCollapse').checked : false,
+    tbShowModelDSustain: $('tbShowModelDSustain') ? $('tbShowModelDSustain').checked : false,
     showOuterLine: $('showOuterLine') ? $('showOuterLine').checked : true,
     showEffectiveTimes: $('showEffectiveTimes') ? $('showEffectiveTimes').checked : false,
     showStatedTimes: $('showStatedTimes') ? $('showStatedTimes').checked : false,
@@ -2468,6 +2526,7 @@ function buildConfigSnapshot(){
     consoleScale: Number($('consoleScale').value),
     meterWidth: Number($('meterWidth').value),
     meterStrokeWidth: Number($('meterStrokeWidth').value),
+    tbSustainGapMax: Number($('tbSustainGapMax').value),
     activePresetIndex: window.getActivePresetIndex ? window.getActivePresetIndex() : -1,
     presetDirtyState: window.presetDirtyState || 'none'
   };
@@ -2479,9 +2538,12 @@ function loadConfigObject(cfg){
   // State
   state.a = cfg.a; state.d = cfg.d; state.s = cfg.s; state.r = cfg.r !== undefined ? cfg.r : 0.5; state.floor = cfg.floor; state.scale = cfg.scale;
   state.target.a = cfg.a; state.target.d = cfg.d; state.target.s = cfg.s; state.target.r = state.r; state.target.floor = cfg.floor; state.target.scale = cfg.scale;
+  const _tbCollapse = cfg.tbSustainCollapse ? true : false;
+  state.tbSustainGap = _tbCollapse ? 0 : SUSTAIN_GAP_MAX;
+  state.target.tbSustainGap = state.tbSustainGap;
 
   // Checkboxes
-  ['loudDecay','drawReleaseWhenZero','showBounds','showContour','showEffectiveTimes','showStatedTimes','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','tbSustainDotted','showOuterLine','meterGlow','meterScanlinesVisible','blobGlowEnabled'].forEach(id => {
+  ['loudDecay','drawReleaseWhenZero','showBounds','showContour','showEffectiveTimes','showStatedTimes','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine','meterGlow','meterScanlinesVisible','blobGlowEnabled'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
   syncHpModeEnabled();
@@ -2531,6 +2593,7 @@ function loadConfigObject(cfg){
   if($('consoleScale') && cfg.consoleScale !== undefined){ $('consoleScale').value = cfg.consoleScale; syncConsoleScale(); }
   if($('meterWidth') && cfg.meterWidth !== undefined){ $('meterWidth').value = cfg.meterWidth; METER_W = Math.max(10, Math.min(80, Number(cfg.meterWidth) || 40)); }
   if($('meterStrokeWidth') && cfg.meterStrokeWidth !== undefined){ $('meterStrokeWidth').value = cfg.meterStrokeWidth; METER_STROKE_W = Math.max(1, Math.min(20, Number(cfg.meterStrokeWidth) || 7)); }
+  if($('tbSustainGapMax') && cfg.tbSustainGapMax !== undefined){ $('tbSustainGapMax').value = cfg.tbSustainGapMax; SUSTAIN_GAP_MAX = Math.max(0.15, Math.min(0.30, (Number(cfg.tbSustainGapMax) || 15) / 100)); }
   if($('meterGlowRadius') && cfg.meterGlowRadius !== undefined){ $('meterGlowRadius').value = cfg.meterGlowRadius; }
   if($('blobGlowRadius') && cfg.blobGlowRadius !== undefined){ $('blobGlowRadius').value = cfg.blobGlowRadius; }
 
