@@ -155,6 +155,21 @@
   </div>
   <div class="stage">
     <svg id="svg" viewBox="0 -110 1200 575" preserveAspectRatio="xMidYMid meet" aria-label="ADSR envelope graph">
+      <defs>
+        <clipPath id="meterClip">
+          <rect id="meterClipRect" x="0" y="0" width="0" height="0"/>
+        </clipPath>
+        <pattern id="scanlines" x="0" y="0" width="100%" height="4" patternUnits="userSpaceOnUse">
+          <rect x="0" y="0" width="100%" height="2" fill="black" opacity="0.3"/>
+        </pattern>
+        <filter id="blobGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur id="blobGlowBlur" stdDeviation="8" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
       <line id="amountLine" x1="80" y1="30" x2="1145" y2="30" style="stroke:var(--line);stroke-width:3.5;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <line id="floorLine" x1="80" y1="445" x2="1145" y2="445" style="stroke:var(--line);stroke-width:3.5;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <line id="sustainMarker" x1="80" y1="445" x2="80" y2="445" style="stroke:var(--line);stroke-opacity:1;stroke-linecap:round;stroke-dasharray:1 24;vector-effect:non-scaling-stroke;" />
@@ -179,6 +194,7 @@
       <circle id="dot" class="env-dot" cx="80" cy="445" />
 
       <rect id="meterFill" x="1145" y="445" width="40" height="0" style="fill:var(--meterFill,var(--line));stroke:none;" />
+      <rect id="meterScanlinesRect" x="1145" y="30" width="40" height="415" fill="url(#scanlines)" clip-path="url(#meterClip)" style="display:none;" />
       <rect id="meterBox"  x="1145" y="30" width="40" height="415" style="fill:none;stroke:var(--line);stroke-width:7;stroke-opacity:1;vector-effect:non-scaling-stroke;" />
       <text id="meterLabelTitle" x="1165" y="72" text-anchor="middle" style="fill:var(--fg);font-size:calc(var(--labelSize) * 1px);font-weight:800;font-family:'UniversCondensed',Arial,Helvetica,sans-serif;display:none;">VOL</text>
       <text id="modeLabel" class="mode-label" x="80" y="0" text-anchor="start">LOUDNESS CONTOUR</text>
@@ -293,7 +309,7 @@
       <div class="row"><label><input id="keepTapMarker" type="checkbox" checked> Leave Tap Marker</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Label <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label><label>Console <input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></label><label>Meter <input id="meterWidth" type="number" min="10" max="80" step="1" value="40"></label><label>Meter Stroke <input id="meterStrokeWidth" type="number" min="1" max="20" step="1" value="7"></label></div>
-      <div class="row"><label><input id="showOuterLine" type="checkbox" checked> Show Outer Line</label></div>
+      <div class="row"><label><input id="showOuterLine" type="checkbox" checked> Show Outer Line</label><label><input id="meterGlow" type="checkbox" checked> Meter Glow</label><label>Glow <input id="meterGlowRadius" type="number" min="0" max="60" step="1" value="5"></label><label><input id="meterScanlinesVisible" type="checkbox" checked> Scanlines</label><label><input id="blobGlowEnabled" type="checkbox" checked> Blob Glow</label><label>Blob Glow R <input id="blobGlowRadius" type="number" min="0" max="30" step="1" value="8"></label></div>
       <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#5fa8ff"></label><label>Meter <input id="meterFillColor" type="color" value="#00ff00"></label><label>Meter F <input id="meterFillColorFilter" type="color" value="#00ffff"></label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:10px;align-items:center;flex-wrap:wrap">
@@ -740,6 +756,19 @@ function render(){
     meterBox.setAttribute('width',meterW); meterBox.setAttribute('height',graph.h);
     meterBox.style.strokeWidth = METER_STROKE_W;
   }
+  const meterClipRect=$('meterClipRect');
+  if(meterClipRect){
+    meterClipRect.setAttribute('x',meterX); meterClipRect.setAttribute('y',meterAbsTop);
+    meterClipRect.setAttribute('width',meterW); meterClipRect.setAttribute('height',graph.h);
+  }
+  const meterFillEl=$('meterFill');
+  if(meterFillEl) meterFillEl.setAttribute('clip-path','url(#meterClip)');
+  const meterScanlinesEl=$('meterScanlinesRect');
+  if(meterScanlinesEl){
+    meterScanlinesEl.setAttribute('x',meterX); meterScanlinesEl.setAttribute('y',meterAbsTop);
+    meterScanlinesEl.setAttribute('width',meterW); meterScanlinesEl.setAttribute('height',graph.h);
+    meterScanlinesEl.style.display=($('meterScanlinesVisible')&&$('meterScanlinesVisible').checked)?'':'none';
+  }
 
   // Floor line and Amount line
   const meterLeftX = meterX; // = graph.x0 + graph.w + 20 = 1145
@@ -838,6 +867,11 @@ $('sustain').addEventListener('input',()=>{ setFromSlider(); if(window.markPrese
 ['floor','scale'].forEach(id=>$(id).addEventListener('input',()=>{ setFromSlider(); if(window.markPresetDirty) markPresetDirty(); }));
 document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) state.target={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale}; syncControls(); }));
 ['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','showOuterLine'].forEach(id=>$(id).addEventListener('change',render));
+$('meterGlow').addEventListener('change', () => setMeterLevel(state.dotLevel));
+$('meterGlowRadius').addEventListener('input', () => setMeterLevel(state.dotLevel));
+$('meterScanlinesVisible').addEventListener('change', render);
+$('blobGlowEnabled').addEventListener('change', () => { applyBlobGlow(); if(state.currentPhase==='sustain') startGlowPulse(); else stopGlowPulse(); });
+$('blobGlowRadius').addEventListener('input', () => { applyBlobGlow(); if(state.currentPhase==='sustain') startGlowPulse(); });
 function syncHpModeEnabled(){
   const freqOn = $('frequencyMode') && $('frequencyMode').checked;
   const hpLabel = $('hpMode') && $('hpMode').closest('label');
@@ -1033,6 +1067,8 @@ function setMeterLevel(level){
     ? (getComputedStyle(document.documentElement).getPropertyValue('--meterFillFilter').trim()||'#00ffff')
     : (getComputedStyle(document.documentElement).getPropertyValue('--meterFill').trim()||'#00ff00');
   fill.style.fill=fillColor;
+  const glowR = Math.max(0, Number(($('meterGlowRadius')&&$('meterGlowRadius').value)||20));
+  fill.style.filter=($('meterGlow')&&$('meterGlow').checked) ? `drop-shadow(0 0 ${glowR}px ${fillColor}) drop-shadow(0 0 ${glowR*2}px ${fillColor})` : '';
   fill.setAttribute('x',mx); fill.setAttribute('width',mw);
   if(!isHP){
     // LP: fill from absolute bottom up to blob level
@@ -1069,6 +1105,42 @@ function hideDot(){
     }
   }
 }
+let glowPulseRaf = null;
+
+function blobGlowRadius(){ return Math.max(0, Number(($('blobGlowRadius')&&$('blobGlowRadius').value)||8)); }
+
+function applyBlobGlow(){
+  const dot=$('dot'), feBlur=$('blobGlowBlur');
+  if(!dot) return;
+  const on=$('blobGlowEnabled')&&$('blobGlowEnabled').checked;
+  if(on){
+    if(feBlur) feBlur.setAttribute('stdDeviation', blobGlowRadius());
+    dot.setAttribute('filter','url(#blobGlow)');
+  } else {
+    dot.removeAttribute('filter');
+  }
+}
+
+function startGlowPulse(){
+  stopGlowPulse();
+  if(!$('blobGlowEnabled')||!$('blobGlowEnabled').checked) return;
+  const feBlur=$('blobGlowBlur'); if(!feBlur) return;
+  const t0=performance.now();
+  function pulse(now){
+    const r=blobGlowRadius();
+    const f=(Math.sin((now-t0)/400)+1)/2;
+    feBlur.setAttribute('stdDeviation', r+f*r*2);
+    glowPulseRaf=requestAnimationFrame(pulse);
+  }
+  glowPulseRaf=requestAnimationFrame(pulse);
+}
+
+function stopGlowPulse(){
+  if(glowPulseRaf!==null){ cancelAnimationFrame(glowPulseRaf); glowPulseRaf=null; }
+  const feBlur=$('blobGlowBlur');
+  if(feBlur) feBlur.setAttribute('stdDeviation', blobGlowRadius());
+}
+
 function getYFromPath(pathEl, targetX){
   const len = pathEl.getTotalLength();
   if(len === 0) return null;
@@ -1096,6 +1168,7 @@ function setDot(pt, visible=true){
   }
   dot.setAttribute('cy', dotY);
   dot.style.opacity='1';
+  applyBlobGlow();
   state.dotLevel=pt.level;
   setMeterLevel(pt.level);
 }
@@ -1118,6 +1191,7 @@ function releaseFromCurrent(){
   const myAnimationToken = animationToken;
   const dot=$('dot'); dot.style.animation='none'; dot.style.opacity='1';
   cancelAnimationFrame(state.dotAnim);
+  stopGlowPulse();
   const e=getEffective();
 
   // Loud Decay OFF: no release phase — blob vanishes instantly.
@@ -1230,6 +1304,7 @@ function updateButtonStates(){
 
 function clearBlobAndMarker(){
   cancelAnimationFrame(state.dotAnim);
+  stopGlowPulse();
   audioCut();
   $('dot').style.animation='none';
   hideDot();
@@ -1323,7 +1398,8 @@ function hold(){
         const decayPathEl=document.getElementById('decayOuter');
         const sampledY=decayPathEl?getYFromPath(decayPathEl,tb.tbDecayEnd.x):tb.tbDecayEnd.y;
         setDot({x:tb.tbDecayEnd.x,y:sampledY,level:tb.e.s,phase:'decay'},true);
-        $('dot').style.animation='blobPulse 0.8s ease-in-out infinite alternate';
+        $('dot').style.animation='none';
+        startGlowPulse();
         state.currentPhase='sustain'; updateButtonStates();
       }
     }
@@ -1333,7 +1409,7 @@ function hold(){
   function step(now){
     if (myAnimationToken !== animationToken) return;
     const elapsed=now-t0; setDot(sampledSustainPoint(pointWhileGateHigh(elapsed)), true);
-    if(elapsed < dur) state.dotAnim=requestAnimationFrame(step); else { const decayPathEl=document.getElementById('decayOuter'); const sampledY=decayPathEl?getYFromPath(decayPathEl,pts.pS.x):pts.pS.y; const parkPoint={x:pts.pS.x,y:sampledY,level:pts.pS.level,phase:'decay'}; setDot(parkPoint,true); $('dot').style.animation='blobPulse 0.8s ease-in-out infinite alternate'; state.currentPhase='sustain'; updateButtonStates(); }
+    if(elapsed < dur) state.dotAnim=requestAnimationFrame(step); else { const decayPathEl=document.getElementById('decayOuter'); const sampledY=decayPathEl?getYFromPath(decayPathEl,pts.pS.x):pts.pS.y; const parkPoint={x:pts.pS.x,y:sampledY,level:pts.pS.level,phase:'decay'}; setDot(parkPoint,true); $('dot').style.animation='none'; startGlowPulse(); state.currentPhase='sustain'; updateButtonStates(); }
   }
   requestAnimationFrame(step);
 }
@@ -2152,6 +2228,11 @@ function buildConfigSnapshot(){
     analogueCurve: $('analogueCurve').checked,
     textbookAdsr: $('textbookAdsr').checked,
     showOuterLine: $('showOuterLine') ? $('showOuterLine').checked : true,
+    meterGlow: $('meterGlow') ? $('meterGlow').checked : true,
+    meterGlowRadius: Number($('meterGlowRadius') ? $('meterGlowRadius').value : 5),
+    meterScanlinesVisible: $('meterScanlinesVisible') ? $('meterScanlinesVisible').checked : true,
+    blobGlowEnabled: $('blobGlowEnabled') ? $('blobGlowEnabled').checked : true,
+    blobGlowRadius: Number($('blobGlowRadius') ? $('blobGlowRadius').value : 8),
     linearTimeScale: Number($('linearTimeScale').value),
     curveAmount: Number($('curveAmount').value),
     audioEnabled: $('audioEnabled').checked,
@@ -2188,7 +2269,7 @@ function loadConfigObject(cfg){
   state.target.a = cfg.a; state.target.d = cfg.d; state.target.s = cfg.s; state.target.r = state.r; state.target.floor = cfg.floor; state.target.scale = cfg.scale;
 
   // Checkboxes
-  ['loudDecay','drawReleaseWhenZero','showBounds','showContour','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','showOuterLine'].forEach(id => {
+  ['loudDecay','drawReleaseWhenZero','showBounds','showContour','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','showOuterLine','meterGlow','meterScanlinesVisible','blobGlowEnabled'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
   syncHpModeEnabled();
@@ -2238,6 +2319,8 @@ function loadConfigObject(cfg){
   if($('consoleScale') && cfg.consoleScale !== undefined){ $('consoleScale').value = cfg.consoleScale; syncConsoleScale(); }
   if($('meterWidth') && cfg.meterWidth !== undefined){ $('meterWidth').value = cfg.meterWidth; METER_W = Math.max(10, Math.min(80, Number(cfg.meterWidth) || 40)); }
   if($('meterStrokeWidth') && cfg.meterStrokeWidth !== undefined){ $('meterStrokeWidth').value = cfg.meterStrokeWidth; METER_STROKE_W = Math.max(1, Math.min(20, Number(cfg.meterStrokeWidth) || 7)); }
+  if($('meterGlowRadius') && cfg.meterGlowRadius !== undefined){ $('meterGlowRadius').value = cfg.meterGlowRadius; }
+  if($('blobGlowRadius') && cfg.blobGlowRadius !== undefined){ $('blobGlowRadius').value = cfg.blobGlowRadius; }
 
   // Preset highlight
   if(window.restorePresetHighlight){
