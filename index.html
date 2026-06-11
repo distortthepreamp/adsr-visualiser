@@ -230,6 +230,8 @@
       <text id="timeAxisReleaseEndStated" x="80" y="465" text-anchor="middle" class="timeAxisStated" style="display:none;"></text>
       <text id="timeAxisReleaseStart" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;"></text>
       <text id="timeAxisReleaseStartStated" x="80" y="465" text-anchor="middle" class="timeAxisStated" style="display:none;"></text>
+      <text id="timeAxisEffectiveLabel" x="0" y="0" text-anchor="start" class="timeAxisEffective" style="display:none;">Effective Time / ms</text>
+      <text id="timeAxisStatedLabel"    x="0" y="0" text-anchor="start" class="timeAxisStated"    style="display:none;">Stated Time / ms</text>
       <text id="segFilterMode" class="mode-label" y="0" text-anchor="start" style="display:none">FILTER MODE: LO</text>
       <text id="segDecay"      class="mode-label" y="0" text-anchor="start">LOUD DECAY: OFF</text>
       <text id="segDisplay"    class="mode-label" y="0" text-anchor="start">DISPLAY: SCHEMATIC</text>
@@ -352,7 +354,7 @@
       </div>
       <div class="row"><label><input id="keepTapMarker" type="checkbox" checked> Leave Tap Marker</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
-      <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Body <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label><label>H1 <input id="h1Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></label><label>H2 <input id="h2Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></label><label>Console <input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></label><label>Meter <input id="meterWidth" type="number" min="10" max="80" step="1" value="40"></label><label>Meter Stroke <input id="meterStrokeWidth" type="number" min="1" max="20" step="1" value="7"></label><label>TB Sustain Max <input id="tbSustainGapMax" type="number" min="15" max="30" step="1" value="15">%</label><label>VB W <input id="vbWidth" type="number" min="800" max="2400" step="10" value="1200"></label><label>VB H <input id="vbHeight" type="number" min="400" max="1200" step="10" value="625"></label></div>
+      <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Body <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label><label>H1 <input id="h1Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></label><label>H2 <input id="h2Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></label><label>Console <input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></label><label>Meter <input id="meterWidth" type="number" min="10" max="80" step="1" value="40"></label><label>Meter Stroke <input id="meterStrokeWidth" type="number" min="1" max="20" step="1" value="7"></label><label>TB Sustain Max <input id="tbSustainGapMax" type="number" min="15" max="30" step="1" value="15">%</label><label>VB W <input id="vbWidth" type="number" min="800" max="2400" step="10" value="1200"></label><label>VB H <input id="vbHeight" type="number" min="400" max="1200" step="10" value="625"></label><label>Inset <input id="graphLeft" type="number" min="80" max="400" step="10" value="220"></label></div>
       <div class="row"><label><input id="showOuterLine" type="checkbox" checked> Show Outer Line</label><label><input id="meterGlow" type="checkbox" checked> Meter Glow</label><label>Glow <input id="meterGlowRadius" type="number" min="0" max="60" step="1" value="5"></label><label><input id="meterScanlinesVisible" type="checkbox" checked> Scanlines</label><label><input id="blobGlowEnabled" type="checkbox" checked> Blob Glow</label><label>Blob Glow R <input id="blobGlowRadius" type="number" min="0" max="30" step="1" value="8"></label></div>
       <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#5fa8ff"></label><label>Meter L <input id="meterFillColor" type="color" value="#00ff00"></label><label>Meter F <input id="meterFillColorFilter" type="color" value="#00ffff"></label><label>Stated <input id="timeAxisStatedColor" type="color" value="#aaaaaa"></label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
@@ -471,7 +473,8 @@ const curve = [
   {p:0.58,t:1.000}, {p:0.75,t:5.000}, {p:0.90,t:10.000}, {p:1.00,t:12.000}
 ];
 const state = { a:.08, d:.25, s:.5, r:.5, floor:0, scale:1, tbSustainGap:SUSTAIN_GAP_MAX, target:{a:.08,d:.25,s:.5,r:.5,floor:0,scale:1,tbSustainGap:SUSTAIN_GAP_MAX}, anim:null, dotAnim:null, held:false, dotLevel:0, currentPhase:'idle', releaseFromDecay:false };
-const graph = { x0:80, y0:445, w:1045, h:415 };
+let GRAPH_LEFT = 220;
+const graph = { x0:GRAPH_LEFT, y0:445, w:905, h:415 };
 let METER_X = graph.x0 + graph.w + METER_GAP;  // 1145
 
 // Initialise static SVG geometry from named constants
@@ -490,13 +493,14 @@ let METER_X = graph.x0 + graph.w + METER_GAP;  // 1145
   set('meterScanlinesRect',{ x:METER_X, y:top,   width:METER_W, height:gh });
 })();
 
-// Right padding  = VB_WIDTH  - graph.x0 - graph.w - METER_GAP - METER_W = 1200-80-1045-20-40 = 15
+// Right padding  = VB_WIDTH  - graph.x0 - graph.w - METER_GAP - METER_W = 1200-220-905-20-40 = 15
 // Bottom padding = VB_HEIGHT - graph.y0                                  = 595-445           = 150
 // Graph top      = graph.y0  - graph.h                                   = 445-415           = 30 (fixed)
 const GRAPH_RIGHT_PAD  = 15;
 const GRAPH_BOTTOM_PAD = 180;  // clearance = VB_Y_ORIGIN + GRAPH_BOTTOM_PAD = -110+180 = 70px below graph floor
 const GRAPH_TOP        = 30;
 function recalcGeometry(){
+  graph.x0 = GRAPH_LEFT;
   graph.w  = VB_WIDTH  - graph.x0 - METER_GAP - METER_W - GRAPH_RIGHT_PAD;
   graph.y0 = VB_HEIGHT - GRAPH_BOTTOM_PAD;
   graph.h  = graph.y0  - GRAPH_TOP;
@@ -970,7 +974,7 @@ function render(){
   const titleEl=$('meterLabelTitle');
   if(titleEl){ titleEl.textContent=freqMode?'FREQ':'VOL'; titleEl.setAttribute('x',meterCX); titleEl.setAttribute('y',meterAbsTop-18); titleEl.style.display=''; }
   const modeLabelEl=$('modeLabel');
-  if(modeLabelEl){ modeLabelEl.textContent=freqMode?'FILTER CONTOUR':'LOUDNESS CONTOUR'; modeLabelEl.setAttribute('x',graph.x0); modeLabelEl.setAttribute('y',yFor(1)-90); modeLabelEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
+  if(modeLabelEl){ modeLabelEl.textContent=freqMode?'FILTER CONTOUR':'LOUDNESS CONTOUR'; modeLabelEl.setAttribute('x',10); modeLabelEl.setAttribute('y',yFor(1)-90); modeLabelEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
   const timeAxis0El=$('timeAxis0');
   const showEffective=!!($('showEffectiveTimes')&&$('showEffectiveTimes').checked);
   const showStated=!!($('showStatedTimes')&&$('showStatedTimes').checked);
@@ -978,6 +982,10 @@ function render(){
   if(timeAxis0El){ timeAxis0El.setAttribute('x',graph.x0); timeAxis0El.setAttribute('y',taY); timeAxis0El.style.display=showEffective?'':'none'; timeAxis0El.style.opacity=showEffective?'1':''; }
   const timeAxis0StatedEl=$('timeAxis0Stated');
   if(timeAxis0StatedEl){ timeAxis0StatedEl.setAttribute('x',graph.x0); timeAxis0StatedEl.setAttribute('y',graph.y0+65); timeAxis0StatedEl.style.display=showStated?'':'none'; timeAxis0StatedEl.style.opacity=showStated?'1':''; }
+  const taEffLabelEl=$('timeAxisEffectiveLabel');
+  if(taEffLabelEl){ taEffLabelEl.setAttribute('x',10); taEffLabelEl.setAttribute('y',taY); taEffLabelEl.style.display=showEffective?'':'none'; taEffLabelEl.style.opacity=showEffective?'1':''; }
+  const taStatedLabelEl=$('timeAxisStatedLabel');
+  if(taStatedLabelEl){ taStatedLabelEl.setAttribute('x',10); taStatedLabelEl.setAttribute('y',graph.y0+65); taStatedLabelEl.style.display=showStated?'':'none'; taStatedLabelEl.style.opacity=showStated?'1':''; }
   const timeAxisAttackEl=$('timeAxisAttack');
   if(timeAxisAttackEl){
     let taAttackX, taAttackMs;
@@ -1105,12 +1113,13 @@ function render(){
     }
   }
   const segY = yFor(1) - 60;
-  const segCount = 5;
-  const segSpacing = graph.w / segCount;
+  const segStart = 10;
+  const segEnd = METER_X;
+  const segSpacing = (segEnd - segStart) / 5;
   const segFontSize = 'calc(var(--labelSize) * var(--h2Scale) * 1px)';
   ['segDecay','segFilterMode','segDisplay','segSustain','segClipping'].forEach((id, i) => {
     const el = document.getElementById(id);
-    if(el){ el.setAttribute('x', graph.x0 + segSpacing * i); el.style.fontSize = segFontSize; }
+    if(el){ el.setAttribute('x', segStart + segSpacing * i); el.style.fontSize = segFontSize; }
   });
   const segFilterModeEl=$('segFilterMode');
   if(segFilterModeEl){ segFilterModeEl.setAttribute('y',segY); segFilterModeEl.style.display=freqMode?'':'none'; segFilterModeEl.textContent=isHP?'FILTER MODE: HI':'FILTER MODE: LO'; segFilterModeEl.style.opacity=1; }
@@ -1239,6 +1248,7 @@ $('meterStrokeWidth').addEventListener('input', e => { const inp=e.target,c=Math
 $('tbSustainGapMax').addEventListener('input', e => { const inp=e.target,c=Math.min(30,Math.max(15,isNaN(parseInt(inp.value))?15:parseInt(inp.value))); inp.value=c; SUSTAIN_GAP_MAX=c/100; render(); });
 $('vbWidth').addEventListener('change', e => { const inp=e.target,c=Math.round(Math.min(2400,Math.max(800,isNaN(parseInt(inp.value))?1200:parseInt(inp.value)))/10)*10; inp.value=c; VB_WIDTH=c; recalcGeometry(); render(); });
 $('vbHeight').addEventListener('change', e => { const inp=e.target,c=Math.round(Math.min(1200,Math.max(400,isNaN(parseInt(inp.value))?595:parseInt(inp.value)))/10)*10; inp.value=c; VB_HEIGHT=c; recalcGeometry(); render(); });
+$('graphLeft').addEventListener('change', e => { const inp=e.target,c=Math.round(Math.min(400,Math.max(80,isNaN(parseInt(inp.value))?220:parseInt(inp.value)))/10)*10; inp.value=c; GRAPH_LEFT=c; recalcGeometry(); render(); });
 
 function transition(durSec){
   clearBlobAndMarker();
@@ -2061,7 +2071,7 @@ document.querySelectorAll('input[name="mode"]').forEach(el => {
 
 function hideLikelyAxes(){
   document.querySelectorAll('svg line, svg path, svg text').forEach(el => {
-    if (el.id === 'timeAxis0' || el.id === 'timeAxis0Stated' || el.id === 'timeAxisAttack' || el.id === 'timeAxisAttackStated' || el.id === 'timeAxisDecayStart' || el.id === 'timeAxisDecayEnd' || el.id === 'timeAxisDecayEndEffective' || el.id === 'timeAxisReleaseEnd' || el.id === 'timeAxisReleaseEndStated' || el.id === 'timeAxisReleaseStart' || el.id === 'timeAxisReleaseStartStated') return;
+    if (el.id === 'timeAxis0' || el.id === 'timeAxis0Stated' || el.id === 'timeAxisAttack' || el.id === 'timeAxisAttackStated' || el.id === 'timeAxisDecayStart' || el.id === 'timeAxisDecayEnd' || el.id === 'timeAxisDecayEndEffective' || el.id === 'timeAxisReleaseEnd' || el.id === 'timeAxisReleaseEndStated' || el.id === 'timeAxisReleaseStart' || el.id === 'timeAxisReleaseStartStated' || el.id === 'timeAxisEffectiveLabel' || el.id === 'timeAxisStatedLabel') return;
     const idClass = ((el.id || '') + ' ' + (el.getAttribute('class') || '')).toLowerCase();
     const text = (el.textContent || '').trim();
 
@@ -2596,6 +2606,7 @@ function buildConfigSnapshot(){
     tbSustainGapMax: Number($('tbSustainGapMax').value),
     vbWidth: Number($('vbWidth').value),
     vbHeight: Number($('vbHeight').value),
+    graphLeft: Number($('graphLeft') ? $('graphLeft').value : 220),
     activePresetIndex: window.getActivePresetIndex ? window.getActivePresetIndex() : -1,
     presetDirtyState: window.presetDirtyState || 'none'
   };
@@ -2667,8 +2678,10 @@ function loadConfigObject(cfg){
   if($('tbSustainGapMax') && cfg.tbSustainGapMax !== undefined){ $('tbSustainGapMax').value = cfg.tbSustainGapMax; SUSTAIN_GAP_MAX = Math.max(0.15, Math.min(0.30, (Number(cfg.tbSustainGapMax) || 15) / 100)); }
   if($('vbWidth')  && cfg.vbWidth  !== undefined){ $('vbWidth').value  = Math.round(Math.min(2400, Math.max(800,  Number(cfg.vbWidth)  || 1200)) / 10) * 10; }
   if($('vbHeight') && cfg.vbHeight !== undefined){ $('vbHeight').value = Math.round(Math.min(1200, Math.max(400,  Number(cfg.vbHeight) || 595))  / 10) * 10; }
-  VB_WIDTH  = Number(document.getElementById('vbWidth').value);
-  VB_HEIGHT = Number(document.getElementById('vbHeight').value);
+  VB_WIDTH   = Number(document.getElementById('vbWidth').value);
+  VB_HEIGHT  = Number(document.getElementById('vbHeight').value);
+  if($('graphLeft') && cfg.graphLeft !== undefined){ $('graphLeft').value = Math.round(Math.min(400,Math.max(80,Number(cfg.graphLeft)||220))/10)*10; }
+  GRAPH_LEFT = Number(document.getElementById('graphLeft').value);
   recalcGeometry();
   if($('meterGlowRadius') && cfg.meterGlowRadius !== undefined){ $('meterGlowRadius').value = cfg.meterGlowRadius; }
   if($('blobGlowRadius') && cfg.blobGlowRadius !== undefined){ $('blobGlowRadius').value = cfg.blobGlowRadius; }
