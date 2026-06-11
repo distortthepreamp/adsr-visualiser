@@ -12,6 +12,12 @@
     font-weight: normal;
     font-style: normal;
   }
+  @font-face {
+    font-family: 'Univers55';
+    src: url('fonts/Linotype - UniversLTStd.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+  }
   :root{
     --bg:#00ff00;
     --fg:#ffffff;
@@ -154,7 +160,7 @@
     <button id="helpBtn" title="Keyboard shortcuts" style="font-size:13px;font-weight:800;width:24px;height:24px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.6);background:rgba(0,0,0,.3);color:#fff;cursor:pointer;line-height:1;flex-shrink:0">?</button>
   </div>
   <div class="stage">
-    <svg id="svg" viewBox="0 -110 1200 575" preserveAspectRatio="xMidYMid meet" aria-label="ADSR envelope graph">
+    <svg id="svg" viewBox="0 -110 1200 595" preserveAspectRatio="xMidYMid meet" aria-label="ADSR envelope graph">
       <defs>
         <clipPath id="meterClip">
           <rect id="meterClipRect" x="0" y="0" width="0" height="0"/>
@@ -198,6 +204,7 @@
       <rect id="meterBox"  x="1145" y="30" width="40" height="415" style="fill:none;stroke:var(--line);stroke-width:7;stroke-opacity:1;vector-effect:non-scaling-stroke;" />
       <text id="meterLabelTitle" x="1165" y="72" text-anchor="middle" style="fill:var(--fg);font-size:calc(var(--labelSize) * 1px);font-weight:800;font-family:'UniversCondensed',Arial,Helvetica,sans-serif;display:none;">VOL</text>
       <text id="modeLabel" class="mode-label" x="80" y="0" text-anchor="start">LOUDNESS CONTOUR</text>
+      <text id="timeAxis0" x="80" y="465" text-anchor="middle" style="fill:var(--fg);font-size:calc(var(--labelSize)*1px);font-family:'UniversCondensed',Arial,sans-serif;display:none;">0</text>
       <text id="segFilterMode" class="mode-label" x="280" y="0" text-anchor="start" style="display:none">FILTER MODE: LO</text>
       <text id="segDecay"      class="mode-label" x="80"  y="0" text-anchor="start">LOUD DECAY: OFF</text>
       <text id="segDisplay"    class="mode-label" x="480" y="0" text-anchor="start">DISPLAY: SCHEMATIC</text>
@@ -275,6 +282,7 @@
       <div class="row"><label><input id="drawReleaseWhenZero" type="checkbox"> Z — Draw Release When Zero</label></div>
       <div class="row"><label><input id="showBounds" type="checkbox"> , — Show Max Min Lines</label></div>
       <div class="row"><label><input id="showContour" type="checkbox" checked> . — Show Contour Top And Bottom</label></div>
+      <div class="row"><label><input id="showTimeAxis" type="checkbox"> / — Show Time Axis</label></div>
       <div class="row"><label><input id="frequencyMode" type="checkbox"> F — Filter Mode</label></div>
       <div class="row"><label><input id="hpMode" type="checkbox"> M — LP/HP Mode</label></div>
       <div class="row"><label><input id="keyboardControl" type="checkbox"> S — Mimic Model D Sustain (80%)</label></div>
@@ -370,6 +378,7 @@
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">C</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Clipped Shape</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">X</td><td style="padding:3px 0;font-size:13px;font-weight:700">Linear Time</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">B</td><td style="padding:3px 0;font-size:13px;font-weight:700">Analogue Curve</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">/</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Time Axis</td></tr>
         </table>
       </div>
       <div>
@@ -800,6 +809,8 @@ function render(){
   if(titleEl){ titleEl.textContent=freqMode?'FREQ':'VOL'; titleEl.setAttribute('x',meterCX); titleEl.setAttribute('y',meterAbsTop-18); titleEl.style.display=''; }
   const modeLabelEl=$('modeLabel');
   if(modeLabelEl){ modeLabelEl.textContent=freqMode?'FILTER CONTOUR':'LOUDNESS CONTOUR'; modeLabelEl.setAttribute('x',graph.x0); modeLabelEl.setAttribute('y',yFor(1)-90); }
+  const timeAxis0El=$('timeAxis0');
+  if(timeAxis0El){ const showTA=$('showTimeAxis')&&$('showTimeAxis').checked; timeAxis0El.setAttribute('x',graph.x0); timeAxis0El.setAttribute('y',graph.y0+30); timeAxis0El.style.display=showTA?'':'none'; timeAxis0El.style.opacity=showTA?'1':''; }
   const segY = yFor(1) - 60;
   const segFilterModeEl=$('segFilterMode');
   if(segFilterModeEl){ segFilterModeEl.setAttribute('y',segY); segFilterModeEl.style.display=freqMode?'':'none'; segFilterModeEl.textContent=isHP?'FILTER MODE: HI':'FILTER MODE: LO'; segFilterModeEl.style.opacity=1; }
@@ -866,7 +877,7 @@ function setFromSlider(){
 $('sustain').addEventListener('input',()=>{ setFromSlider(); if(window.markPresetDirty) markPresetDirty(); });
 ['floor','scale'].forEach(id=>$(id).addEventListener('input',()=>{ setFromSlider(); if(window.markPresetDirty) markPresetDirty(); }));
 document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) state.target={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale}; syncControls(); }));
-['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','showOuterLine'].forEach(id=>$(id).addEventListener('change',render));
+['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','showTimeAxis','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','showOuterLine'].forEach(id=>$(id).addEventListener('change',render));
 $('meterGlow').addEventListener('change', () => setMeterLevel(state.dotLevel));
 $('meterGlowRadius').addEventListener('input', () => setMeterLevel(state.dotLevel));
 $('meterScanlinesVisible').addEventListener('change', render);
@@ -1493,6 +1504,7 @@ document.addEventListener('keydown', e => {
   } else if(e.key === 'z' || e.key === 'Z'){ toggleCheckbox('drawReleaseWhenZero');
   } else if(e.key === ','){ toggleCheckbox('showBounds');
   } else if(e.key === '.'){ toggleCheckbox('showContour');
+  } else if(e.key === '/'){ e.preventDefault(); document.getElementById('showTimeAxis').click();
   } else if(e.key === 'f' || e.key === 'F'){ toggleCheckbox('frequencyMode');
   } else if(e.key === 'm' || e.key === 'M'){ toggleCheckbox('hpMode');
   } else if(e.key === 's' || e.key === 'S'){ toggleCheckbox('keyboardControl');
@@ -1734,6 +1746,7 @@ document.querySelectorAll('input[name="mode"]').forEach(el => {
 
 function hideLikelyAxes(){
   document.querySelectorAll('svg line, svg path, svg text').forEach(el => {
+    if (el.id === 'timeAxis0') return;
     const idClass = ((el.id || '') + ' ' + (el.getAttribute('class') || '')).toLowerCase();
     const text = (el.textContent || '').trim();
 
@@ -2228,6 +2241,7 @@ function buildConfigSnapshot(){
     analogueCurve: $('analogueCurve').checked,
     textbookAdsr: $('textbookAdsr').checked,
     showOuterLine: $('showOuterLine') ? $('showOuterLine').checked : true,
+    showTimeAxis: $('showTimeAxis') ? $('showTimeAxis').checked : false,
     meterGlow: $('meterGlow') ? $('meterGlow').checked : true,
     meterGlowRadius: Number($('meterGlowRadius') ? $('meterGlowRadius').value : 5),
     meterScanlinesVisible: $('meterScanlinesVisible') ? $('meterScanlinesVisible').checked : true,
@@ -2269,7 +2283,7 @@ function loadConfigObject(cfg){
   state.target.a = cfg.a; state.target.d = cfg.d; state.target.s = cfg.s; state.target.r = state.r; state.target.floor = cfg.floor; state.target.scale = cfg.scale;
 
   // Checkboxes
-  ['loudDecay','drawReleaseWhenZero','showBounds','showContour','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','showOuterLine','meterGlow','meterScanlinesVisible','blobGlowEnabled'].forEach(id => {
+  ['loudDecay','drawReleaseWhenZero','showBounds','showContour','showTimeAxis','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','showOuterLine','meterGlow','meterScanlinesVisible','blobGlowEnabled'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
   syncHpModeEnabled();
