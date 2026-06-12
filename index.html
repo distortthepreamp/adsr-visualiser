@@ -34,6 +34,7 @@
     --boundsColor:#ffffff;
     --timeAxisEffectiveColor:#ffffff;
     --timeAxisStatedColor:#aaaaaa;
+    --contourLineColor:#ffff00;
     --panel:rgba(0,0,0,.28);
     --panel2:rgba(0,0,0,.42);
   }
@@ -218,8 +219,8 @@
           </feMerge>
         </filter>
       </defs>
-      <line id="amountLine" x1="80" y1="30" x2="1145" y2="30" style="stroke:var(--line);stroke-width:3.5;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
-      <line id="floorLine" x1="80" y1="445" x2="1145" y2="445" style="stroke:var(--line);stroke-width:3.5;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
+      <line id="amountLine" x1="80" y1="30" x2="1145" y2="30" style="stroke:var(--contourLineColor);stroke-width:1;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
+      <line id="floorLine" x1="80" y1="445" x2="1145" y2="445" style="stroke:var(--contourLineColor);stroke-width:1;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <line id="sustainMarker" x1="80" y1="445" x2="80" y2="445" style="stroke:var(--line);stroke-opacity:1;stroke-linecap:round;stroke-dasharray:1 14;vector-effect:non-scaling-stroke;" />
       <line id="tbSustainMarker" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
       <line id="tbModelDSustainLine" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
@@ -272,6 +273,8 @@
 
       <text id="sLabel" class="small-label" x="0" y="0">SUSTAIN</text>
       <text id="tbSustainLabel" class="small-label" x="0" y="0" style="display:none;">SUSTAIN</text>
+      <text id="contourAmountLabel" class="small-label" x="0" y="0" text-anchor="end" style="display:none;">CONTOUR AMOUNT</text>
+      <text id="cutoffFreqLabel"    class="small-label" x="0" y="0" text-anchor="end" style="display:none;">CUTOFF FREQUENCY</text>
 
     </svg>
   </div>
@@ -445,7 +448,7 @@
         <div id="advancedPopup" style="display:none;position:absolute;bottom:calc(100% + 6px);left:0;background:#1c1c1c;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:8px;z-index:200;min-width:260px;">
           <div class="row"><label><input id="meterGlow" type="checkbox" checked> Meter Glow</label><label>Glow R <input id="meterGlowRadius" type="number" min="0" max="60" step="1" value="5"></label><label><input id="meterScanlinesVisible" type="checkbox" checked> Scanlines</label></div>
           <div class="row"><label><input id="blobGlowEnabled" type="checkbox" checked> Blob Glow</label><label>Blob R <input id="blobGlowRadius" type="number" min="0" max="30" step="1" value="8"></label></div>
-          <div class="row"><label>Meter L <input id="meterFillColor" type="color" value="#00ff00"></label><label>Meter F <input id="meterFillColorFilter" type="color" value="#00ffff"></label><label>Stated <input id="timeAxisStatedColor" type="color" value="#aaaaaa"></label></div>
+          <div class="row"><label>Meter L <input id="meterFillColor" type="color" value="#00ff00"></label><label>Meter F <input id="meterFillColorFilter" type="color" value="#00ffff"></label><label>Stated <input id="timeAxisStatedColor" type="color" value="#aaaaaa"></label><label>Contour <input id="contourLineColor" type="color" value="#ffff00"></label></div>
         </div>
       </div>
       <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#5fa8ff"></label></div>
@@ -1044,12 +1047,13 @@ function render(){
   }
 
   // Floor line and Amount line
+  const freqMode = $('frequencyMode') && $('frequencyMode').checked;
   const meterLeftX = meterX;
   const floorLine = $('floorLine');
   const amountLine = $('amountLine');
   const floorY = yFor(pts.e.floor);
   const amountY = Math.max(yFor(pts.e.floor + pts.e.scale), yFor(1));
-  const showContour = $('showContour') && $('showContour').checked;
+  const showContour = freqMode && $('showContour') && $('showContour').checked;
   if(floorLine){
     floorLine.setAttribute('x1', graph.x0);
     floorLine.setAttribute('y1', floorY);
@@ -1064,9 +1068,28 @@ function render(){
     amountLine.setAttribute('y2', amountY);
     amountLine.style.display = showContour ? '' : 'none';
   }
+  // Contour line labels
+  const contourLabelX = METER_X - 30;
+  const contourAmountLabelEl = $('contourAmountLabel');
+  if(contourAmountLabelEl){
+    contourAmountLabelEl.setAttribute('x', contourLabelX);
+    contourAmountLabelEl.setAttribute('y', amountY - 8);
+    contourAmountLabelEl.style.display = showContour ? '' : 'none';
+  }
+  const cutoffFreqLabelEl = $('cutoffFreqLabel');
+  if(cutoffFreqLabelEl){
+    cutoffFreqLabelEl.setAttribute('x', contourLabelX);
+    cutoffFreqLabelEl.setAttribute('y', floorY - 8);
+    cutoffFreqLabelEl.style.display = showContour ? '' : 'none';
+  }
+  // Show Contour checkbox: only meaningful in filter mode
+  const showContourLabel = $('showContour') && $('showContour').closest('label');
+  if(showContourLabel){
+    showContourLabel.style.opacity = freqMode ? '' : '0.35';
+    showContourLabel.style.pointerEvents = freqMode ? '' : 'none';
+  }
 
   // Meter labels
-  const freqMode = $('frequencyMode') && $('frequencyMode').checked;
   const isHP = $('hpMode') && $('hpMode').checked;
   const meterCX = meterX + meterW/2;
   const titleEl=$('meterLabelTitle');
@@ -1417,6 +1440,7 @@ $('bgColor').addEventListener('input',e=>document.documentElement.style.setPrope
 $('meterFillColor').addEventListener('input',e=>document.documentElement.style.setProperty('--meterFill', e.target.value));
 $('meterFillColorFilter').addEventListener('input',e=>document.documentElement.style.setProperty('--meterFillFilter', e.target.value));
 $('timeAxisStatedColor').addEventListener('input',e=>document.documentElement.style.setProperty('--timeAxisStatedColor', e.target.value));
+$('contourLineColor').addEventListener('input',e=>{ document.documentElement.style.setProperty('--contourLineColor', e.target.value); render(); });
 $('attackColor').addEventListener('input',e=>document.documentElement.style.setProperty('--attackColor', e.target.value));
 $('decayColor').addEventListener('input',e=>document.documentElement.style.setProperty('--decayColor', e.target.value));
 $('releaseColor').addEventListener('input',e=>document.documentElement.style.setProperty('--releaseColor', e.target.value));
@@ -2798,6 +2822,7 @@ function buildConfigSnapshot(){
     meterFillColor: $('meterFillColor').value,
     meterFillColorFilter: $('meterFillColorFilter').value,
     timeAxisStatedColor: $('timeAxisStatedColor').value,
+    contourLineColor: $('contourLineColor') ? $('contourLineColor').value : '#ffff00',
     lineWidth: Number($('lineWidth').value),
     innerLineWidth: Number($('innerLineWidth').value),
     labelSize: Number($('labelSize').value),
@@ -2865,7 +2890,7 @@ function loadConfigObject(cfg){
   }
 
   // Colours (dispatch input to update CSS variables)
-  ['lineColor','bgColor','attackColor','decayColor','releaseColor','meterFillColor','meterFillColorFilter','timeAxisStatedColor'].forEach(id => {
+  ['lineColor','bgColor','attackColor','decayColor','releaseColor','meterFillColor','meterFillColorFilter','timeAxisStatedColor','contourLineColor'].forEach(id => {
     if($(id) && cfg[id]){ $(id).value = cfg[id]; $(id).dispatchEvent(new Event('input')); }
   });
 
