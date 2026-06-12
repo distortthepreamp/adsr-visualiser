@@ -1389,7 +1389,8 @@ function syncHpModeEnabled(){
   const hpLabel = $('hpMode') && $('hpMode').closest('label');
   if(hpLabel){ hpLabel.style.opacity = freqOn ? '' : '0.35'; hpLabel.style.pointerEvents = freqOn ? '' : 'none'; }
 }
-$('frequencyMode').addEventListener('change', syncHpModeEnabled);
+$('frequencyMode').addEventListener('change', () => { syncHpModeEnabled(); setMeterLevel(state.dotLevel); });
+$('hpMode').addEventListener('change', () => setMeterLevel(state.dotLevel));
 syncHpModeEnabled();
 function syncLinearTimeScale(){
   const on = $('linearTime') && $('linearTime').checked;
@@ -2192,6 +2193,7 @@ function commitFloor(){
     state.target = { a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale };
     render();
   } else { syncControls(); }
+  setMeterLevel(state.dotLevel);
   requestAnimationFrame(refreshNumericInputs);
 }
 
@@ -2255,7 +2257,7 @@ if (decaySlider)   decaySlider.addEventListener('input',   () => { clearTypedFor
 const releaseSlider = document.getElementById('release');
 if (releaseSlider) releaseSlider.addEventListener('input', () => { clearTypedForSlider('r'); setTimeout(refreshNumericInputs, 0); });
 if (sustainSlider) sustainSlider.addEventListener('input', () => { setTimeout(refreshNumericInputs, 0); });
-if (floorSlider)   floorSlider.addEventListener('input',  () => { setTimeout(refreshNumericInputs, 0); });
+if (floorSlider)   floorSlider.addEventListener('input',  () => { setMeterLevel(state.dotLevel); setTimeout(refreshNumericInputs, 0); });
 if (scaleSlider)   scaleSlider.addEventListener('input',  () => { setTimeout(refreshNumericInputs, 0); });
 
 document.querySelectorAll('input[name="mode"]').forEach(el => {
@@ -3089,6 +3091,7 @@ setTapMode('tap200','tapMode200Btn');
 setNoteMode('noteA4Btn', 440);
 
 if(window.loadConfigByIndex) window.loadConfigByIndex(0);
+setMeterLevel(state.dotLevel);
 
 </script>
 </body>
