@@ -1011,14 +1011,15 @@ function render(){
   $('sustainPoint').setAttribute('cy', drawPS.y);
   $('sustainPoint').style.display = textbookAdsr ? 'none' : '';
 
+  const kcOn = $('keyboardControl') && $('keyboardControl').checked;
+  let statedSustainX = drawPS.x; // uncapped sustain x; equals drawPS.x when kc OFF
   const statedSustainLineEl = $('statedSustainLine');
   if(statedSustainLineEl){
-    const kcOn = $('keyboardControl') && $('keyboardControl').checked;
     if(kcOn && !textbookAdsr){
       const floorY = yFor(pts.e.floor);
       const statedY = floorY - (floorY - drawPS.y) * 1.25;
       const decayPathEl = document.getElementById('decayOuter');
-      let statedX = pts.p1.x + (drawPS.x - pts.p1.x) * 1.25; // geometric fallback
+      statedSustainX = pts.p1.x + (drawPS.x - pts.p1.x) * 1.25; // geometric fallback
       if(decayPathEl){
         let lo = pts.p1.x, hi = drawPS.x;
         for(let i = 0; i < 32; i++){
@@ -1026,9 +1027,9 @@ function render(){
           const y = getYFromPath(decayPathEl, mid);
           if(y === null || y < statedY) lo = mid; else hi = mid;
         }
-        statedX = (lo + hi) / 2;
+        statedSustainX = (lo + hi) / 2;
       }
-      statedSustainLineEl.setAttribute('x1', statedX);
+      statedSustainLineEl.setAttribute('x1', statedSustainX);
       statedSustainLineEl.setAttribute('y1', statedY);
       statedSustainLineEl.setAttribute('x2', markerEndX);
       statedSustainLineEl.setAttribute('y2', statedY);
@@ -1232,8 +1233,8 @@ function render(){
   if(taDecayEndStatedEl){
     const showDecayEndSt=showStated&&e.releaseOn;
     if(showDecayEndSt){
-      const stDecayEndX=textbookAdsr?pts.pEnd.x:drawPS.x;
-      const stDecayFraction=textbookAdsr?1:Math.max(0,(drawPS.x-pts.p1.x)/(pts.dwFull||1));
+      const stDecayEndX=textbookAdsr?pts.pEnd.x:statedSustainX;
+      const stDecayFraction=textbookAdsr?1:Math.max(0,(statedSustainX-pts.p1.x)/(pts.dwFull||1));
       const stDecayEndMs=Math.round((e.aT+e.dT*stDecayFraction)*1000);
       taDecayEndStatedEl.setAttribute('x',stDecayEndX); taDecayEndStatedEl.setAttribute('y',graph.y0+80);
       taDecayEndStatedEl.textContent=stDecayEndMs;
