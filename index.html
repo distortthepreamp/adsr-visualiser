@@ -221,6 +221,7 @@
       </defs>
       <line id="amountLine" x1="80" y1="30" x2="1145" y2="30" style="stroke:var(--contourLineColor);stroke-width:1;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <line id="floorLine" x1="80" y1="445" x2="1145" y2="445" style="stroke:var(--contourLineColor);stroke-width:1;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
+      <line id="statedSustainLine" x1="80" y1="445" x2="1145" y2="445" style="stroke:var(--contourLineColor);stroke-width:1;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <line id="sustainMarker" x1="80" y1="445" x2="80" y2="445" style="stroke:var(--line);stroke-opacity:1;stroke-linecap:round;stroke-dasharray:1 14;vector-effect:non-scaling-stroke;" />
       <line id="tbSustainMarker" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
       <line id="tbModelDSustainLine" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
@@ -273,8 +274,9 @@
 
       <text id="sLabel" class="small-label" x="0" y="0">SUSTAIN</text>
       <text id="tbSustainLabel" class="small-label" x="0" y="0" style="display:none;">SUSTAIN</text>
-      <text id="contourAmountLabel" class="small-label" x="0" y="0" text-anchor="end" style="display:none;">CONTOUR AMOUNT</text>
-      <text id="cutoffFreqLabel"    class="small-label" x="0" y="0" text-anchor="end" style="display:none;">CUTOFF FREQUENCY</text>
+      <text id="contourAmountLabel"  class="small-label" x="0" y="0" text-anchor="end" style="display:none;">CONTOUR AMOUNT</text>
+      <text id="cutoffFreqLabel"     class="small-label" x="0" y="0" text-anchor="end" style="display:none;">CUTOFF FREQUENCY</text>
+      <text id="statedSustainLabel"  class="small-label" x="0" y="0" text-anchor="end" style="display:none;">SUSTAIN (STATED)</text>
 
     </svg>
   </div>
@@ -774,7 +776,6 @@ function render(){
     if (drawPS.x < cDX) drawPS = { x: cDX, y: ceilY, level: drawPS.level };
   }
 
-  const releaseR = state.r; // reserved for future use
   const releaseBox = $('releaseKnobBox');
   if(releaseBox){ releaseBox.style.opacity = textbookAdsr ? '1' : '0.35'; releaseBox.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
   const releaseLegendEl=$('releaseLegend'); if(releaseLegendEl) releaseLegendEl.style.opacity=textbookAdsr?'1':'0.35';
@@ -1006,6 +1007,25 @@ function render(){
   $('sustainPoint').style.display = textbookAdsr ? 'none' : '';
 
   $('sLabel').setAttribute('x',Math.min(markerEndX-105, drawPS.x+28)); $('sLabel').setAttribute('y',drawPS.y-18); $('sLabel').style.display = textbookAdsr ? 'none' : '';
+  $('sLabel').textContent = ($('keyboardControl')&&$('keyboardControl').checked) ? 'SUSTAIN (ACTUAL)' : 'SUSTAIN (STATED)';
+
+  const kcOn = $('keyboardControl') && $('keyboardControl').checked;
+  const statedSustainY = yFor(pts.e.floor + state.s * pts.e.scale);
+  const statedSustainLineEl = $('statedSustainLine');
+  if(statedSustainLineEl){
+    statedSustainLineEl.setAttribute('x1', graph.x0);
+    statedSustainLineEl.setAttribute('x2', METER_X);
+    statedSustainLineEl.setAttribute('y1', statedSustainY);
+    statedSustainLineEl.setAttribute('y2', statedSustainY);
+    statedSustainLineEl.style.display = (kcOn && !textbookAdsr) ? '' : 'none';
+  }
+  const statedSustainLabelEl = $('statedSustainLabel');
+  if(statedSustainLabelEl){
+    statedSustainLabelEl.setAttribute('x', METER_X - 30);
+    statedSustainLabelEl.setAttribute('y', statedSustainY - 8);
+    statedSustainLabelEl.style.display = (kcOn && !textbookAdsr) ? '' : 'none';
+  }
+
   const tbSustainLabelEl=$('tbSustainLabel');
   if(tbSustainLabelEl){
     if(textbookAdsr&&$('tbShowModelDSustain')&&$('tbShowModelDSustain').checked){
