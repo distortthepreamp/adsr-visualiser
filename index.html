@@ -123,6 +123,23 @@
     border-radius: 6px;
   }
 
+  /* quickset buttons */
+  .quickset-btn {
+    padding: 4px 7px;
+    min-height: unset;
+    line-height: 1.1;
+    border-radius: 6px;
+    display: block;
+    width: 50%;
+    margin-top: 3px;
+  }
+  .quickset-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 6px;
+  }
+
   /* numeric ms / value controls */
   .numeric-ms-control,
   .numeric-value-control {margin-top: 1px; color: #fff;}
@@ -266,6 +283,13 @@
           <input id="attack" type="range" min="0" max="1000" value="80" style="display:none">
           <div id="attackRead" class="readout"></div>
           <div id="attackTarget" class="targetReadout"></div>
+          <div class="quickset-col">
+            <button class="quickset-btn" data-knob="attack" data-value="0">0</button>
+            <button class="quickset-btn" data-knob="attack" data-value="100">100</button>
+            <button class="quickset-btn" data-knob="attack" data-value="250">250</button>
+            <button class="quickset-btn" data-knob="attack" data-value="1000">1000</button>
+            <button class="quickset-btn" data-knob="attack" data-value="2000">2000</button>
+          </div>
         </div>
         <div class="knobBox">
           <div class="knobLabel">Decay</div>
@@ -273,6 +297,13 @@
           <input id="decay" type="range" min="0" max="1000" value="250" style="display:none">
           <div id="decayRead" class="readout"></div>
           <div id="decayTarget" class="targetReadout"></div>
+          <div class="quickset-col">
+            <button class="quickset-btn" data-knob="decay" data-value="0">0</button>
+            <button class="quickset-btn" data-knob="decay" data-value="50">50</button>
+            <button class="quickset-btn" data-knob="decay" data-value="150">150</button>
+            <button class="quickset-btn" data-knob="decay" data-value="500">500</button>
+            <button class="quickset-btn" data-knob="decay" data-value="2000">2000</button>
+          </div>
         </div>
         <div class="knobBox">
           <div class="knobLabel">Sustain</div>
@@ -280,6 +311,13 @@
           <input id="sustain" type="range" min="0" max="1000" value="500" style="display:none">
           <div id="sustainRead" class="readout"></div>
           <div id="sustainTarget" class="targetReadout"></div>
+          <div class="quickset-col">
+            <button class="quickset-btn" data-knob="sustain" data-value="0">0</button>
+            <button class="quickset-btn" data-knob="sustain" data-value="2">2</button>
+            <button class="quickset-btn" data-knob="sustain" data-value="5">5</button>
+            <button class="quickset-btn" data-knob="sustain" data-value="8">8</button>
+            <button class="quickset-btn" data-knob="sustain" data-value="10">10</button>
+          </div>
         </div>
         <div id="releaseKnobBox" class="knobBox">
           <div class="knobLabel">Release</div>
@@ -287,6 +325,13 @@
           <input id="release" type="range" min="0" max="1000" value="500" style="display:none">
           <div id="releaseRead" class="readout"></div>
           <div id="releaseTarget" class="targetReadout"></div>
+          <div class="quickset-col">
+            <button class="quickset-btn" data-knob="release" data-value="0">0</button>
+            <button class="quickset-btn" data-knob="release" data-value="250">250</button>
+            <button class="quickset-btn" data-knob="release" data-value="500">500</button>
+            <button class="quickset-btn" data-knob="release" data-value="1000">1000</button>
+            <button class="quickset-btn" data-knob="release" data-value="2000">2000</button>
+          </div>
         </div>
         <div id="floorKnobBox" class="knobBox">
           <div class="knobLabel">Cutoff</div>
@@ -294,6 +339,13 @@
           <input id="floor" type="range" min="0" max="1000" value="0" style="display:none">
           <div id="floorRead" class="readout"></div>
           <div id="floorTarget" class="targetReadout"></div>
+          <div class="quickset-col">
+            <button class="quickset-btn" data-knob="cutoff" data-value="0">0</button>
+            <button class="quickset-btn" data-knob="cutoff" data-value="1">1</button>
+            <button class="quickset-btn" data-knob="cutoff" data-value="2">2</button>
+            <button class="quickset-btn" data-knob="cutoff" data-value="3">3</button>
+            <button class="quickset-btn" data-knob="cutoff" data-value="4">4</button>
+          </div>
         </div>
         <div id="scaleKnobBox" class="knobBox">
           <div class="knobLabel">Amount</div>
@@ -301,6 +353,13 @@
           <input id="scale" type="range" min="0" max="1000" value="1000" style="display:none">
           <div id="scaleRead" class="readout"></div>
           <div id="scaleTarget" class="targetReadout"></div>
+          <div class="quickset-col">
+            <button class="quickset-btn" data-knob="amount" data-value="3">3</button>
+            <button class="quickset-btn" data-knob="amount" data-value="5">5</button>
+            <button class="quickset-btn" data-knob="amount" data-value="7">7</button>
+            <button class="quickset-btn" data-knob="amount" data-value="9">9</button>
+            <button class="quickset-btn" data-knob="amount" data-value="10">10</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1258,11 +1317,12 @@ function transition(durSec){
   hideTapMarker();
   if(durSec===undefined) durSec=currentTransitionSec;
   const dur=durSec*1000;
-  const start={a:state.a,d:state.d,s:state.s,floor:state.floor,scale:state.scale,tbSustainGap:state.tbSustainGap}, end={...state.target};
+  const start={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale,tbSustainGap:state.tbSustainGap}, end={...state.target};
   const startAms=mapTime(start.a)*1000, endAms=mapTime(end.a)*1000;
   const startDms=mapTime(start.d)*1000, endDms=mapTime(end.d)*1000;
+  const startRms=mapTime(start.r)*1000, endRms=mapTime(end.r)*1000;
   cancelAnimationFrame(state.anim);
-  state.a=start.a; state.d=start.d; state.s=start.s; state.floor=start.floor; state.scale=start.scale; state.tbSustainGap=start.tbSustainGap;
+  state.a=start.a; state.d=start.d; state.s=start.s; state.r=start.r; state.floor=start.floor; state.scale=start.scale; state.tbSustainGap=start.tbSustainGap;
   render();
   let t0=null;
   function step(now){
@@ -1272,11 +1332,12 @@ function transition(durSec){
     state.a=positionFromMs(startAms+(endAms-startAms)*k);
     state.d=positionFromMs(startDms+(endDms-startDms)*k);
     state.s=start.s+(end.s-start.s)*k;
+    state.r=positionFromMs(startRms+(endRms-startRms)*k);
     state.floor=start.floor+(end.floor-start.floor)*k;
     state.scale=start.scale+(end.scale-start.scale)*k;
     state.tbSustainGap=start.tbSustainGap+(end.tbSustainGap-start.tbSustainGap)*k;
     render();
-    if(f<1) state.anim=requestAnimationFrame(step); else { state.a=end.a; state.d=end.d; state.s=end.s; state.floor=end.floor; state.scale=end.scale; state.tbSustainGap=end.tbSustainGap; render(); }
+    if(f<1) state.anim=requestAnimationFrame(step); else { state.a=end.a; state.d=end.d; state.s=end.s; state.r=end.r; state.floor=end.floor; state.scale=end.scale; state.tbSustainGap=end.tbSustainGap; render(); }
   }
   state.anim=requestAnimationFrame(step);
 }
@@ -1765,6 +1826,22 @@ $('tap1sBtn').addEventListener('click', () => setTapMode('tap1000','tap1sBtn'));
 $('tapModeHoldBtn').addEventListener('click', () => setTapMode('hold','tapModeHoldBtn'));
 $('clearBtn').addEventListener('click',clearBlobAndMarker);
 $('keepTapMarker').addEventListener('change',()=>{ if(!$('keepTapMarker').checked) hideTapMarker(); });
+
+// quickset buttons
+document.querySelectorAll('.quickset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const ms = Number(btn.dataset.value);
+    const knob = btn.dataset.knob;
+    state.target.tbSustainGap = state.tbSustainGap;
+    if(knob === 'attack') state.target.a = positionFromMs(ms);
+    else if(knob === 'decay') state.target.d = positionFromMs(ms);
+    else if(knob === 'sustain') state.target.s = ms / 10;
+    else if(knob === 'release') state.target.r = positionFromMs(ms);
+    else if(knob === 'cutoff') state.target.floor = ms / 10;
+    else if(knob === 'amount') state.target.scale = ms / 10;
+    transition(currentTransitionSec);
+  });
+});
 
 // ---- Help popup ----
 function showHelp(){ $('helpOverlay').style.display='flex'; }
