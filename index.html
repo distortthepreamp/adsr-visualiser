@@ -222,7 +222,7 @@
       <line id="amountLine" x1="80" y1="30" x2="1145" y2="30" style="stroke:var(--contourLineColor);stroke-width:1;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <line id="floorLine" x1="80" y1="445" x2="1145" y2="445" style="stroke:var(--contourLineColor);stroke-width:1;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <line id="sustainMarker" x1="80" y1="445" x2="80" y2="445" style="stroke:var(--line);stroke-opacity:1;stroke-linecap:round;stroke-dasharray:1 14;vector-effect:non-scaling-stroke;" />
-      <line id="statedSustainLine" x1="80" y1="445" x2="80" y2="445" style="stroke:var(--contourLineColor);stroke-width:1;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
+      <line id="statedSustainLine" x1="80" y1="445" x2="80" y2="445" style="stroke:#00ffff;stroke-width:1;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
 <line id="tbSustainMarker" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
       <line id="tbModelDSustainLine" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
       <circle id="sustainPoint" class="tap-marker" cx="80" cy="445" style="opacity:.85" />
@@ -260,6 +260,7 @@
       <text id="timeAxisDecayStart" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;"></text>
       <text id="timeAxisDecayEnd" x="80" y="465" text-anchor="middle" class="timeAxisStated" style="display:none;"></text>
       <text id="timeAxisDecayEndEffective" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;"></text>
+      <text id="timeAxisDecayEndStated" x="80" y="465" text-anchor="middle" class="timeAxisStated" style="display:none;"></text>
       <text id="timeAxisReleaseEnd" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;"></text>
       <text id="timeAxisReleaseEndStated" x="80" y="465" text-anchor="middle" class="timeAxisStated" style="display:none;"></text>
       <text id="timeAxisReleaseStart" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;"></text>
@@ -272,10 +273,14 @@
       <text id="segSustain"    class="mode-label" y="0" text-anchor="start">SUSTAIN: SCHEMATIC</text>
       <text id="segClipping"   class="mode-label" y="0" text-anchor="start">CONTOUR PEAK: SCHEMATIC</text>
 
-      <text id="sLabel" class="small-label" x="0" y="0">SUSTAIN</text>
+      <rect id="sLabelBg" x="0" y="0" width="0" height="0" fill="#ffffff" style="display:none;" />
+      <text id="sLabel" class="small-label" x="0" y="0" text-anchor="end">SUSTAIN</text>
       <text id="tbSustainLabel" class="small-label" x="0" y="0" style="display:none;">SUSTAIN</text>
+      <rect id="contourAmountLabelBg" x="0" y="0" width="0" height="0" fill="#ffffff" style="display:none;" />
       <text id="contourAmountLabel" class="small-label" x="0" y="0" text-anchor="end" style="display:none;">CONTOUR AMOUNT</text>
+      <rect id="cutoffFreqLabelBg" x="0" y="0" width="0" height="0" fill="#ffffff" style="display:none;" />
       <text id="cutoffFreqLabel"    class="small-label" x="0" y="0" text-anchor="end" style="display:none;">CUTOFF FREQUENCY</text>
+      <text id="statedSustainLabel" class="timeAxisEffective" x="0" y="0" text-anchor="end" style="display:none;fill:#00ffff;">Stated Sustain Level</text>
 
     </svg>
   </div>
@@ -1028,12 +1033,19 @@ function render(){
       statedSustainLineEl.setAttribute('x2', markerEndX);
       statedSustainLineEl.setAttribute('y2', statedY);
       statedSustainLineEl.style.display = '';
+      const sslEl=$('statedSustainLabel');
+      if(sslEl){ sslEl.setAttribute('x', pts.pEnd.x); sslEl.setAttribute('y', statedY - 8); sslEl.setAttribute('text-anchor', 'start'); sslEl.setAttribute('style', 'fill:#00ffff;'); }
     } else {
       statedSustainLineEl.style.display = 'none';
+      const sslEl=$('statedSustainLabel');
+      if(sslEl) sslEl.style.display = 'none';
     }
   }
 
-  $('sLabel').setAttribute('x',Math.min(markerEndX-105, drawPS.x+28)); $('sLabel').setAttribute('y',drawPS.y-18); $('sLabel').style.display = textbookAdsr ? 'none' : '';
+  { const el=$('sLabel'), bg=$('sLabelBg');
+    el.setAttribute('x', METER_X - 30); el.setAttribute('y', drawPS.y); el.setAttribute('dominant-baseline', 'middle'); el.removeAttribute('stroke'); el.removeAttribute('stroke-width'); el.removeAttribute('paint-order'); el.style.fill = '#000000'; el.style.display = textbookAdsr ? 'none' : ''; el.textContent = ($('keyboardControl') && $('keyboardControl').checked) ? 'MODEL D SUSTAIN' : 'SUSTAIN';
+    if(bg){ const bbox=el.getBBox(); bg.setAttribute('x',bbox.x-4); bg.setAttribute('y',bbox.y-2); bg.setAttribute('width',bbox.width+8); bg.setAttribute('height',bbox.height+4); bg.setAttribute('fill','#ffffff'); bg.style.display=el.style.display; }
+  }
   const tbSustainLabelEl=$('tbSustainLabel');
   if(tbSustainLabelEl){
     if(textbookAdsr&&$('tbShowModelDSustain')&&$('tbShowModelDSustain').checked){
@@ -1101,14 +1113,22 @@ function render(){
   const contourAmountLabelEl = $('contourAmountLabel');
   if(contourAmountLabelEl){
     contourAmountLabelEl.setAttribute('x', contourLabelX);
-    contourAmountLabelEl.setAttribute('y', amountY - 8);
+    contourAmountLabelEl.setAttribute('y', amountY);
+    contourAmountLabelEl.setAttribute('dominant-baseline', 'middle');
+    contourAmountLabelEl.removeAttribute('stroke'); contourAmountLabelEl.removeAttribute('stroke-width'); contourAmountLabelEl.removeAttribute('paint-order');
+    contourAmountLabelEl.style.fill = '#000000';
     contourAmountLabelEl.style.display = showContour ? '' : 'none';
+    const caBg=$('contourAmountLabelBg'); if(caBg){ const bbox=contourAmountLabelEl.getBBox(); caBg.setAttribute('x',bbox.x-4); caBg.setAttribute('y',bbox.y-2); caBg.setAttribute('width',bbox.width+8); caBg.setAttribute('height',bbox.height+4); caBg.setAttribute('fill','#ffffff'); caBg.style.display=contourAmountLabelEl.style.display; }
   }
   const cutoffFreqLabelEl = $('cutoffFreqLabel');
   if(cutoffFreqLabelEl){
     cutoffFreqLabelEl.setAttribute('x', contourLabelX);
-    cutoffFreqLabelEl.setAttribute('y', floorY - 8);
+    cutoffFreqLabelEl.setAttribute('y', floorY);
+    cutoffFreqLabelEl.setAttribute('dominant-baseline', 'middle');
+    cutoffFreqLabelEl.removeAttribute('stroke'); cutoffFreqLabelEl.removeAttribute('stroke-width'); cutoffFreqLabelEl.removeAttribute('paint-order');
+    cutoffFreqLabelEl.style.fill = '#000000';
     cutoffFreqLabelEl.style.display = showContour ? '' : 'none';
+    const cfBg=$('cutoffFreqLabelBg'); if(cfBg){ const bbox=cutoffFreqLabelEl.getBBox(); cfBg.setAttribute('x',bbox.x-4); cfBg.setAttribute('y',bbox.y-2); cfBg.setAttribute('width',bbox.width+8); cfBg.setAttribute('height',bbox.height+4); cfBg.setAttribute('fill','#ffffff'); cfBg.style.display=cutoffFreqLabelEl.style.display; }
   }
   // Show Contour checkbox: only meaningful in filter mode
   const showContourLabel = $('showContour') && $('showContour').closest('label');
@@ -1207,6 +1227,21 @@ function render(){
       taDecayEndEffEl.style.display='none'; taDecayEndEffEl.style.opacity='';
     }
   }
+  // timeAxisDecayEndStated: stated row, same x as effective — controlled by showStatedTimes
+  const taDecayEndStatedEl=$('timeAxisDecayEndStated');
+  if(taDecayEndStatedEl){
+    const showDecayEndSt=showStated&&e.releaseOn;
+    if(showDecayEndSt){
+      const stDecayEndX=textbookAdsr?pts.pEnd.x:drawPS.x;
+      const stDecayFraction=textbookAdsr?1:Math.max(0,(drawPS.x-pts.p1.x)/(pts.dwFull||1));
+      const stDecayEndMs=Math.round((e.aT+e.dT*stDecayFraction)*1000);
+      taDecayEndStatedEl.setAttribute('x',stDecayEndX); taDecayEndStatedEl.setAttribute('y',graph.y0+80);
+      taDecayEndStatedEl.textContent=stDecayEndMs;
+      taDecayEndStatedEl.style.display=''; taDecayEndStatedEl.style.opacity='1';
+    } else {
+      taDecayEndStatedEl.style.display='none'; taDecayEndStatedEl.style.opacity='';
+    }
+  }
   const taReleaseEndEl=$('timeAxisReleaseEnd');
   const taReleaseEndStatedEl=$('timeAxisReleaseEndStated');
   {
@@ -1288,7 +1323,7 @@ function render(){
         }
       }
     });
-  })('dropLinesEffective',['timeAxisAttack','timeAxisDecayStart','timeAxisDecayEndEffective','timeAxisReleaseStart','timeAxisReleaseEnd'],showEffLines,'drop-line-effective');
+  })('dropLinesEffective',['timeAxisAttack','timeAxisDecayStart','timeAxisDecayEndEffective','timeAxisReleaseStart'],showEffLines,'drop-line-effective');
   (function(groupId,elIds,show,colorClass){
     const g=$(groupId); if(!g) return;
     while(g.firstChild) g.removeChild(g.firstChild);
@@ -1310,7 +1345,7 @@ function render(){
         }
       }
     });
-  })('dropLinesStated',['timeAxisAttackStated','timeAxisDecayEnd','timeAxisReleaseEndStated'],showStLines,'drop-line-stated');
+  })('dropLinesStated',['timeAxisAttackStated','timeAxisDecayEndStated','timeAxisReleaseStartStated'],showStLines,'drop-line-stated');
   // Dim drop line rows when their time axis equivalent is off
   const effLinesRow=$('showEffectiveLinesRow'), statedLinesRow=$('showStatedLinesRow');
   if(effLinesRow){ effLinesRow.style.opacity=showEffective?'':'0.35'; effLinesRow.style.pointerEvents=showEffective?'':'none'; }
@@ -2324,7 +2359,7 @@ document.querySelectorAll('input[name="mode"]').forEach(el => {
 
 function hideLikelyAxes(){
   document.querySelectorAll('svg line, svg path, svg text').forEach(el => {
-    if (el.id === 'timeAxis0' || el.id === 'timeAxis0Stated' || el.id === 'timeAxisAttack' || el.id === 'timeAxisAttackStated' || el.id === 'timeAxisDecayStart' || el.id === 'timeAxisDecayEnd' || el.id === 'timeAxisDecayEndEffective' || el.id === 'timeAxisReleaseEnd' || el.id === 'timeAxisReleaseEndStated' || el.id === 'timeAxisReleaseStart' || el.id === 'timeAxisReleaseStartStated' || el.id === 'timeAxisEffectiveLabel' || el.id === 'timeAxisStatedLabel') return;
+    if (el.id === 'timeAxis0' || el.id === 'timeAxis0Stated' || el.id === 'timeAxisAttack' || el.id === 'timeAxisAttackStated' || el.id === 'timeAxisDecayStart' || el.id === 'timeAxisDecayEnd' || el.id === 'timeAxisDecayEndEffective' || el.id === 'timeAxisDecayEndStated' || el.id === 'timeAxisReleaseEnd' || el.id === 'timeAxisReleaseEndStated' || el.id === 'timeAxisReleaseStart' || el.id === 'timeAxisReleaseStartStated' || el.id === 'timeAxisEffectiveLabel' || el.id === 'timeAxisStatedLabel') return;
     const idClass = ((el.id || '') + ' ' + (el.getAttribute('class') || '')).toLowerCase();
     const text = (el.textContent || '').trim();
 
