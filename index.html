@@ -139,6 +139,13 @@
     align-items: center;
     margin-top: 6px;
   }
+  .quickset-legend {
+    font-size: 10px;
+    opacity: 1;
+    text-align: center;
+    margin-top: 4px;
+    white-space: nowrap;
+  }
 
   /* numeric ms / value controls */
   .numeric-ms-control,
@@ -293,6 +300,7 @@
             <button class="quickset-btn" data-knob="attack" data-value="250">250</button>
             <button class="quickset-btn" data-knob="attack" data-value="1000">1000</button>
             <button class="quickset-btn" data-knob="attack" data-value="2000">2000</button>
+            <div class="quickset-legend">⇧ 1–5</div>
           </div>
         </div>
         <div class="knobBox">
@@ -307,6 +315,7 @@
             <button class="quickset-btn" data-knob="decay" data-value="150">150</button>
             <button class="quickset-btn" data-knob="decay" data-value="500">500</button>
             <button class="quickset-btn" data-knob="decay" data-value="2000">2000</button>
+            <div class="quickset-legend">⇧⌥ 1–5</div>
           </div>
         </div>
         <div class="knobBox">
@@ -321,6 +330,7 @@
             <button class="quickset-btn" data-knob="sustain" data-value="5">5</button>
             <button class="quickset-btn" data-knob="sustain" data-value="8">8</button>
             <button class="quickset-btn" data-knob="sustain" data-value="10">10</button>
+            <div class="quickset-legend">⌥ 1–5</div>
           </div>
         </div>
         <div id="releaseKnobBox" class="knobBox">
@@ -335,6 +345,7 @@
             <button class="quickset-btn" data-knob="release" data-value="500">500</button>
             <button class="quickset-btn" data-knob="release" data-value="1000">1000</button>
             <button class="quickset-btn" data-knob="release" data-value="2000">2000</button>
+            <div id="releaseLegend" class="quickset-legend">⇧⌥⌘ 1–5</div>
           </div>
         </div>
         <div id="floorKnobBox" class="knobBox">
@@ -349,6 +360,7 @@
             <button class="quickset-btn" data-knob="cutoff" data-value="2">2</button>
             <button class="quickset-btn" data-knob="cutoff" data-value="3">3</button>
             <button class="quickset-btn" data-knob="cutoff" data-value="4">4</button>
+            <div id="cutoffLegend" class="quickset-legend">⌃⌥ 1–5</div>
           </div>
         </div>
         <div id="scaleKnobBox" class="knobBox">
@@ -363,6 +375,7 @@
             <button class="quickset-btn" data-knob="amount" data-value="7">7</button>
             <button class="quickset-btn" data-knob="amount" data-value="9">9</button>
             <button class="quickset-btn" data-knob="amount" data-value="10">10</button>
+            <div id="amountLegend" class="quickset-legend">⌥⌘ 1–5</div>
           </div>
         </div>
       </div>
@@ -507,12 +520,6 @@
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">5</td><td style="padding:3px 0;font-size:13px;font-weight:700">Tap 1s</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">?</td><td style="padding:3px 0;font-size:13px;font-weight:700">This Help</td></tr>
         </table>
-        <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-top:14px;margin-bottom:10px">Quick Set</div>
-        <table style="border-collapse:collapse;width:100%">
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">↑ / ↓</td><td style="padding:3px 0;font-size:13px;font-weight:700">Sustain +/− 1</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">Shift+0–8</td><td style="padding:3px 0;font-size:13px;font-weight:700">Attack presets</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">Opt+0–8</td><td style="padding:3px 0;font-size:13px;font-weight:700">Decay presets</td></tr>
-        </table>
         <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-top:14px;margin-bottom:10px">Textbook ADSR</div>
         <table style="border-collapse:collapse;width:100%">
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">T</td><td style="padding:3px 0;font-size:13px;font-weight:700">Textbook ADSR</td></tr>
@@ -523,6 +530,15 @@
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">Shift+;</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Effective Drop Lines</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">'</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Stated Times</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">Shift+'</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Stated Drop Lines</td></tr>
+        </table>
+        <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-top:14px;margin-bottom:10px">Quick Set</div>
+        <table style="border-collapse:collapse;width:100%">
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">⇧ 1–5</td><td style="padding:3px 0;font-size:13px;font-weight:700">Attack presets</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">⇧⌥ 1–5</td><td style="padding:3px 0;font-size:13px;font-weight:700">Decay presets</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">⌥ 1–5</td><td style="padding:3px 0;font-size:13px;font-weight:700">Sustain presets</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">⇧⌥⌘ 1–5</td><td style="padding:3px 0;font-size:13px;font-weight:700">Release presets</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">⌃⌥ 1–5</td><td style="padding:3px 0;font-size:13px;font-weight:700">Cutoff presets</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">⌥⌘ 1–5</td><td style="padding:3px 0;font-size:13px;font-weight:700">Amount presets</td></tr>
         </table>
       </div>
     </div>
@@ -759,6 +775,7 @@ function render(){
   const releaseR = state.r; // reserved for future use
   const releaseBox = $('releaseKnobBox');
   if(releaseBox){ releaseBox.style.opacity = textbookAdsr ? '1' : '0.35'; releaseBox.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
+  const releaseLegendEl=$('releaseLegend'); if(releaseLegendEl) releaseLegendEl.style.opacity=textbookAdsr?'1':'0.35';
   const loudDecayRow = $('loudDecayRow');
   if(loudDecayRow){ loudDecayRow.style.opacity = textbookAdsr ? '0.35' : '1'; loudDecayRow.style.pointerEvents = textbookAdsr ? 'none' : 'auto'; }
   const showClippedRow = $('showClippedRow');
@@ -1272,6 +1289,8 @@ function render(){
   const floorBox=$('floorKnobBox'), scaleBox=$('scaleKnobBox');
   if(floorBox) floorBox.style.opacity=freqMode?'':'0.35';
   if(scaleBox) scaleBox.style.opacity=freqMode?'':'0.35';
+  const cutoffLegendEl=$('cutoffLegend'); if(cutoffLegendEl) cutoffLegendEl.style.opacity=freqMode?'1':'0.35';
+  const amountLegendEl=$('amountLegend'); if(amountLegendEl) amountLegendEl.style.opacity=freqMode?'1':'0.35';
   // Dynamic loud/filter decay label
   const loudDecayLabel = $('loudDecayLabel');
   if(loudDecayLabel) loudDecayLabel.textContent = freqMode ? 'Filter Decay' : 'Loud Decay';
@@ -1309,6 +1328,39 @@ function syncControls(){
   $('scaleTarget').textContent=mode==='animate' ? 'Target: '+formatSustainScale(state.target.scale) : '';
   $('modeHint').textContent = mode==='live' ? 'Live Mode: Knobs Update The Graph Immediately.' : 'Animate Mode: Knobs Set Targets. Press Transition To Morph The Graph.';
   patchSustainReadouts(); // keep sustain 0-10 scale display correct
+
+  // Quick-set button highlight: exact match = solid white; closest = dim; others = default
+  (function(){
+    const checks = [
+      { knob: 'attack',  val: Math.round(msFromPosition(state.a)) },
+      { knob: 'decay',   val: Math.round(msFromPosition(state.d)) },
+      { knob: 'sustain', val: Math.round(state.s * 10) },
+      { knob: 'release', val: Math.round(msFromPosition(state.r)) },
+      { knob: 'cutoff',  val: Math.round(state.floor * 10) },
+      { knob: 'amount',  val: Math.round(state.scale * 10) },
+    ];
+    checks.forEach(({ knob, val }) => {
+      const btns = Array.from(document.querySelectorAll(`.quickset-btn[data-knob="${knob}"]`));
+      const exactIdx = btns.findIndex(b => parseInt(b.dataset.value) === val);
+      let closestIdx = -1;
+      if(exactIdx === -1){
+        let minDist = Infinity;
+        btns.forEach((b, i) => {
+          const dist = Math.abs(parseInt(b.dataset.value) - val);
+          if(dist < minDist){ minDist = dist; closestIdx = i; }
+        });
+      }
+      btns.forEach((btn, i) => {
+        if(exactIdx !== -1 && i === exactIdx){
+          btn.style.background = '#ffffff'; btn.style.color = '#111111';
+        } else if(exactIdx === -1 && i === closestIdx){
+          btn.style.background = 'rgba(255,255,255,0.35)'; btn.style.color = '#ffffff';
+        } else {
+          btn.style.background = ''; btn.style.color = '';
+        }
+      });
+    });
+  })();
 }
 
 function setFromSlider(){
@@ -1969,11 +2021,11 @@ document.addEventListener('keydown', e => {
       const ms = tapMode === 'tap50' ? 50 : tapMode === 'tap100' ? 100 : tapMode === 'tap500' ? 500 : tapMode === 'tap1000' ? 1000 : tapMode === 'tapCustom' ? (Number($('tapCustomMs').value)||200) : 200;
       tap(ms);
     }
-  } else if(e.key === '1'){ setTapMode('tap50','tapMode50Btn');
-  } else if(e.key === '2'){ setTapMode('tap100','tapMode100Btn');
-  } else if(e.key === '3'){ setTapMode('tap200','tapMode200Btn');
-  } else if(e.key === '4'){ setTapMode('tap500', 'tap500Btn');
-  } else if(e.key === '5'){ setTapMode('tap1000', 'tap1sBtn');
+  } else if(e.key === '1' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey){ setTapMode('tap50','tapMode50Btn');
+  } else if(e.key === '2' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey){ setTapMode('tap100','tapMode100Btn');
+  } else if(e.key === '3' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey){ setTapMode('tap200','tapMode200Btn');
+  } else if(e.key === '4' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey){ setTapMode('tap500', 'tap500Btn');
+  } else if(e.key === '5' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey){ setTapMode('tap1000', 'tap1sBtn');
   } else if(e.key === 'h' || e.key === 'H'){ setTapMode('hold','tapModeHoldBtn');
   } else if(e.key === 'Enter'){
     e.preventDefault();
@@ -2000,33 +2052,17 @@ document.addEventListener('keydown', e => {
   } else if(e.key === ']'){ toggleCheckbox('tbSustainCollapse');
   } else if(e.key === '\\'){ toggleCheckbox('tbShowModelDSustain');
   } else if(e.key === 'b' || e.key === 'B'){ toggleCheckbox('analogueCurve');
-  // Quick Set — Up/Down arrows adjust sustain
-  } else if(e.key === 'ArrowUp'){
+  // Quick Set — modifier+1-5
+  } else if(/^Digit[1-5]$/.test(e.code) && (e.shiftKey||e.altKey||e.metaKey)){
+    const idx = parseInt(e.code.replace('Digit', '')) - 1;
+    const qs = k => { const b=document.querySelectorAll(`.quickset-btn[data-knob="${k}"]`)[idx]; return b?Number(b.dataset.value):null; };
+    if(e.shiftKey && e.altKey && e.metaKey && !e.ctrlKey){ const v=qs('release'); if(v!==null){ state.target.tbSustainGap=state.tbSustainGap; state.target.r=positionFromMs(v); transition(currentTransitionSec); } }
+    else if(e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey){ const v=qs('attack'); if(v!==null){ state.target.tbSustainGap=state.tbSustainGap; state.target.a=positionFromMs(v); transition(currentTransitionSec); } }
+    else if(e.shiftKey && e.altKey && !e.metaKey && !e.ctrlKey){ const v=qs('decay'); if(v!==null){ state.target.tbSustainGap=state.tbSustainGap; state.target.d=positionFromMs(v); transition(currentTransitionSec); } }
+    else if(e.altKey && e.metaKey && !e.shiftKey && !e.ctrlKey){ const v=qs('amount'); if(v!==null){ state.target.tbSustainGap=state.tbSustainGap; state.target.scale=v/10; transition(currentTransitionSec); } }
+    else if(e.altKey && !e.shiftKey && !e.metaKey && !e.ctrlKey){ const v=qs('sustain'); if(v!==null){ state.target.tbSustainGap=state.tbSustainGap; state.target.s=v/10; transition(currentTransitionSec); } }
+    else if(e.ctrlKey && e.altKey && !e.shiftKey && !e.metaKey){ const v=qs('cutoff'); if(v!==null){ state.target.tbSustainGap=state.tbSustainGap; state.target.floor=v/10; transition(currentTransitionSec); } }
     e.preventDefault();
-    const newS = Math.min(1, Math.round(state.target.s * 10 + 1) / 10);
-    state.target.s = newS; $('sustain').value = Math.round(newS * 1000);
-    transition(currentTransitionSec);
-    if(window.markPresetDirty) markPresetDirty();
-  } else if(e.key === 'ArrowDown'){
-    e.preventDefault();
-    const newS = Math.max(0, Math.round(state.target.s * 10 - 1) / 10);
-    state.target.s = newS; $('sustain').value = Math.round(newS * 1000);
-    transition(currentTransitionSec);
-    if(window.markPresetDirty) markPresetDirty();
-  // Quick Set — Shift+0-8 attack presets
-  } else if(e.shiftKey && e.code >= 'Digit0' && e.code <= 'Digit8'){
-    const attackMs = [0,10,50,100,200,500,1000,2000,4000][Number(e.code.replace('Digit',''))];
-    const p = positionFromMs(attackMs);
-    state.target.a = p; $('attack').value = Math.round(p * 1000);
-    transition(currentTransitionSec);
-    if(window.markPresetDirty) markPresetDirty();
-  // Quick Set — Opt/Alt+0-8 decay presets
-  } else if(e.altKey && e.code >= 'Digit0' && e.code <= 'Digit8'){
-    const decayMs = [0,10,50,100,200,500,1000,2000,4000][Number(e.code.replace('Digit',''))];
-    const p = positionFromMs(decayMs);
-    state.target.d = p; $('decay').value = Math.round(p * 1000);
-    transition(currentTransitionSec);
-    if(window.markPresetDirty) markPresetDirty();
   }
 });
 
@@ -2856,7 +2892,6 @@ function loadConfigObject(cfg){
   if(window.restorePresetHighlight){
     window.restorePresetHighlight(cfg.activePresetIndex !== undefined ? cfg.activePresetIndex : -1, cfg.presetDirtyState || 'none');
   }
-
   render();
   refreshNumericInputs();
   syncControls();
