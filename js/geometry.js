@@ -48,7 +48,7 @@ function displayTimeWidth(t){
 function getEffective(){
   const aT=mapTime(state.a), dT=mapTime(state.d);
   const rawS=state.s;
-  const s=$('keyboardControl').checked ? rawS*.8 : rawS;
+  const s=($('keyboardControl') && $('keyboardControl').checked) ? rawS*.8 : rawS;
   const textbookOn = $('textbookAdsr') && $('textbookAdsr').checked;
   const releaseOn = textbookOn ? true : $('loudDecay').checked;
   const freqMode = $('frequencyMode') && $('frequencyMode').checked;
@@ -86,7 +86,7 @@ function computePoints(){
   const p0={x:x0,y:yFor(e.floor),level:0};
   const p1={x:x0+aw,y:yFor(e.floor+e.scale),level:1};
   const pEnd={x:p1.x+dwFull,y:yFor(e.floor),level:0};
-  const mimicOn = document.getElementById('keyboardControl').checked;
+  const mimicOn = $('keyboardControl') && $('keyboardControl').checked;
   const sAbsolute = e.floor + e.s * e.scale;
   const sSafe = (mimicOn && sAbsolute > 0.8 && e.scale > 0)
     ? Math.max(0, (0.8 - e.floor) / e.scale)

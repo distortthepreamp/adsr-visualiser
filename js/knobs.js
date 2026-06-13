@@ -187,32 +187,26 @@ function initKnobs(){
 
   if (attackInput) {
     attackInput.addEventListener('change', () => commitTime('a', attackInput));
-    attackInput.addEventListener('blur',   () => commitTime('a', attackInput));
     attackInput.addEventListener('keydown', e => { if (e.key === 'Enter') commitTime('a', attackInput); });
   }
   if (decayInput) {
     decayInput.addEventListener('change', () => commitTime('d', decayInput));
-    decayInput.addEventListener('blur',   () => commitTime('d', decayInput));
     decayInput.addEventListener('keydown', e => { if (e.key === 'Enter') commitTime('d', decayInput); });
   }
   if (releaseInput) {
     releaseInput.addEventListener('change', () => commitTime('r', releaseInput));
-    releaseInput.addEventListener('blur',   () => commitTime('r', releaseInput));
     releaseInput.addEventListener('keydown', e => { if (e.key === 'Enter') commitTime('r', releaseInput); });
   }
   if (sustainInput) {
     sustainInput.addEventListener('change', commitSustain);
-    sustainInput.addEventListener('blur',   commitSustain);
     sustainInput.addEventListener('keydown', e => { if (e.key === 'Enter') commitSustain(); });
   }
   if (floorInput) {
     floorInput.addEventListener('change', commitFloor);
-    floorInput.addEventListener('blur',   commitFloor);
     floorInput.addEventListener('keydown', e => { if (e.key === 'Enter') commitFloor(); });
   }
   if (scaleInput) {
     scaleInput.addEventListener('change', commitScale);
-    scaleInput.addEventListener('blur',   commitScale);
     scaleInput.addEventListener('keydown', e => { if (e.key === 'Enter') commitScale(); });
   }
 

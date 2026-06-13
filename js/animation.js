@@ -220,7 +220,7 @@ function releaseFromCurrent(){
     return;
   }
   const overrange = e.floor + e.scale > 1;
-  const showClipped = document.getElementById('showClipped').checked;
+  const showClipped = $('showClipped') && $('showClipped').checked;
   const f_decay = overrange ? (pts.e.floor + pts.e.scale - 1) / pts.e.scale : 0;
   const ceilDecayX = pts.p1.x + (pts.pEnd.x - pts.p1.x) * f_decay;
   const peakForSlope = (showClipped && overrange)

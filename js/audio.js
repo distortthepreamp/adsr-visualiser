@@ -138,7 +138,7 @@ const MASTER_GAIN = 0.7;             // default master output gain
     filter2.frequency.cancelScheduledValues(now); filter2.frequency.setTargetAtTime(minFreq,now,0.005);
   }
 
-  function openAudioHelp(){ $('audioHelpText').style.display='block'; }
+  function openAudioHelp(){ $('audioHelpText').style.display=''; }
   function closeAudioHelp(){ $('audioHelpText').style.display='none'; }
   function isAudioHelpOpen(){ return $('audioHelpText').style.display !== 'none'; }
 
