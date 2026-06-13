@@ -1,6 +1,9 @@
 // ---- knobs.js — knob drag handlers, numeric input logic, and display helpers ----
-// Top-level declarations are global (accessible by render.js, syncControls, etc.)
-// Event listener registration is deferred to initKnobs(), called from init after $ is defined.
+// Public API (assigned to window below): initKnobs, refreshNumericInputs,
+// patchSustainReadouts, fmtScaleValue, formatSustainScale, syncTargetToLive,
+// commitTime, commitSustain, commitFloor, commitScale, addPointerFeedback
+
+(function(){
 
 // ---- Numeric input typed-display state ----
 const typedDisplay = {
@@ -260,3 +263,17 @@ function initKnobs(){
     });
   });
 }
+
+window.initKnobs          = initKnobs;
+window.refreshNumericInputs = refreshNumericInputs;
+window.patchSustainReadouts = patchSustainReadouts;
+window.fmtScaleValue      = fmtScaleValue;
+window.formatSustainScale = formatSustainScale;
+window.syncTargetToLive   = syncTargetToLive;
+window.commitTime         = commitTime;
+window.commitSustain      = commitSustain;
+window.commitFloor        = commitFloor;
+window.commitScale        = commitScale;
+window.addPointerFeedback = addPointerFeedback;
+
+})();

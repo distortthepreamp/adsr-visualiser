@@ -1,7 +1,7 @@
 // ---- Blob animation state ----
 let animationToken = 0;
 let releaseStartPoint = null;
-let glowPulseRaf = null;
+// glowPulseRaf is scoped inside the glow closure below
 
 // ---- Point geometry helpers ----
 
@@ -77,25 +77,32 @@ function applyBlobGlow(){
   }
 }
 
-function startGlowPulse(){
-  stopGlowPulse();
-  if(!$('blobGlowEnabled')||!$('blobGlowEnabled').checked) return;
-  const feBlur=$('blobGlowBlur'); if(!feBlur) return;
-  const t0=performance.now();
-  function pulse(now){
-    const r=blobGlowRadius();
-    const f=(Math.sin((now-t0)/400)+1)/2;
-    feBlur.setAttribute('stdDeviation', r+f*r*2);
+;(function(){
+  let glowPulseRaf = null;
+
+  function startGlowPulse(){
+    stopGlowPulse();
+    if(!$('blobGlowEnabled')||!$('blobGlowEnabled').checked) return;
+    const feBlur=$('blobGlowBlur'); if(!feBlur) return;
+    const t0=performance.now();
+    function pulse(now){
+      const r=blobGlowRadius();
+      const f=(Math.sin((now-t0)/400)+1)/2;
+      feBlur.setAttribute('stdDeviation', r+f*r*2);
+      glowPulseRaf=requestAnimationFrame(pulse);
+    }
     glowPulseRaf=requestAnimationFrame(pulse);
   }
-  glowPulseRaf=requestAnimationFrame(pulse);
-}
 
-function stopGlowPulse(){
-  if(glowPulseRaf!==null){ cancelAnimationFrame(glowPulseRaf); glowPulseRaf=null; }
-  const feBlur=$('blobGlowBlur');
-  if(feBlur) feBlur.setAttribute('stdDeviation', blobGlowRadius());
-}
+  function stopGlowPulse(){
+    if(glowPulseRaf!==null){ cancelAnimationFrame(glowPulseRaf); glowPulseRaf=null; }
+    const feBlur=$('blobGlowBlur');
+    if(feBlur) feBlur.setAttribute('stdDeviation', blobGlowRadius());
+  }
+
+  window.startGlowPulse = startGlowPulse;
+  window.stopGlowPulse  = stopGlowPulse;
+})();
 
 // ---- Path sampling ----
 

@@ -4,8 +4,6 @@
 
 // ---- Transport modal state ----
 let tapMode = 'tap200';
-const tapModeBtns = ['tapMode50Btn','tapMode100Btn','tapMode200Btn','tap500Btn','tap1sBtn','tapModeCustomBtn','tapModeHoldBtn'];
-const transBtnIds = ['transInstantBtn','trans1Btn','trans2Btn','trans3Btn','trans4Btn','trans5Btn','transCustomToggle'];
 
 // ---- syncControls — sync knob/slider/readout display to state ----
 function syncControls(){
@@ -96,9 +94,10 @@ function transition(durSec){
 }
 
 function setTransMode(durSec, activeBtnId){
+  const transBtns = ['transInstantBtn','trans1Btn','trans2Btn','trans3Btn','trans4Btn','trans5Btn','transCustomToggle'];
   if(durSec !== null) currentTransitionSec = durSec;
   activeTransBtn = activeBtnId;
-  transBtnIds.forEach(id => { const b=$(id); if(b){ b.style.background=''; b.style.color=''; } });
+  transBtns.forEach(id => { const b=$(id); if(b){ b.style.background=''; b.style.color=''; } });
   const b=$(activeBtnId); if(b){ b.style.background='#ffffff'; b.style.color='#111111'; }
   const row=$('customTransitionRow');
   if(row) row.style.display = activeBtnId==='transCustomToggle' ? '' : 'none';
@@ -144,6 +143,7 @@ function updateButtonStates(){
 
 // ---- setTapMode ----
 function setTapMode(mode, btnId){
+  const tapModeBtns = ['tapMode50Btn','tapMode100Btn','tapMode200Btn','tap500Btn','tap1sBtn','tapModeCustomBtn','tapModeHoldBtn'];
   tapMode = mode;
   tapModeBtns.forEach(id => { const b=$(id); if(b){ b.style.background=''; b.style.color=''; } });
   const b=$(btnId); if(b){ b.style.background='#ffffff'; b.style.color='#111111'; }

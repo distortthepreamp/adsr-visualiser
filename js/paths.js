@@ -1,11 +1,10 @@
 // ---- paths.js — SVG path building, knob sync, and the render() coordinator ----
 // Depends on geometry.js (clamp, yFor, computePoints, etc.) being loaded first.
 
-const KNOB_RED    = 'radial-gradient(circle at 36% 30%, #aa1111, #660808 68%, #220000 100%)';
-const KNOB_CYAN   = 'radial-gradient(circle at 36% 30%, #00bbcc, #006677 68%, #001f22 100%)';
-const KNOB_YELLOW = 'radial-gradient(circle at 36% 30%, #ccaa00, #886600 68%, #2a2000 100%)';
-
 function syncKnobColours(freqMode){
+  const KNOB_RED    = 'radial-gradient(circle at 36% 30%, #aa1111, #660808 68%, #220000 100%)';
+  const KNOB_CYAN   = 'radial-gradient(circle at 36% 30%, #00bbcc, #006677 68%, #001f22 100%)';
+  const KNOB_YELLOW = 'radial-gradient(circle at 36% 30%, #ccaa00, #886600 68%, #2a2000 100%)';
   const adsBg = freqMode ? KNOB_CYAN : KNOB_RED;
   ['attackKnob','decayKnob','sustainKnob','releaseKnob'].forEach(id => { const k=$(id); if(k) k.style.background=adsBg; });
   const fsBg = KNOB_YELLOW; // shown/hidden via opacity; always yellow when filter mode on
