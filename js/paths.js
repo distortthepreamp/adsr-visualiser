@@ -67,20 +67,20 @@ function render(){
   }
 
   const releaseBox = $('releaseKnobBox');
-  if(releaseBox){ releaseBox.style.opacity = textbookAdsr ? '1' : '0.35'; releaseBox.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
-  const releaseLegendEl=$('releaseLegend'); if(releaseLegendEl) releaseLegendEl.style.opacity=textbookAdsr?'1':'0.35';
+  if(releaseBox){ releaseBox.style.opacity = textbookAdsr ? '1' : UI_DISABLED_OPACITY; releaseBox.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
+  const releaseLegendEl=$('releaseLegend'); if(releaseLegendEl) releaseLegendEl.style.opacity=textbookAdsr?'1':UI_DISABLED_OPACITY;
   const loudDecayRow = $('loudDecayRow');
-  if(loudDecayRow){ loudDecayRow.style.opacity = textbookAdsr ? '0.35' : '1'; loudDecayRow.style.pointerEvents = textbookAdsr ? 'none' : 'auto'; }
+  if(loudDecayRow){ loudDecayRow.style.opacity = textbookAdsr ? UI_DISABLED_OPACITY : '1'; loudDecayRow.style.pointerEvents = textbookAdsr ? 'none' : 'auto'; }
   const showClippedRow = $('showClippedRow');
-  if(showClippedRow){ showClippedRow.style.opacity = textbookAdsr ? '0.35' : '1'; showClippedRow.style.pointerEvents = textbookAdsr ? 'none' : 'auto'; }
+  if(showClippedRow){ showClippedRow.style.opacity = textbookAdsr ? UI_DISABLED_OPACITY : '1'; showClippedRow.style.pointerEvents = textbookAdsr ? 'none' : 'auto'; }
   const analogueCurveRow = $('analogueCurveRow');
-  if(analogueCurveRow){ analogueCurveRow.style.opacity = textbookAdsr ? '0.35' : '1'; analogueCurveRow.style.pointerEvents = textbookAdsr ? 'none' : 'auto'; }
+  if(analogueCurveRow){ analogueCurveRow.style.opacity = textbookAdsr ? UI_DISABLED_OPACITY : '1'; analogueCurveRow.style.pointerEvents = textbookAdsr ? 'none' : 'auto'; }
   const tbSustainDottedRow = $('tbSustainDottedRow');
-  if(tbSustainDottedRow){ tbSustainDottedRow.style.opacity = textbookAdsr ? '1' : '0.35'; tbSustainDottedRow.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
+  if(tbSustainDottedRow){ tbSustainDottedRow.style.opacity = textbookAdsr ? '1' : UI_DISABLED_OPACITY; tbSustainDottedRow.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
   const tbSustainCollapseRow = $('tbSustainCollapseRow');
-  if(tbSustainCollapseRow){ tbSustainCollapseRow.style.opacity = textbookAdsr ? '1' : '0.35'; tbSustainCollapseRow.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
+  if(tbSustainCollapseRow){ tbSustainCollapseRow.style.opacity = textbookAdsr ? '1' : UI_DISABLED_OPACITY; tbSustainCollapseRow.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
   const tbShowModelDSustainRow = $('tbShowModelDSustainRow');
-  if(tbShowModelDSustainRow){ tbShowModelDSustainRow.style.opacity = textbookAdsr ? '1' : '0.35'; tbShowModelDSustainRow.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
+  if(tbShowModelDSustainRow){ tbShowModelDSustainRow.style.opacity = textbookAdsr ? '1' : UI_DISABLED_OPACITY; tbShowModelDSustainRow.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
   const analogueOn = !textbookAdsr && $('analogueCurve') && $('analogueCurve').checked;
   const curveAmt = analogueOn ? (Number($('curveAmount').value) / 100) : 0;
 
@@ -333,7 +333,7 @@ function render(){
   // Show Contour checkbox: only meaningful in filter mode
   const showContourLabel = $('showContour') && $('showContour').closest('label');
   if(showContourLabel){
-    showContourLabel.style.opacity = freqMode ? '' : '0.35';
+    showContourLabel.style.opacity = freqMode ? '' : UI_DISABLED_OPACITY;
     showContourLabel.style.pointerEvents = freqMode ? '' : 'none';
   }
 
@@ -369,10 +369,10 @@ function render(){
   if(segClippingEl){ segClippingEl.setAttribute('y',segY); segClippingEl.style.display=freqMode?'':'none'; if(textbookAdsr){ segClippingEl.textContent='PEAK: TEXTBOOK'; segClippingEl.style.opacity=1; } else if(showClipped){ segClippingEl.textContent='PEAK: CORRECTED'; segClippingEl.style.opacity=1; } else { segClippingEl.textContent='PEAK: SCHEMATIC'; segClippingEl.style.opacity=STATUS_DIM_OPACITY; } }
   // Cutoff/Amount knobs: active only in Filter Mode
   const floorBox=$('floorKnobBox'), scaleBox=$('scaleKnobBox');
-  if(floorBox) floorBox.style.opacity=freqMode?'':'0.35';
-  if(scaleBox) scaleBox.style.opacity=freqMode?'':'0.35';
-  const cutoffLegendEl=$('cutoffLegend'); if(cutoffLegendEl) cutoffLegendEl.style.opacity=freqMode?'1':'0.35';
-  const amountLegendEl=$('amountLegend'); if(amountLegendEl) amountLegendEl.style.opacity=freqMode?'1':'0.35';
+  if(floorBox) floorBox.style.opacity=freqMode?'':UI_DISABLED_OPACITY;
+  if(scaleBox) scaleBox.style.opacity=freqMode?'':UI_DISABLED_OPACITY;
+  const cutoffLegendEl=$('cutoffLegend'); if(cutoffLegendEl) cutoffLegendEl.style.opacity=freqMode?'1':UI_DISABLED_OPACITY;
+  const amountLegendEl=$('amountLegend'); if(amountLegendEl) amountLegendEl.style.opacity=freqMode?'1':UI_DISABLED_OPACITY;
   // Dynamic loud/filter decay label
   const loudDecayLabel = $('loudDecayLabel');
   if(loudDecayLabel) loudDecayLabel.textContent = freqMode ? 'Filter Decay' : 'Loud Decay';

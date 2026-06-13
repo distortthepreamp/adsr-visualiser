@@ -171,6 +171,6 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   updateDropLineGroup('dropLinesStated',['timeAxisAttackStated','timeAxisDecayEndStated','timeAxisReleaseStartStated'],showStLines,'drop-line-stated');
   // Dim drop line rows when their time axis equivalent is off
   const effLinesRow=$('showEffectiveLinesRow'), statedLinesRow=$('showStatedLinesRow');
-  if(effLinesRow){ effLinesRow.style.opacity=showEffective?'':'0.35'; effLinesRow.style.pointerEvents=showEffective?'':'none'; }
-  if(statedLinesRow){ statedLinesRow.style.opacity=showStated?'':'0.35'; statedLinesRow.style.pointerEvents=showStated?'':'none'; }
+  if(effLinesRow){ effLinesRow.style.opacity=showEffective?'':UI_DISABLED_OPACITY; effLinesRow.style.pointerEvents=showEffective?'':'none'; }
+  if(statedLinesRow){ statedLinesRow.style.opacity=showStated?'':UI_DISABLED_OPACITY; statedLinesRow.style.pointerEvents=showStated?'':'none'; }
 }

@@ -2,6 +2,9 @@
 // Top-level declarations/functions are global (accessible by render.js, animation.js, etc.)
 // Event listener registration is deferred to initUIControls(), called from init after $ is defined.
 
+// ---- Shared UI constants ----
+const UI_DISABLED_OPACITY = '0.35';
+
 // ---- Transport modal state ----
 let tapMode = 'tap200';
 
@@ -23,7 +26,7 @@ function syncControls(){
   $('scaleTarget').textContent=mode==='animate' ? 'Target: '+formatSustainScale(state.target.scale) : '';
   $('modeHint').textContent = mode==='live' ? 'Live Mode: Knobs Update The Graph Immediately.' : 'Animate Mode: Knobs Set Targets. Press Transition To Morph The Graph.';
   patchSustainReadouts();
-  { const linearOn = $('linearTime') && $('linearTime').checked; const zl = $('timelineZoom3xLabel'); if(zl){ zl.style.opacity = linearOn ? '' : '0.35'; zl.style.pointerEvents = linearOn ? '' : 'none'; } }
+  { const linearOn = $('linearTime') && $('linearTime').checked; const zl = $('timelineZoom3xLabel'); if(zl){ zl.style.opacity = linearOn ? '' : UI_DISABLED_OPACITY; zl.style.pointerEvents = linearOn ? '' : 'none'; } }
 
   // Quick-set button highlight: exact match = solid white; closest = dim; others = default
   (function(){
@@ -160,16 +163,16 @@ function isAdvancedOpen(){ return $('advancedPopup').style.display !== 'none'; }
 function syncHpModeEnabled(){
   const freqOn = $('frequencyMode') && $('frequencyMode').checked;
   const hpLabel = $('hpMode') && $('hpMode').closest('label');
-  if(hpLabel){ hpLabel.style.opacity = freqOn ? '' : '0.35'; hpLabel.style.pointerEvents = freqOn ? '' : 'none'; }
+  if(hpLabel){ hpLabel.style.opacity = freqOn ? '' : UI_DISABLED_OPACITY; hpLabel.style.pointerEvents = freqOn ? '' : 'none'; }
 }
 function syncLinearTimeScale(){
   const on = $('linearTime') && $('linearTime').checked;
   const zoomLbl = $('timelineZoom3xLabel');
-  if(zoomLbl){ zoomLbl.style.opacity = on ? '' : '0.35'; zoomLbl.style.pointerEvents = on ? '' : 'none'; }
+  if(zoomLbl){ zoomLbl.style.opacity = on ? '' : UI_DISABLED_OPACITY; zoomLbl.style.pointerEvents = on ? '' : 'none'; }
 }
 function syncAnalogueCurve(){
   const on = $('analogueCurve') && $('analogueCurve').checked;
-  const opacity = on ? '' : '0.35';
+  const opacity = on ? '' : UI_DISABLED_OPACITY;
   const sl = $('curveAmount'), val = $('curveAmountVal');
   if(sl)  sl.style.opacity  = opacity;
   if(val){ val.style.opacity = opacity; val.textContent = sl ? sl.value : '40'; }

@@ -6,12 +6,13 @@
 
 let noteMode = 'noteA4Btn';
 const noteFreqs = { noteE1Btn: 41.2, noteE2Btn: 82.4, noteC4Btn: 261.6, noteA4Btn: 440 };
+const FILTER_OPEN_FREQUENCY = 20000; // Hz — fully open (bypassed) filter cutoff
 
 (function(){
 
   const cutoffCurve = [
     {p:0.00,f:10},{p:0.10,f:40},{p:0.20,f:140},{p:0.30,f:500},{p:0.40,f:1800},
-    {p:0.50,f:3500},{p:0.60,f:6000},{p:0.70,f:9000},{p:0.80,f:13000},{p:0.90,f:17000},{p:1.00,f:20000}
+    {p:0.50,f:3500},{p:0.60,f:6000},{p:0.70,f:9000},{p:0.80,f:13000},{p:0.90,f:17000},{p:1.00,f:FILTER_OPEN_FREQUENCY}
   ];
   function mapCutoff(p){
     p=clamp(p);
@@ -52,8 +53,8 @@ const noteFreqs = { noteE1Btn: 41.2, noteE2Btn: 82.4, noteC4Btn: 261.6, noteA4Bt
     audioCtx=new (window.AudioContext||window.webkitAudioContext)();
     osc=audioCtx.createOscillator(); osc.type='sawtooth'; osc.frequency.value=noteFreq();
     vcaGain=audioCtx.createGain(); vcaGain.gain.value=0;
-    filter1=audioCtx.createBiquadFilter(); filter1.type='lowpass'; filter1.frequency.value=20000; filter1.Q.value=0;
-    filter2=audioCtx.createBiquadFilter(); filter2.type='lowpass'; filter2.frequency.value=20000; filter2.Q.value=0;
+    filter1=audioCtx.createBiquadFilter(); filter1.type='lowpass'; filter1.frequency.value=FILTER_OPEN_FREQUENCY; filter1.Q.value=0;
+    filter2=audioCtx.createBiquadFilter(); filter2.type='lowpass'; filter2.frequency.value=FILTER_OPEN_FREQUENCY; filter2.Q.value=0;
     masterGain=audioCtx.createGain(); masterGain.gain.value=0.7;
     osc.connect(vcaGain); vcaGain.connect(filter1); filter1.connect(filter2); filter2.connect(masterGain); masterGain.connect(audioCtx.destination);
     osc.start();
@@ -68,8 +69,8 @@ const noteFreqs = { noteE1Btn: 41.2, noteE2Btn: 82.4, noteC4Btn: 261.6, noteA4Bt
     if(freqMode){
       filter1.type=isHP?'highpass':'lowpass'; filter2.type=isHP?'highpass':'lowpass';
     } else {
-      filter1.type='lowpass'; filter1.frequency.value=20000; filter1.Q.value=0;
-      filter2.type='lowpass'; filter2.frequency.value=20000; filter2.Q.value=0;
+      filter1.type='lowpass'; filter1.frequency.value=FILTER_OPEN_FREQUENCY; filter1.Q.value=0;
+      filter2.type='lowpass'; filter2.frequency.value=FILTER_OPEN_FREQUENCY; filter2.Q.value=0;
     }
   }
 
@@ -85,8 +86,8 @@ const noteFreqs = { noteE1Btn: 41.2, noteE2Btn: 82.4, noteC4Btn: 261.6, noteA4Bt
       vcaGain.gain.setValueAtTime(0,now);
       vcaGain.gain.linearRampToValueAtTime(1,now+Math.max(0.001,e.aT));
       vcaGain.gain.linearRampToValueAtTime(Math.max(0.0001,e.s),now+Math.max(0.001,e.aT)+Math.max(0.001,e.dT));
-      filter1.type='lowpass'; filter1.frequency.cancelScheduledValues(now); filter1.frequency.setValueAtTime(20000,now); filter1.Q.value=0;
-      filter2.type='lowpass'; filter2.frequency.cancelScheduledValues(now); filter2.frequency.setValueAtTime(20000,now); filter2.Q.value=0;
+      filter1.type='lowpass'; filter1.frequency.cancelScheduledValues(now); filter1.frequency.setValueAtTime(FILTER_OPEN_FREQUENCY,now); filter1.Q.value=0;
+      filter2.type='lowpass'; filter2.frequency.cancelScheduledValues(now); filter2.frequency.setValueAtTime(FILTER_OPEN_FREQUENCY,now); filter2.Q.value=0;
     } else {
       // Filter envelope, VCA fully open
       vcaGain.gain.cancelScheduledValues(now); vcaGain.gain.setValueAtTime(1,now);

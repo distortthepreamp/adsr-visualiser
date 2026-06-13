@@ -2,19 +2,20 @@
 let animationToken = 0;
 let releaseStartPoint = null;
 // glowPulseRaf is scoped inside the glow closure below
+const INSTANT_PHASE_THRESHOLD = 0.0005; // treat phases shorter than this as instant
 
 // ---- Point geometry helpers ----
 
 function pointOnAttackDecay(ms){
   const pts=computePoints(), e=pts.e; const t=ms/1000;
 
-  if(e.aT > .0005 && t <= e.aT){
+  if(e.aT > INSTANT_PHASE_THRESHOLD && t <= e.aT){
     const f=clamp(t/e.aT);
     return { x:pts.p0.x+(pts.p1.x-pts.p0.x)*f, y:pts.p0.y+(pts.p1.y-pts.p0.y)*f, level:f, phase:'attack' };
   }
 
-  const after = e.aT <= .0005 ? t : t-e.aT;
-  const f=e.dT<=.0005 ? 1 : clamp(after/e.dT);
+  const after = e.aT <= INSTANT_PHASE_THRESHOLD ? t : t-e.aT;
+  const f=e.dT<=INSTANT_PHASE_THRESHOLD ? 1 : clamp(after/e.dT);
   const level=1-f;
   const phase = level <= e.s + .0001 ? 'sustain' : 'decay';
   return { x:pts.p1.x+(pts.pEnd.x-pts.p1.x)*f, y:yFor(e.floor+level*e.scale), level, phase };
@@ -46,12 +47,12 @@ function pointWhileGateHighTextbook(ms){
   const e=tb.e;
   const t=ms/1000;
   const floorY=yFor(e.floor);
-  if(e.aT>.0005 && t<=e.aT){
+  if(e.aT>INSTANT_PHASE_THRESHOLD && t<=e.aT){
     const f=clamp(t/e.aT);
     return {x:graph.x0+(tb.tbAttackEnd.x-graph.x0)*f, y:floorY+(tb.tbAttackEnd.y-floorY)*f, level:f, phase:'attack'};
   }
-  const afterAttack=e.aT<=.0005?t:t-e.aT;
-  const f=e.dT<=.0005?1:clamp(afterAttack/e.dT);
+  const afterAttack=e.aT<=INSTANT_PHASE_THRESHOLD?t:t-e.aT;
+  const f=e.dT<=INSTANT_PHASE_THRESHOLD?1:clamp(afterAttack/e.dT);
   if(f>=1) return {x:tb.tbDecayEnd.x, y:tb.tbDecayEnd.y, level:e.s, phase:'sustain'};
   const level=1-f*(1-e.s);
   return {

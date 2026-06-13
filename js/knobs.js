@@ -3,6 +3,8 @@
 // patchSustainReadouts, fmtScaleValue, formatSustainScale, syncTargetToLive,
 // commitTime, commitSustain, commitFloor, commitScale, addPointerFeedback
 
+const MAX_TIME_MS = 12000; // maximum ms value for attack/decay/release inputs
+
 (function(){
 
 // ---- Numeric input typed-display state ----
@@ -54,7 +56,7 @@ function commitTime(which, input){
   if (!input) return;
   if(currentMode()==='live') clearBlobAndMarker();
   if(window.markPresetDirty) markPresetDirty();
-  const ms = Math.max(0, Math.min(12000, Math.round(Number(input.value) || 0)));
+  const ms = Math.max(0, Math.min(MAX_TIME_MS, Math.round(Number(input.value) || 0)));
   input.value = ms;
   const m = currentMode();
   typedDisplay[m][which] = ms;
@@ -174,9 +176,9 @@ function addPointerFeedback(){
 function initKnobs(){
 
   // Numeric inputs for Attack / Decay / Sustain / Release / Floor / Scale
-  attackInput  = ensureInputAfter('attackTarget',  'attackMsInput',    '', 'type="number" min="0" max="12000" step="1"');
-  decayInput   = ensureInputAfter('decayTarget',   'decayMsInput',     '', 'type="number" min="0" max="12000" step="1"');
-  releaseInput = ensureInputAfter('releaseTarget', 'releaseMsInput',   '', 'type="number" min="0" max="12000" step="1"');
+  attackInput  = ensureInputAfter('attackTarget',  'attackMsInput',    '', `type="number" min="0" max="${MAX_TIME_MS}" step="1"`);
+  decayInput   = ensureInputAfter('decayTarget',   'decayMsInput',     '', `type="number" min="0" max="${MAX_TIME_MS}" step="1"`);
+  releaseInput = ensureInputAfter('releaseTarget', 'releaseMsInput',   '', `type="number" min="0" max="${MAX_TIME_MS}" step="1"`);
   sustainInput = ensureInputAfter('sustainTarget', 'sustainScaleInput','', 'type="number" min="0" max="10" step="0.1"');
   floorInput   = ensureInputAfter('floorTarget',   'floorScaleInput',  '', 'type="number" min="0" max="10" step="0.1"');
   scaleInput   = ensureInputAfter('scaleTarget',   'scaleScaleInput',  '', 'type="number" min="0" max="10" step="0.1"');
