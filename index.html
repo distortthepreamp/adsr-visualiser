@@ -126,7 +126,7 @@
 
   /* quickset buttons */
   .quickset-btn {
-    padding: 4px 7px;
+    padding: 3px 7px;
     min-height: unset;
     line-height: 1.1;
     border-radius: 6px;
@@ -289,10 +289,6 @@
     <div class="panel">
       <div id="presetBtns" style="display:grid;grid-template-columns:repeat(13,1fr);gap:4px;margin-bottom:2px"></div>
       <div class="row" style="gap:4px;margin:2px 0;justify-content:space-between">
-        <div style="display:flex;gap:4px">
-          <button id="exportPresetsBtn" style="padding:3px 6px">Export</button>
-          <button id="importPresetsBtn" style="padding:3px 6px">Import</button>
-        </div>
         <span id="presetName" style="opacity:.85"></span>
       </div>
       <div class="knobs">
@@ -470,24 +466,27 @@
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:10px;align-items:center;flex-wrap:wrap">
         <label><input id="audioEnabled" type="checkbox" checked> A — Audio</label>
-        <div id="noteRow" style="display:flex;gap:4px;align-items:center;flex-wrap:wrap">
+        <div id="noteRow" style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;position:relative;">
           <button id="noteE1Btn">E1</button>
           <button id="noteE2Btn">E2</button>
           <button id="noteC4Btn">C4</button>
           <button id="noteA4Btn">A4</button>
           <button id="noteCustomToggle">Custom</button>
+          <button id="audioHelpBtn" title="Help" style="font-size:13px;font-weight:800;width:24px;height:24px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.6);background:rgba(0,0,0,.3);color:#fff;cursor:pointer;line-height:1;flex-shrink:0">?</button>
         </div>
       </div>
       <div id="noteCustomRow" style="display:none" class="row">
         <label>Hz <input id="noteCustomHz" type="number" min="20" max="20000" step="0.1" value="440"></label>
       </div>
-      <div class="hint">Tap releases after the chosen gate time. Attack, Decay and Release are shown as white strokes with soft colour centres. Sustain is a chunky rightward dotted level guide.</div>
+      <div id="audioHelpText" class="hint" style="display:none;position:absolute;bottom:calc(100% + 6px);right:0;background:#1c1c1c;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:8px;z-index:100;min-width:260px;max-width:320px;line-height:1.4;">Tap releases after the chosen gate time. Attack, Decay and Release are shown as white strokes with soft colour centres. Sustain is a chunky rightward dotted level guide.</div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div id="configBtns" style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:2px"></div>
       <div class="row" style="gap:4px;margin:2px 0;justify-content:space-between">
         <div style="display:flex;gap:4px">
-          <button id="exportConfigsBtn" style="padding:3px 6px">Export</button>
-          <button id="importConfigsBtn" style="padding:3px 6px">Import</button>
+          <button id="exportConfigsBtn" style="padding:3px 6px">Save Config</button>
+          <button id="importConfigsBtn" style="padding:3px 6px">Load Config</button>
+          <button id="exportPresetsBtn" style="padding:3px 6px">Save Presets</button>
+          <button id="importPresetsBtn" style="padding:3px 6px">Load Presets</button>
         </div>
         <span id="configName" style="font-size:13px;font-weight:700;opacity:.85"></span>
       </div>
@@ -2573,6 +2572,12 @@ Object.entries(noteFreqs).forEach(([btnId, freq]) => {
   const btn = $(btnId);
   if(btn) btn.addEventListener('click', () => { setNoteMode(btnId, freq); });
 });
+function openAudioHelp(){ $('audioHelpText').style.display='block'; }
+function closeAudioHelp(){ $('audioHelpText').style.display='none'; }
+function isAudioHelpOpen(){ return $('audioHelpText').style.display !== 'none'; }
+$('audioHelpBtn').addEventListener('click', e => { e.stopPropagation(); isAudioHelpOpen() ? closeAudioHelp() : openAudioHelp(); });
+$('audioHelpText').addEventListener('click', e => e.stopPropagation());
+document.addEventListener('click', () => { if(isAudioHelpOpen()) closeAudioHelp(); });
 $('noteCustomToggle') && $('noteCustomToggle').addEventListener('click', () => {
   const hz = Number($('noteCustomHz').value) || 440;
   setNoteMode('noteCustomToggle', hz);
