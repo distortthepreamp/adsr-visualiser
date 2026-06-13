@@ -377,6 +377,7 @@
 <script src="presets-logic.js"></script>
 <script src="configs-logic.js"></script>
 <script src="ui-controls.js"></script>
+<script src="shortcuts.js"></script>
 <script>
 
 const STATUS_DIM_OPACITY = 0.65;
@@ -437,6 +438,7 @@ function recalcGeometry(){
 initPresetsLogic();
 initConfigsLogic();
 initUIControls();
+initShortcuts();
 
 // Default mode: Animate
 document.querySelector('input[name="mode"][value="animate"]').checked = true;
