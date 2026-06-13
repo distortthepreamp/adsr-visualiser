@@ -1464,7 +1464,13 @@ function setFromSlider(){
 }
 ['attack','decay','release'].forEach(id=>$(id).addEventListener('input',()=>{ if(currentMode()==='live') clearBlobAndMarker(); setFromSlider(); if(window.markPresetDirty) markPresetDirty(); }));
 $('sustain').addEventListener('input',()=>{ setFromSlider(); if(window.markPresetDirty) markPresetDirty(); });
-['floor','scale'].forEach(id=>$(id).addEventListener('input',()=>{ setFromSlider(); if(window.markPresetDirty) markPresetDirty(); }));
+['floor','scale'].forEach(id=>$(id).addEventListener('input',()=>{
+  const mode=document.querySelector('input[name="mode"]:checked').value;
+  const dest=mode==='live' ? state : state.target;
+  dest.floor=$('floor').value/1000; dest.scale=$('scale').value/1000;
+  if(mode==='live') { state.target={...state.target,floor:state.floor,scale:state.scale}; render(); } else syncControls();
+  if(window.markPresetDirty) markPresetDirty();
+}));
 document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) state.target={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale,tbSustainGap:state.tbSustainGap}; syncControls(); }));
 ['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine'].forEach(id=>$(id).addEventListener('change',render));
 $('tbSustainCollapse').addEventListener('change', () => {
