@@ -1,6 +1,8 @@
 // ---- paths.js — SVG path building, knob sync, and the render() coordinator ----
 // Depends on geometry.js (clamp, yFor, computePoints, etc.) being loaded first.
 
+const KC_SUSTAIN_SCALE = KC_SUSTAIN_SCALE; // inverse of the 0.8 keyboard-control sustain cap (1/0.8)
+
 function syncKnobColours(freqMode){
   const KNOB_RED    = 'radial-gradient(circle at 36% 30%, #aa1111, #660808 68%, #220000 100%)';
   const KNOB_CYAN   = 'radial-gradient(circle at 36% 30%, #00bbcc, #006677 68%, #001f22 100%)';
@@ -228,9 +230,9 @@ function render(){
   if(statedSustainLineEl){
     if(kcOn && !textbookAdsr){
       const floorY = yFor(pts.e.floor);
-      const statedY = floorY - (floorY - drawPS.y) * 1.25;
+      const statedY = floorY - (floorY - drawPS.y) * KC_SUSTAIN_SCALE;
       const decayPathEl = document.getElementById('decayOuter');
-      statedSustainX = pts.p1.x + (drawPS.x - pts.p1.x) * 1.25; // geometric fallback
+      statedSustainX = pts.p1.x + (drawPS.x - pts.p1.x) * KC_SUSTAIN_SCALE; // geometric fallback
       if(decayPathEl){
         let lo = pts.p1.x, hi = drawPS.x;
         for(let i = 0; i < 32; i++){

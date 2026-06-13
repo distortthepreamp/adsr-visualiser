@@ -1,19 +1,21 @@
 // ---- Time axis labels and drop lines ----
 // Called from render() with pre-computed geometry values.
+const TIME_AXIS_EFF_OFFSET_Y    = 40; // px below graph.y0 for the effective-times row
+const TIME_AXIS_STATED_OFFSET_Y = 80; // px below graph.y0 for the stated-times row
 function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, linearTimeOn, drawPS, statedSustainX) {
   const e = pts.e;
   const timeAxis0El=$('timeAxis0');
   const showEffective=!!($('showEffectiveTimes')&&$('showEffectiveTimes').checked);
   const showStated=!!($('showStatedTimes')&&$('showStatedTimes').checked);
-  const taY=graph.y0+40;
+  const taY=graph.y0+TIME_AXIS_EFF_OFFSET_Y;
   const showEffectiveVisible=showEffective&&!textbookAdsr;
   if(timeAxis0El){ timeAxis0El.setAttribute('x',graph.x0); timeAxis0El.setAttribute('y',taY); timeAxis0El.style.display=showEffectiveVisible?'':'none'; timeAxis0El.style.opacity=showEffectiveVisible?'1':''; }
   const timeAxis0StatedEl=$('timeAxis0Stated');
-  if(timeAxis0StatedEl){ timeAxis0StatedEl.setAttribute('x',graph.x0); timeAxis0StatedEl.setAttribute('y',graph.y0+80); timeAxis0StatedEl.style.display=showStated?'':'none'; timeAxis0StatedEl.style.opacity=showStated?'1':''; }
+  if(timeAxis0StatedEl){ timeAxis0StatedEl.setAttribute('x',graph.x0); timeAxis0StatedEl.setAttribute('y',graph.y0+TIME_AXIS_STATED_OFFSET_Y); timeAxis0StatedEl.style.display=showStated?'':'none'; timeAxis0StatedEl.style.opacity=showStated?'1':''; }
   const taEffLabelEl=$('timeAxisEffectiveLabel');
   if(taEffLabelEl){ taEffLabelEl.setAttribute('x',10); taEffLabelEl.setAttribute('y',taY); taEffLabelEl.style.display=showEffectiveVisible?'':'none'; taEffLabelEl.style.opacity=showEffectiveVisible?'1':''; }
   const taStatedLabelEl=$('timeAxisStatedLabel');
-  if(taStatedLabelEl){ taStatedLabelEl.setAttribute('x',10); taStatedLabelEl.setAttribute('y',graph.y0+80); taStatedLabelEl.style.display=showStated?'':'none'; taStatedLabelEl.style.opacity=showStated?'1':''; }
+  if(taStatedLabelEl){ taStatedLabelEl.setAttribute('x',10); taStatedLabelEl.setAttribute('y',graph.y0+TIME_AXIS_STATED_OFFSET_Y); taStatedLabelEl.style.display=showStated?'':'none'; taStatedLabelEl.style.opacity=showStated?'1':''; }
   const timeAxisAttackEl=$('timeAxisAttack');
   if(timeAxisAttackEl){
     let taAttackX, taAttackMs;
@@ -35,7 +37,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   const timeAxisAttackStatedEl=$('timeAxisAttackStated');
   if(timeAxisAttackStatedEl){
     if(showStated){
-      timeAxisAttackStatedEl.setAttribute('x',pts.p1.x); timeAxisAttackStatedEl.setAttribute('y',graph.y0+80);
+      timeAxisAttackStatedEl.setAttribute('x',pts.p1.x); timeAxisAttackStatedEl.setAttribute('y',graph.y0+TIME_AXIS_STATED_OFFSET_Y);
       timeAxisAttackStatedEl.textContent=Math.round(e.aT*1000)+' ms';
       timeAxisAttackStatedEl.style.display=''; timeAxisAttackStatedEl.style.opacity='1';
     } else {
@@ -60,7 +62,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
     const showDecayEnd=showStated&&(textbookAdsr||e.releaseOn);
     if(showDecayEnd){
       const decayEndX=pts.pEnd.x;
-      taDecayEndEl.setAttribute('x',decayEndX); taDecayEndEl.setAttribute('y',graph.y0+80);
+      taDecayEndEl.setAttribute('x',decayEndX); taDecayEndEl.setAttribute('y',graph.y0+TIME_AXIS_STATED_OFFSET_Y);
       taDecayEndEl.textContent=Math.round((e.aT+e.dT)*1000)+' ms';
       taDecayEndEl.style.display=''; taDecayEndEl.style.opacity='1';
     } else {
@@ -90,7 +92,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       const stDecayEndX=textbookAdsr?pts.pEnd.x:statedSustainX;
       const stDecayFraction=textbookAdsr?1:Math.max(0,(statedSustainX-pts.p1.x)/(pts.dwFull||1));
       const stDecayEndMs=Math.round((e.aT+e.dT*stDecayFraction)*1000);
-      taDecayEndStatedEl.setAttribute('x',stDecayEndX); taDecayEndStatedEl.setAttribute('y',graph.y0+80);
+      taDecayEndStatedEl.setAttribute('x',stDecayEndX); taDecayEndStatedEl.setAttribute('y',graph.y0+TIME_AXIS_STATED_OFFSET_Y);
       taDecayEndStatedEl.textContent=stDecayEndMs+' ms';
       taDecayEndStatedEl.style.display=''; taDecayEndStatedEl.style.opacity='1';
     } else {
@@ -122,7 +124,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
     }
     if(taReleaseEndStatedEl){
       if(showStated){
-        taReleaseEndStatedEl.setAttribute('x',releaseEndX); taReleaseEndStatedEl.setAttribute('y',graph.y0+80);
+        taReleaseEndStatedEl.setAttribute('x',releaseEndX); taReleaseEndStatedEl.setAttribute('y',graph.y0+TIME_AXIS_STATED_OFFSET_Y);
         taReleaseEndStatedEl.textContent=releaseEndMs+' ms';
         taReleaseEndStatedEl.style.display=''; taReleaseEndStatedEl.style.opacity='1';
       } else { taReleaseEndStatedEl.style.display='none'; taReleaseEndStatedEl.style.opacity=''; }
@@ -136,7 +138,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
     if(taReleaseStartEl){ taReleaseStartEl.style.display='none'; taReleaseStartEl.style.opacity=''; }
     if(taReleaseStartStatedEl){
       if(showStated&&textbookAdsr){
-        taReleaseStartStatedEl.setAttribute('x',tbSusEndX); taReleaseStartStatedEl.setAttribute('y',graph.y0+80);
+        taReleaseStartStatedEl.setAttribute('x',tbSusEndX); taReleaseStartStatedEl.setAttribute('y',graph.y0+TIME_AXIS_STATED_OFFSET_Y);
         taReleaseStartStatedEl.textContent=releaseStartMs+' ms';
         taReleaseStartStatedEl.style.display=''; taReleaseStartStatedEl.style.opacity='1';
       } else { taReleaseStartStatedEl.style.display='none'; taReleaseStartStatedEl.style.opacity=''; }

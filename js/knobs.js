@@ -3,7 +3,9 @@
 // patchSustainReadouts, fmtScaleValue, formatSustainScale, syncTargetToLive,
 // commitTime, commitSustain, commitFloor, commitScale, addPointerFeedback
 
-const MAX_TIME_MS = 12000; // maximum ms value for attack/decay/release inputs
+const MAX_TIME_MS = 12000;       // maximum ms value for attack/decay/release inputs
+const KNOB_DRAG_PX_RANGE = 200;          // px of vertical drag that spans the full 0–1 knob range
+const BTN_PRESS_RELEASE_DELAY_MS = 120;  // ms before removing the pressed visual state from a button
 
 (function(){
 
@@ -161,7 +163,7 @@ function addPointerFeedback(){
     if (btn.__v28PointerFeedback) return;
     btn.__v28PointerFeedback = true;
     function press(){ btn.classList.add('v28-pressed'); }
-    function release(){ setTimeout(() => btn.classList.remove('v28-pressed'), 120); }
+    function release(){ setTimeout(() => btn.classList.remove('v28-pressed'), BTN_PRESS_RELEASE_DELAY_MS); }
     btn.addEventListener('pointerdown', press, true);
     btn.addEventListener('mousedown', press, true);
     btn.addEventListener('pointerup', release, true);
@@ -245,7 +247,7 @@ function initKnobs(){
     knob.addEventListener('pointermove', e => {
       if (!knob.hasPointerCapture(e.pointerId)) return;
       const delta  = startY - e.clientY;
-      const newVal = clamp(startVal + delta / 200);
+      const newVal = clamp(startVal + delta / KNOB_DRAG_PX_RANGE);
       const mode   = currentMode();
       if (mode === 'live') {
         if (isTime) clearBlobAndMarker();

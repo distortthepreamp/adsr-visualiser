@@ -130,8 +130,8 @@ function loadConfigObject(cfg){
   if($('meterWidth') && cfg.meterWidth !== undefined){ $('meterWidth').value = cfg.meterWidth; METER_W = Math.max(10, Math.min(80, Number(cfg.meterWidth) || 40)); }
   if($('meterStrokeWidth') && cfg.meterStrokeWidth !== undefined){ $('meterStrokeWidth').value = cfg.meterStrokeWidth; METER_STROKE_W = Math.max(1, Math.min(20, Number(cfg.meterStrokeWidth) || 7)); }
   if($('tbSustainGapMax') && cfg.tbSustainGapMax !== undefined){ $('tbSustainGapMax').value = cfg.tbSustainGapMax; SUSTAIN_GAP_MAX = Math.max(0.15, Math.min(0.30, (Number(cfg.tbSustainGapMax) || 15) / 100)); }
-  if($('vbWidth')  && cfg.vbWidth  !== undefined){ $('vbWidth').value  = Math.round(Math.min(2400, Math.max(800,  Number(cfg.vbWidth)  || 1200)) / 10) * 10; }
-  if($('vbHeight') && cfg.vbHeight !== undefined){ $('vbHeight').value = Math.round(Math.min(1200, Math.max(400,  Number(cfg.vbHeight) || 595))  / 10) * 10; }
+  if($('vbWidth')  && cfg.vbWidth  !== undefined){ $('vbWidth').value  = Math.round(Math.min(VB_WIDTH_MAX, Math.max(VB_WIDTH_MIN,  Number(cfg.vbWidth)  || 1200)) / 10) * 10; }
+  if($('vbHeight') && cfg.vbHeight !== undefined){ $('vbHeight').value = Math.round(Math.min(VB_HEIGHT_MAX, Math.max(VB_HEIGHT_MIN,  Number(cfg.vbHeight) || 595))  / 10) * 10; }
   VB_WIDTH   = Number(document.getElementById('vbWidth').value);
   VB_HEIGHT  = Number(document.getElementById('vbHeight').value);
   if($('graphLeft') && cfg.graphLeft !== undefined){ $('graphLeft').value = Math.round(Math.min(400,Math.max(80,Number(cfg.graphLeft)||220))/10)*10; }
@@ -195,7 +195,7 @@ function initConfigsLogic(){
     if(activeConfigBtn){ activeConfigBtn.style.background = ''; activeConfigBtn.style.color = ''; }
     const btns = container.querySelectorAll('button');
     activeConfigBtn = btns[idx] || null;
-    if(activeConfigBtn){ activeConfigBtn.style.background = '#ffffff'; activeConfigBtn.style.color = '#111111'; }
+    if(activeConfigBtn){ activeConfigBtn.style.background = BTN_ACTIVE_BG; activeConfigBtn.style.color = BTN_ACTIVE_FG; }
     activeConfigIndex = idx;
     updateConfigNameDisplay(cfg);
     loadConfigObject(cfg);

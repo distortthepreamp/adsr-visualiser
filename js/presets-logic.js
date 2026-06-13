@@ -23,7 +23,7 @@ function initPresetsLogic(){
   window.markPresetDirty = function(){
     if(window.presetDirtyState !== 'clean') return;
     window.presetDirtyState = 'dirty';
-    if(activeBtn){ activeBtn.style.background = 'rgba(255,255,255,0.35)'; activeBtn.style.color = '#ffffff'; }
+    if(activeBtn){ activeBtn.style.background = BTN_PARTIAL_BG; activeBtn.style.color = '#ffffff'; }
   };
 
   function savePresetsToStorage(){
@@ -57,7 +57,7 @@ function initPresetsLogic(){
     if(activeBtn){ activeBtn.style.background = ''; activeBtn.style.color = ''; }
     const btns = container.querySelectorAll('button');
     activeBtn = btns[idx] || null;
-    if(activeBtn){ activeBtn.style.background = '#ffffff'; activeBtn.style.color = '#111111'; }
+    if(activeBtn){ activeBtn.style.background = BTN_ACTIVE_BG; activeBtn.style.color = BTN_ACTIVE_FG; }
     activePresetIndex = idx;
     window.presetDirtyState = 'clean';
     updatePresetNameDisplay(preset);
@@ -83,8 +83,8 @@ function initPresetsLogic(){
       const btns = container.querySelectorAll('button');
       activeBtn = btns[idx] || null;
       if(activeBtn){
-        if(dirtyState === 'dirty'){ activeBtn.style.background = 'rgba(255,255,255,0.35)'; activeBtn.style.color = '#ffffff'; }
-        else { activeBtn.style.background = '#ffffff'; activeBtn.style.color = '#111111'; }
+        if(dirtyState === 'dirty'){ activeBtn.style.background = BTN_PARTIAL_BG; activeBtn.style.color = '#ffffff'; }
+        else { activeBtn.style.background = BTN_ACTIVE_BG; activeBtn.style.color = BTN_ACTIVE_FG; }
       }
       updatePresetNameDisplay(PRESETS[idx]);
     } else {

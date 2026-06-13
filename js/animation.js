@@ -3,6 +3,9 @@ let animationToken = 0;
 let releaseStartPoint = null;
 // glowPulseRaf is scoped inside the glow closure below
 const INSTANT_PHASE_THRESHOLD = 0.0005; // treat phases shorter than this as instant
+const PATH_BISECT_ITERATIONS  = 32;     // binary search depth for SVG path Y sampling
+const GLOW_PULSE_PERIOD_MS    = 400;    // period of the sustain blob glow pulse animation
+const MIN_RELEASE_MS          = 20;     // minimum release/decay animation duration in ms
 
 // ---- Point geometry helpers ----
 
@@ -88,7 +91,7 @@ function applyBlobGlow(){
     const t0=performance.now();
     function pulse(now){
       const r=blobGlowRadius();
-      const f=(Math.sin((now-t0)/400)+1)/2;
+      const f=(Math.sin((now-t0)/GLOW_PULSE_PERIOD_MS)+1)/2;
       feBlur.setAttribute('stdDeviation', r+f*r*2);
       glowPulseRaf=requestAnimationFrame(pulse);
     }
@@ -111,7 +114,7 @@ function getYFromPath(pathEl, targetX){
   const len = pathEl.getTotalLength();
   if(len === 0) return null;
   let lo = 0, hi = len;
-  for(let i = 0; i < 32; i++){
+  for(let i = 0; i < PATH_BISECT_ITERATIONS; i++){
     const mid = (lo + hi) / 2;
     const p = pathEl.getPointAtLength(mid);
     if(p.x < targetX) lo = mid; else hi = mid;
@@ -199,7 +202,7 @@ function releaseFromCurrent(){
       tbStart={x: tb.tbSustainEnd.x, y: sY};
     }
     const end={x:tb.tbReleaseEnd.x, y:fY, level:0};
-    const dur=Math.max(20,e.rT*1000);
+    const dur=Math.max(MIN_RELEASE_MS,e.rT*1000);
     const t0=performance.now();
     state.currentPhase='release';
     setDot({x:tbStart.x, y:tbStart.y, level:startLevel, phase:'sustain'}, true);
@@ -232,7 +235,7 @@ function releaseFromCurrent(){
   const tSlope = (slopeY !== 0) ? remainingY / slopeY : 1;
   const endX = pts.pS.x + slopeX * tSlope;
   const end = { x: endX, y: floorY, level: 0 };
-  const dur = Math.max(20, e.dT * startLevel * 1000);
+  const dur = Math.max(MIN_RELEASE_MS, e.dT * startLevel * 1000);
   // If gate ended before the release slope (mid-attack or before sustain), snap the
   // start position to the equivalent point on the release slope at startLevel.
   // This prevents the blob from traversing the attack or decay paths during release.

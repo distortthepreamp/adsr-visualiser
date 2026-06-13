@@ -4,6 +4,13 @@
 
 // ---- Shared UI constants ----
 const UI_DISABLED_OPACITY = '0.35';
+const VB_WIDTH_MAX  = 2400;
+const VB_WIDTH_MIN  = 800;
+const VB_HEIGHT_MAX = 1200;
+const VB_HEIGHT_MIN = 400;
+const BTN_ACTIVE_BG  = '#ffffff';
+const BTN_ACTIVE_FG  = '#111111';
+const BTN_PARTIAL_BG = 'rgba(255,255,255,0.35)';
 
 // ---- Transport modal state ----
 let tapMode = 'tap200';
@@ -51,9 +58,9 @@ function syncControls(){
       }
       btns.forEach((btn, i) => {
         if(exactIdx !== -1 && i === exactIdx){
-          btn.style.background = '#ffffff'; btn.style.color = '#111111';
+          btn.style.background = BTN_ACTIVE_BG; btn.style.color = BTN_ACTIVE_FG;
         } else if(exactIdx === -1 && i === closestIdx){
-          btn.style.background = 'rgba(255,255,255,0.35)'; btn.style.color = '#ffffff';
+          btn.style.background = BTN_PARTIAL_BG; btn.style.color = '#ffffff';
         } else {
           btn.style.background = ''; btn.style.color = '';
         }
@@ -101,7 +108,7 @@ function setTransMode(durSec, activeBtnId){
   if(durSec !== null) currentTransitionSec = durSec;
   activeTransBtn = activeBtnId;
   transBtns.forEach(id => { const b=$(id); if(b){ b.style.background=''; b.style.color=''; } });
-  const b=$(activeBtnId); if(b){ b.style.background='#ffffff'; b.style.color='#111111'; }
+  const b=$(activeBtnId); if(b){ b.style.background=BTN_ACTIVE_BG; b.style.color=BTN_ACTIVE_FG; }
   const row=$('customTransitionRow');
   if(row) row.style.display = activeBtnId==='transCustomToggle' ? '' : 'none';
 }
@@ -149,13 +156,13 @@ function setTapMode(mode, btnId){
   const tapModeBtns = ['tapMode50Btn','tapMode100Btn','tapMode200Btn','tap500Btn','tap1sBtn','tapModeCustomBtn','tapModeHoldBtn'];
   tapMode = mode;
   tapModeBtns.forEach(id => { const b=$(id); if(b){ b.style.background=''; b.style.color=''; } });
-  const b=$(btnId); if(b){ b.style.background='#ffffff'; b.style.color='#111111'; }
+  const b=$(btnId); if(b){ b.style.background=BTN_ACTIVE_BG; b.style.color=BTN_ACTIVE_FG; }
   const customRow=$('tapCustomRow');
   if(customRow) customRow.style.display = mode==='tapCustom' ? '' : 'none';
 }
 
 // ---- Advanced popup helpers ----
-function openAdvanced(){ $('advancedPopup').style.display=''; $('advancedToggle').style.background='#ffffff'; $('advancedToggle').style.color='#111111'; }
+function openAdvanced(){ $('advancedPopup').style.display=''; $('advancedToggle').style.background=BTN_ACTIVE_BG; $('advancedToggle').style.color=BTN_ACTIVE_FG; }
 function closeAdvanced(){ $('advancedPopup').style.display='none'; $('advancedToggle').style.background=''; $('advancedToggle').style.color=''; }
 function isAdvancedOpen(){ return $('advancedPopup').style.display !== 'none'; }
 
@@ -201,7 +208,7 @@ function flashButton(btn, isActive){
   btn.style.background = '#00ff88';
   btn.style.color = '#000';
   setTimeout(() => {
-    if(isActive()){ btn.style.background = '#ffffff'; btn.style.color = '#111111'; }
+    if(isActive()){ btn.style.background = BTN_ACTIVE_BG; btn.style.color = BTN_ACTIVE_FG; }
     else { btn.style.background = ''; btn.style.color = ''; }
   }, 600);
 }
@@ -306,8 +313,8 @@ function initUIControls(){
   $('meterWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(80,Math.max(10,isNaN(parseInt(inp.value))?40:parseInt(inp.value))); inp.value=c; METER_W=c; recalcGeometry(); render(); });
   $('meterStrokeWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(20,Math.max(1,isNaN(parseInt(inp.value))?7:parseInt(inp.value))); inp.value=c; METER_STROKE_W=c; render(); });
   $('tbSustainGapMax').addEventListener('input', e => { const inp=e.target,c=Math.min(30,Math.max(15,isNaN(parseInt(inp.value))?15:parseInt(inp.value))); inp.value=c; SUSTAIN_GAP_MAX=c/100; render(); });
-  $('vbWidth').addEventListener('change', e => { const inp=e.target,c=Math.round(Math.min(2400,Math.max(800,isNaN(parseInt(inp.value))?1200:parseInt(inp.value)))/10)*10; inp.value=c; VB_WIDTH=c; recalcGeometry(); render(); });
-  $('vbHeight').addEventListener('change', e => { const inp=e.target,c=Math.round(Math.min(1200,Math.max(400,isNaN(parseInt(inp.value))?595:parseInt(inp.value)))/10)*10; inp.value=c; VB_HEIGHT=c; recalcGeometry(); render(); });
+  $('vbWidth').addEventListener('change', e => { const inp=e.target,c=Math.round(Math.min(VB_WIDTH_MAX,Math.max(VB_WIDTH_MIN,isNaN(parseInt(inp.value))?1200:parseInt(inp.value)))/10)*10; inp.value=c; VB_WIDTH=c; recalcGeometry(); render(); });
+  $('vbHeight').addEventListener('change', e => { const inp=e.target,c=Math.round(Math.min(VB_HEIGHT_MAX,Math.max(VB_HEIGHT_MIN,isNaN(parseInt(inp.value))?595:parseInt(inp.value)))/10)*10; inp.value=c; VB_HEIGHT=c; recalcGeometry(); render(); });
   $('graphLeft').addEventListener('change', e => { const inp=e.target,c=Math.round(Math.min(400,Math.max(80,isNaN(parseInt(inp.value))?220:parseInt(inp.value)))/10)*10; inp.value=c; GRAPH_LEFT=c; recalcGeometry(); render(); });
 
   // Transition buttons

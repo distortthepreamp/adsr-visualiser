@@ -7,6 +7,7 @@
 let noteMode = 'noteA4Btn';
 const noteFreqs = { noteE1Btn: 41.2, noteE2Btn: 82.4, noteC4Btn: 261.6, noteA4Btn: 440 };
 const FILTER_OPEN_FREQUENCY = 20000; // Hz — fully open (bypassed) filter cutoff
+const MASTER_GAIN = 0.7;             // default master output gain
 
 (function(){
 
@@ -32,7 +33,7 @@ const FILTER_OPEN_FREQUENCY = 20000; // Hz — fully open (bypassed) filter cuto
   function setNoteMode(btnId, freq){
     noteMode = btnId;
     noteBtnIds.forEach(id => { const b=$(''+id); if(b){ b.style.background=''; b.style.color=''; } });
-    const b=$(''+btnId); if(b){ b.style.background='#ffffff'; b.style.color='#111111'; }
+    const b=$(''+btnId); if(b){ b.style.background=BTN_ACTIVE_BG; b.style.color=BTN_ACTIVE_FG; }
     const customRow=$('noteCustomRow');
     if(customRow) customRow.style.display = btnId==='noteCustomToggle' ? '' : 'none';
     if(freq !== null && osc) osc.frequency.value = freq;
@@ -55,7 +56,7 @@ const FILTER_OPEN_FREQUENCY = 20000; // Hz — fully open (bypassed) filter cuto
     vcaGain=audioCtx.createGain(); vcaGain.gain.value=0;
     filter1=audioCtx.createBiquadFilter(); filter1.type='lowpass'; filter1.frequency.value=FILTER_OPEN_FREQUENCY; filter1.Q.value=0;
     filter2=audioCtx.createBiquadFilter(); filter2.type='lowpass'; filter2.frequency.value=FILTER_OPEN_FREQUENCY; filter2.Q.value=0;
-    masterGain=audioCtx.createGain(); masterGain.gain.value=0.7;
+    masterGain=audioCtx.createGain(); masterGain.gain.value=MASTER_GAIN;
     osc.connect(vcaGain); vcaGain.connect(filter1); filter1.connect(filter2); filter2.connect(masterGain); masterGain.connect(audioCtx.destination);
     osc.start();
     audioReady=true;

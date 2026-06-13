@@ -1,6 +1,12 @@
 // ---- geometry.js — pure mathematical functions for the ADSR envelope ----
 // No DOM access. All functions are top-level globals, called by paths.js and others.
 
+// ---- displayTimeWidth curve coefficients ----
+const DISPLAY_SHORTBOOST_AMP = 38;    // amplitude of the exponential short-value boost
+const DISPLAY_SHORTBOOST_TC  = 0.012; // time constant of the short-value boost (seconds)
+const DISPLAY_LOG_AMP        = 245;   // amplitude of the logarithmic long-value component
+const DISPLAY_LOG_SCALE      = 6.5;   // horizontal scale of the logarithmic component
+
 function clamp(v,min=0,max=1){ return Math.max(min, Math.min(max, v)); }
 function easeInOut(t){ return t<0.5 ? 2*t*t : -1+(4-2*t)*t; }
 function mapTime(p){
@@ -36,8 +42,8 @@ function displayTimeWidth(t){
   // to avoid an initial jump when transitioning away from zero.
   t = Math.max(0, t);
   if(t === 0) return 0;
-  const shortBoost = 38 * (1 - Math.exp(-t / 0.012));
-  return shortBoost + 245 * Math.log10(1 + 6.5 * t);
+  const shortBoost = DISPLAY_SHORTBOOST_AMP * (1 - Math.exp(-t / DISPLAY_SHORTBOOST_TC));
+  return shortBoost + DISPLAY_LOG_AMP * Math.log10(1 + DISPLAY_LOG_SCALE * t);
 }
 function getEffective(){
   const aT=mapTime(state.a), dT=mapTime(state.d);
