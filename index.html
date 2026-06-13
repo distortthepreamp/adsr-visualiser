@@ -1181,14 +1181,14 @@ function render(){
       taAttackMs=Math.round(e.aT*1000);
     }
     timeAxisAttackEl.setAttribute('x',taAttackX); timeAxisAttackEl.setAttribute('y',taY);
-    timeAxisAttackEl.textContent=taAttackMs;
+    timeAxisAttackEl.textContent=taAttackMs+' ms';
     timeAxisAttackEl.style.display=showEffectiveVisible?'':'none'; timeAxisAttackEl.style.opacity=showEffectiveVisible?'1':'';
   }
   const timeAxisAttackStatedEl=$('timeAxisAttackStated');
   if(timeAxisAttackStatedEl){
     if(showStated){
       timeAxisAttackStatedEl.setAttribute('x',pts.p1.x); timeAxisAttackStatedEl.setAttribute('y',graph.y0+80);
-      timeAxisAttackStatedEl.textContent=Math.round(e.aT*1000);
+      timeAxisAttackStatedEl.textContent=Math.round(e.aT*1000)+' ms';
       timeAxisAttackStatedEl.style.display=''; timeAxisAttackStatedEl.style.opacity='1';
     } else {
       timeAxisAttackStatedEl.style.display='none'; timeAxisAttackStatedEl.style.opacity='';
@@ -1204,7 +1204,7 @@ function render(){
       const f_d=(e.floor+e.scale-1)/e.scale;
       const ceilDecayX=pts.p1.x+(pts.pEnd.x-pts.p1.x)*f_d;
       taDecayStartEl.setAttribute('x',ceilDecayX); taDecayStartEl.setAttribute('y',taY);
-      taDecayStartEl.textContent=Math.round((e.aT*f_a+e.dT*f_d)*1000);
+      taDecayStartEl.textContent=Math.round((e.aT+e.dT*f_d)*1000)+' ms';
       taDecayStartEl.style.display=''; taDecayStartEl.style.opacity='1';
     } else {
       taDecayStartEl.style.display='none'; taDecayStartEl.style.opacity='';
@@ -1214,7 +1214,7 @@ function render(){
     if(showDecayEnd){
       const decayEndX=pts.pEnd.x;
       taDecayEndEl.setAttribute('x',decayEndX); taDecayEndEl.setAttribute('y',graph.y0+80);
-      taDecayEndEl.textContent=Math.round((e.aT+e.dT)*1000);
+      taDecayEndEl.textContent=Math.round((e.aT+e.dT)*1000)+' ms';
       taDecayEndEl.style.display=''; taDecayEndEl.style.opacity='1';
     } else {
       taDecayEndEl.style.display='none'; taDecayEndEl.style.opacity='';
@@ -1229,7 +1229,7 @@ function render(){
       const effDecayFraction=textbookAdsr?1:Math.max(0,(drawPS.x-pts.p1.x)/(pts.dwFull||1));
       const effDecayEndMs=Math.round((e.aT+e.dT*effDecayFraction)*1000);
       taDecayEndEffEl.setAttribute('x',effDecayEndX); taDecayEndEffEl.setAttribute('y',taY);
-      taDecayEndEffEl.textContent=effDecayEndMs;
+      taDecayEndEffEl.textContent=effDecayEndMs+' ms';
       taDecayEndEffEl.style.display=''; taDecayEndEffEl.style.opacity='1';
     } else {
       taDecayEndEffEl.style.display='none'; taDecayEndEffEl.style.opacity='';
@@ -1244,7 +1244,7 @@ function render(){
       const stDecayFraction=textbookAdsr?1:Math.max(0,(statedSustainX-pts.p1.x)/(pts.dwFull||1));
       const stDecayEndMs=Math.round((e.aT+e.dT*stDecayFraction)*1000);
       taDecayEndStatedEl.setAttribute('x',stDecayEndX); taDecayEndStatedEl.setAttribute('y',graph.y0+80);
-      taDecayEndStatedEl.textContent=stDecayEndMs;
+      taDecayEndStatedEl.textContent=stDecayEndMs+' ms';
       taDecayEndStatedEl.style.display=''; taDecayEndStatedEl.style.opacity='1';
     } else {
       taDecayEndStatedEl.style.display='none'; taDecayEndStatedEl.style.opacity='';
@@ -1275,14 +1275,14 @@ function render(){
       const showReleaseEnd=showEffectiveVisible&&e.releaseOn;
       if(showReleaseEnd){
         taReleaseEndEl.setAttribute('x',releaseEndX); taReleaseEndEl.setAttribute('y',taY);
-        taReleaseEndEl.textContent=releaseEndMs;
+        taReleaseEndEl.textContent=releaseEndMs+' ms';
         taReleaseEndEl.style.display=''; taReleaseEndEl.style.opacity='1';
       } else { taReleaseEndEl.style.display='none'; taReleaseEndEl.style.opacity=''; }
     }
     if(taReleaseEndStatedEl){
       if(showStated){
         taReleaseEndStatedEl.setAttribute('x',releaseEndX); taReleaseEndStatedEl.setAttribute('y',graph.y0+80);
-        taReleaseEndStatedEl.textContent=releaseEndMs;
+        taReleaseEndStatedEl.textContent=releaseEndMs+' ms';
         taReleaseEndStatedEl.style.display=''; taReleaseEndStatedEl.style.opacity='1';
       } else { taReleaseEndStatedEl.style.display='none'; taReleaseEndStatedEl.style.opacity=''; }
     }
@@ -1295,14 +1295,14 @@ function render(){
     if(taReleaseStartEl){
       if(false){
         taReleaseStartEl.setAttribute('x',tbSusEndX); taReleaseStartEl.setAttribute('y',taY);
-        taReleaseStartEl.textContent=releaseStartMs;
+        taReleaseStartEl.textContent=releaseStartMs+' ms';
         taReleaseStartEl.style.display=''; taReleaseStartEl.style.opacity='1';
       } else { taReleaseStartEl.style.display='none'; taReleaseStartEl.style.opacity=''; }
     }
     if(taReleaseStartStatedEl){
       if(showStated&&textbookAdsr){
         taReleaseStartStatedEl.setAttribute('x',tbSusEndX); taReleaseStartStatedEl.setAttribute('y',graph.y0+80);
-        taReleaseStartStatedEl.textContent=releaseStartMs;
+        taReleaseStartStatedEl.textContent=releaseStartMs+' ms';
         taReleaseStartStatedEl.style.display=''; taReleaseStartStatedEl.style.opacity='1';
       } else { taReleaseStartStatedEl.style.display='none'; taReleaseStartStatedEl.style.opacity=''; }
     }
