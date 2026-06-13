@@ -213,13 +213,7 @@ function initConfigsLogic(){
     Object.assign(cfg, snapshot);
     saveConfigsToStorage();
     const btn = container.querySelectorAll('button')[idx];
-    if(btn){
-      btn.style.background = '#00ff88'; btn.style.color = '#000';
-      setTimeout(() => {
-        if(activeConfigIndex === idx){ btn.style.background = '#ffffff'; btn.style.color = '#111111'; }
-        else { btn.style.background = ''; btn.style.color = ''; }
-      }, 600);
-    }
+    if(btn) flashButton(btn, () => activeConfigIndex === idx);
     if(activeConfigIndex === idx) updateConfigNameDisplay(cfg);
   }
 
@@ -240,38 +234,16 @@ function initConfigsLogic(){
   }
   buildButtons();
 
-  function attachConfigNameEdit(){
-    const el = $('configName');
-    if(!el || el.tagName !== 'SPAN') return;
-    el.style.cursor = 'text';
-    el.title = 'Click to rename';
-    el.onclick = () => {
-      if(activeConfigIndex < 0) return;
-      const cfg = CONFIGS[activeConfigIndex];
-      const inp = document.createElement('input');
-      inp.type = 'text'; inp.value = cfg.label;
-      inp.style.cssText = 'font-size:13px;font-weight:700;background:rgba(0,0,0,.5);color:#fff;border:1px solid rgba(255,255,255,.7);border-radius:4px;padding:1px 5px;width:130px;outline:none';
-      el.replaceWith(inp); inp.id = 'configName'; inp.focus(); inp.select();
-      let committed = false;
-      function save(){
-        if(committed) return; committed = true;
-        const newLabel = inp.value.trim() || cfg.label;
-        cfg.label = newLabel; saveConfigsToStorage();
-        const span = document.createElement('span');
-        span.id = 'configName'; span.style.cssText = 'font-size:13px;font-weight:700;opacity:.85';
-        span.textContent = `${cfg.name}: ${newLabel}`; inp.replaceWith(span); attachConfigNameEdit();
-      }
-      function revert(){
-        if(committed) return; committed = true;
-        const span = document.createElement('span');
-        span.id = 'configName'; span.style.cssText = 'font-size:13px;font-weight:700;opacity:.85';
-        span.textContent = `${cfg.name}: ${cfg.label}`; inp.replaceWith(span); attachConfigNameEdit();
-      }
-      inp.addEventListener('keydown', e => { if(e.key==='Enter'){save();e.preventDefault();} else if(e.key==='Escape') revert(); });
-      inp.addEventListener('blur', save);
-    };
-  }
-  attachConfigNameEdit();
+  attachNameEdit('configName', newLabel => {
+    if(newLabel === null){
+      if(activeConfigIndex < 0) return null;
+      return { label: CONFIGS[activeConfigIndex].label };
+    }
+    const cfg = CONFIGS[activeConfigIndex];
+    cfg.label = newLabel;
+    saveConfigsToStorage();
+    return `${cfg.name}: ${newLabel}`;
+  });
 
   $('exportConfigsBtn').addEventListener('click', () => {
     const blob = new Blob([JSON.stringify(CONFIGS, null, 2)], {type:'application/json'});

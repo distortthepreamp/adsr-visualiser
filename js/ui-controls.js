@@ -180,6 +180,61 @@ function syncConsoleScale(){
   if(uiEl){ uiEl.style.transform = `scale(${s})`; uiEl.style.width = `${(1/s)*100}%`; }
 }
 
+// ---- Shared flash-green button feedback ----
+function flashButton(btn, isActive){
+  btn.style.background = '#00ff88';
+  btn.style.color = '#000';
+  setTimeout(() => {
+    if(isActive()){ btn.style.background = '#ffffff'; btn.style.color = '#111111'; }
+    else { btn.style.background = ''; btn.style.color = ''; }
+  }, 600);
+}
+
+// ---- Shared inline name-edit widget ----
+// onSave(null)     → { label } to open the editor, or null to abort (guard)
+// onSave(newLabel) → string display text to show in the span after committing
+function attachNameEdit(spanId, onSave){
+  const el = $(spanId);
+  if(!el || el.tagName !== 'SPAN') return;
+  el.style.cursor = 'text';
+  el.title = 'Click to rename';
+  el.onclick = () => {
+    const ctx = onSave(null);
+    if(!ctx) return;
+    const originalText = el.textContent;
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.value = ctx.label;
+    inp.style.cssText = 'font-size:13px;font-weight:700;background:rgba(0,0,0,.5);color:#fff;border:1px solid rgba(255,255,255,.7);border-radius:4px;padding:1px 5px;width:130px;outline:none';
+    el.replaceWith(inp);
+    inp.id = spanId;
+    inp.focus(); inp.select();
+    let committed = false;
+    function restoreSpan(text){
+      const span = document.createElement('span');
+      span.id = spanId;
+      span.style.cssText = 'font-size:13px;font-weight:700;opacity:.85';
+      span.textContent = text;
+      inp.replaceWith(span);
+      attachNameEdit(spanId, onSave);
+    }
+    function save(){
+      if(committed) return; committed = true;
+      const newLabel = inp.value.trim() || ctx.label;
+      restoreSpan(onSave(newLabel));
+    }
+    function revert(){
+      if(committed) return; committed = true;
+      restoreSpan(originalText);
+    }
+    inp.addEventListener('keydown', e => {
+      if(e.key === 'Enter'){ save(); e.preventDefault(); }
+      else if(e.key === 'Escape') revert();
+    });
+    inp.addEventListener('blur', save);
+  };
+}
+
 // ---- initUIControls — registers all event listeners; called from init ----
 function initUIControls(){
 

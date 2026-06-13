@@ -114,14 +114,7 @@ function initPresetsLogic(){
     savePresetsToStorage();
     // Flash green confirmation, then restore highlight state
     const btn = container.querySelectorAll('button')[idx];
-    if(btn){
-      btn.style.background = '#00ff88';
-      btn.style.color = '#000';
-      setTimeout(() => {
-        if(activePresetIndex === idx){ btn.style.background = '#ffffff'; btn.style.color = '#111111'; }
-        else { btn.style.background = ''; btn.style.color = ''; }
-      }, 600);
-    }
+    if(btn) flashButton(btn, () => activePresetIndex === idx);
     if(activePresetIndex === idx) updatePresetNameDisplay(preset);
   }
 
@@ -173,51 +166,16 @@ function initPresetsLogic(){
   });
 
   // Click-to-edit preset name display
-  function attachNameEdit(){
-    const el = $('presetName');
-    if(!el || el.tagName !== 'SPAN') return;
-    el.style.cursor = 'text';
-    el.title = 'Click to rename';
-    el.onclick = () => {
-      if(activePresetIndex < 0) return;
-      const preset = PRESETS[activePresetIndex];
-      const inp = document.createElement('input');
-      inp.type = 'text';
-      inp.value = preset.label;
-      inp.style.cssText = 'font-size:13px;font-weight:700;background:rgba(0,0,0,.5);color:#fff;border:1px solid rgba(255,255,255,.7);border-radius:4px;padding:1px 5px;width:130px;outline:none';
-      el.replaceWith(inp);
-      inp.id = 'presetName';
-      inp.focus(); inp.select();
-      let committed = false;
-      function save(){
-        if(committed) return; committed = true;
-        const newLabel = inp.value.trim() || preset.label;
-        preset.label = newLabel;
-        savePresetsToStorage();
-        const span = document.createElement('span');
-        span.id = 'presetName';
-        span.style.cssText = 'font-size:13px;font-weight:700;opacity:.85';
-        span.textContent = `${preset.name}: ${newLabel}`;
-        inp.replaceWith(span);
-        attachNameEdit();
-      }
-      function revert(){
-        if(committed) return; committed = true;
-        const span = document.createElement('span');
-        span.id = 'presetName';
-        span.style.cssText = 'font-size:13px;font-weight:700;opacity:.85';
-        span.textContent = `${preset.name}: ${preset.label}`;
-        inp.replaceWith(span);
-        attachNameEdit();
-      }
-      inp.addEventListener('keydown', e => {
-        if(e.key === 'Enter'){ save(); e.preventDefault(); }
-        else if(e.key === 'Escape') revert();
-      });
-      inp.addEventListener('blur', save);
-    };
-  }
-  attachNameEdit();
+  attachNameEdit('presetName', newLabel => {
+    if(newLabel === null){
+      if(activePresetIndex < 0) return null;
+      return { label: PRESETS[activePresetIndex].label };
+    }
+    const preset = PRESETS[activePresetIndex];
+    preset.label = newLabel;
+    savePresetsToStorage();
+    return `${preset.name}: ${newLabel}`;
+  });
 
   // Export presets as JSON file
   $('exportPresetsBtn').addEventListener('click', () => {
