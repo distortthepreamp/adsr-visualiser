@@ -111,6 +111,7 @@ function applyBlobGlow(){
 // ---- Path sampling ----
 
 function getYFromPath(pathEl, targetX){
+  if(!pathEl) return null;
   const len = pathEl.getTotalLength();
   if(len === 0) return null;
   let lo = 0, hi = len;
@@ -126,6 +127,7 @@ function getYFromPath(pathEl, targetX){
 
 function setDot(pt, visible=true){
   const dot=$('dot');
+  if(!dot) return;
   if(!visible){ hideDot(); return; }
   dot.style.visibility='visible';
   dot.setAttribute('cx',pt.x);

@@ -271,6 +271,7 @@ function initConfigsLogic(){
         } catch(err){ alert('Import failed: ' + err.message); }
         document.body.removeChild(inp);
       };
+      reader.onerror = () => alert('Failed to read file — please try again.');
       reader.readAsText(file);
     });
     inp.click();

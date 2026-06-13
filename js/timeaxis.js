@@ -23,7 +23,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       taAttackX=pts.p1.x;
       taAttackMs=Math.round(e.aT*1000);
     } else if(freqMode && showClipped && overrange){
-      const f_a=(1-e.floor)/e.scale;
+      const f_a=(1-e.floor)/e.scale; // e.scale > 0 guaranteed: overrange condition implies e.scale > 1-e.floor ≥ 0
       taAttackX=pts.p0.x+(pts.p1.x-pts.p0.x)*f_a;
       taAttackMs=Math.round(e.aT*f_a*1000);
     } else {
@@ -50,7 +50,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
     const showClipLabels=showEffectiveVisible&&freqMode&&showClipped&&overrange;
     // timeAxisDecayStart: clipping mode only — right edge of flat top (effective row)
     if(showClipLabels){
-      const f_d=(e.floor+e.scale-1)/e.scale;
+      const f_d=(e.floor+e.scale-1)/e.scale; // e.scale > 0 guaranteed: overrange condition implies e.scale > 1-e.floor ≥ 0
       const ceilDecayX=pts.p1.x+(pts.pEnd.x-pts.p1.x)*f_d;
       taDecayStartEl.setAttribute('x',ceilDecayX); taDecayStartEl.setAttribute('y',taY);
       taDecayStartEl.textContent=Math.round((e.aT+e.dT*f_d)*1000)+' ms';
