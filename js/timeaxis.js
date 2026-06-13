@@ -139,13 +139,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   if(taReleaseStartEl||taReleaseStartStatedEl){
     const tbSusEndX=textbookAdsr ? pts.pEnd.x+graph.w*state.tbSustainGap : 0;
     const releaseStartMs=Math.round((e.aT+e.dT)*1000);
-    if(taReleaseStartEl){
-      if(false){
-        taReleaseStartEl.setAttribute('x',tbSusEndX); taReleaseStartEl.setAttribute('y',taY);
-        taReleaseStartEl.textContent=releaseStartMs+' ms';
-        taReleaseStartEl.style.display=''; taReleaseStartEl.style.opacity='1';
-      } else { taReleaseStartEl.style.display='none'; taReleaseStartEl.style.opacity=''; }
-    }
+    if(taReleaseStartEl){ taReleaseStartEl.style.display='none'; taReleaseStartEl.style.opacity=''; }
     if(taReleaseStartStatedEl){
       if(showStated&&textbookAdsr){
         taReleaseStartStatedEl.setAttribute('x',tbSusEndX); taReleaseStartStatedEl.setAttribute('y',graph.y0+80);

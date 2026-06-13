@@ -155,7 +155,6 @@ function hideDot(){
 }
 
 function updateButtonStates(){
-  const phase = state.currentPhase;
 }
 
 // ---- setTapMode ----
@@ -194,30 +193,6 @@ function syncConsoleScale(){
   const s = Number($('consoleScale').value) || 0.7;
   const uiEl = document.querySelector('.ui');
   if(uiEl){ uiEl.style.transform = `scale(${s})`; uiEl.style.width = `${(1/s)*100}%`; }
-}
-
-// ---- Pointer feedback and axis cleanup ----
-function hideLikelyAxes(){
-  document.querySelectorAll('svg line, svg path, svg text').forEach(el => {
-    if (el.id === 'timeAxis0' || el.id === 'timeAxis0Stated' || el.id === 'timeAxisAttack' || el.id === 'timeAxisAttackStated' || el.id === 'timeAxisDecayStart' || el.id === 'timeAxisDecayEnd' || el.id === 'timeAxisDecayEndEffective' || el.id === 'timeAxisDecayEndStated' || el.id === 'timeAxisReleaseEnd' || el.id === 'timeAxisReleaseEndStated' || el.id === 'timeAxisReleaseStart' || el.id === 'timeAxisReleaseStartStated' || el.id === 'timeAxisEffectiveLabel' || el.id === 'timeAxisStatedLabel') return;
-    const idClass = ((el.id || '') + ' ' + (el.getAttribute('class') || '')).toLowerCase();
-    const text = (el.textContent || '').trim();
-    if (/axis|xaxis|yaxis|baseline|zero-line|reference-line/.test(idClass)) {
-      el.style.display = 'none'; el.style.opacity = '0'; return;
-    }
-    if (el.tagName.toLowerCase() === 'text') {
-      if (text === 'TIME' || text === 'AMPLITUDE' || text === '0' || text === '1.0') {
-        el.style.display = 'none'; el.style.opacity = '0';
-      }
-    }
-    if (el.tagName.toLowerCase() === 'line') {
-      const stroke = (el.getAttribute('stroke') || '').toLowerCase();
-      const op = Number(el.getAttribute('opacity') || el.style.opacity || 1);
-      if ((stroke === '#ffffff' || stroke === 'white' || stroke === '#fff') && op < 0.45) {
-        el.style.display = 'none'; el.style.opacity = '0';
-      }
-    }
-  });
 }
 
 // ---- initUIControls — registers all event listeners; called from init ----
