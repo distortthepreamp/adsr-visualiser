@@ -136,22 +136,7 @@ function hideDot(){
   const dot=$('dot');
   dot.style.opacity=0;
   dot.style.visibility='hidden';
-  const fill=$('meterFill');
-  if(fill){
-    const e=getEffective();
-    const mx=METER_X, mw=METER_W;
-    const isHP=$('hpMode')&&$('hpMode').checked;
-    fill.setAttribute('x',mx); fill.setAttribute('width',mw);
-    if(!isHP){
-      const floorY=yFor(e.floor), bottomAbsY=graph.y0;
-      fill.setAttribute('y',floorY); fill.setAttribute('height',Math.max(0,bottomAbsY-floorY));
-    } else {
-      const floorY = yFor(e.floor);
-      const topY = yFor(1);
-      fill.setAttribute('y', String(topY));
-      fill.setAttribute('height', String(floorY - topY));
-    }
-  }
+  setMeterLevel(0);
 }
 
 function updateButtonStates(){
@@ -199,7 +184,7 @@ function syncConsoleScale(){
 function initUIControls(){
 
   // Mode change
-  document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) state.target={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale,tbSustainGap:state.tbSustainGap}; syncControls(); }));
+  document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) syncTargetToLive(); syncControls(); }));
 
   // Checkbox render-only listeners
   ['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine'].forEach(id=>$(id).addEventListener('change',render));

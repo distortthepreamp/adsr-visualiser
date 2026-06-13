@@ -20,12 +20,19 @@ function activeObject(){
   return currentMode() === 'animate' ? state.target : state;
 }
 
+function syncTargetToLive(){
+  state.target = { ...state.target, a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale, tbSustainGap: state.tbSustainGap };
+}
+
 // ---- Numeric display helpers ----
+function fmtScaleValue(v){
+  return Number.isInteger(v) ? String(v) : v.toFixed(1).replace(/\.0$/, '');
+}
+
 function formatSustainScale(v){
   const pct = Math.round(v * 100);
   const scale = v * 10;
-  const scaleText = Number.isInteger(scale) ? String(scale) : scale.toFixed(1).replace(/\.0$/, '');
-  return `${scaleText} (${pct}%)`;
+  return `${fmtScaleValue(scale)} (${pct}%)`;
 }
 
 function ensureInputAfter(sliderId, inputId, label, attrs){
@@ -51,7 +58,7 @@ function commitTime(which, input){
   const obj = activeObject();
   obj[which] = positionFromMs(ms);
   if (m === 'live') {
-    state.target = { a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale };
+    syncTargetToLive();
     render();
   } else {
     syncControls();
@@ -63,11 +70,11 @@ function commitSustain(){
   if (!sustainInput) return;
   if(window.markPresetDirty) markPresetDirty();
   const scale = Math.max(0, Math.min(10, Number(sustainInput.value) || 0));
-  sustainInput.value = Number.isInteger(scale) ? String(scale) : scale.toFixed(1).replace(/\.0$/, '');
+  sustainInput.value = fmtScaleValue(scale);
   const obj = activeObject();
   obj.s = scale / 10;
   if (currentMode() === 'live') {
-    state.target = { a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale };
+    syncTargetToLive();
     render();
   } else {
     syncControls();
@@ -89,15 +96,15 @@ function refreshNumericInputs(){
   }
   if (sustainInput && document.activeElement !== sustainInput) {
     const scale = obj.s * 10;
-    sustainInput.value = Number.isInteger(scale) ? String(scale) : scale.toFixed(1).replace(/\.0$/, '');
+    sustainInput.value = fmtScaleValue(scale);
   }
   if (floorInput && document.activeElement !== floorInput) {
     const v = obj.floor * 10;
-    floorInput.value = Number.isInteger(v) ? String(v) : v.toFixed(1).replace(/\.0$/, '');
+    floorInput.value = fmtScaleValue(v);
   }
   if (scaleInput && document.activeElement !== scaleInput) {
     const v = obj.scale * 10;
-    scaleInput.value = Number.isInteger(v) ? String(v) : v.toFixed(1).replace(/\.0$/, '');
+    scaleInput.value = fmtScaleValue(v);
   }
   patchSustainReadouts();
 }
@@ -115,11 +122,11 @@ function commitFloor(){
   if (!floorInput) return;
   if(window.markPresetDirty) markPresetDirty();
   const v = Math.max(0, Math.min(10, Number(floorInput.value) || 0));
-  floorInput.value = Number.isInteger(v) ? String(v) : v.toFixed(1).replace(/\.0$/, '');
+  floorInput.value = fmtScaleValue(v);
   const obj = activeObject();
   obj.floor = v / 10;
   if (currentMode() === 'live') {
-    state.target = { a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale };
+    syncTargetToLive();
     render();
   } else { syncControls(); }
   setMeterLevel(state.dotLevel);
@@ -130,11 +137,11 @@ function commitScale(){
   if (!scaleInput) return;
   if(window.markPresetDirty) markPresetDirty();
   const v = Math.max(0, Math.min(10, Number(scaleInput.value) || 0));
-  scaleInput.value = Number.isInteger(v) ? String(v) : v.toFixed(1).replace(/\.0$/, '');
+  scaleInput.value = fmtScaleValue(v);
   const obj = activeObject();
   obj.scale = v / 10;
   if (currentMode() === 'live') {
-    state.target = { a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale };
+    syncTargetToLive();
     render();
   } else { syncControls(); }
   requestAnimationFrame(refreshNumericInputs);
