@@ -296,7 +296,6 @@
           <div class="knobLabel">Attack</div>
           <div id="attackKnob" class="knob"></div>
           <input id="attack" type="range" min="0" max="1000" value="80" style="display:none">
-          <div id="attackRead" class="readout"></div>
           <div id="attackTarget" class="targetReadout"></div>
           <div class="quickset-col">
             <button class="quickset-btn" data-knob="attack" data-value="0">0</button>
@@ -312,7 +311,6 @@
           <div class="knobLabel">Decay</div>
           <div id="decayKnob" class="knob"></div>
           <input id="decay" type="range" min="0" max="1000" value="250" style="display:none">
-          <div id="decayRead" class="readout"></div>
           <div id="decayTarget" class="targetReadout"></div>
           <div class="quickset-col">
             <button class="quickset-btn" data-knob="decay" data-value="0">0</button>
@@ -328,7 +326,6 @@
           <div class="knobLabel">Sustain</div>
           <div id="sustainKnob" class="knob"></div>
           <input id="sustain" type="range" min="0" max="1000" value="500" style="display:none">
-          <div id="sustainRead" class="readout"></div>
           <div id="sustainTarget" class="targetReadout"></div>
           <div class="quickset-col">
             <button class="quickset-btn" data-knob="sustain" data-value="0">0</button>
@@ -344,7 +341,6 @@
           <div class="knobLabel">Release</div>
           <div id="releaseKnob" class="knob"></div>
           <input id="release" type="range" min="0" max="1000" value="500" style="display:none">
-          <div id="releaseRead" class="readout"></div>
           <div id="releaseTarget" class="targetReadout"></div>
           <div class="quickset-col">
             <button class="quickset-btn" data-knob="release" data-value="0">0</button>
@@ -360,7 +356,6 @@
           <div class="knobLabel">Cutoff</div>
           <div id="floorKnob" class="knob"></div>
           <input id="floor" type="range" min="0" max="1000" value="0" style="display:none">
-          <div id="floorRead" class="readout"></div>
           <div id="floorTarget" class="targetReadout"></div>
           <div class="quickset-col">
             <button class="quickset-btn" data-knob="cutoff" data-value="0">0</button>
@@ -376,7 +371,6 @@
           <div class="knobLabel">Amount</div>
           <div id="scaleKnob" class="knob"></div>
           <input id="scale" type="range" min="0" max="1000" value="1000" style="display:none">
-          <div id="scaleRead" class="readout"></div>
           <div id="scaleTarget" class="targetReadout"></div>
           <div class="quickset-col">
             <button class="quickset-btn" data-knob="amount" data-value="3">3</button>
@@ -1411,9 +1405,6 @@ function syncControls(){
   $('releaseKnob').style.setProperty('--deg', (-135 + vals.r*270)+'deg');
   $('floorKnob').style.setProperty('--deg', (-135 + vals.floor*270)+'deg');
   $('scaleKnob').style.setProperty('--deg', (-135 + vals.scale*270)+'deg');
-  $('attackRead').textContent=fmtTime(mapTime(state.a)); $('decayRead').textContent=fmtTime(mapTime(state.d)); $('sustainRead').textContent=Math.round(getEffective().s*100)+'%';
-  $('releaseRead').textContent=fmtTime(mapTime(state.r));
-  $('floorRead').textContent=formatSustainScale(state.floor); $('scaleRead').textContent=formatSustainScale(state.scale);
   $('attackTarget').textContent=mode==='animate' ? 'Target: '+fmtTime(mapTime(state.target.a)) : '';
   $('decayTarget').textContent=mode==='animate' ? 'Target: '+fmtTime(mapTime(state.target.d)) : '';
   $('sustainTarget').textContent=mode==='animate' ? 'Target: '+Math.round(($('keyboardControl').checked?state.target.s*.8:state.target.s)*100)+'%' : '';
