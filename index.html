@@ -2886,6 +2886,7 @@ function buildConfigSnapshot(){
     meterScanlinesVisible: $('meterScanlinesVisible') ? $('meterScanlinesVisible').checked : true,
     blobGlowEnabled: $('blobGlowEnabled') ? $('blobGlowEnabled').checked : true,
     keepTapMarker: $('keepTapMarker') ? $('keepTapMarker').checked : true,
+    timelineZoom3x: $('timelineZoom3x') ? $('timelineZoom3x').checked : false,
     blobGlowRadius: Number($('blobGlowRadius') ? $('blobGlowRadius').value : 8),
     linearTimeScale: Number($('linearTimeScale').value),
     curveAmount: Number($('curveAmount').value),
@@ -2934,9 +2935,11 @@ function loadConfigObject(cfg){
   state.target.tbSustainGap = state.tbSustainGap;
 
   // Checkboxes
-  ['loudDecay','drawReleaseWhenZero','showBounds','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine','meterGlow','meterScanlinesVisible','blobGlowEnabled','keepTapMarker'].forEach(id => {
+  ['loudDecay','drawReleaseWhenZero','showBounds','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine','meterGlow','meterScanlinesVisible','blobGlowEnabled','keepTapMarker','timelineZoom3x'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
+  const restoredZoom = ($('timelineZoom3x') && $('timelineZoom3x').checked) ? 3 : 1;
+  state.zoomFactor = restoredZoom; state.target.zoomFactor = restoredZoom;
   syncHpModeEnabled();
   syncAnalogueCurve();
 
@@ -3001,7 +3004,7 @@ function loadConfigObject(cfg){
   if(window.restorePresetHighlight){
     window.restorePresetHighlight(cfg.activePresetIndex !== undefined ? cfg.activePresetIndex : -1, cfg.presetDirtyState || 'none');
   }
-  render();
+  transition(0);
   refreshNumericInputs();
   syncControls();
 }
