@@ -11,9 +11,6 @@ const transBtnIds = ['transInstantBtn','trans1Btn','trans2Btn','trans3Btn','tran
 function syncControls(){
   const mode=document.querySelector('input[name="mode"]:checked').value;
   const vals = mode==='live' ? state : state.target;
-  $('attack').value=Math.round(vals.a*1000); $('decay').value=Math.round(vals.d*1000); $('sustain').value=Math.round(vals.s*1000);
-  $('release').value=Math.round(vals.r*1000);
-  $('floor').value=Math.round(vals.floor*1000); $('scale').value=Math.round(vals.scale*1000);
   $('attackKnob').style.setProperty('--deg', (-135 + vals.a*270)+'deg');
   $('decayKnob').style.setProperty('--deg', (-135 + vals.d*270)+'deg');
   $('sustainKnob').style.setProperty('--deg', (-135 + vals.s*270)+'deg');
@@ -62,15 +59,6 @@ function syncControls(){
       });
     });
   })();
-}
-
-function setFromSlider(){
-  const mode=document.querySelector('input[name="mode"]:checked').value;
-  const dest=mode==='live' ? state : state.target;
-  dest.a=$('attack').value/1000; dest.d=$('decay').value/1000; dest.s=$('sustain').value/1000;
-  dest.r=$('release').value/1000;
-  dest.floor=$('floor').value/1000; dest.scale=$('scale').value/1000;
-  if(mode==='live') { state.target={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale,tbSustainGap:state.tbSustainGap}; render(); } else syncControls();
 }
 
 // ---- transition — animates state toward state.target ----
@@ -234,17 +222,6 @@ function hideLikelyAxes(){
 
 // ---- initUIControls — registers all event listeners; called from init ----
 function initUIControls(){
-
-  // Slider input listeners
-  ['attack','decay','release'].forEach(id=>$(id).addEventListener('input',()=>{ if(currentMode()==='live') clearBlobAndMarker(); setFromSlider(); if(window.markPresetDirty) markPresetDirty(); }));
-  $('sustain').addEventListener('input',()=>{ setFromSlider(); if(window.markPresetDirty) markPresetDirty(); });
-  ['floor','scale'].forEach(id=>$(id).addEventListener('input',()=>{
-    const mode=document.querySelector('input[name="mode"]:checked').value;
-    const dest=mode==='live' ? state : state.target;
-    dest.floor=$('floor').value/1000; dest.scale=$('scale').value/1000;
-    if(mode==='live') { state.target={...state.target,floor:state.floor,scale:state.scale}; render(); } else syncControls();
-    if(window.markPresetDirty) markPresetDirty();
-  }));
 
   // Mode change
   document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) state.target={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale,tbSustainGap:state.tbSustainGap}; syncControls(); }));

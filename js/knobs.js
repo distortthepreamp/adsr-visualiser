@@ -205,20 +205,6 @@ function initKnobs(){
     scaleInput.addEventListener('keydown', e => { if (e.key === 'Enter') commitScale(); });
   }
 
-  const attackSlider  = document.getElementById('attack');
-  const decaySlider   = document.getElementById('decay');
-  const sustainSlider = document.getElementById('sustain');
-  const floorSlider   = document.getElementById('floor');
-  const scaleSlider   = document.getElementById('scale');
-  const releaseSlider = document.getElementById('release');
-
-  if (attackSlider)  attackSlider.addEventListener('input',  () => { clearTypedForSlider('a'); setTimeout(refreshNumericInputs, 0); });
-  if (decaySlider)   decaySlider.addEventListener('input',   () => { clearTypedForSlider('d'); setTimeout(refreshNumericInputs, 0); });
-  if (releaseSlider) releaseSlider.addEventListener('input', () => { clearTypedForSlider('r'); setTimeout(refreshNumericInputs, 0); });
-  if (sustainSlider) sustainSlider.addEventListener('input', () => { setTimeout(refreshNumericInputs, 0); });
-  if (floorSlider)   floorSlider.addEventListener('input',  () => { setMeterLevel(state.dotLevel); setTimeout(refreshNumericInputs, 0); });
-  if (scaleSlider)   scaleSlider.addEventListener('input',  () => { setTimeout(refreshNumericInputs, 0); });
-
   document.querySelectorAll('input[name="mode"]').forEach(el => {
     el.addEventListener('change', () => setTimeout(refreshNumericInputs, 0));
   });
@@ -227,32 +213,43 @@ function initKnobs(){
     if (el) el.addEventListener('change', () => setTimeout(refreshNumericInputs, 0));
   });
 
-  // Knob drag interaction
+  // Knob drag interaction — reads/writes state directly, no hidden slider elements.
+  // Sensitivity: 200px drag = full 0–1 position range (same as before: old range was
+  // 0–1000 slider units, delta*(1000/200)/1000 = delta/200 in position space).
   [
-    { knobId: 'attackKnob',  sliderId: 'attack'  },
-    { knobId: 'decayKnob',   sliderId: 'decay'   },
-    { knobId: 'sustainKnob', sliderId: 'sustain' },
-    { knobId: 'releaseKnob', sliderId: 'release' },
-    { knobId: 'floorKnob',   sliderId: 'floor'   },
-    { knobId: 'scaleKnob',   sliderId: 'scale'   },
-  ].forEach(({ knobId, sliderId }) => {
-    const knob   = $(knobId);
-    const slider = $(sliderId);
+    { knobId: 'attackKnob',  field: 'a',     isTime: true  },
+    { knobId: 'decayKnob',   field: 'd',     isTime: true  },
+    { knobId: 'sustainKnob', field: 's',     isTime: false },
+    { knobId: 'releaseKnob', field: 'r',     isTime: true  },
+    { knobId: 'floorKnob',   field: 'floor', isTime: false },
+    { knobId: 'scaleKnob',   field: 'scale', isTime: false },
+  ].forEach(({ knobId, field, isTime }) => {
+    const knob = $(knobId);
     knob.style.cursor = 'ns-resize';
     let startY, startVal;
     knob.addEventListener('pointerdown', e => {
       startY   = e.clientY;
-      startVal = Number(slider.value);
+      startVal = activeObject()[field];
       knob.setPointerCapture(e.pointerId);
       e.preventDefault();
     });
     knob.addEventListener('pointermove', e => {
       if (!knob.hasPointerCapture(e.pointerId)) return;
-      const delta = startY - e.clientY;
-      const range = Number(slider.max) - Number(slider.min);
-      const newVal = Math.round(clamp(startVal + delta * (range / 200), Number(slider.min), Number(slider.max)));
-      slider.value = newVal;
-      slider.dispatchEvent(new Event('input', { bubbles: true }));
+      const delta  = startY - e.clientY;
+      const newVal = clamp(startVal + delta / 200);
+      const mode   = currentMode();
+      if (mode === 'live') {
+        if (isTime) clearBlobAndMarker();
+        state[field]        = newVal;
+        state.target[field] = newVal;
+        render();
+      } else {
+        state.target[field] = newVal;
+        syncControls();
+        setTimeout(refreshNumericInputs, 0);
+      }
+      if (isTime) clearTypedForSlider(field);
+      if (window.markPresetDirty) markPresetDirty();
     });
     knob.addEventListener('pointerup', e => {
       knob.releasePointerCapture(e.pointerId);
