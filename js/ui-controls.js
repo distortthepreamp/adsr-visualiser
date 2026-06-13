@@ -345,7 +345,7 @@ function initUIControls(){
   $('tap500Btn').addEventListener('click', () => setTapMode('tap500','tap500Btn'));
   $('tap1sBtn').addEventListener('click', () => setTapMode('tap1000','tap1sBtn'));
   $('tapModeHoldBtn').addEventListener('click', () => setTapMode('hold','tapModeHoldBtn'));
-  $('clearBtn').addEventListener('click',clearBlobAndMarker);
+  $('clearBtn').addEventListener('click', () => { logEvent('ANIMATION', { action: 'clear' }); clearBlobAndMarker(); });
   $('keepTapMarker').addEventListener('change',()=>{ if(!$('keepTapMarker').checked) hideTapMarker(); });
 
   // Quick-set buttons

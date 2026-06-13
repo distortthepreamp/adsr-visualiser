@@ -262,6 +262,7 @@ function initKnobs(){
     });
     knob.addEventListener('pointerup', e => {
       knob.releasePointerCapture(e.pointerId);
+      logEvent('COMMIT', { knob: field, value: activeObject()[field] });
     });
   });
 }

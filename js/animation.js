@@ -277,7 +277,6 @@ function releaseFromCurrent(){
 // ---- Clear ----
 
 function clearBlobAndMarker(){
-  logEvent('ANIMATION', { action: 'clear' });
   cancelAnimationFrame(state.dotAnim);
   stopGlowPulse();
   audioCut();

@@ -55,7 +55,7 @@ function initShortcuts(){
     } else if(e.key === 'Enter'){
       e.preventDefault();
       transition(currentTransitionSec);
-    } else if((e.key === 'c' || e.key === 'C') && e.altKey){ clearBlobAndMarker();
+    } else if((e.key === 'c' || e.key === 'C') && e.altKey){ logEvent('ANIMATION', { action: 'clear' }); clearBlobAndMarker();
     } else if(e.key === 'c' || e.key === 'C'){ toggleCheckbox('showClipped');
     } else if(e.key === 'l' || e.key === 'L'){ toggleMode();
     } else if(e.key === 'a' || e.key === 'A'){ toggleCheckbox('audioEnabled');
