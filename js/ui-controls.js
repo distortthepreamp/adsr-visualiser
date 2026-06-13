@@ -71,6 +71,7 @@ function syncControls(){
 
 // ---- transition — animates state toward state.target ----
 function transition(durSec){
+  logEvent('TRANSITION', { durSec: durSec !== undefined ? durSec : currentTransitionSec, target: { a: state.target.a, d: state.target.d, s: state.target.s, r: state.target.r, floor: state.target.floor, scale: state.target.scale } });
   clearBlobAndMarker();
   animationToken++;
   const myAnimationToken = animationToken;
@@ -84,6 +85,11 @@ function transition(durSec){
   cancelAnimationFrame(state.anim);
   state.a=start.a; state.d=start.d; state.s=start.s; state.r=start.r; state.floor=start.floor; state.scale=start.scale; state.tbSustainGap=start.tbSustainGap; state.zoomFactor=start.zoomFactor;
   render();
+  if(dur <= 0){
+    state.a=end.a; state.d=end.d; state.s=end.s; state.r=end.r; state.floor=end.floor; state.scale=end.scale; state.tbSustainGap=end.tbSustainGap; state.zoomFactor=end.zoomFactor;
+    render();
+    return;
+  }
   let t0=null;
   function step(now){
     if (myAnimationToken !== animationToken) return;
@@ -266,6 +272,9 @@ function initUIControls(){
 
   // Checkbox render-only listeners
   ['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine'].forEach(id=>$(id).addEventListener('change',render));
+
+  // Checkbox debug log listeners
+  ['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine'].forEach(id=>{ const el=$(id); if(el) el.addEventListener('change', () => logEvent('CHECKBOX', { id, checked: el.checked })); });
 
   // tbSustainCollapse — also triggers a transition
   $('tbSustainCollapse').addEventListener('change', () => {

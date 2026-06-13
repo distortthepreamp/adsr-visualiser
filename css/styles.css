@@ -1,12 +1,12 @@
 @font-face {
   font-family: 'UniversCondensed';
-  src: url('fonts/UniversCondensedBQ-Regular.otf') format('opentype');
+  src: url('../fonts/UniversCondensedBQ-Regular.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
 }
 @font-face {
   font-family: 'Univers55';
-  src: url('fonts/Linotype - UniversLTStd.otf') format('opentype');
+  src: url('../fonts/Linotype - UniversLTStd.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
 }

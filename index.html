@@ -285,6 +285,7 @@
           <button id="importConfigsBtn" style="padding:3px 6px">Load Config</button>
           <button id="exportPresetsBtn" style="padding:3px 6px">Save Presets</button>
           <button id="importPresetsBtn" style="padding:3px 6px">Load Presets</button>
+          <button id="debugLogBtn" style="padding:3px 6px">Debug Log</button>
         </div>
         <span id="configName" style="font-size:13px;font-weight:700;opacity:.85"></span>
       </div>
@@ -360,6 +361,7 @@
   </div>
 </div>
 
+<script src="js/debug-log.js"></script>
 <script src="data/presets.js"></script>
 <script src="data/configs.js"></script>
 <script src="default-config.js"></script>
@@ -464,6 +466,20 @@ setNoteMode('noteA4Btn', 440);
 
 if(window.loadConfigByIndex) window.loadConfigByIndex(0);
 setMeterLevel(state.dotLevel);
+
+logEvent('INIT', {
+  a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale,
+  loudDecay: $('loudDecay').checked, drawReleaseWhenZero: $('drawReleaseWhenZero').checked,
+  showBounds: $('showBounds').checked, showContour: $('showContour').checked,
+  frequencyMode: $('frequencyMode').checked, hpMode: $('hpMode').checked,
+  keyboardControl: $('keyboardControl').checked, showClipped: $('showClipped').checked,
+  linearTime: $('linearTime').checked, analogueCurve: $('analogueCurve').checked,
+  textbookAdsr: $('textbookAdsr').checked, tbSustainDotted: $('tbSustainDotted').checked,
+  tbSustainCollapse: $('tbSustainCollapse').checked, tbShowModelDSustain: $('tbShowModelDSustain').checked,
+  showOuterLine: $('showOuterLine').checked, showEffectiveTimes: $('showEffectiveTimes').checked,
+  showStatedTimes: $('showStatedTimes').checked, showEffectiveLines: $('showEffectiveLines').checked,
+  showStatedLines: $('showStatedLines').checked
+});
 
 </script>
 </body>

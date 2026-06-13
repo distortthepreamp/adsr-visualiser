@@ -192,6 +192,7 @@ function initConfigsLogic(){
   function loadConfig(idx){
     if(idx < 0 || idx >= CONFIGS.length) return;
     const cfg = CONFIGS[idx];
+    logEvent('CONFIG', { action: 'load', index: idx, name: cfg.name });
     if(activeConfigBtn){ activeConfigBtn.style.background = ''; activeConfigBtn.style.color = ''; }
     const btns = container.querySelectorAll('button');
     activeConfigBtn = btns[idx] || null;
@@ -207,6 +208,7 @@ function initConfigsLogic(){
     const cfg = CONFIGS[idx];
     const label = prompt('Config name:', cfg.label);
     if(label === null) return;
+    logEvent('CONFIG', { action: 'save', index: idx, name: cfg.name });
     const snapshot = buildConfigSnapshot();
     snapshot.name = cfg.name;
     snapshot.label = label.trim() || cfg.label;

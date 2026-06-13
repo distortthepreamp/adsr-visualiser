@@ -164,6 +164,7 @@ function setTapMarker(pt){
 // ---- Release ----
 
 function releaseFromCurrent(){
+  logEvent('ANIMATION', { action: 'release' });
   audioGateClose();
   animationToken++;
   const myAnimationToken = animationToken;
@@ -276,6 +277,7 @@ function releaseFromCurrent(){
 // ---- Clear ----
 
 function clearBlobAndMarker(){
+  logEvent('ANIMATION', { action: 'clear' });
   cancelAnimationFrame(state.dotAnim);
   stopGlowPulse();
   audioCut();
@@ -293,6 +295,7 @@ function clearBlobAndMarker(){
 // ---- Tap and Hold ----
 
 function tap(ms){
+  logEvent('ANIMATION', { action: 'tap', ms: Number(ms) || 200 });
   if(state.currentPhase === 'hold' || state.currentPhase === 'sustain') clearBlobAndMarker();
   releaseStartPoint=null;
   hideDot();
@@ -350,6 +353,7 @@ function tap(ms){
 }
 
 function hold(){
+  logEvent('ANIMATION', { action: 'hold' });
   releaseStartPoint=null;
   animationToken++;
   const myAnimationToken = animationToken;

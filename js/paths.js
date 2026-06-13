@@ -1,7 +1,7 @@
 // ---- paths.js — SVG path building, knob sync, and the render() coordinator ----
 // Depends on geometry.js (clamp, yFor, computePoints, etc.) being loaded first.
 
-const KC_SUSTAIN_SCALE = KC_SUSTAIN_SCALE; // inverse of the 0.8 keyboard-control sustain cap (1/0.8)
+const KC_SUSTAIN_SCALE = 1.25; // inverse of the 0.8 keyboard-control sustain cap (1/0.8)
 
 function syncKnobColours(freqMode){
   const KNOB_RED    = 'radial-gradient(circle at 36% 30%, #aa1111, #660808 68%, #220000 100%)';
@@ -38,6 +38,7 @@ function syncRadii(){
 }
 
 function render(){
+  try {
   // Keep viewBox and VB_WIDTH-dependent elements in sync
   const svgEl = document.getElementById('svg');
   if(svgEl) svgEl.setAttribute('viewBox', `0 ${VB_Y_ORIGIN} ${VB_WIDTH} ${VB_HEIGHT}`);
@@ -387,4 +388,8 @@ function render(){
   syncControls();
   updateButtonStates();
   setTimeout(refreshNumericInputs, 0); // keep numeric inputs in sync after every render
+  } catch(err) {
+    logEvent('RENDER_ERROR', { message: err && err.message, state: { a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale } });
+    throw err;
+  }
 }

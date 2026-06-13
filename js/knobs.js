@@ -60,6 +60,7 @@ function commitTime(which, input){
   if(window.markPresetDirty) markPresetDirty();
   const ms = Math.max(0, Math.min(MAX_TIME_MS, Math.round(Number(input.value) || 0)));
   input.value = ms;
+  logEvent('COMMIT', { knob: which, value: ms });
   const m = currentMode();
   typedDisplay[m][which] = ms;
   const obj = activeObject();
@@ -78,6 +79,7 @@ function commitSustain(){
   if(window.markPresetDirty) markPresetDirty();
   const scale = Math.max(0, Math.min(10, Number(sustainInput.value) || 0));
   sustainInput.value = fmtScaleValue(scale);
+  logEvent('COMMIT', { knob: 's', value: scale });
   const obj = activeObject();
   obj.s = scale / 10;
   if (currentMode() === 'live') {
@@ -130,6 +132,7 @@ function commitFloor(){
   if(window.markPresetDirty) markPresetDirty();
   const v = Math.max(0, Math.min(10, Number(floorInput.value) || 0));
   floorInput.value = fmtScaleValue(v);
+  logEvent('COMMIT', { knob: 'floor', value: v });
   const obj = activeObject();
   obj.floor = v / 10;
   if (currentMode() === 'live') {
@@ -145,6 +148,7 @@ function commitScale(){
   if(window.markPresetDirty) markPresetDirty();
   const v = Math.max(0, Math.min(10, Number(scaleInput.value) || 0));
   scaleInput.value = fmtScaleValue(v);
+  logEvent('COMMIT', { knob: 'scale', value: v });
   const obj = activeObject();
   obj.scale = v / 10;
   if (currentMode() === 'live') {

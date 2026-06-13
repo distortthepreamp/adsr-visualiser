@@ -39,6 +39,7 @@ function initPresetsLogic(){
   function loadPreset(idx){
     if(idx < 0 || idx >= PRESETS.length) return;
     const preset = PRESETS[idx];
+    logEvent('PRESET', { action: 'load', index: idx, name: preset.name });
     // Restore checkbox states if saved in preset
     if(preset.loudDecay !== undefined) $('loudDecay').checked = preset.loudDecay;
     if(preset.drawReleaseWhenZero !== undefined) $('drawReleaseWhenZero').checked = preset.drawReleaseWhenZero;
@@ -98,6 +99,7 @@ function initPresetsLogic(){
     const preset = PRESETS[idx];
     const label = prompt('Preset name:', preset.label);
     if(label === null) return; // cancelled
+    logEvent('PRESET', { action: 'save', index: idx, name: preset.name });
     preset.label = label.trim() || preset.label;
     preset.a = msFromPosition(state.a);
     preset.d = msFromPosition(state.d);
