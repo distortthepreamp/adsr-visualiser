@@ -67,7 +67,6 @@ function render(){
     if (drawPS.x < cDX) drawPS = { x: cDX, y: ceilY, level: drawPS.level };
   }
 
-  const releaseR = state.r; // reserved for future use
   const releaseBox = $('releaseKnobBox');
   if(releaseBox){ releaseBox.style.opacity = textbookAdsr ? '1' : '0.35'; releaseBox.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
   const releaseLegendEl=$('releaseLegend'); if(releaseLegendEl) releaseLegendEl.style.opacity=textbookAdsr?'1':'0.35';

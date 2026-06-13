@@ -104,9 +104,6 @@ function refreshNumericInputs(){
 
 function patchSustainReadouts(){
   const eff = getEffective();
-  const formatted = formatSustainScale(eff.s);
-  const sustainRead = document.getElementById('sustainRead');
-  if (sustainRead) sustainRead.textContent = formatted;
   const sustainTarget = document.getElementById('sustainTarget');
   if (sustainTarget && currentMode() === 'animate') {
     const targetS = document.getElementById('keyboardControl').checked ? state.target.s * 0.8 : state.target.s;
@@ -167,12 +164,12 @@ function addPointerFeedback(){
 function initKnobs(){
 
   // Numeric inputs for Attack / Decay / Sustain / Release / Floor / Scale
-  attackInput  = ensureInputAfter('attack',  'attackMsInput',    '', 'type="number" min="0" max="12000" step="1"');
-  decayInput   = ensureInputAfter('decay',   'decayMsInput',     '', 'type="number" min="0" max="12000" step="1"');
-  releaseInput = ensureInputAfter('release', 'releaseMsInput',   '', 'type="number" min="0" max="12000" step="1"');
-  sustainInput = ensureInputAfter('sustain', 'sustainScaleInput','', 'type="number" min="0" max="10" step="0.1"');
-  floorInput   = ensureInputAfter('floor',   'floorScaleInput',  '', 'type="number" min="0" max="10" step="0.1"');
-  scaleInput   = ensureInputAfter('scale',   'scaleScaleInput',  '', 'type="number" min="0" max="10" step="0.1"');
+  attackInput  = ensureInputAfter('attackTarget',  'attackMsInput',    '', 'type="number" min="0" max="12000" step="1"');
+  decayInput   = ensureInputAfter('decayTarget',   'decayMsInput',     '', 'type="number" min="0" max="12000" step="1"');
+  releaseInput = ensureInputAfter('releaseTarget', 'releaseMsInput',   '', 'type="number" min="0" max="12000" step="1"');
+  sustainInput = ensureInputAfter('sustainTarget', 'sustainScaleInput','', 'type="number" min="0" max="10" step="0.1"');
+  floorInput   = ensureInputAfter('floorTarget',   'floorScaleInput',  '', 'type="number" min="0" max="10" step="0.1"');
+  scaleInput   = ensureInputAfter('scaleTarget',   'scaleScaleInput',  '', 'type="number" min="0" max="10" step="0.1"');
 
   if (attackInput) {
     attackInput.addEventListener('change', () => commitTime('a', attackInput));
