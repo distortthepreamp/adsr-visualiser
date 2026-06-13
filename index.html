@@ -396,8 +396,9 @@
           <div class="row"><label><input id="hpMode" type="checkbox"> LP/HP Mode (M)</label></div>
           <div class="row"><label><input id="keyboardControl" type="checkbox"> Mimic Model D Sustain (80%) (S)</label></div>
           <div id="showClippedRow" class="row"><label><input id="showClipped" type="checkbox"> Show Clipped Shape (C)</label></div>
-          <div class="row" style="align-items:center;gap:6px"><label><input id="linearTime" type="checkbox"> Linear Time (X)</label><input id="linearTimeScale" type="number" min="1" max="15" step="1" value="6" style="width:42px;text-align:center;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.3);border-radius:5px;color:#fff;font-size:13px;padding:2px 4px"><label id="linearTimeScaleLabel" for="linearTimeScale" style="font-size:13px">s</label><label id="timelineZoom3xLabel" style="font-size:13px;opacity:0.35;pointer-events:none"><input id="timelineZoom3x" type="checkbox"> Timeline Zoom x3 (Z)</label></div>
-          <div id="analogueCurveRow" class="row" style="align-items:center;gap:6px"><label><input id="analogueCurve" type="checkbox"> Analogue Curve (B)</label><input id="curveAmount" type="range" min="0" max="100" value="40" style="width:80px;opacity:0.35"><span id="curveAmountVal" style="font-size:13px;min-width:20px;text-align:right;opacity:0.35">40</span></div>
+          <div class="row"><label><input id="linearTime" type="checkbox"> Linear Time (X)</label></div>
+          <div class="row"><label id="timelineZoom3xLabel" style="opacity:0.35;pointer-events:none"><input id="timelineZoom3x" type="checkbox"> Zoom Time x3 (Z)</label></div>
+          <div id="analogueCurveRow" class="row" style="align-items:center;gap:6px"><label><input id="analogueCurve" type="checkbox"> Analogue (B)</label><input id="curveAmount" type="range" min="0" max="100" value="40" style="width:80px;opacity:0.35"><span id="curveAmountVal" style="font-size:13px;min-width:20px;text-align:right;opacity:0.35">40</span></div>
         </div>
         <div>
           <div class="row"><label><input id="textbookAdsr" type="checkbox"> Textbook ADSR (T)</label></div>
@@ -681,8 +682,7 @@ function getEffective(){
 }
 function yFor(level){ return graph.y0 - level*graph.h; }
 function getLinearTotalMs(){
-  const ms = Math.max(1, Number($('linearTimeScale') ? $('linearTimeScale').value : 6)) * 1000;
-  return ms / Math.max(1, state.zoomFactor);
+  return 6000 / Math.max(1, state.zoomFactor);
 }
 
 function computePoints(){
@@ -1492,15 +1492,10 @@ $('hpMode').addEventListener('change', () => setMeterLevel(state.dotLevel));
 syncHpModeEnabled();
 function syncLinearTimeScale(){
   const on = $('linearTime') && $('linearTime').checked;
-  const inp = $('linearTimeScale'), lbl = $('linearTimeScaleLabel');
-  const opacity = on ? '' : '0.35';
-  if(inp) inp.style.opacity = opacity;
-  if(lbl) lbl.style.opacity = opacity;
   const zoomLbl = $('timelineZoom3xLabel');
   if(zoomLbl){ zoomLbl.style.opacity = on ? '' : '0.35'; zoomLbl.style.pointerEvents = on ? '' : 'none'; }
 }
 $('linearTime').addEventListener('change', syncLinearTimeScale);
-$('linearTimeScale').addEventListener('input', render);
 $('timelineZoom3x') && $('timelineZoom3x').addEventListener('change', () => { state.target.zoomFactor = $('timelineZoom3x').checked ? 3 : 1; transition(currentTransitionSec); });
 syncLinearTimeScale();
 function syncAnalogueCurve(){
@@ -2894,7 +2889,6 @@ function buildConfigSnapshot(){
     keepTapMarker: $('keepTapMarker') ? $('keepTapMarker').checked : true,
     timelineZoom3x: $('timelineZoom3x') ? $('timelineZoom3x').checked : false,
     blobGlowRadius: Number($('blobGlowRadius') ? $('blobGlowRadius').value : 8),
-    linearTimeScale: Number($('linearTimeScale').value),
     curveAmount: Number($('curveAmount').value),
     audioEnabled: $('audioEnabled').checked,
     tapMode: tapMode,
@@ -2950,7 +2944,6 @@ function loadConfigObject(cfg){
   syncAnalogueCurve();
 
   // Numeric inputs
-  if($('linearTimeScale') && cfg.linearTimeScale !== undefined) $('linearTimeScale').value = cfg.linearTimeScale;
   if($('tapCustomMs') && cfg.tapCustomMs !== undefined) $('tapCustomMs').value = cfg.tapCustomMs;
   if($('noteCustomHz') && cfg.noteCustomHz !== undefined) $('noteCustomHz').value = cfg.noteCustomHz;
   if($('curveAmount') && cfg.curveAmount !== undefined){
