@@ -423,8 +423,11 @@
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:5px;justify-content:space-between">
         <div style="display:flex;gap:5px">
+          <button id="transInstantBtn">Instant</button>
           <button id="trans1Btn">1s</button>
           <button id="trans2Btn">2s</button>
+          <button id="trans3Btn">3s</button>
+          <button id="trans4Btn">4s</button>
           <button id="trans5Btn">5s</button>
           <button id="transCustomToggle">Custom</button>
         </div>
@@ -1564,7 +1567,7 @@ function transition(durSec){
   }
   state.anim=requestAnimationFrame(step);
 }
-const transBtnIds = ['trans1Btn','trans2Btn','trans5Btn','transCustomToggle'];
+const transBtnIds = ['transInstantBtn','trans1Btn','trans2Btn','trans3Btn','trans4Btn','trans5Btn','transCustomToggle'];
 function setTransMode(durSec, activeBtnId){
   if(durSec !== null) currentTransitionSec = durSec;
   activeTransBtn = activeBtnId;
@@ -1573,8 +1576,11 @@ function setTransMode(durSec, activeBtnId){
   const row=$('customTransitionRow');
   if(row) row.style.display = activeBtnId==='transCustomToggle' ? '' : 'none';
 }
+$('transInstantBtn').addEventListener('click',()=>{ setTransMode(0.001,'transInstantBtn'); transition(0.001); });
 $('trans1Btn').addEventListener('click',()=>{ setTransMode(1,'trans1Btn'); transition(1); });
 $('trans2Btn').addEventListener('click',()=>{ setTransMode(2,'trans2Btn'); transition(2); });
+$('trans3Btn').addEventListener('click',()=>{ setTransMode(3,'trans3Btn'); transition(3); });
+$('trans4Btn').addEventListener('click',()=>{ setTransMode(4,'trans4Btn'); transition(4); });
 $('trans5Btn').addEventListener('click',()=>{ setTransMode(5,'trans5Btn'); transition(5); });
 $('transCustomToggle').addEventListener('click',()=>{
   const val=Number($('customTransitionTime').value)||3;
