@@ -105,13 +105,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       const sustainGap=graph.w*state.tbSustainGap;
       const tbSusEndX=pts.pEnd.x+sustainGap;
       const rT_r=mapTime(state.r);
-      let rwFull;
-      if(linearTimeOn){
-        const totalMs=getLinearTotalMs();
-        rwFull=rT_r*1000*(graph.w/totalMs);
-      } else {
-        rwFull=displayTimeWidth(rT_r);
-      }
+      const rwFull=timeToPixels(rT_r,linearTimeOn);
       releaseEndX=tbSusEndX+rwFull;
       releaseEndMs=Math.round((e.aT+e.dT+rT_r)*1000);
     } else {
@@ -151,7 +145,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   // Drop lines
   const showEffLines=!!($('showEffectiveLines')&&$('showEffectiveLines').checked);
   const showStLines=!!($('showStatedLines')&&$('showStatedLines').checked);
-  (function updateDropLineGroup(groupId, elIds, show, colorClass){
+  function updateDropLineGroup(groupId, elIds, show, colorClass){
     const g=$(groupId); if(!g) return;
     while(g.firstChild) g.removeChild(g.firstChild);
     if(!show) return;
@@ -172,29 +166,9 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
         }
       }
     });
-  })('dropLinesEffective',['timeAxisAttack','timeAxisDecayStart','timeAxisDecayEndEffective','timeAxisReleaseStart'],showEffLines,'drop-line-effective');
-  (function(groupId,elIds,show,colorClass){
-    const g=$(groupId); if(!g) return;
-    while(g.firstChild) g.removeChild(g.firstChild);
-    if(!show) return;
-    const NS='http://www.w3.org/2000/svg';
-    elIds.forEach(id=>{
-      const el=$(id);
-      if(el&&el.style.display!=='none'){
-        const x=parseFloat(el.getAttribute('x'));
-        if(!isNaN(x)){
-          const ln=document.createElementNS(NS,'line');
-          ln.setAttribute('x1',x); ln.setAttribute('x2',x);
-          ln.setAttribute('y1',yFor(1)); ln.setAttribute('y2',graph.y0);
-          ln.setAttribute('stroke-width','1');
-          ln.setAttribute('vector-effect','non-scaling-stroke');
-          ln.setAttribute('opacity','1');
-          ln.setAttribute('class',colorClass);
-          g.appendChild(ln);
-        }
-      }
-    });
-  })('dropLinesStated',['timeAxisAttackStated','timeAxisDecayEndStated','timeAxisReleaseStartStated'],showStLines,'drop-line-stated');
+  }
+  updateDropLineGroup('dropLinesEffective',['timeAxisAttack','timeAxisDecayStart','timeAxisDecayEndEffective','timeAxisReleaseStart'],showEffLines,'drop-line-effective');
+  updateDropLineGroup('dropLinesStated',['timeAxisAttackStated','timeAxisDecayEndStated','timeAxisReleaseStartStated'],showStLines,'drop-line-stated');
   // Dim drop line rows when their time axis equivalent is off
   const effLinesRow=$('showEffectiveLinesRow'), statedLinesRow=$('showStatedLinesRow');
   if(effLinesRow){ effLinesRow.style.opacity=showEffective?'':'0.35'; effLinesRow.style.pointerEvents=showEffective?'':'none'; }

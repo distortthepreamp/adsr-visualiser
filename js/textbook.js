@@ -4,17 +4,9 @@
 function tbComputeAnimPoints(){
   const e=getEffective();
   const linearTimeOn=$('linearTime')&&$('linearTime').checked;
-  let aw,dwFull,rwFull;
-  if(linearTimeOn){
-    const totalMs=getLinearTotalMs();
-    aw=e.aT*1000*(graph.w/totalMs);
-    dwFull=e.dT*1000*(graph.w/totalMs);
-    rwFull=mapTime(state.r)*1000*(graph.w/totalMs);
-  } else {
-    aw=displayTimeWidth(e.aT);
-    dwFull=displayTimeWidth(e.dT);
-    rwFull=displayTimeWidth(mapTime(state.r));
-  }
+  const aw=timeToPixels(e.aT,linearTimeOn);
+  const dwFull=timeToPixels(e.dT,linearTimeOn);
+  const rwFull=timeToPixels(mapTime(state.r),linearTimeOn);
   const sustainGap=graph.w*state.tbSustainGap;
   const floorY=yFor(e.floor);
   const peakY=yFor(e.floor+e.scale);
@@ -76,13 +68,7 @@ function renderTextbookPaths({ pts, drawPS, drawP1, ceilY, showClipped, drawRele
   }
   // Release: starts from end of sustain segment, spans rwFull to the right
   const rT_r2 = mapTime(state.r);
-  let rwFull2;
-  if(linearTimeOn){
-    const totalMs2 = getLinearTotalMs();
-    rwFull2 = rT_r2 * 1000 * (graph.w / totalMs2);
-  } else {
-    rwFull2 = displayTimeWidth(rT_r2);
-  }
+  const rwFull2 = timeToPixels(rT_r2, linearTimeOn);
   const tbREnd = { x: tbSusEnd.x + rwFull2, y: yFor(e.floor) };
   const tbRPath = drawReleasePath ? buildPath(tbSusEnd.x, tbSusEnd.y, tbREnd.x, tbREnd.y, curveAmt, rSF) : '';
   ['releaseOuter','releaseInner'].forEach(id => $(id).setAttribute('d', tbRPath));

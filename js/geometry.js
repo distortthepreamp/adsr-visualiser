@@ -54,24 +54,22 @@ function yFor(level){ return graph.y0 - level*graph.h; }
 function getLinearTotalMs(){
   return 6000 / Math.max(1, state.zoomFactor);
 }
+function timeToPixels(t, linearOn){
+  return linearOn ? t * 1000 * (graph.w / getLinearTotalMs()) : displayTimeWidth(t);
+}
 
 function computePoints(){
   const e=getEffective();
   const linearTimeEl = document.getElementById('linearTime');
   const linearTime = linearTimeEl && linearTimeEl.checked;
   let aw, dwFull;
+  aw     = timeToPixels(e.aT, linearTime);
+  dwFull = timeToPixels(e.dT, linearTime);
   if(linearTime){
-    const totalMs = getLinearTotalMs();
-    const pxPerMs = graph.w / totalMs;
-    aw     = e.aT * 1000 * pxPerMs;
-    dwFull = e.dT * 1000 * pxPerMs;
     // Clip: decay end cannot exceed graph right edge
     const maxX = graph.x0 + graph.w;
     if(graph.x0 + aw > maxX) aw = graph.w;
     if(graph.x0 + aw + dwFull > maxX) dwFull = maxX - (graph.x0 + aw);
-  } else {
-    aw = displayTimeWidth(e.aT);
-    dwFull = displayTimeWidth(e.dT);
   }
   const x0=graph.x0;
 

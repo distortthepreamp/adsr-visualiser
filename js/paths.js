@@ -149,13 +149,7 @@ function render(){
     let pEndForRelease = pts.pEnd;
     if(textbookAdsr && e.releaseOn){
       const rT_r = mapTime(state.r);
-      let rwFull;
-      if(linearTimeOn){
-        const totalMs = getLinearTotalMs();
-        rwFull = rT_r * 1000 * (graph.w / totalMs);
-      } else {
-        rwFull = displayTimeWidth(rT_r);
-      }
+      const rwFull = timeToPixels(rT_r, linearTimeOn);
       pEndForRelease = { x: pts.pEnd.x + rwFull, y: yFor(e.floor) };
     }
     rEnd = e.releaseOn ? pEndForRelease : { x: drawPS.x, y: pts.p0.y };
