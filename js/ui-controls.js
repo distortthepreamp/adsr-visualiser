@@ -180,6 +180,19 @@ function syncConsoleScale(){
   if(uiEl){ uiEl.style.transform = `scale(${s})`; uiEl.style.width = `${(1/s)*100}%`; }
 }
 
+// ---- Shared JSON download helper ----
+function downloadJSON(data, filename){
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 // ---- Shared flash-green button feedback ----
 function flashButton(btn, isActive){
   btn.style.background = '#00ff88';
