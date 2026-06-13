@@ -1,0 +1,190 @@
+@font-face {
+  font-family: 'UniversCondensed';
+  src: url('fonts/UniversCondensedBQ-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Univers55';
+  src: url('fonts/Linotype - UniversLTStd.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+:root{
+  --bg:#00ff00;
+  --fg:#ffffff;
+  --line:#ffffff;
+  --lineWidth:14;
+  --innerLineWidth:6;
+  --labelSize:17;
+  --h1Scale:1.0;
+  --h2Scale:1.0;
+  --attackColor:#ff6b6b;
+  --decayColor:#5fa8ff;
+  --releaseColor:#5fa8ff;
+  --meterFill:#00ff00;
+  --boundsColor:#ffffff;
+  --timeAxisEffectiveColor:#ffffff;
+  --timeAxisStatedColor:#aaaaaa;
+  --contourLineColor:#ffff00;
+  --panel:rgba(0,0,0,.28);
+  --panel2:rgba(0,0,0,.42);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  padding:0;
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--fg);
+  font-family:Arial, Helvetica, sans-serif;
+  display:flex;
+  flex-direction:column;
+}
+.stage{
+  padding:8px 36px;
+}
+svg{width:100%; height:auto; display:block; overflow:visible;}
+.axis{stroke:rgba(255,255,255,.35); stroke-width:2; vector-effect:non-scaling-stroke;}
+.env-outer{fill:none; stroke:var(--line); stroke-width:var(--lineWidth); stroke-linecap:square; stroke-linejoin:round; vector-effect:non-scaling-stroke;}
+.env-inner{fill:none; stroke-width:var(--innerLineWidth); stroke-linecap:square; stroke-linejoin:round; vector-effect:non-scaling-stroke;}
+.attack-inner{stroke:var(--attackColor);}
+.decay-inner{stroke:var(--decayColor);}
+.release-inner{stroke:var(--releaseColor);}
+.env-dot{fill:var(--line); stroke:none; opacity:0;}
+@keyframes blobPulse{from{opacity:1} to{opacity:.4}}
+.tap-marker{fill:var(--line); stroke:none; opacity:0;}
+.label{fill:var(--fg); font-size:24px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; font-family:'UniversCondensed',Arial,Helvetica,sans-serif;}
+.small-label{fill:var(--fg); font-size:calc(var(--labelSize) * 1px); font-weight:800; font-family:'UniversCondensed',Arial,Helvetica,sans-serif;}
+.mode-label{fill:var(--fg); font-size:calc(var(--labelSize) * 1px); font-weight:700; font-family:'UniversCondensed',Arial,Helvetica,sans-serif;}
+.ui{
+  flex-shrink:0;
+  display:grid;
+  grid-template-columns: 1.6fr 1.15fr 1.15fr;
+  gap:8px;
+  padding:3px 14px 5px;
+  transform-origin: top left;
+}
+.ui * { font-size:12px; font-weight:700; }
+.panel{
+  background:var(--panel);
+  border:1px solid rgba(255,255,255,.35);
+  border-radius:12px;
+  padding:8px;
+  backdrop-filter:blur(2px);
+  overflow:hidden;
+}
+.knobs{display:grid; grid-template-columns:repeat(6,1fr); gap:6px; align-items:start;}
+.knobBox{text-align:center;}
+.knobLabel{letter-spacing:.03em; margin-bottom:1px;}
+.knob{
+  width:56px; height:56px; margin:0 auto 2px; border-radius:50%;
+  background:radial-gradient(circle at 36% 30%, #8b2020, #4a0a0a 68%, #1a0000 100%);
+  border:3px solid rgba(255,255,255,.8); position:relative;
+}
+.knob::after{
+  content:""; position:absolute; left:50%; top:5px; width:3px; height:21px; border-radius:3px;
+  background:var(--fg); transform-origin:50% 23px; transform:translateX(-50%) rotate(var(--deg, -135deg));
+}
+input[type=range]{accent-color:white;}
+.readout{min-height:14px;}
+.targetReadout{opacity:.9; min-height:12px;}
+.row{display:flex; gap:5px; flex-wrap:wrap; align-items:center; margin:4px 0;}
+button, .fakeButton{
+  appearance:none; border:1px solid rgba(255,255,255,.8); background:var(--panel2); color:var(--fg);
+  border-radius:8px; padding:5px 9px; cursor:pointer;
+}
+button:hover{background:rgba(255,255,255,.22)}
+button.primary{padding:6px 12px; border-width:2px;}
+label{letter-spacing:.01em;}
+input[type=checkbox]{transform:scale(1.1); accent-color:white; margin-right:4px;}
+input[type=color]{width:30px; height:22px; padding:0; border:1px solid white; background:transparent;}
+input[type=number]{width:62px; border:1px solid white; background:rgba(0,0,0,.25); color:white; border-radius:6px; padding:3px 4px;}
+.seg{display:flex; gap:4px; align-items:center; flex-wrap:wrap;}
+.seg input{display:none}
+.seg span{display:inline-block; border:1px solid rgba(255,255,255,.75); border-radius:999px; padding:4px 8px; cursor:pointer; background:rgba(0,0,0,.22)}
+.seg input:checked + span{background:white; color:#111;}
+.hint{font-size:11px; font-weight:400; line-height:1.2; opacity:.88; margin-top:2px;}
+hr{margin:3px 0;}
+
+/* transport button layout */
+#tapMode50Btn, #tapMode100Btn, #tapMode200Btn, #tap500Btn, #tap1sBtn,
+#tapModeCustomBtn, #tapModeHoldBtn, #clearBtn {
+  padding: 4px 7px;
+  min-height: unset;
+  line-height: 1.1;
+  border-radius: 6px;
+}
+
+/* quickset buttons */
+.quickset-btn {
+  padding: 3px 7px;
+  min-height: unset;
+  line-height: 1.1;
+  border-radius: 6px;
+  display: block;
+  width: 50%;
+  margin-top: 3px;
+}
+.quickset-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 6px;
+}
+.quickset-legend {
+  font-size: 10px;
+  opacity: 1;
+  text-align: center;
+  margin-top: 4px;
+  white-space: nowrap;
+}
+
+/* numeric ms / value controls */
+.numeric-ms-control,
+.numeric-value-control {margin-top: 1px; color: #fff;}
+.numeric-ms-control input,
+.numeric-value-control input {
+  width: 58px;
+  background: rgba(255,255,255,.14);
+  color: #fff;
+  border: 1px solid #fff;
+  border-radius: 4px;
+  padding: 2px 4px;
+  text-align: right;
+}
+
+/* click / press feedback */
+button.v28-pressed,
+.button.v28-pressed {
+  background: #ffffff !important;
+  color: #008000 !important;
+  border-color: #ffffff !important;
+  transform: scale(0.97);
+}
+
+.timeAxisEffective {
+  font-family: 'Univers55', 'UniversCondensed', Arial, sans-serif;
+  font-size: calc(var(--labelSize) * 1px);
+  fill: var(--timeAxisEffectiveColor);
+  opacity: 1;
+}
+.timeAxisStated {
+  font-family: 'Univers55', 'UniversCondensed', Arial, sans-serif;
+  font-size: calc(var(--labelSize) * 1px);
+  fill: var(--timeAxisStatedColor);
+  opacity: 1;
+}
+
+.drop-line-effective { stroke: var(--timeAxisEffectiveColor); }
+.drop-line-stated    { stroke: var(--timeAxisStatedColor); }
+
+/* hide preset row 2 (N–Z) */
+#presetBtns button:nth-child(n+14) { display:none; }
+
+/* hide A/D/R labels */
+#aLabel, #dLabel, #rLabel,
+.a-label, .d-label, .r-label {
+  display: none !important;
+  opacity: 0 !important;
+}
