@@ -1,14 +1,19 @@
 // ---- Kiosk overlay — panel image with live knob pointer rendering ----
 
+const panelImgLoudness = new Image();
+panelImgLoudness.src = 'images/panel-loudness.png';
+const panelImgFilter = new Image();
+panelImgFilter.src = 'images/panel-filter.png';
+
 const KIOSK_KNOBS = [
-  { id:'cutoff',   x:280, y:371,  getVal:()=> state.floor, curve: false },
-  { id:'amount',   x:651, y:371,  getVal:()=> state.scale, curve: false },
-  { id:'attackF',  x:280, y:618,  getVal:()=> state.a,     curve: true  },
-  { id:'decayF',   x:466, y:618,  getVal:()=> state.d,     curve: true  },
-  { id:'sustainF', x:651, y:618,  getVal:()=> state.s,     curve: false },
-  { id:'attack',   x:280, y:864,  getVal:()=> state.a,     curve: true  },
-  { id:'decay',    x:466, y:864,  getVal:()=> state.d,     curve: true  },
-  { id:'sustain',  x:651, y:864,  getVal:()=> state.s,     curve: false },
+  { id:'cutoff',   x:280, y:371,  getVal:()=> state.floor, curve: false, modes: ['filter']   },
+  { id:'amount',   x:651, y:371,  getVal:()=> state.scale, curve: false, modes: ['filter']   },
+  { id:'attackF',  x:280, y:618,  getVal:()=> state.a,     curve: true,  modes: ['filter']   },
+  { id:'decayF',   x:466, y:618,  getVal:()=> state.d,     curve: true,  modes: ['filter']   },
+  { id:'sustainF', x:651, y:618,  getVal:()=> state.s,     curve: false, modes: ['filter']   },
+  { id:'attack',   x:280, y:864,  getVal:()=> state.a,     curve: true,  modes: ['loudness'] },
+  { id:'decay',    x:466, y:864,  getVal:()=> state.d,     curve: true,  modes: ['loudness'] },
+  { id:'sustain',  x:651, y:864,  getVal:()=> state.s,     curve: false, modes: ['loudness'] },
 ];
 
 const KNOB_ANGLE_CURVE = [
@@ -92,7 +97,13 @@ function drawKiosk(){
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  const filterOn = $('frequencyMode') && $('frequencyMode').checked;
+  const panelImg = filterOn ? panelImgFilter : panelImgLoudness;
+  ctx.drawImage(panelImg, 0, 0, canvas.width, canvas.height);
+
   KIOSK_KNOBS.forEach(knob => {
+    if (knob.modes.includes('filter')   && !filterOn) return;
+    if (knob.modes.includes('loudness') &&  filterOn) return;
     const val = Math.max(0, Math.min(1, knob.getVal()));
     // curve knobs use piecewise angle table; linear knobs use 210°→510° sweep
     // angle convention: 0° = 6 o'clock, increasing clockwise
@@ -105,15 +116,9 @@ function drawKiosk(){
   // Switch indicators
   const loudDecayOn = !!($('loudDecay') && $('loudDecay').checked);
   const hpModeOn    = !!($('hpMode')    && $('hpMode').checked);
-  drawSwitch(ctx, 114, 248, hpModeOn,    'white');  // Filter Mode Lo/Hi
-  drawSwitch(ctx, 114, 744, loudDecayOn, 'black');  // Filter Decay
-  drawSwitch(ctx, 114, 864, loudDecayOn, 'black');  // Loud Decay
-  drawSwitch(ctx, 114, 371, false, 'white');        // Filter Modulation (static)
-  drawSwitch(ctx, 114, 495, false, 'white');        // Keyboard Control 1 (static)
-  drawSwitch(ctx, 114, 618, false, 'white');        // Keyboard Control 2 (static)
-
-  // Filter Emphasis — static at zero
-  drawKnobPointer(ctx, 466, 371, 210);
+  if (filterOn)  drawSwitch(ctx, 114, 248, hpModeOn,    'white');  // Filter Mode Lo/Hi
+  if (filterOn)  drawSwitch(ctx, 114, 744, loudDecayOn, 'black');  // Filter Decay
+  if (!filterOn) drawSwitch(ctx, 114, 864, loudDecayOn, 'black');  // Loud Decay
 }
 
 let kioskOpen = false;
