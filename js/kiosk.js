@@ -111,6 +111,8 @@ function drawKiosk(){
   const currentDecayAngle = decayT >= 1
     ? posToAngle(Math.max(0, Math.min(1, state.d)))
     : kioskDecayStart + easeInOut(decayT) * (kioskDecayTarget - kioskDecayStart);
+  lastDrawnAttackAngle = currentAttackAngle;
+  lastDrawnDecayAngle  = currentDecayAngle;
 
   KIOSK_KNOBS.forEach(knob => {
     if (knob.modes.includes('filter')   && !filterOn) return;
@@ -137,18 +139,13 @@ function drawKiosk(){
 
 let kioskAttackStart = 210, kioskAttackTarget = 210, kioskAttackTransStart = 0, kioskAttackTransDur = 0;
 let kioskDecayStart  = 210, kioskDecayTarget  = 210, kioskDecayTransStart  = 0, kioskDecayTransDur  = 0;
+let lastDrawnAttackAngle = 210;
+let lastDrawnDecayAngle  = 210;
 
 window.kioskBeginTransition = function(fromA, toA, fromD, toD, durMs) {
   const now = performance.now();
-  // Capture current displayed angle as new start (handles mid-transition interrupts)
-  const attackT = kioskAttackTransDur > 0 ? Math.min(1, (now - kioskAttackTransStart) / kioskAttackTransDur) : 1;
-  const decayT  = kioskDecayTransDur  > 0 ? Math.min(1, (now - kioskDecayTransStart)  / kioskDecayTransDur)  : 1;
-  kioskAttackStart = attackT >= 1
-    ? posToAngle(Math.max(0, Math.min(1, fromA)))
-    : kioskAttackStart + easeInOut(attackT) * (kioskAttackTarget - kioskAttackStart);
-  kioskDecayStart = decayT >= 1
-    ? posToAngle(Math.max(0, Math.min(1, fromD)))
-    : kioskDecayStart + easeInOut(decayT) * (kioskDecayTarget - kioskDecayStart);
+  kioskAttackStart = lastDrawnAttackAngle;
+  kioskDecayStart  = lastDrawnDecayAngle;
   kioskAttackTarget    = posToAngle(Math.max(0, Math.min(1, toA)));
   kioskDecayTarget     = posToAngle(Math.max(0, Math.min(1, toD)));
   kioskAttackTransStart = now;
