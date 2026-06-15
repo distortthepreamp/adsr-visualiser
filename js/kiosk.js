@@ -21,10 +21,10 @@ const KNOB_ANGLE_CURVE = [
   { p: 0.08, deg: 240 },
   { p: 0.25, deg: 270 },
   { p: 0.42, deg: 330 },
-  { p: 0.58, deg:  30 },
-  { p: 0.75, deg:  60 },
-  { p: 0.90, deg: 105 },
-  { p: 1.00, deg: 150 },
+  { p: 0.58, deg: 390 },  // 30 + 360 — avoids wrap-around discontinuity
+  { p: 0.75, deg: 420 },  // 60 + 360
+  { p: 0.90, deg: 465 },  // 105 + 360
+  { p: 1.00, deg: 510 },  // 150 + 360
 ];
 
 function posToAngle(p) {

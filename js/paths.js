@@ -227,11 +227,13 @@ function render(){
 
   const kcOn = $('keyboardControl') && $('keyboardControl').checked;
   let statedSustainX = drawPS.x; // uncapped sustain x; equals drawPS.x when kc OFF
+  let _statedY = null; // elevated for geometry logging
   const statedSustainLineEl = $('statedSustainLine');
   if(statedSustainLineEl){
     if(kcOn && !textbookAdsr){
       const floorY = yFor(pts.e.floor);
       const statedY = floorY - (floorY - drawPS.y) * KC_SUSTAIN_SCALE;
+      _statedY = statedY;
       const decayPathEl = document.getElementById('decayOuter');
       statedSustainX = pts.p1.x + (drawPS.x - pts.p1.x) * KC_SUSTAIN_SCALE; // geometric fallback
       if(decayPathEl){
@@ -388,6 +390,17 @@ function render(){
   syncControls();
   updateButtonStates();
   setTimeout(refreshNumericInputs, 0); // keep numeric inputs in sync after every render
+  window._lastRenderGeometry = {
+    drawPS:        { x: drawPS.x, y: drawPS.y, level: drawPS.level },
+    drawP1:        { x: drawP1.x, y: drawP1.y },
+    p1:            { x: pts.p1.x, y: pts.p1.y },
+    pEnd:          { x: pts.pEnd.x, y: pts.pEnd.y },
+    ceilY,
+    statedSustainX,
+    statedY:       _statedY,
+    overrange,
+    showClipped
+  };
   if(window.kioskDrawIfOpen) window.kioskDrawIfOpen();
   } catch(err) {
     logEvent('RENDER_ERROR', { message: err && err.message, state: { a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale } });

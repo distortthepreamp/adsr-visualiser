@@ -71,7 +71,7 @@ function syncControls(){
 
 // ---- transition — animates state toward state.target ----
 function transition(durSec){
-  logEvent('TRANSITION', { durSec: durSec !== undefined ? durSec : currentTransitionSec, target: { a: state.target.a, d: state.target.d, s: state.target.s, r: state.target.r, floor: state.target.floor, scale: state.target.scale } });
+  logEvent('TRANSITION', { durSec: durSec !== undefined ? durSec : currentTransitionSec, from: { a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale }, target: { a: state.target.a, d: state.target.d, s: state.target.s, r: state.target.r, floor: state.target.floor, scale: state.target.scale }, geometry: window._lastRenderGeometry || null });
   clearBlobAndMarker();
   animationToken++;
   const myAnimationToken = animationToken;
@@ -270,11 +270,30 @@ function initUIControls(){
   // Mode change
   document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>{ if(el.value==='animate' && el.checked) syncTargetToLive(); syncControls(); }));
 
+  // Declutter toggle
+  if($('declutter')) $('declutter').addEventListener('change', e => {
+    document.body.classList.toggle('decluttered', e.target.checked);
+  });
+
   // Checkbox render-only listeners
   ['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine'].forEach(id=>$(id).addEventListener('change',render));
 
   // Checkbox debug log listeners
-  ['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine'].forEach(id=>{ const el=$(id); if(el) el.addEventListener('change', () => logEvent('CHECKBOX', { id, checked: el.checked })); });
+  ['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine'].forEach(id=>{ const el=$(id); if(el) el.addEventListener('change', () => {
+    const chk = id2 => { const e2=$(id2); return e2 ? e2.checked : undefined; };
+    logEvent('CHECKBOX', {
+      id, checked: el.checked,
+      state: { a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale },
+      flags: {
+        loudDecay: chk('loudDecay'), keyboardControl: chk('keyboardControl'),
+        frequencyMode: chk('frequencyMode'), hpMode: chk('hpMode'),
+        showClipped: chk('showClipped'), analogueCurve: chk('analogueCurve'),
+        textbookAdsr: chk('textbookAdsr'), linearTime: chk('linearTime'),
+        drawReleaseWhenZero: chk('drawReleaseWhenZero'), tbSustainCollapse: chk('tbSustainCollapse')
+      },
+      geometry: window._lastRenderGeometry || null
+    });
+  }); });
 
   // tbSustainCollapse — also triggers a transition
   $('tbSustainCollapse').addEventListener('change', () => {
