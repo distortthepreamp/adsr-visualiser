@@ -105,8 +105,12 @@ function drawKiosk(){
   const now = performance.now();
   const attackT = kioskAttackTransDur > 0 ? Math.min(1, (now - kioskAttackTransStart) / kioskAttackTransDur) : 1;
   const decayT  = kioskDecayTransDur  > 0 ? Math.min(1, (now - kioskDecayTransStart)  / kioskDecayTransDur)  : 1;
-  const currentAttackAngle = kioskAttackStart + easeInOut(attackT) * (kioskAttackTarget - kioskAttackStart);
-  const currentDecayAngle  = kioskDecayStart  + easeInOut(decayT)  * (kioskDecayTarget  - kioskDecayStart);
+  const currentAttackAngle = attackT >= 1
+    ? posToAngle(Math.max(0, Math.min(1, state.a)))
+    : kioskAttackStart + easeInOut(attackT) * (kioskAttackTarget - kioskAttackStart);
+  const currentDecayAngle = decayT >= 1
+    ? posToAngle(Math.max(0, Math.min(1, state.d)))
+    : kioskDecayStart + easeInOut(decayT) * (kioskDecayTarget - kioskDecayStart);
 
   KIOSK_KNOBS.forEach(knob => {
     if (knob.modes.includes('filter')   && !filterOn) return;
@@ -139,8 +143,12 @@ window.kioskBeginTransition = function(fromA, toA, fromD, toD, durMs) {
   // Capture current displayed angle as new start (handles mid-transition interrupts)
   const attackT = kioskAttackTransDur > 0 ? Math.min(1, (now - kioskAttackTransStart) / kioskAttackTransDur) : 1;
   const decayT  = kioskDecayTransDur  > 0 ? Math.min(1, (now - kioskDecayTransStart)  / kioskDecayTransDur)  : 1;
-  kioskAttackStart = kioskAttackStart + easeInOut(attackT) * (kioskAttackTarget - kioskAttackStart);
-  kioskDecayStart  = kioskDecayStart  + easeInOut(decayT)  * (kioskDecayTarget  - kioskDecayStart);
+  kioskAttackStart = attackT >= 1
+    ? posToAngle(Math.max(0, Math.min(1, fromA)))
+    : kioskAttackStart + easeInOut(attackT) * (kioskAttackTarget - kioskAttackStart);
+  kioskDecayStart = decayT >= 1
+    ? posToAngle(Math.max(0, Math.min(1, fromD)))
+    : kioskDecayStart + easeInOut(decayT) * (kioskDecayTarget - kioskDecayStart);
   kioskAttackTarget    = posToAngle(Math.max(0, Math.min(1, toA)));
   kioskDecayTarget     = posToAngle(Math.max(0, Math.min(1, toD)));
   kioskAttackTransStart = now;
