@@ -79,6 +79,7 @@ function transition(durSec){
   if(durSec===undefined) durSec=currentTransitionSec;
   const dur=durSec*1000;
   const start={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale,tbSustainGap:state.tbSustainGap,zoomFactor:state.zoomFactor}, end={...state.target};
+  if(window.kioskBeginTransition) window.kioskBeginTransition(start.a, end.a, start.d, end.d, dur);
   const startAms=mapTime(start.a)*1000, endAms=mapTime(end.a)*1000;
   const startDms=mapTime(start.d)*1000, endDms=mapTime(end.d)*1000;
   const startRms=mapTime(start.r)*1000, endRms=mapTime(end.r)*1000;

@@ -101,15 +101,25 @@ function drawKiosk(){
   const panelImg = filterOn ? panelImgFilter : panelImgLoudness;
   ctx.drawImage(panelImg, 0, 0, canvas.width, canvas.height);
 
+  // Compute time-based eased angles for attack and decay
+  const now = performance.now();
+  const attackT = kioskAttackTransDur > 0 ? Math.min(1, (now - kioskAttackTransStart) / kioskAttackTransDur) : 1;
+  const decayT  = kioskDecayTransDur  > 0 ? Math.min(1, (now - kioskDecayTransStart)  / kioskDecayTransDur)  : 1;
+  const currentAttackAngle = kioskAttackStart + easeInOut(attackT) * (kioskAttackTarget - kioskAttackStart);
+  const currentDecayAngle  = kioskDecayStart  + easeInOut(decayT)  * (kioskDecayTarget  - kioskDecayStart);
+
   KIOSK_KNOBS.forEach(knob => {
     if (knob.modes.includes('filter')   && !filterOn) return;
     if (knob.modes.includes('loudness') &&  filterOn) return;
     const val = Math.max(0, Math.min(1, knob.getVal()));
-    // curve knobs use piecewise angle table; linear knobs use 210°→510° sweep
+    // curve knobs use time-based eased angle; linear knobs use 210°→510° sweep
     // angle convention: 0° = 6 o'clock, increasing clockwise
-    const angleDeg = knob.curve
-      ? posToAngle(val)
-      : 210 + val * 300;
+    let angleDeg;
+    if (knob.curve) {
+      angleDeg = (knob.id === 'attack' || knob.id === 'attackF') ? currentAttackAngle : currentDecayAngle;
+    } else {
+      angleDeg = 210 + val * 300;
+    }
     drawKnobPointer(ctx, knob.x, knob.y, angleDeg);
   });
 
@@ -120,6 +130,24 @@ function drawKiosk(){
   if (filterOn)  drawSwitch(ctx, 114, 744, loudDecayOn, 'black');  // Filter Decay
   if (!filterOn) drawSwitch(ctx, 114, 864, loudDecayOn, 'black');  // Loud Decay
 }
+
+let kioskAttackStart = 210, kioskAttackTarget = 210, kioskAttackTransStart = 0, kioskAttackTransDur = 0;
+let kioskDecayStart  = 210, kioskDecayTarget  = 210, kioskDecayTransStart  = 0, kioskDecayTransDur  = 0;
+
+window.kioskBeginTransition = function(fromA, toA, fromD, toD, durMs) {
+  const now = performance.now();
+  // Capture current displayed angle as new start (handles mid-transition interrupts)
+  const attackT = kioskAttackTransDur > 0 ? Math.min(1, (now - kioskAttackTransStart) / kioskAttackTransDur) : 1;
+  const decayT  = kioskDecayTransDur  > 0 ? Math.min(1, (now - kioskDecayTransStart)  / kioskDecayTransDur)  : 1;
+  kioskAttackStart = kioskAttackStart + easeInOut(attackT) * (kioskAttackTarget - kioskAttackStart);
+  kioskDecayStart  = kioskDecayStart  + easeInOut(decayT)  * (kioskDecayTarget  - kioskDecayStart);
+  kioskAttackTarget    = posToAngle(Math.max(0, Math.min(1, toA)));
+  kioskDecayTarget     = posToAngle(Math.max(0, Math.min(1, toD)));
+  kioskAttackTransStart = now;
+  kioskDecayTransStart  = now;
+  kioskAttackTransDur   = durMs;
+  kioskDecayTransDur    = durMs;
+};
 
 let kioskOpen = false;
 
