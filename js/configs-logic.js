@@ -61,7 +61,8 @@ function buildConfigSnapshot(){
     vbHeight: Number($('vbHeight').value),
     graphLeft: Number($('graphLeft') ? $('graphLeft').value : 220),
     activePresetIndex: window.getActivePresetIndex ? window.getActivePresetIndex() : -1,
-    presetDirtyState: window.presetDirtyState || 'none'
+    presetDirtyState: window.presetDirtyState || 'none',
+    kioskOpen: kioskOpen
   };
 }
 
@@ -144,6 +145,9 @@ function loadConfigObject(cfg){
   if(window.restorePresetHighlight){
     window.restorePresetHighlight(cfg.activePresetIndex !== undefined ? cfg.activePresetIndex : -1, cfg.presetDirtyState || 'none');
   }
+  // Kiosk state
+  if(cfg.kioskOpen) openKiosk(); else closeKiosk();
+
   transition(0);
   refreshNumericInputs();
   syncControls();

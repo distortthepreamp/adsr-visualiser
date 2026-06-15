@@ -127,6 +127,7 @@ function openKiosk(){
   kioskOpen = true;
   const overlay = document.getElementById('kioskOverlay');
   if(overlay) overlay.style.display = 'flex';
+  document.body.classList.add('kiosk-open');
   drawKiosk();
 }
 
@@ -134,6 +135,7 @@ function closeKiosk(){
   kioskOpen = false;
   const overlay = document.getElementById('kioskOverlay');
   if(overlay) overlay.style.display = 'none';
+  document.body.classList.remove('kiosk-open');
 }
 
 function toggleKiosk(){
