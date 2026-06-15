@@ -34,7 +34,7 @@ function posToAngle(p) {
 }
 
 const KNOB_RADIUS    = 50;
-const POINTER_LENGTH = 40;
+const POINTER_LENGTH = 61;
 
 const SWITCH_LEFT_X   = 53;
 const SWITCH_CENTRE_X = 114;
@@ -59,15 +59,38 @@ function drawSwitch(ctx, x, y, on, color) {
   ctx.fill();
 }
 
+function drawKnobPointer(ctx, cx, cy, angleDeg) {
+  const rad = (angleDeg - 90) * Math.PI / 180;
+  const offset = KNOB_RADIUS - POINTER_LENGTH; // = -11
+
+  const tipX = cx + Math.cos(rad) * (POINTER_LENGTH + offset);
+  const tipY = cy + Math.sin(rad) * (POINTER_LENGTH + offset);
+
+  const perpRad = rad + Math.PI / 2;
+  const halfH = 22.5;
+  const backLeftX  = cx + Math.cos(rad) * offset + Math.cos(perpRad) * halfH;
+  const backLeftY  = cy + Math.sin(rad) * offset + Math.sin(perpRad) * halfH;
+  const backRightX = cx + Math.cos(rad) * offset - Math.cos(perpRad) * halfH;
+  const backRightY = cy + Math.sin(rad) * offset - Math.sin(perpRad) * halfH;
+
+  const notchX = cx + Math.cos(rad) * (POINTER_LENGTH * 0.2 + offset);
+  const notchY = cy + Math.sin(rad) * (POINTER_LENGTH * 0.2 + offset);
+
+  ctx.beginPath();
+  ctx.moveTo(tipX, tipY);
+  ctx.lineTo(backLeftX, backLeftY);
+  ctx.lineTo(notchX, notchY);
+  ctx.lineTo(backRightX, backRightY);
+  ctx.closePath();
+  ctx.fillStyle = 'white';
+  ctx.fill();
+}
+
 function drawKiosk(){
   const canvas = document.getElementById('kioskCanvas');
   if(!canvas) return;
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth   = 6;
-  ctx.lineCap     = 'round';
 
   KIOSK_KNOBS.forEach(knob => {
     const val = Math.max(0, Math.min(1, knob.getVal()));
@@ -75,16 +98,8 @@ function drawKiosk(){
     // angle convention: 0° = 6 o'clock, increasing clockwise
     const angleDeg = knob.curve
       ? posToAngle(val)
-      : knob.sustain
-        ? 210 + val * 300
-        : 210 + val * 300;
-    const angleRad = (angleDeg - 90) * Math.PI / 180;
-    const x2 = knob.x + Math.cos(angleRad) * POINTER_LENGTH;
-    const y2 = knob.y + Math.sin(angleRad) * POINTER_LENGTH;
-    ctx.beginPath();
-    ctx.moveTo(knob.x, knob.y);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
+      : 210 + val * 300;
+    drawKnobPointer(ctx, knob.x, knob.y, angleDeg);
   });
 
   // Switch indicators
@@ -98,15 +113,7 @@ function drawKiosk(){
   drawSwitch(ctx, 114, 618, false, 'white');        // Keyboard Control 2 (static)
 
   // Filter Emphasis — static at zero
-  const emphX = 466, emphY = 371;
-  const emphAngle = (210 - 90) * Math.PI / 180;
-  ctx.beginPath();
-  ctx.moveTo(emphX, emphY);
-  ctx.lineTo(emphX + Math.cos(emphAngle) * POINTER_LENGTH, emphY + Math.sin(emphAngle) * POINTER_LENGTH);
-  ctx.strokeStyle = 'white';
-  ctx.lineWidth = 6;
-  ctx.lineCap = 'round';
-  ctx.stroke();
+  drawKnobPointer(ctx, 466, 371, 210);
 }
 
 let kioskOpen = false;
