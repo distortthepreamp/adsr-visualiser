@@ -388,6 +388,7 @@ function render(){
   syncControls();
   updateButtonStates();
   setTimeout(refreshNumericInputs, 0); // keep numeric inputs in sync after every render
+  if(window.kioskDrawIfOpen) window.kioskDrawIfOpen();
   } catch(err) {
     logEvent('RENDER_ERROR', { message: err && err.message, state: { a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale } });
     throw err;

@@ -6,6 +6,7 @@
 <title>Model D ADSR Visualiser - Sustain Marker v17</title>
 <!-- v17: sustain-marker model with thick white A/D/R strokes and soft coloured centre lines. -->
 <link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/kiosk.css">
 </head>
 <body>
   <div style="background:rgba(0,0,0,0.7);padding:4px 36px;display:flex;justify-content:flex-end;align-items:center;flex-shrink:0">
@@ -292,6 +293,14 @@
     </div>
   </div>
 
+<!-- Kiosk overlay -->
+<div id="kioskOverlay">
+  <div id="kioskPanel">
+    <img src="images/panel.png" alt="Model D Panel">
+    <canvas id="kioskCanvas" width="800" height="1160"></canvas>
+  </div>
+</div>
+
 <!-- Help modal -->
 <div id="helpOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;align-items:center;justify-content:center;">
   <div id="helpModal" style="background:rgba(18,18,18,.97);border:1px solid rgba(255,255,255,.3);border-radius:14px;padding:22px 28px 24px;min-width:340px;color:#fff;font-family:Arial,Helvetica,sans-serif;position:relative;">
@@ -324,6 +333,7 @@
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">C</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Clipped Shape</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">X</td><td style="padding:3px 0;font-size:13px;font-weight:700">Linear Time</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">B</td><td style="padding:3px 0;font-size:13px;font-weight:700">Analogue Curve</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">K</td><td style="padding:3px 0;font-size:13px;font-weight:700">Kiosk Mode</td></tr>
         </table>
       </div>
       <div>
@@ -375,6 +385,7 @@
 <script src="js/ui-controls.js"></script>
 <script src="js/shortcuts.js"></script>
 <script src="js/knobs.js"></script>
+<script src="js/kiosk.js"></script>
 <script>
 
 const STATUS_DIM_OPACITY = 0.65;

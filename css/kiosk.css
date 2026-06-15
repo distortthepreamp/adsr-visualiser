@@ -1,0 +1,36 @@
+#kioskOverlay {
+  display: none;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 400px;
+  height: 580px;
+  background: #000;
+  z-index: 100;
+  overflow: hidden;
+}
+
+#kioskPanel {
+  position: relative;
+  width: 800px;
+  height: 1160px;
+  transform: scale(0.5);
+  transform-origin: top left;
+}
+
+#kioskPanel img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 800px;
+  height: 1160px;
+}
+
+#kioskCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 800px;
+  height: 1160px;
+  pointer-events: none;
+}
