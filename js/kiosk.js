@@ -36,6 +36,29 @@ function posToAngle(p) {
 const KNOB_RADIUS    = 50;
 const POINTER_LENGTH = 40;
 
+const SWITCH_LEFT_X   = 53;
+const SWITCH_CENTRE_X = 114;
+const SWITCH_RIGHT_X  = 175;
+const SWITCH_ARROW_H  = 45;
+
+function drawSwitch(ctx, x, y, on, color) {
+  ctx.beginPath();
+  if (on) {
+    ctx.moveTo(SWITCH_CENTRE_X + (SWITCH_RIGHT_X - SWITCH_CENTRE_X) * 0.9, y);
+    ctx.lineTo(SWITCH_CENTRE_X, y - SWITCH_ARROW_H/2);
+    ctx.lineTo(SWITCH_CENTRE_X + (SWITCH_RIGHT_X - SWITCH_CENTRE_X) * 0.2, y);
+    ctx.lineTo(SWITCH_CENTRE_X, y + SWITCH_ARROW_H/2);
+  } else {
+    ctx.moveTo(SWITCH_CENTRE_X - (SWITCH_CENTRE_X - SWITCH_LEFT_X) * 0.9, y);
+    ctx.lineTo(SWITCH_CENTRE_X, y - SWITCH_ARROW_H/2);
+    ctx.lineTo(SWITCH_CENTRE_X - (SWITCH_CENTRE_X - SWITCH_LEFT_X) * 0.2, y);
+    ctx.lineTo(SWITCH_CENTRE_X, y + SWITCH_ARROW_H/2);
+  }
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+}
+
 function drawKiosk(){
   const canvas = document.getElementById('kioskCanvas');
   if(!canvas) return;
@@ -63,6 +86,16 @@ function drawKiosk(){
     ctx.lineTo(x2, y2);
     ctx.stroke();
   });
+
+  // Switch indicators
+  const loudDecayOn = !!($('loudDecay') && $('loudDecay').checked);
+  const hpModeOn    = !!($('hpMode')    && $('hpMode').checked);
+  drawSwitch(ctx, 114, 248, hpModeOn,    'white');  // Filter Mode Lo/Hi
+  drawSwitch(ctx, 114, 744, loudDecayOn, 'black');  // Filter Decay
+  drawSwitch(ctx, 114, 864, loudDecayOn, 'black');  // Loud Decay
+  drawSwitch(ctx, 114, 371, false, 'white');        // Filter Modulation (static)
+  drawSwitch(ctx, 114, 495, false, 'white');        // Keyboard Control 1 (static)
+  drawSwitch(ctx, 114, 618, false, 'white');        // Keyboard Control 2 (static)
 
   // Filter Emphasis — static at zero
   const emphX = 466, emphY = 371;
