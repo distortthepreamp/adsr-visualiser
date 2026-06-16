@@ -1,8 +1,8 @@
 // ---- Textbook ADSR geometry and rendering ----
 
 function copySustainStyle(source, target) {
-  ['stroke','stroke-width','stroke-dasharray','stroke-linecap','stroke-opacity']
-    .forEach(attr => target.setAttribute(attr, source.getAttribute(attr)));
+  ['stroke','strokeWidth','strokeDasharray','strokeLinecap','strokeOpacity']
+    .forEach(prop => target.style[prop] = source.style[prop]);
 }
 
 // Textbook ADSR animation geometry — mirrors render()'s textbook coordinate logic.
