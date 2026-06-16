@@ -282,25 +282,26 @@ function initUIControls(){
     document.body.classList.toggle('decluttered', e.target.checked);
   });
 
-  // Checkbox render-only listeners
-  ['loudDecay','keyboardControl','drawReleaseWhenZero','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine'].forEach(id=>$(id).addEventListener('change',render));
-
-  // Checkbox debug log listeners
-  ['loudDecay','keyboardControl','drawReleaseWhenZero','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine'].forEach(id=>{ const el=$(id); if(el) el.addEventListener('change', () => {
-    const chk = id2 => { const e2=$(id2); return e2 ? e2.checked : undefined; };
-    logEvent('CHECKBOX', {
-      id, checked: el.checked,
-      state: { a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale },
-      flags: {
-        loudDecay: chk('loudDecay'), keyboardControl: chk('keyboardControl'),
-        frequencyMode: chk('frequencyMode'), hpMode: chk('hpMode'),
-        showClipped: chk('showClipped'), analogueCurve: chk('analogueCurve'),
-        textbookAdsr: chk('textbookAdsr'), linearTime: chk('linearTime'),
-        drawReleaseWhenZero: chk('drawReleaseWhenZero'), tbSustainCollapse: chk('tbSustainCollapse')
-      },
-      geometry: window._lastRenderGeometry || null
+  // Checkbox render and debug log listeners
+  ['loudDecay','keyboardControl','drawReleaseWhenZero','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine'].forEach(id => {
+    const el = $(id); if(!el) return;
+    el.addEventListener('change', render);
+    el.addEventListener('change', () => {
+      const chk = id2 => { const e2=$(id2); return e2 ? e2.checked : undefined; };
+      logEvent('CHECKBOX', {
+        id, checked: el.checked,
+        state: { a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale },
+        flags: {
+          loudDecay: chk('loudDecay'), keyboardControl: chk('keyboardControl'),
+          frequencyMode: chk('frequencyMode'), hpMode: chk('hpMode'),
+          showClipped: chk('showClipped'), analogueCurve: chk('analogueCurve'),
+          textbookAdsr: chk('textbookAdsr'), linearTime: chk('linearTime'),
+          drawReleaseWhenZero: chk('drawReleaseWhenZero'), tbSustainCollapse: chk('tbSustainCollapse')
+        },
+        geometry: window._lastRenderGeometry || null
+      });
     });
-  }); });
+  });
 
   // tbSustainCollapse — also triggers a transition
   $('tbSustainCollapse').addEventListener('change', () => {

@@ -1,5 +1,10 @@
 // ---- Textbook ADSR geometry and rendering ----
 
+function copySustainStyle(source, target) {
+  ['stroke','stroke-width','stroke-dasharray','stroke-linecap','stroke-opacity']
+    .forEach(attr => target.setAttribute(attr, source.getAttribute(attr)));
+}
+
 // Textbook ADSR animation geometry — mirrors render()'s textbook coordinate logic.
 function tbComputeAnimPoints(){
   const e=getEffective();
@@ -46,13 +51,7 @@ function renderTextbookPaths({ pts, drawPS, drawP1, ceilY, showClipped, drawRele
     const tbSusMarker=$('tbSustainMarker');
     if(tbSusMarker){
       const smSrc=$('sustainMarker');
-      if(smSrc){
-        tbSusMarker.style.stroke         = smSrc.style.stroke;
-        tbSusMarker.style.strokeWidth    = smSrc.style.strokeWidth;
-        tbSusMarker.style.strokeDasharray= smSrc.style.strokeDasharray;
-        tbSusMarker.style.strokeLinecap  = smSrc.style.strokeLinecap;
-        tbSusMarker.style.strokeOpacity  = smSrc.style.strokeOpacity;
-      }
+      if(smSrc) copySustainStyle(smSrc, tbSusMarker);
       if(drawReleasePath){
         tbSusMarker.setAttribute('x1',pts.pEnd.x); tbSusMarker.setAttribute('y1',drawPS.y);
         tbSusMarker.setAttribute('x2',tbSusEnd.x);  tbSusMarker.setAttribute('y2',drawPS.y);
@@ -77,13 +76,7 @@ function renderTextbookPaths({ pts, drawPS, drawP1, ceilY, showClipped, drawRele
   if(tbMDLine){
     if($('tbShowModelDSustain')&&$('tbShowModelDSustain').checked){
       const smSrc=$('sustainMarker');
-      if(smSrc){
-        tbMDLine.style.stroke         = smSrc.style.stroke;
-        tbMDLine.style.strokeWidth    = smSrc.style.strokeWidth;
-        tbMDLine.style.strokeDasharray= smSrc.style.strokeDasharray;
-        tbMDLine.style.strokeLinecap  = smSrc.style.strokeLinecap;
-        tbMDLine.style.strokeOpacity  = smSrc.style.strokeOpacity;
-      }
+      if(smSrc) copySustainStyle(smSrc, tbMDLine);
       tbMDLine.setAttribute('x1',tbSusEnd.x); tbMDLine.setAttribute('y1',drawPS.y);
       tbMDLine.setAttribute('x2',graph.x0+graph.w); tbMDLine.setAttribute('y2',drawPS.y);
       tbMDLine.style.display='';

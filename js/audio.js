@@ -87,18 +87,17 @@ const MASTER_GAIN = 0.7;             // default master output gain
       vcaGain.gain.setValueAtTime(0,now);
       vcaGain.gain.linearRampToValueAtTime(1,now+Math.max(0.001,e.aT));
       vcaGain.gain.linearRampToValueAtTime(Math.max(0.0001,e.s),now+Math.max(0.001,e.aT)+Math.max(0.001,e.dT));
-      filter1.type='lowpass'; filter1.frequency.cancelScheduledValues(now); filter1.frequency.setValueAtTime(FILTER_OPEN_FREQUENCY,now); filter1.Q.value=0;
-      filter2.type='lowpass'; filter2.frequency.cancelScheduledValues(now); filter2.frequency.setValueAtTime(FILTER_OPEN_FREQUENCY,now); filter2.Q.value=0;
+      [filter1,filter2].forEach(f=>{ f.type='lowpass'; f.frequency.cancelScheduledValues(now); f.frequency.setValueAtTime(FILTER_OPEN_FREQUENCY,now); f.Q.value=0; });
     } else {
       // Filter envelope, VCA fully open
       vcaGain.gain.cancelScheduledValues(now); vcaGain.gain.setValueAtTime(1,now);
       const fFloor=mapCutoff(e.floor), fCeil=mapCutoff(e.floor+e.scale), fSus=mapCutoff(e.floor+e.s*e.scale);
-      filter1.frequency.cancelScheduledValues(now); filter2.frequency.cancelScheduledValues(now);
-      filter1.frequency.setValueAtTime(fFloor,now); filter2.frequency.setValueAtTime(fFloor,now);
-      filter1.frequency.linearRampToValueAtTime(fCeil,now+Math.max(0.001,e.aT));
-      filter2.frequency.linearRampToValueAtTime(fCeil,now+Math.max(0.001,e.aT));
-      filter1.frequency.linearRampToValueAtTime(fSus,now+Math.max(0.001,e.aT)+Math.max(0.001,e.dT));
-      filter2.frequency.linearRampToValueAtTime(fSus,now+Math.max(0.001,e.aT)+Math.max(0.001,e.dT));
+      [filter1,filter2].forEach(f=>{
+        f.frequency.cancelScheduledValues(now);
+        f.frequency.setValueAtTime(fFloor,now);
+        f.frequency.linearRampToValueAtTime(fCeil,now+Math.max(0.001,e.aT));
+        f.frequency.linearRampToValueAtTime(fSus,now+Math.max(0.001,e.aT)+Math.max(0.001,e.dT));
+      });
     }
   }
 
@@ -118,13 +117,13 @@ const MASTER_GAIN = 0.7;             // default master output gain
     } else {
       const fFloor=mapCutoff(e.floor), fSus=mapCutoff(e.floor+e.s*e.scale);
       if(e.releaseOn){
-        filter1.frequency.cancelScheduledValues(now); filter2.frequency.cancelScheduledValues(now);
-        filter1.frequency.setValueAtTime(filter1.frequency.value,now); filter2.frequency.setValueAtTime(filter2.frequency.value,now);
-        filter1.frequency.linearRampToValueAtTime(fFloor,now+Math.max(0.001,e.rT));
-        filter2.frequency.linearRampToValueAtTime(fFloor,now+Math.max(0.001,e.rT));
+        [filter1,filter2].forEach(f=>{
+          f.frequency.cancelScheduledValues(now);
+          f.frequency.setValueAtTime(f.frequency.value,now);
+          f.frequency.linearRampToValueAtTime(fFloor,now+Math.max(0.001,e.rT));
+        });
       } else {
-        filter1.frequency.cancelScheduledValues(now); filter1.frequency.setValueAtTime(fFloor,now);
-        filter2.frequency.cancelScheduledValues(now); filter2.frequency.setValueAtTime(fFloor,now);
+        [filter1,filter2].forEach(f=>{ f.frequency.cancelScheduledValues(now); f.frequency.setValueAtTime(fFloor,now); });
       }
     }
   }

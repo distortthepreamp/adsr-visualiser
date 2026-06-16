@@ -177,20 +177,17 @@ function releaseFromCurrent(){
   if(!e.releaseOn){ clearBlobAndMarker(); return; }
 
   const pts=computePoints();
-  let startLevel, startX, startY;
+  const startX = Number($('dot').getAttribute('cx'));
+  const startY = Number($('dot').getAttribute('cy'));
+  let startLevel;
   if(state.held && state.currentPhase === 'sustain'){
     startLevel = pts.e.s;
-    startX = Number($('dot').getAttribute('cx'));
-    startY = Number($('dot').getAttribute('cy'));
-    releaseStartPoint = { x: startX, y: startY, level: startLevel };
     state.releaseFromDecay = false;
   } else {
     startLevel = state.dotLevel;
-    startX = Number($('dot').getAttribute('cx'));
-    startY = Number($('dot').getAttribute('cy'));
-    releaseStartPoint = { x: startX, y: startY, level: startLevel };
     state.releaseFromDecay = (startLevel > pts.e.s);
   }
+  releaseStartPoint = { x: startX, y: startY, level: startLevel };
   if($('textbookAdsr') && $('textbookAdsr').checked){
     const tb=tbComputeAnimPoints();
     const sY=tb.tbSustainEnd.y, fY=tb.tbReleaseEnd.y;
