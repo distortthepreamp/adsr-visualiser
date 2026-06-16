@@ -308,6 +308,8 @@ function initUIControls(){
   $('meterScanlinesVisible').addEventListener('change', render);
   $('blobGlowEnabled').addEventListener('change', () => { applyBlobGlow(); if(state.currentPhase==='sustain') startGlowPulse(); else stopGlowPulse(); });
   $('blobGlowRadius').addEventListener('input', e => { const inp=e.target,c=Math.min(30,Math.max(0,isNaN(parseInt(inp.value))?8:parseInt(inp.value))); inp.value=c; applyBlobGlow(); if(state.currentPhase==='sustain') startGlowPulse(); });
+  $('kioskKnobGlow').addEventListener('change', () => { render(); if(window.kioskDrawIfOpen) kioskDrawIfOpen(); });
+  $('kioskKnobGlowRadius').addEventListener('input', e => { const inp=e.target,c=Math.min(100,Math.max(0,isNaN(parseInt(inp.value))?40:parseInt(inp.value))); inp.value=c; if(window.kioskDrawIfOpen) kioskDrawIfOpen(); });
 
   // Filter mode
   $('frequencyMode').addEventListener('change', () => { syncHpModeEnabled(); setMeterLevel(state.dotLevel); });

@@ -24,6 +24,8 @@ function buildConfigSnapshot(){
     showStatedLines: $('showStatedLines') ? $('showStatedLines').checked : false,
     meterGlow: $('meterGlow') ? $('meterGlow').checked : true,
     meterGlowRadius: Number($('meterGlowRadius') ? $('meterGlowRadius').value : 5),
+    kioskKnobGlow: $('kioskKnobGlow') ? $('kioskKnobGlow').checked : true,
+    kioskKnobGlowRadius: Number($('kioskKnobGlowRadius') ? $('kioskKnobGlowRadius').value : 40),
     meterScanlinesVisible: $('meterScanlinesVisible') ? $('meterScanlinesVisible').checked : true,
     blobGlowEnabled: $('blobGlowEnabled') ? $('blobGlowEnabled').checked : true,
     keepTapMarker: $('keepTapMarker') ? $('keepTapMarker').checked : true,
@@ -80,7 +82,7 @@ function loadConfigObject(cfg){
   state.target.tbSustainGap = state.tbSustainGap;
 
   // Checkboxes
-  ['loudDecay','drawReleaseWhenZero','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine','meterGlow','meterScanlinesVisible','blobGlowEnabled','keepTapMarker','timelineZoom3x'].forEach(id => {
+  ['loudDecay','drawReleaseWhenZero','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine','meterGlow','meterScanlinesVisible','blobGlowEnabled','keepTapMarker','timelineZoom3x','kioskKnobGlow'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
   const restoredZoom = ($('timelineZoom3x') && $('timelineZoom3x').checked) ? 3 : 1;
@@ -143,6 +145,7 @@ function loadConfigObject(cfg){
   recalcGeometry();
   if($('meterGlowRadius') && cfg.meterGlowRadius !== undefined){ $('meterGlowRadius').value = cfg.meterGlowRadius; }
   if($('blobGlowRadius') && cfg.blobGlowRadius !== undefined){ $('blobGlowRadius').value = cfg.blobGlowRadius; }
+  if($('kioskKnobGlowRadius') && cfg.kioskKnobGlowRadius !== undefined){ $('kioskKnobGlowRadius').value = cfg.kioskKnobGlowRadius; }
 
   // Preset highlight
   if(window.restorePresetHighlight){

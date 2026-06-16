@@ -108,23 +108,36 @@ function drawKiosk(){
   const filterColor       = _cs.getPropertyValue('--kioskFilterColor').trim()       || '#0DCAF2';
   const cutoffAmountColor = _cs.getPropertyValue('--kioskCutoffAmountColor').trim() || '#E5F20D';
 
-  function drawKnobCircle(x, y, color) {
+  const glowEnabled = $('kioskKnobGlow') && $('kioskKnobGlow').checked;
+  const glowRadius  = parseInt($('kioskKnobGlowRadius') && $('kioskKnobGlowRadius').value) || 40;
+
+  // Expire glow if its window has passed
+  if (performance.now() >= activeKioskGlowUntil) activeKioskKnob = null;
+  const nowGlowing = activeKioskKnob !== null && performance.now() < activeKioskGlowUntil;
+
+  function drawKnobCircle(x, y, color, param) {
+    const glow = nowGlowing && activeKioskKnob.includes(param);
+    if (glow && glowEnabled) {
+      ctx.shadowColor = color;
+      ctx.shadowBlur  = glowRadius;
+    }
     ctx.beginPath();
     ctx.arc(x, y, KNOB_RADIUS, 0, Math.PI * 2);
     ctx.fillStyle = color;
     ctx.fill();
+    ctx.shadowBlur = 0;
   }
 
   if (!filterOn) {
-    drawKnobCircle(280, 864, loudnessColor);
-    drawKnobCircle(466, 864, loudnessColor);
-    drawKnobCircle(651, 864, loudnessColor);
+    drawKnobCircle(280, 864, loudnessColor,     'attack');
+    drawKnobCircle(466, 864, loudnessColor,     'decay');
+    drawKnobCircle(651, 864, loudnessColor,     'sustain');
   } else {
-    drawKnobCircle(280, 618, filterColor);
-    drawKnobCircle(466, 618, filterColor);
-    drawKnobCircle(651, 618, filterColor);
-    drawKnobCircle(280, 371, cutoffAmountColor);
-    drawKnobCircle(651, 371, cutoffAmountColor);
+    drawKnobCircle(280, 618, filterColor,       'attack');
+    drawKnobCircle(466, 618, filterColor,       'decay');
+    drawKnobCircle(651, 618, filterColor,       'sustain');
+    drawKnobCircle(280, 371, cutoffAmountColor, 'cutoff');
+    drawKnobCircle(651, 371, cutoffAmountColor, 'amount');
   }
 
   // Compute time-based eased angles for attack and decay
@@ -167,6 +180,24 @@ let kioskAttackStart = 210, kioskAttackTarget = 210, kioskAttackTransStart = 0, 
 let kioskDecayStart  = 210, kioskDecayTarget  = 210, kioskDecayTransStart  = 0, kioskDecayTransDur  = 0;
 let lastDrawnAttackAngle = 210;
 let lastDrawnDecayAngle  = 210;
+let activeKioskKnob   = null; // array of param strings currently glowing, or null
+let activeKioskGlowUntil = 0;
+let kioskGlowRaf = null;
+
+// Keeps drawKiosk() running until 100ms past activeKioskGlowUntil so the
+// expiry check inside drawKiosk() has a chance to fire and clear the glow.
+function startKioskGlowLoop() {
+  if (kioskGlowRaf !== null) cancelAnimationFrame(kioskGlowRaf);
+  function tick() {
+    kioskGlowRaf = null;
+    if (!kioskOpen) return;
+    drawKiosk();
+    if (performance.now() < activeKioskGlowUntil + 100) {
+      kioskGlowRaf = requestAnimationFrame(tick);
+    }
+  }
+  kioskGlowRaf = requestAnimationFrame(tick);
+}
 
 window.kioskBeginTransition = function(fromA, toA, fromD, toD, durMs) {
   const now = performance.now();
@@ -178,6 +209,22 @@ window.kioskBeginTransition = function(fromA, toA, fromD, toD, durMs) {
   kioskDecayTransStart  = now;
   kioskAttackTransDur   = durMs;
   kioskDecayTransDur    = durMs;
+  // Track which knobs are actually changing
+  const changing = [];
+  if (Math.abs(toA - fromA) > 0.0001) changing.push('attack');
+  if (Math.abs(toD - fromD) > 0.0001) changing.push('decay');
+  if (changing.length > 0) {
+    activeKioskKnob = changing;
+    activeKioskGlowUntil = now + durMs + 1000;
+    startKioskGlowLoop();
+  }
+};
+
+// Called by cue list / quick-sets for sustain, cutoff, amount transitions
+window.kioskNotifyKnob = function(param, durMs) {
+  activeKioskKnob = [param];
+  activeKioskGlowUntil = performance.now() + durMs + 1000;
+  startKioskGlowLoop();
 };
 
 let kioskOpen = false;
