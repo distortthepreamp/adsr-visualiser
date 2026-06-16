@@ -128,7 +128,7 @@ function render(){
   });
   ['decayOuter','decayInner'].forEach(id => $(id).setAttribute('d', dPath));
 
-  const drawZeroRelease = $('drawReleaseWhenZero').checked;
+  const drawZeroRelease = $('drawReleaseWhenZero') && $('drawReleaseWhenZero').checked;
   const drawReleasePath = pts.e.releaseOn || drawZeroRelease;
   let rEnd;
   if(overrange && e.releaseOn){

@@ -76,6 +76,7 @@ function initShortcuts(){
     } else if(e.key === ']'){ toggleCheckbox('tbSustainCollapse');
     } else if(e.key === '\\'){ toggleCheckbox('tbShowModelDSustain');
     } else if(e.key === 'b' || e.key === 'B'){ toggleCheckbox('analogueCurve');
+    } else if(e.key === 'g' || e.key === 'G'){ toggleCheckbox('showCues');
     } else if(e.key === 'k' || e.key === 'K'){ toggleKiosk();
     } else if(/^Digit[1-6]$/.test(e.code) && (e.shiftKey||e.altKey||e.metaKey)){
       const idx = parseInt(e.code.replace('Digit', '')) - 1;

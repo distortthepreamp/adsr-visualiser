@@ -161,6 +161,7 @@ function hideDot(){
 }
 
 function updateButtonStates(){
+  // stub — reserved for future button state sync
 }
 
 // ---- setTapMode ----
@@ -416,7 +417,7 @@ function initUIControls(){
   $('noteCustomHz') && $('noteCustomHz').addEventListener('input', () => {
     if($('noteCustomRow') && $('noteCustomRow').style.display !== 'none'){
       const hz = Number($('noteCustomHz').value) || 440;
-      if(osc) osc.frequency.value = hz;
+      if(window.audioUpdateFrequency) audioUpdateFrequency(hz);
     }
   });
   ['frequencyMode','hpMode'].forEach(id=>{ const el=$(id); if(el) el.addEventListener('change',syncAudioFilterType); });

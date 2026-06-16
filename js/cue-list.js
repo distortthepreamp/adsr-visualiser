@@ -243,100 +243,81 @@ function executeEvent(event) {
       case 'loud-decay':
         $('loudDecay').checked = event.value;
         $('loudDecay').dispatchEvent(new Event('change'));
-        render();
         if (window.kioskNotifySwitch) kioskNotifySwitch('loud-decay');
         break;
       case 'filter-mode':
         $('frequencyMode').checked = event.value;
         $('frequencyMode').dispatchEvent(new Event('change'));
-        render();
         if (window.kioskNotifySwitch) kioskNotifySwitch('filter-mode');
         break;
       case 'filter-decay':
         $('loudDecay').checked = event.value;
         $('loudDecay').dispatchEvent(new Event('change'));
-        render();
         if (window.kioskNotifySwitch) kioskNotifySwitch('filter-decay');
         break;
       case 'hp-mode':
         $('hpMode').checked = event.value;
         $('hpMode').dispatchEvent(new Event('change'));
-        render();
         break;
       case 'mimic-sustain':
         $('keyboardControl').checked = event.value;
         $('keyboardControl').dispatchEvent(new Event('change'));
-        render();
         break;
       case 'analogue':
         $('analogueCurve').checked = event.value;
         $('analogueCurve').dispatchEvent(new Event('change'));
-        render();
         break;
       case 'linear-time':
         $('linearTime').checked = event.value;
         $('linearTime').dispatchEvent(new Event('change'));
-        render();
         break;
       case 'zoom-time':
         $('timelineZoom3x').checked = event.value;
         $('timelineZoom3x').dispatchEvent(new Event('change'));
-        render();
         break;
       case 'textbook':
         $('textbookAdsr').checked = event.value;
         $('textbookAdsr').dispatchEvent(new Event('change'));
-        render();
         break;
       case 'zero-release':
         $('drawReleaseWhenZero').checked = event.value;
         $('drawReleaseWhenZero').dispatchEvent(new Event('change'));
-        render();
         break;
       case 'show-clipped':
         $('showClipped').checked = event.value;
         $('showClipped').dispatchEvent(new Event('change'));
-        render();
         break;
       case 'show-effective-times':
         $('showEffectiveTimes').checked = event.value;
         $('showEffectiveTimes').dispatchEvent(new Event('change'));
-        render();
         break;
       case 'show-stated-times':
         $('showStatedTimes').checked = event.value;
         $('showStatedTimes').dispatchEvent(new Event('change'));
-        render();
         break;
       case 'show-effective-lines':
         $('showEffectiveLines').checked = event.value;
         $('showEffectiveLines').dispatchEvent(new Event('change'));
-        render();
         break;
       case 'show-stated-lines':
         $('showStatedLines').checked = event.value;
         $('showStatedLines').dispatchEvent(new Event('change'));
-        render();
         break;
       case 'show-contour':
         $('showContour').checked = event.value;
         $('showContour').dispatchEvent(new Event('change'));
-        render();
         break;
       case 'tb-sustain-dotted':
         $('tbSustainDotted').checked = event.value;
         $('tbSustainDotted').dispatchEvent(new Event('change'));
-        render();
         break;
       case 'tb-sustain-collapse':
         $('tbSustainCollapse').checked = event.value;
         $('tbSustainCollapse').dispatchEvent(new Event('change'));
-        render();
         break;
       case 'tb-model-d-sustain':
         $('tbShowModelDSustain').checked = event.value;
         $('tbShowModelDSustain').dispatchEvent(new Event('change'));
-        render();
         break;
       case 'cutoff':
         state.target.floor = event.value / 10;
@@ -610,15 +591,11 @@ function initCueList() {
       cueListText = text;
       cueList = parseCueList(text);
       console.log('[CueList] events:', cueList.length);
-      console.log('[CueList] first 3:', JSON.stringify(cueList.slice(0, 3), null, 2));
-      console.log('[CueList] last 3:', JSON.stringify(cueList.slice(-3), null, 2));
     })
     .catch(() => { /* no default script present — silently ignore */ });
 
   // Show Cues checkbox
   const showCuesEl = document.getElementById('showCues');
-  const panel2 = showCuesEl && showCuesEl.closest('.panel') && showCuesEl.closest('.panel').nextElementSibling;
-  // panel2 is the second .panel — find it more reliably via the UI container
   const allPanels = document.querySelectorAll('.ui .panel');
   const cuePanel2 = allPanels[1] || null;
   if (showCuesEl) {

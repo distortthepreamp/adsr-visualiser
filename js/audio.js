@@ -142,6 +142,10 @@ const MASTER_GAIN = 0.7;             // default master output gain
   function closeAudioHelp(){ $('audioHelpText').style.display='none'; }
   function isAudioHelpOpen(){ return $('audioHelpText').style.display !== 'none'; }
 
+  function audioUpdateFrequency(freq){
+    if(osc) osc.frequency.value = freq;
+  }
+
   window.initAudio          = initAudio;
   window.syncAudioFilterType= syncAudioFilterType;
   window.audioGateOpen      = audioGateOpen;
@@ -152,5 +156,6 @@ const MASTER_GAIN = 0.7;             // default master output gain
   window.openAudioHelp      = openAudioHelp;
   window.closeAudioHelp     = closeAudioHelp;
   window.isAudioHelpOpen    = isAudioHelpOpen;
+  window.audioUpdateFrequency = audioUpdateFrequency;
 
 })();

@@ -130,19 +130,15 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       } else { taReleaseEndStatedEl.style.display='none'; taReleaseEndStatedEl.style.opacity=''; }
     }
   }
-  const taReleaseStartEl=$('timeAxisReleaseStart');
   const taReleaseStartStatedEl=$('timeAxisReleaseStartStated');
-  if(taReleaseStartEl||taReleaseStartStatedEl){
+  if(taReleaseStartStatedEl){
     const tbSusEndX=textbookAdsr ? pts.pEnd.x+graph.w*state.tbSustainGap : 0;
     const releaseStartMs=Math.round((e.aT+e.dT)*1000);
-    if(taReleaseStartEl){ taReleaseStartEl.style.display='none'; taReleaseStartEl.style.opacity=''; }
-    if(taReleaseStartStatedEl){
-      if(showStated&&textbookAdsr){
-        taReleaseStartStatedEl.setAttribute('x',tbSusEndX); taReleaseStartStatedEl.setAttribute('y',graph.y0+TIME_AXIS_STATED_OFFSET_Y);
-        taReleaseStartStatedEl.textContent=releaseStartMs+' ms';
-        taReleaseStartStatedEl.style.display=''; taReleaseStartStatedEl.style.opacity='1';
-      } else { taReleaseStartStatedEl.style.display='none'; taReleaseStartStatedEl.style.opacity=''; }
-    }
+    if(showStated&&textbookAdsr){
+      taReleaseStartStatedEl.setAttribute('x',tbSusEndX); taReleaseStartStatedEl.setAttribute('y',graph.y0+TIME_AXIS_STATED_OFFSET_Y);
+      taReleaseStartStatedEl.textContent=releaseStartMs+' ms';
+      taReleaseStartStatedEl.style.display=''; taReleaseStartStatedEl.style.opacity='1';
+    } else { taReleaseStartStatedEl.style.display='none'; taReleaseStartStatedEl.style.opacity=''; }
   }
   // Drop lines
   const showEffLines=!!($('showEffectiveLines')&&$('showEffectiveLines').checked);
@@ -169,7 +165,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       }
     });
   }
-  updateDropLineGroup('dropLinesEffective',['timeAxisAttack','timeAxisDecayStart','timeAxisDecayEndEffective','timeAxisReleaseStart'],showEffLines,'drop-line-effective');
+  updateDropLineGroup('dropLinesEffective',['timeAxisAttack','timeAxisDecayStart','timeAxisDecayEndEffective'],showEffLines,'drop-line-effective');
   updateDropLineGroup('dropLinesStated',['timeAxisAttackStated','timeAxisDecayEndStated','timeAxisReleaseStartStated'],showStLines,'drop-line-stated');
   // Dim drop line rows when their time axis equivalent is off
   const effLinesRow=$('showEffectiveLinesRow'), statedLinesRow=$('showStatedLinesRow');

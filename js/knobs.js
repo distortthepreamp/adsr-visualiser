@@ -42,14 +42,14 @@ function formatSustainScale(v){
   return `${fmtScaleValue(scale)} (${pct}%)`;
 }
 
-function ensureInputAfter(sliderId, inputId, label, attrs){
+function ensureInputAfter(sliderId, inputId, attrs){
   const slider = document.getElementById(sliderId);
   if (!slider) return null;
   let input = document.getElementById(inputId);
   if (input) return input;
   const wrap = document.createElement('div');
   wrap.className = ['sustainScaleInput','floorScaleInput','scaleScaleInput'].includes(inputId) ? 'numeric-value-control' : 'numeric-ms-control';
-  wrap.innerHTML = `<label>${label} <input id="${inputId}" ${attrs}></label>`;
+  wrap.innerHTML = `<label><input id="${inputId}" ${attrs}></label>`;
   slider.insertAdjacentElement('afterend', wrap);
   return document.getElementById(inputId);
 }
@@ -119,7 +119,6 @@ function refreshNumericInputs(){
 }
 
 function patchSustainReadouts(){
-  const eff = getEffective();
   const sustainTarget = document.getElementById('sustainTarget');
   if (sustainTarget && currentMode() === 'animate') {
     const targetS = document.getElementById('keyboardControl').checked ? state.target.s * 0.8 : state.target.s;
@@ -182,12 +181,12 @@ function addPointerFeedback(){
 function initKnobs(){
 
   // Numeric inputs for Attack / Decay / Sustain / Release / Floor / Scale
-  attackInput  = ensureInputAfter('attackTarget',  'attackMsInput',    '', `type="number" min="0" max="${MAX_TIME_MS}" step="1"`);
-  decayInput   = ensureInputAfter('decayTarget',   'decayMsInput',     '', `type="number" min="0" max="${MAX_TIME_MS}" step="1"`);
-  releaseInput = ensureInputAfter('releaseTarget', 'releaseMsInput',   '', `type="number" min="0" max="${MAX_TIME_MS}" step="1"`);
-  sustainInput = ensureInputAfter('sustainTarget', 'sustainScaleInput','', 'type="number" min="0" max="10" step="0.1"');
-  floorInput   = ensureInputAfter('floorTarget',   'floorScaleInput',  '', 'type="number" min="0" max="10" step="0.1"');
-  scaleInput   = ensureInputAfter('scaleTarget',   'scaleScaleInput',  '', 'type="number" min="0" max="10" step="0.1"');
+  attackInput  = ensureInputAfter('attackTarget',  'attackMsInput',    `type="number" min="0" max="${MAX_TIME_MS}" step="1"`);
+  decayInput   = ensureInputAfter('decayTarget',   'decayMsInput',     `type="number" min="0" max="${MAX_TIME_MS}" step="1"`);
+  releaseInput = ensureInputAfter('releaseTarget', 'releaseMsInput',   `type="number" min="0" max="${MAX_TIME_MS}" step="1"`);
+  sustainInput = ensureInputAfter('sustainTarget', 'sustainScaleInput','type="number" min="0" max="10" step="0.1"');
+  floorInput   = ensureInputAfter('floorTarget',   'floorScaleInput',  'type="number" min="0" max="10" step="0.1"');
+  scaleInput   = ensureInputAfter('scaleTarget',   'scaleScaleInput',  'type="number" min="0" max="10" step="0.1"');
 
   if (attackInput) {
     attackInput.addEventListener('change', () => commitTime('a', attackInput));
