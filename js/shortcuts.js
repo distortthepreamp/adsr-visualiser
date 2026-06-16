@@ -28,7 +28,7 @@ function initShortcuts(){
 
   // Keyboard shortcuts
   document.addEventListener('keydown', e => {
-    const tag = document.activeElement ? document.activeElement.tagName : '';
+const tag = document.activeElement ? document.activeElement.tagName : '';
     if(['INPUT','SELECT','TEXTAREA'].includes(tag)) return;
     if($('helpOverlay').style.display !== 'none'){
       if(e.key === 'Escape') hideHelp();
@@ -78,6 +78,8 @@ function initShortcuts(){
     } else if(e.key === 'b' || e.key === 'B'){ toggleCheckbox('analogueCurve');
     } else if(e.key === 'g' || e.key === 'G'){ toggleCheckbox('showCues');
     } else if(e.key === 'k' || e.key === 'K'){ toggleKiosk();
+    } else if(e.key === '}' && e.shiftKey){ e.preventDefault(); if(window.cueStepFwd) cueStepFwd();
+    } else if(e.key === '{' && e.shiftKey){ e.preventDefault(); if(window.cueStepBack) cueStepBack();
     } else if(/^Digit[1-6]$/.test(e.code) && (e.shiftKey||e.altKey||e.metaKey)){
       const idx = parseInt(e.code.replace('Digit', '')) - 1;
       const qs = k => { const b=document.querySelectorAll(`.quickset-btn[data-knob="${k}"]`)[idx]; return b?Number(b.dataset.value):null; };

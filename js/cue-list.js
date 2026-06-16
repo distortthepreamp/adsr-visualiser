@@ -550,6 +550,9 @@ function cueStepBack() {
   updateCueScriptView();
 }
 
+window.cueStepFwd  = cueStepFwd;
+window.cueStepBack = cueStepBack;
+
 // ---- generateStateSnapshot — returns set commands for all cueable params ----
 function generateStateSnapshot() {
   const lines = [];

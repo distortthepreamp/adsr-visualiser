@@ -158,6 +158,7 @@ function initPresetsLogic(){
     const tag = document.activeElement ? document.activeElement.tagName : '';
     if(['INPUT','SELECT','TEXTAREA'].includes(tag)) return;
     if($('helpOverlay') && $('helpOverlay').style.display !== 'none') return;
+    if(e.altKey || e.metaKey || e.ctrlKey || e.shiftKey) return;
     if(e.key === 'ArrowRight'){
       e.preventDefault();
       loadPreset((activePresetIndex + 1) % PRESETS.length);

@@ -1,0 +1,58 @@
+
+# INITAL SETUP
+set attack 250ms
+set decay 250ms
+set sustain 5
+set release 250ms
+set cutoff 2
+set amount 5
+set loud-decay on
+set filter-mode off
+set hp-mode off
+set mimic-sustain off
+set analogue on
+set linear-time on
+set zoom-time on
+set textbook on
+set zero-release on
+set show-clipped on
+set show-effective-times on
+set show-stated-times off
+set show-effective-lines on
+set show-stated-lines off
+set show-contour on
+set tb-sustain-dotted off
+set tb-sustain-collapse off
+set tb-model-d-sustain off
+
+# CUE SEQUENCE
+
+
+# demonstrate textbook adsr
+wait 00:00:03:00
+set show-stated-times on
+wait 00:00:03:00
+set show-stated-lines on
+wait 00:00:03:00
+transition attack 600ms 00:00:02:00
+wait 00:00:03:00
+transition attack 80ms 00:00:02:00
+wait 00:00:03:00
+transition attack 250ms 00:00:02:00
+wait 00:00:03:00
+transition decay 600ms 00:00:02:00
+wait 00:00:03:00
+transition decay 150ms 00:00:02:00
+wait 00:00:03:00
+transition decay 250ms 00:00:02:00
+wait 00:00:03:00
+
+
+#collapse textbook sustain
+wait 00:00:03:00
+set tb-sustain-dotted on
+wait 00:00:03:00
+set tb-sustain-collapse on
+wait 00:00:03:00
+set tb-model-d-sustain on
+
