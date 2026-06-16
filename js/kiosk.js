@@ -108,8 +108,9 @@ function drawKiosk(){
   const filterColor       = _cs.getPropertyValue('--kioskFilterColor').trim()       || '#0DCAF2';
   const cutoffAmountColor = _cs.getPropertyValue('--kioskCutoffAmountColor').trim() || '#E5F20D';
 
-  const glowEnabled = $('kioskKnobGlow') && $('kioskKnobGlow').checked;
-  const glowRadius  = parseInt($('kioskKnobGlowRadius') && $('kioskKnobGlowRadius').value) || 40;
+  const glowEnabled      = $('kioskKnobGlow') && $('kioskKnobGlow').checked;
+  const glowRadius       = parseInt($('kioskKnobGlowRadius') && $('kioskKnobGlowRadius').value) || 40;
+  const inactiveOpacity  = (parseInt($('kioskInactiveOpacity') && $('kioskInactiveOpacity').value) ?? 70) / 100;
 
   // Expire glow if its window has passed
   if (performance.now() >= activeKioskGlowUntil) activeKioskKnob = null;
@@ -121,11 +122,13 @@ function drawKiosk(){
       ctx.shadowColor = color;
       ctx.shadowBlur  = glowRadius;
     }
+    ctx.globalAlpha = glow ? 1.0 : inactiveOpacity;
     ctx.beginPath();
     ctx.arc(x, y, KNOB_RADIUS, 0, Math.PI * 2);
     ctx.fillStyle = color;
     ctx.fill();
-    ctx.shadowBlur = 0;
+    ctx.shadowBlur  = 0;
+    ctx.globalAlpha = 1.0;
   }
 
   if (!filterOn) {

@@ -26,6 +26,7 @@ function buildConfigSnapshot(){
     meterGlowRadius: Number($('meterGlowRadius') ? $('meterGlowRadius').value : 5),
     kioskKnobGlow: $('kioskKnobGlow') ? $('kioskKnobGlow').checked : true,
     kioskKnobGlowRadius: Number($('kioskKnobGlowRadius') ? $('kioskKnobGlowRadius').value : 40),
+    kioskInactiveOpacity: Number($('kioskInactiveOpacity') ? $('kioskInactiveOpacity').value : 70),
     meterScanlinesVisible: $('meterScanlinesVisible') ? $('meterScanlinesVisible').checked : true,
     blobGlowEnabled: $('blobGlowEnabled') ? $('blobGlowEnabled').checked : true,
     keepTapMarker: $('keepTapMarker') ? $('keepTapMarker').checked : true,
@@ -146,6 +147,7 @@ function loadConfigObject(cfg){
   if($('meterGlowRadius') && cfg.meterGlowRadius !== undefined){ $('meterGlowRadius').value = cfg.meterGlowRadius; }
   if($('blobGlowRadius') && cfg.blobGlowRadius !== undefined){ $('blobGlowRadius').value = cfg.blobGlowRadius; }
   if($('kioskKnobGlowRadius') && cfg.kioskKnobGlowRadius !== undefined){ $('kioskKnobGlowRadius').value = cfg.kioskKnobGlowRadius; }
+  if($('kioskInactiveOpacity') && cfg.kioskInactiveOpacity !== undefined){ $('kioskInactiveOpacity').value = cfg.kioskInactiveOpacity; }
 
   // Preset highlight
   if(window.restorePresetHighlight){

@@ -80,6 +80,11 @@ function transition(durSec){
   const dur=durSec*1000;
   const start={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale,tbSustainGap:state.tbSustainGap,zoomFactor:state.zoomFactor}, end={...state.target};
   if(window.kioskBeginTransition) window.kioskBeginTransition(start.a, end.a, start.d, end.d, dur);
+  if(window.kioskNotifyKnob && dur > 0) {
+    if(Math.abs(end.s     - start.s)     > 0.0001) window.kioskNotifyKnob('sustain', dur);
+    if(Math.abs(end.floor - start.floor) > 0.0001) window.kioskNotifyKnob('cutoff',  dur);
+    if(Math.abs(end.scale - start.scale) > 0.0001) window.kioskNotifyKnob('amount',  dur);
+  }
   const startAms=mapTime(start.a)*1000, endAms=mapTime(end.a)*1000;
   const startDms=mapTime(start.d)*1000, endDms=mapTime(end.d)*1000;
   const startRms=mapTime(start.r)*1000, endRms=mapTime(end.r)*1000;
@@ -310,6 +315,7 @@ function initUIControls(){
   $('blobGlowRadius').addEventListener('input', e => { const inp=e.target,c=Math.min(30,Math.max(0,isNaN(parseInt(inp.value))?8:parseInt(inp.value))); inp.value=c; applyBlobGlow(); if(state.currentPhase==='sustain') startGlowPulse(); });
   $('kioskKnobGlow').addEventListener('change', () => { render(); if(window.kioskDrawIfOpen) kioskDrawIfOpen(); });
   $('kioskKnobGlowRadius').addEventListener('input', e => { const inp=e.target,c=Math.min(100,Math.max(0,isNaN(parseInt(inp.value))?40:parseInt(inp.value))); inp.value=c; if(window.kioskDrawIfOpen) kioskDrawIfOpen(); });
+  $('kioskInactiveOpacity').addEventListener('input', e => { const inp=e.target,c=Math.min(100,Math.max(0,isNaN(parseInt(inp.value))?70:parseInt(inp.value))); inp.value=c; if(window.kioskDrawIfOpen) kioskDrawIfOpen(); });
 
   // Filter mode
   $('frequencyMode').addEventListener('change', () => { syncHpModeEnabled(); setMeterLevel(state.dotLevel); });
