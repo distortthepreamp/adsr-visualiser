@@ -526,6 +526,28 @@ function cueStepBack() {
   updateCueScriptView();
 }
 
+// ---- generateStateSnapshot — returns set commands for all cueable params ----
+function generateStateSnapshot() {
+  const lines = [];
+  lines.push(`set attack ${Math.round(msFromPosition(state.a))}ms`);
+  lines.push(`set decay ${Math.round(msFromPosition(state.d))}ms`);
+  lines.push(`set sustain ${Math.round(state.s * 10)}`);
+  lines.push(`set release ${Math.round(msFromPosition(state.r))}ms`);
+  lines.push(`set cutoff ${Math.round(state.floor * 10)}`);
+  lines.push(`set amount ${Math.round(state.scale * 10)}`);
+  lines.push(`set loud-decay ${$('loudDecay').checked ? 'on' : 'off'}`);
+  lines.push(`set filter-mode ${$('frequencyMode').checked ? 'on' : 'off'}`);
+  lines.push(`set hp-mode ${$('hpMode').checked ? 'on' : 'off'}`);
+  lines.push(`set mimic-sustain ${$('keyboardControl').checked ? 'on' : 'off'}`);
+  lines.push(`set analogue ${$('analogueCurve').checked ? 'on' : 'off'}`);
+  lines.push(`set linear-time ${$('linearTime').checked ? 'on' : 'off'}`);
+  lines.push(`set zoom-time ${$('timelineZoom3x').checked ? 'on' : 'off'}`);
+  lines.push(`set textbook ${$('textbookAdsr').checked ? 'on' : 'off'}`);
+  lines.push(`set zero-release ${$('drawReleaseWhenZero').checked ? 'on' : 'off'}`);
+  lines.push(`set show-clipped ${$('showClipped').checked ? 'on' : 'off'}`);
+  return lines.join('\n');
+}
+
 // ---- initCueList ----
 function initCueList() {
   updateTimecodeDisplay();
@@ -615,6 +637,11 @@ function initCueList() {
 
   const editBtn = document.getElementById('cueEditBtn');
   if (editBtn) editBtn.addEventListener('click', openEditModal);
+
+  const copyStateBtn = document.getElementById('cueCopyStateBtn');
+  if (copyStateBtn) copyStateBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(generateStateSnapshot());
+  });
 
   // Load button — file picker
   const loadBtn = document.getElementById('cueLoadBtn');
