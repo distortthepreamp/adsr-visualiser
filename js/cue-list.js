@@ -94,6 +94,27 @@ function parseCueList(text) {
       continue;
     }
 
+    // set <checkbox-param> on/off — single regex for remaining boolean params
+    const setBoolMatch = line.match(/^set\s+(filter-decay|hp-mode|mimic-sustain|analogue|linear-time|zoom-time|textbook|zero-release|show-clipped)\s+(on|off)$/i);
+    if (setBoolMatch) {
+      result.push({ type: 'set', param: setBoolMatch[1].toLowerCase(), value: setBoolMatch[2].toLowerCase() === 'on' });
+      continue;
+    }
+
+    // set cutoff N
+    const setCutoffMatch = line.match(/^set\s+cutoff\s+(\d+(?:\.\d+)?)$/i);
+    if (setCutoffMatch) {
+      result.push({ type: 'set', param: 'cutoff', value: parseFloat(setCutoffMatch[1]) });
+      continue;
+    }
+
+    // set amount N
+    const setAmountMatch = line.match(/^set\s+amount\s+(\d+(?:\.\d+)?)$/i);
+    if (setAmountMatch) {
+      result.push({ type: 'set', param: 'amount', value: parseFloat(setAmountMatch[1]) });
+      continue;
+    }
+
     // transition attack NNNms HH:MM:SS:FF
     const transAttackMatch = line.match(/^transition\s+attack\s+(\d+(?:\.\d+)?)ms\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
     if (transAttackMatch) {
@@ -119,6 +140,20 @@ function parseCueList(text) {
     const transReleaseMatch = line.match(/^transition\s+release\s+(\d+(?:\.\d+)?)ms\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
     if (transReleaseMatch) {
       result.push({ type: 'transition', param: 'release', value: parseFloat(transReleaseMatch[1]), durationMs: tcToMs(transReleaseMatch[2]) });
+      continue;
+    }
+
+    // transition cutoff N HH:MM:SS:FF
+    const transCutoffMatch = line.match(/^transition\s+cutoff\s+(\d+(?:\.\d+)?)\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
+    if (transCutoffMatch) {
+      result.push({ type: 'transition', param: 'cutoff', value: parseFloat(transCutoffMatch[1]), durationMs: tcToMs(transCutoffMatch[2]) });
+      continue;
+    }
+
+    // transition amount N HH:MM:SS:FF
+    const transAmountMatch = line.match(/^transition\s+amount\s+(\d+(?:\.\d+)?)\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
+    if (transAmountMatch) {
+      result.push({ type: 'transition', param: 'amount', value: parseFloat(transAmountMatch[1]), durationMs: tcToMs(transAmountMatch[2]) });
       continue;
     }
   }
@@ -161,6 +196,59 @@ function executeEvent(event) {
         $('frequencyMode').dispatchEvent(new Event('change'));
         render();
         break;
+      case 'filter-decay':
+        $('loudDecay').checked = event.value;
+        $('loudDecay').dispatchEvent(new Event('change'));
+        render();
+        break;
+      case 'hp-mode':
+        $('hpMode').checked = event.value;
+        $('hpMode').dispatchEvent(new Event('change'));
+        render();
+        break;
+      case 'mimic-sustain':
+        $('keyboardControl').checked = event.value;
+        $('keyboardControl').dispatchEvent(new Event('change'));
+        render();
+        break;
+      case 'analogue':
+        $('analogueCurve').checked = event.value;
+        $('analogueCurve').dispatchEvent(new Event('change'));
+        render();
+        break;
+      case 'linear-time':
+        $('linearTime').checked = event.value;
+        $('linearTime').dispatchEvent(new Event('change'));
+        render();
+        break;
+      case 'zoom-time':
+        $('timelineZoom3x').checked = event.value;
+        $('timelineZoom3x').dispatchEvent(new Event('change'));
+        render();
+        break;
+      case 'textbook':
+        $('textbookAdsr').checked = event.value;
+        $('textbookAdsr').dispatchEvent(new Event('change'));
+        render();
+        break;
+      case 'zero-release':
+        $('drawReleaseWhenZero').checked = event.value;
+        $('drawReleaseWhenZero').dispatchEvent(new Event('change'));
+        render();
+        break;
+      case 'show-clipped':
+        $('showClipped').checked = event.value;
+        $('showClipped').dispatchEvent(new Event('change'));
+        render();
+        break;
+      case 'cutoff':
+        state.target.floor = event.value / 10;
+        transition(0);
+        break;
+      case 'amount':
+        state.target.scale = event.value / 10;
+        transition(0);
+        break;
     }
   } else if (event.type === 'transition') {
     switch (event.param) {
@@ -178,6 +266,14 @@ function executeEvent(event) {
         break;
       case 'release':
         state.target.r = positionFromMs(event.value);
+        transition(event.durationMs / 1000);
+        break;
+      case 'cutoff':
+        state.target.floor = event.value / 10;
+        transition(event.durationMs / 1000);
+        break;
+      case 'amount':
+        state.target.scale = event.value / 10;
         transition(event.durationMs / 1000);
         break;
     }

@@ -1,7 +1,25 @@
-# DTP Model D Cue List — Test Script
-# Parameters: attack, decay, sustain, release (ms), loud-decay, filter-mode (on/off)
-# Commands: wait HH:MM:SS:FF, set [param] [value], transition [param] [value] HH:MM:SS:FF
 
+# DTP Model D Cue List — Test Script
+
+# Initial state
+set attack 500ms
+set decay 500ms
+set sustain 5
+set release 500ms
+set cutoff 0
+set amount 10
+set loud-decay off
+set filter-mode off
+set hp-mode off
+set mimic-sustain off
+set analogue off
+set linear-time on
+set zoom-time off
+set textbook off
+set zero-release off
+set show-clipped off
+
+# Cue sequence
 wait 00:00:02:00
 set attack 500ms
 set decay 500ms
