@@ -182,6 +182,10 @@ button.v28-pressed,
 /* hide preset row 2 (N–Z) */
 #presetBtns button:nth-child(n+14) { display:none; }
 
+/* cue script view */
+.cues-mode > *:not(#cueScriptView) { display: none !important; }
+#cueScriptView { display: block; font-family: monospace; font-size: small; }
+
 /* hide A/D/R labels */
 #aLabel, #dLabel, #rLabel,
 .a-label, .d-label, .r-label {

@@ -65,6 +65,7 @@
       <text id="meterLabelTitle" x="1165" y="72" text-anchor="middle" style="fill:var(--fg);font-size:calc(var(--labelSize) * 1px);font-weight:800;font-family:'UniversCondensed',Arial,Helvetica,sans-serif;display:none;">VOL</text>
       <text id="toolTitle" class="mode-label" x="600" y="-82" text-anchor="middle">DISTORT THE PREAMP: MODEL D CONTOUR VISUALISER</text>
       <text id="modeLabel" class="mode-label" x="80" y="0" text-anchor="start">LOUDNESS CONTOUR</text>
+      <text id="svgTimecode" x="0" y="0" text-anchor="end" font-family="'UniversCondensed',Arial,Helvetica,sans-serif" fill="#00ff00" style="display:none">00:00:00:00</text>
       <text id="timeAxis0" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;">0</text>
       <text id="timeAxis0Stated" x="80" y="465" text-anchor="middle" class="timeAxisStated" style="display:none;">0</text>
       <text id="timeAxisAttack" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;"></text>
@@ -196,24 +197,18 @@
         <button id="cueEditBtn" style="padding:3px 7px;min-height:unset;line-height:1.1;border-radius:6px">Edit</button>
         <button id="cueStepBackBtn" style="padding:3px 7px;min-height:unset;line-height:1.1;border-radius:6px">Step ←</button>
         <button id="cueStepFwdBtn" style="padding:3px 7px;min-height:unset;line-height:1.1;border-radius:6px">Step →</button>
+        <label style="font-size:12px;white-space:nowrap"><input type="checkbox" id="showCues"> Show Cues</label>
       </div>
       <div class="row" style="gap:4px;align-items:center">
         <button id="cuePlayBtn" style="padding:3px 7px;min-height:unset;line-height:1.1;border-radius:6px">Play</button>
         <button id="cueStopBtn" style="padding:3px 7px;min-height:unset;line-height:1.1;border-radius:6px">Stop</button>
         <button id="cueResetBtn" style="padding:3px 7px;min-height:unset;line-height:1.1;border-radius:6px">Reset</button>
         <span id="cueTimecode" style="font-family:monospace">00:00:00:00</span>
-        <input id="cueTimecodeInput" type="text" placeholder="00:00:00:00" style="font-family:monospace;width:90px">
-      </div>
-      <div id="cuePreview" style="margin-top:4px;background:rgba(0,0,0,.35);border-radius:5px;padding:3px 6px;font-family:monospace;font-size:12px;line-height:1.5;min-height:90px;">
-        <div id="cuePreviewBefore"  style="opacity:0.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
-        <div id="cuePreviewCurrent" style="opacity:1.0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
-        <div id="cuePreviewNext"    style="opacity:0.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
-        <div id="cuePreviewAfter"   style="opacity:0.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
-        <div id="cuePreviewAfter2"  style="opacity:0.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       </div>
     </div>
 
     <div class="panel">
+      <div id="cueScriptView" style="display:none;font-family:monospace;font-size:small;line-height:1.4;overflow:hidden;"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 12px;">
         <div>
           <div id="loudDecayRow" class="row"><label><input id="loudDecay" type="checkbox"> <span id="loudDecayLabel">Loud Decay</span> (D)</label></div>

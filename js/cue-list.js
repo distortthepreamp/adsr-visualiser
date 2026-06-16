@@ -31,8 +31,14 @@ function msToTc(ms) {
 }
 
 function updateTimecodeDisplay() {
+  const tc = msToTc(cueTimecodeMs);
   const el = document.getElementById('cueTimecode');
-  if (el) el.textContent = msToTc(cueTimecodeMs);
+  if (el) el.textContent = tc;
+  const svgEl = document.getElementById('svgTimecode');
+  if (svgEl) {
+    svgEl.textContent = tc;
+    svgEl.style.display = cueList.length > 0 ? '' : 'none';
+  }
 }
 
 // ---- Parser ----
@@ -311,32 +317,58 @@ function executeEvent(event) {
   }
 }
 
-// ---- Cue preview display ----
-function getCueLineText(idx) {
-  if (idx < 0 || idx >= cueList.length) return '';
+// ---- Cue script view ----
+// Returns the raw line index in cueListText for cueList[idx]
+function getRawLineIndex(idx) {
+  if (idx < 0 || idx >= cueList.length) return -1;
   const lines = cueListText.split('\n');
   let count = 0;
   for (let i = 0; i < lines.length; i++) {
     const trimmed = lines[i].trim();
     if (!trimmed || trimmed.startsWith('#')) continue;
-    if (count === idx) return trimmed;
+    if (count === idx) return i;
     count++;
   }
-  return '';
+  return -1;
 }
 
-function updateCuePreview() {
-  const beforeEl  = document.getElementById('cuePreviewBefore');
-  const currentEl = document.getElementById('cuePreviewCurrent');
-  const nextEl    = document.getElementById('cuePreviewNext');
-  const afterEl   = document.getElementById('cuePreviewAfter');
-  const after2El  = document.getElementById('cuePreviewAfter2');
-  if (beforeEl)  beforeEl.textContent  = getCueLineText(cueIndex - 2);
-  if (currentEl) currentEl.textContent = getCueLineText(cueIndex - 1);
-  if (nextEl)    nextEl.textContent    = getCueLineText(cueIndex);
-  if (afterEl)   afterEl.textContent   = getCueLineText(cueIndex + 1);
-  if (after2El)  after2El.textContent  = getCueLineText(cueIndex + 2);
+function updateCueScriptView() {
+  const view = document.getElementById('cueScriptView');
+  if (!view) return;
+  const showCuesEl = document.getElementById('showCues');
+  if (!showCuesEl || !showCuesEl.checked) return;
+
+  const lines = cueListText ? cueListText.split('\n') : [];
+  // Anchor: raw line of the most-recently executed event (cueIndex - 1)
+  const currentCueIdx = cueIndex - 1;
+  let anchorRaw = currentCueIdx >= 0 ? getRawLineIndex(currentCueIdx) : -1;
+  if (anchorRaw < 0) anchorRaw = 0;
+
+  const TOTAL = 30;
+  const BEFORE = 4; // playhead sits at display position 4 (0-indexed)
+
+  const frag = document.createDocumentFragment();
+  for (let pos = 0; pos < TOTAL; pos++) {
+    const rawIdx = anchorRaw - BEFORE + pos;
+    const text = (rawIdx >= 0 && rawIdx < lines.length) ? lines[rawIdx] : '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    div.style.whiteSpace = 'pre';
+    div.style.overflow = 'hidden';
+    div.style.textOverflow = 'ellipsis';
+    if (pos === BEFORE) {
+      div.style.opacity = '1';
+    } else if (pos < BEFORE) {
+      div.style.opacity = '0.35';
+    } else {
+      div.style.opacity = '0.6';
+    }
+    frag.appendChild(div);
+  }
+  view.innerHTML = '';
+  view.appendChild(frag);
 }
+
 
 // ---- Playback engine ----
 function cuePlay() {
@@ -360,7 +392,7 @@ function cuePlay() {
         updateTimecodeDisplay();
         executeEvent(event);
         cueIndex = idx + 1;
-        updateCuePreview();
+        updateCueScriptView();
       }, delay);
       cuePlayTimers.push(handle);
     }
@@ -389,30 +421,36 @@ function cueReset() {
   cueIndex = 0;
   cueTimecodeMs = 0;
   updateTimecodeDisplay();
-  updateCuePreview();
+  updateCueScriptView();
+}
+
+// Compute the cumulative wait time (timecode) at a given cueList index
+// by summing all wait events from the start of the list up to (not including) idx.
+function cueTimecodeAtIndex(idx) {
+  let ms = 0;
+  for (let i = 0; i < idx && i < cueList.length; i++) {
+    if (cueList[i].type === 'wait') ms += cueList[i].ms;
+  }
+  return ms;
 }
 
 function cueStepFwd() {
   if (cueIsPlaying) return;
-  let accMs = 0;
   for (let i = cueIndex; i < cueList.length; i++) {
     const event = cueList[i];
-    if (event.type === 'wait') {
-      accMs += event.ms;
-    } else {
-      cueTimecodeMs += accMs;
-      executeEvent(event);
-      cueIndex = i + 1;
-      updateTimecodeDisplay();
-      updateCuePreview();
-      return;
-    }
+    if (event.type === 'wait') continue;
+    cueIndex = i + 1;
+    cueTimecodeMs = cueTimecodeAtIndex(cueIndex);
+    executeEvent(event);
+    updateTimecodeDisplay();
+    updateCueScriptView();
+    return;
   }
-  // Only waits remain (or list exhausted) — advance time and index
-  cueTimecodeMs += accMs;
+  // Only waits remain (or list exhausted) — advance to end
   cueIndex = cueList.length;
+  cueTimecodeMs = cueTimecodeAtIndex(cueIndex);
   updateTimecodeDisplay();
-  updateCuePreview();
+  updateCueScriptView();
 }
 
 function cueStepBack() {
@@ -433,25 +471,14 @@ function cueStepBack() {
     cueIndex = 0;
     cueTimecodeMs = 0;
     updateTimecodeDisplay();
-    updateCuePreview();
+    updateCueScriptView();
     return;
   }
 
-  // Subtract the waits that immediately precede prevEventIdx
-  // (these were added to cueTimecodeMs when we stepped forward to it)
-  let accMs = 0;
-  for (let i = prevEventIdx - 1; i >= 0; i--) {
-    if (cueList[i].type === 'wait') {
-      accMs += cueList[i].ms;
-    } else {
-      break;
-    }
-  }
-
-  cueTimecodeMs -= accMs;
   cueIndex = prevEventIdx;
+  cueTimecodeMs = cueTimecodeAtIndex(cueIndex);
   updateTimecodeDisplay();
-  updateCuePreview();
+  updateCueScriptView();
 }
 
 // ---- initCueList ----
@@ -469,6 +496,22 @@ function initCueList() {
       console.log('[CueList] last 3:', JSON.stringify(cueList.slice(-3), null, 2));
     })
     .catch(() => { /* no default script present — silently ignore */ });
+
+  // Show Cues checkbox
+  const showCuesEl = document.getElementById('showCues');
+  const panel2 = showCuesEl && showCuesEl.closest('.panel') && showCuesEl.closest('.panel').nextElementSibling;
+  // panel2 is the second .panel — find it more reliably via the UI container
+  const allPanels = document.querySelectorAll('.ui .panel');
+  const cuePanel2 = allPanels[1] || null;
+  if (showCuesEl) {
+    showCuesEl.addEventListener('change', () => {
+      const on = showCuesEl.checked;
+      if (cuePanel2) cuePanel2.classList.toggle('cues-mode', on);
+      const view = document.getElementById('cueScriptView');
+      if (view) view.style.display = on ? 'block' : 'none';
+      if (on) updateCueScriptView();
+    });
+  }
 
   // Transport buttons
   const playBtn      = document.getElementById('cuePlayBtn');

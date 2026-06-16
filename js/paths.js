@@ -349,6 +349,8 @@ function render(){
   if(titleEl){ titleEl.textContent=freqMode?'FREQ':'VOL'; titleEl.setAttribute('x',meterCX); titleEl.setAttribute('y',meterAbsTop-18); titleEl.style.display=''; }
   const modeLabelEl=$('modeLabel');
   if(modeLabelEl){ modeLabelEl.textContent=freqMode?'FILTER CONTOUR':'LOUDNESS CONTOUR'; modeLabelEl.setAttribute('x',10); modeLabelEl.setAttribute('y',yFor(1)-90); modeLabelEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
+  const svgTimecodeEl=$('svgTimecode');
+  if(svgTimecodeEl){ svgTimecodeEl.setAttribute('x',METER_X); svgTimecodeEl.setAttribute('y',yFor(1)-90); svgTimecodeEl.setAttribute('text-anchor','end'); svgTimecodeEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; svgTimecodeEl.setAttribute('font-family',"'UniversCondensed',Arial,Helvetica,sans-serif"); }
   const toolTitleEl=$('toolTitle');
   if(toolTitleEl){ toolTitleEl.setAttribute('x',VB_WIDTH/2); toolTitleEl.setAttribute('y',yFor(1)-173); toolTitleEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
   updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, linearTimeOn, drawPS, statedSustainX);

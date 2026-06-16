@@ -62,7 +62,8 @@ function buildConfigSnapshot(){
     graphLeft: Number($('graphLeft') ? $('graphLeft').value : 220),
     activePresetIndex: window.getActivePresetIndex ? window.getActivePresetIndex() : -1,
     presetDirtyState: window.presetDirtyState || 'none',
-    kioskOpen: kioskOpen
+    kioskOpen: kioskOpen,
+    showCues: $('showCues') ? $('showCues').checked : false
   };
 }
 
@@ -147,6 +148,12 @@ function loadConfigObject(cfg){
   }
   // Kiosk state
   if(cfg.kioskOpen) openKiosk(); else closeKiosk();
+
+  // Show Cues state
+  if($('showCues') && cfg.showCues !== undefined){
+    $('showCues').checked = cfg.showCues;
+    $('showCues').dispatchEvent(new Event('change'));
+  }
 
   transition(0);
   refreshNumericInputs();
