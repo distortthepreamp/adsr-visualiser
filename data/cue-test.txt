@@ -20,34 +20,34 @@ set show-clipped off
 
 # Cue sequence
 wait 00:00:02:00
-play-tap 500ms
+play-tap 500ms E2
 wait 00:00:03:00
 transition attack 1000ms 00:00:02:00
 wait 00:00:03:00
-play-tap 500ms
+play-tap 500ms E2
 wait 00:00:04:00
 transition decay 2000ms 00:00:02:00
 wait 00:00:03:00
-play-tap 500ms
+play-tap 500ms E2
 wait 00:00:04:00
 transition sustain 8 00:00:01:00
 wait 00:00:02:00
-play-hold
+play-hold E2
 wait 00:00:03:00
 play-release
 wait 00:00:03:00
 set loud-decay on
 wait 00:00:01:00
-play-hold
+play-hold E2
 wait 00:00:02:00
 play-release
 wait 00:00:03:00
 transition attack 100ms 00:00:03:00
 wait 00:00:04:00
-play-tap 200ms
+play-tap 200ms E2
 wait 00:00:05:00
 set filter-mode on
 wait 00:00:02:00
 transition decay 500ms 00:00:02:00
 wait 00:00:02:00
-play-tap 300ms
+play-tap 300ms E2

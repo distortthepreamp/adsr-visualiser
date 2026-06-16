@@ -191,22 +191,23 @@ function parseCueList(text) {
       continue;
     }
 
-    // play-tap NNNms
-    const playTapMatch = line.match(/^play-tap\s+(\d+(?:\.\d+)?)ms$/i);
+    // play-tap NNNms [note]
+    const playTapMatch = line.match(/^play-tap\s+(\d+(?:\.\d+)?)ms(?:\s+([A-Ga-g]\d))?$/i);
     if (playTapMatch) {
-      result.push({ type: 'play', action: 'tap', ms: parseFloat(playTapMatch[1]) });
+      result.push({ type: 'play', action: 'tap', ms: parseFloat(playTapMatch[1]), note: playTapMatch[2] ? playTapMatch[2].toUpperCase() : null });
       continue;
     }
 
-    // play-hold
-    if (/^play-hold$/i.test(line)) {
-      result.push({ type: 'play', action: 'hold' });
+    // play-hold [note]
+    const playHoldMatch = line.match(/^play-hold(?:\s+([A-Ga-g]\d))?$/i);
+    if (playHoldMatch) {
+      result.push({ type: 'play', action: 'hold', note: playHoldMatch[1] ? playHoldMatch[1].toUpperCase() : null });
       continue;
     }
 
     // play-release
     if (/^play-release$/i.test(line)) {
-      result.push({ type: 'play', action: 'release' });
+      result.push({ type: 'play', action: 'release', note: null });
       continue;
     }
   }
@@ -331,6 +332,11 @@ function executeEvent(event) {
         break;
     }
   } else if (event.type === 'play') {
+    if (event.note && window.noteFreqs) {
+      const btnId = 'note' + event.note + 'Btn';
+      const freq = noteFreqs[btnId] !== undefined ? noteFreqs[btnId] : null;
+      if (freq !== null) setNoteMode(btnId, freq);
+    }
     switch (event.action) {
       case 'tap':
         if (window.tap) tap(event.ms);
