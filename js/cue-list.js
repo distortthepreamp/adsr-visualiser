@@ -7,6 +7,9 @@ let cueIndex = 0;
 let cueTimecodeMs = 0;
 let cuePlayTimers = [];
 let cueIsPlaying = false;
+let elapsedTimerRaf = null;
+let elapsedStartTime = null;
+let elapsedSoFarMs = 0;
 
 // ---- Timecode helpers (24fps) ----
 function tcToMs(tc) {
@@ -30,15 +33,42 @@ function msToTc(ms) {
   return [h, m, s, ff].map(n => String(n).padStart(2, '0')).join(':');
 }
 
+function msToElapsed(ms) {
+  const totalFrames = Math.round(ms * 24 / 1000);
+  const ff = totalFrames % 24;
+  const totalSec = Math.floor(totalFrames / 24);
+  const s = totalSec % 60;
+  const m = Math.floor(totalSec / 60);
+  return [m, s, ff].map(n => String(n).padStart(2, '0')).join(':');
+}
+
+function startElapsedTimer() {
+  // elapsedStartTime must be seeded by the caller before invoking this
+  const svgParent = document.getElementById('svgTimecodes');
+  if (svgParent) svgParent.style.display = '';
+  function tick() {
+    const el = document.getElementById('svgElapsed');
+    if (el) el.textContent = 'ELAPSED: ' + msToElapsed(performance.now() - elapsedStartTime);
+    elapsedTimerRaf = requestAnimationFrame(tick);
+  }
+  elapsedTimerRaf = requestAnimationFrame(tick);
+}
+
+function stopElapsedTimer() {
+  if (elapsedTimerRaf !== null) {
+    cancelAnimationFrame(elapsedTimerRaf);
+    elapsedTimerRaf = null;
+  }
+}
+
 function updateTimecodeDisplay() {
   const tc = msToTc(cueTimecodeMs);
   const el = document.getElementById('cueTimecode');
   if (el) el.textContent = tc;
-  const svgEl = document.getElementById('svgTimecode');
-  if (svgEl) {
-    svgEl.textContent = tc;
-    svgEl.style.display = cueList.length > 0 ? '' : 'none';
-  }
+  const svgCueEl = document.getElementById('svgCue');
+  if (svgCueEl) svgCueEl.textContent = 'CUE: ' + tc;
+  const svgParent = document.getElementById('svgTimecodes');
+  if (svgParent) svgParent.style.display = cueList.length > 0 ? '' : 'none';
 }
 
 // ---- Parser ----
@@ -375,6 +405,9 @@ function cuePlay() {
   if (cueIsPlaying) return;
   cueIsPlaying = true;
   console.log(`[CueList] playing from index ${cueIndex}, timecode ${msToTc(cueTimecodeMs)}`);
+  elapsedSoFarMs = cueTimecodeMs;
+  elapsedStartTime = performance.now() - elapsedSoFarMs;
+  startElapsedTimer();
 
   let accumulatedMs = 0;
   const baseTimecodeMs = cueTimecodeMs;
@@ -413,13 +446,21 @@ function cueStop() {
   cuePlayTimers.forEach(h => clearTimeout(h));
   cuePlayTimers = [];
   cueIsPlaying = false;
+  stopElapsedTimer();
+  if (elapsedStartTime !== null) elapsedSoFarMs = performance.now() - elapsedStartTime;
   console.log(`[CueList] stopped at timecode ${msToTc(cueTimecodeMs)}`);
 }
 
 function cueReset() {
   cueStop();
-  cueIndex = 0;
+  elapsedSoFarMs = 0;
+  elapsedStartTime = null;
   cueTimecodeMs = 0;
+  const svgElapsedTspan = document.getElementById('svgElapsed');
+  if (svgElapsedTspan) svgElapsedTspan.textContent = 'ELAPSED: 00:00:00';
+  const svgTimecodes = document.getElementById('svgTimecodes');
+  if (svgTimecodes) svgTimecodes.style.display = 'none';
+  cueIndex = 0;
   updateTimecodeDisplay();
   updateCueScriptView();
 }
