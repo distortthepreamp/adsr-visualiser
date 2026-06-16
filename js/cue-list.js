@@ -1,0 +1,428 @@
+// ---- cue-list.js — cue list state, parsing, and transport controls ----
+
+// ---- State ----
+let cueListText = '';
+let cueList = [];
+let cueIndex = 0;
+let cueTimecodeMs = 0;
+let cuePlayTimers = [];
+let cueIsPlaying = false;
+
+// ---- Timecode helpers (24fps) ----
+function tcToMs(tc) {
+  const parts = tc.split(':');
+  if (parts.length !== 4) return 0;
+  const h  = parseInt(parts[0], 10) || 0;
+  const m  = parseInt(parts[1], 10) || 0;
+  const s  = parseInt(parts[2], 10) || 0;
+  const ff = parseInt(parts[3], 10) || 0;
+  return ((h * 3600 + m * 60 + s) * 1000) + Math.round(ff * 1000 / 24);
+}
+
+function msToTc(ms) {
+  const totalFrames = Math.round(ms * 24 / 1000);
+  const ff = totalFrames % 24;
+  const totalSec = Math.floor(totalFrames / 24);
+  const s = totalSec % 60;
+  const totalMin = Math.floor(totalSec / 60);
+  const m = totalMin % 60;
+  const h = Math.floor(totalMin / 60);
+  return [h, m, s, ff].map(n => String(n).padStart(2, '0')).join(':');
+}
+
+function updateTimecodeDisplay() {
+  const el = document.getElementById('cueTimecode');
+  if (el) el.textContent = msToTc(cueTimecodeMs);
+}
+
+// ---- Parser ----
+function parseCueList(text) {
+  const result = [];
+  const lines = text.split('\n');
+  const tcPat = /\d{2}:\d{2}:\d{2}:\d{2}/;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line || line.startsWith('#')) continue;
+
+    // wait HH:MM:SS:FF
+    const waitMatch = line.match(/^wait\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
+    if (waitMatch) {
+      result.push({ type: 'wait', ms: tcToMs(waitMatch[1]) });
+      continue;
+    }
+
+    // set attack NNNms
+    const setAttackMatch = line.match(/^set\s+attack\s+(\d+(?:\.\d+)?)ms$/i);
+    if (setAttackMatch) {
+      result.push({ type: 'set', param: 'attack', value: parseFloat(setAttackMatch[1]) });
+      continue;
+    }
+
+    // set decay NNNms
+    const setDecayMatch = line.match(/^set\s+decay\s+(\d+(?:\.\d+)?)ms$/i);
+    if (setDecayMatch) {
+      result.push({ type: 'set', param: 'decay', value: parseFloat(setDecayMatch[1]) });
+      continue;
+    }
+
+    // set sustain N
+    const setSustainMatch = line.match(/^set\s+sustain\s+(\d+(?:\.\d+)?)$/i);
+    if (setSustainMatch) {
+      result.push({ type: 'set', param: 'sustain', value: parseFloat(setSustainMatch[1]) });
+      continue;
+    }
+
+    // set release NNNms
+    const setReleaseMatch = line.match(/^set\s+release\s+(\d+(?:\.\d+)?)ms$/i);
+    if (setReleaseMatch) {
+      result.push({ type: 'set', param: 'release', value: parseFloat(setReleaseMatch[1]) });
+      continue;
+    }
+
+    // set loud-decay on/off
+    const setLoudDecayMatch = line.match(/^set\s+loud-decay\s+(on|off)$/i);
+    if (setLoudDecayMatch) {
+      result.push({ type: 'set', param: 'loud-decay', value: setLoudDecayMatch[1].toLowerCase() === 'on' });
+      continue;
+    }
+
+    // set filter-mode on/off
+    const setFilterModeMatch = line.match(/^set\s+filter-mode\s+(on|off)$/i);
+    if (setFilterModeMatch) {
+      result.push({ type: 'set', param: 'filter-mode', value: setFilterModeMatch[1].toLowerCase() === 'on' });
+      continue;
+    }
+
+    // transition attack NNNms HH:MM:SS:FF
+    const transAttackMatch = line.match(/^transition\s+attack\s+(\d+(?:\.\d+)?)ms\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
+    if (transAttackMatch) {
+      result.push({ type: 'transition', param: 'attack', value: parseFloat(transAttackMatch[1]), durationMs: tcToMs(transAttackMatch[2]) });
+      continue;
+    }
+
+    // transition decay NNNms HH:MM:SS:FF
+    const transDecayMatch = line.match(/^transition\s+decay\s+(\d+(?:\.\d+)?)ms\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
+    if (transDecayMatch) {
+      result.push({ type: 'transition', param: 'decay', value: parseFloat(transDecayMatch[1]), durationMs: tcToMs(transDecayMatch[2]) });
+      continue;
+    }
+
+    // transition sustain N HH:MM:SS:FF
+    const transSustainMatch = line.match(/^transition\s+sustain\s+(\d+(?:\.\d+)?)\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
+    if (transSustainMatch) {
+      result.push({ type: 'transition', param: 'sustain', value: parseFloat(transSustainMatch[1]), durationMs: tcToMs(transSustainMatch[2]) });
+      continue;
+    }
+
+    // transition release NNNms HH:MM:SS:FF
+    const transReleaseMatch = line.match(/^transition\s+release\s+(\d+(?:\.\d+)?)ms\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
+    if (transReleaseMatch) {
+      result.push({ type: 'transition', param: 'release', value: parseFloat(transReleaseMatch[1]), durationMs: tcToMs(transReleaseMatch[2]) });
+      continue;
+    }
+  }
+
+  return result;
+}
+
+// ---- Event executor ----
+function executeEvent(event) {
+  console.log(`[CueList] executing ${event.type} ${event.param ?? ''} ${event.value ?? ''} at ${msToTc(cueTimecodeMs)}`);
+  if (event.type === 'set') {
+    switch (event.param) {
+      case 'attack':
+        state.a = positionFromMs(event.value);
+        state.target.a = state.a;
+        render();
+        break;
+      case 'decay':
+        state.d = positionFromMs(event.value);
+        state.target.d = state.d;
+        render();
+        break;
+      case 'sustain':
+        state.s = event.value / 10;
+        state.target.s = state.s;
+        render();
+        break;
+      case 'release':
+        state.r = positionFromMs(event.value);
+        state.target.r = state.r;
+        render();
+        break;
+      case 'loud-decay':
+        $('loudDecay').checked = event.value;
+        $('loudDecay').dispatchEvent(new Event('change'));
+        render();
+        break;
+      case 'filter-mode':
+        $('frequencyMode').checked = event.value;
+        $('frequencyMode').dispatchEvent(new Event('change'));
+        render();
+        break;
+    }
+  } else if (event.type === 'transition') {
+    switch (event.param) {
+      case 'attack':
+        state.target.a = positionFromMs(event.value);
+        transition(event.durationMs / 1000);
+        break;
+      case 'decay':
+        state.target.d = positionFromMs(event.value);
+        transition(event.durationMs / 1000);
+        break;
+      case 'sustain':
+        state.target.s = event.value / 10;
+        transition(event.durationMs / 1000);
+        break;
+      case 'release':
+        state.target.r = positionFromMs(event.value);
+        transition(event.durationMs / 1000);
+        break;
+    }
+  }
+}
+
+// ---- Cue preview display ----
+function getCueLineText(idx) {
+  if (idx < 0 || idx >= cueList.length) return '';
+  const lines = cueListText.split('\n');
+  let count = 0;
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    if (count === idx) return trimmed;
+    count++;
+  }
+  return '';
+}
+
+function updateCuePreview() {
+  const beforeEl  = document.getElementById('cuePreviewBefore');
+  const currentEl = document.getElementById('cuePreviewCurrent');
+  const nextEl    = document.getElementById('cuePreviewNext');
+  const afterEl   = document.getElementById('cuePreviewAfter');
+  const after2El  = document.getElementById('cuePreviewAfter2');
+  if (beforeEl)  beforeEl.textContent  = getCueLineText(cueIndex - 2);
+  if (currentEl) currentEl.textContent = getCueLineText(cueIndex - 1);
+  if (nextEl)    nextEl.textContent    = getCueLineText(cueIndex);
+  if (afterEl)   afterEl.textContent   = getCueLineText(cueIndex + 1);
+  if (after2El)  after2El.textContent  = getCueLineText(cueIndex + 2);
+}
+
+// ---- Playback engine ----
+function cuePlay() {
+  if (cueIsPlaying) return;
+  cueIsPlaying = true;
+  console.log(`[CueList] playing from index ${cueIndex}, timecode ${msToTc(cueTimecodeMs)}`);
+
+  let accumulatedMs = 0;
+  const baseTimecodeMs = cueTimecodeMs;
+
+  for (let i = cueIndex; i < cueList.length; i++) {
+    const event = cueList[i];
+    if (event.type === 'wait') {
+      accumulatedMs += event.ms;
+    } else {
+      const delay     = accumulatedMs;
+      const tcAtFire  = baseTimecodeMs + accumulatedMs;
+      const idx       = i;
+      const handle = setTimeout(() => {
+        cueTimecodeMs = tcAtFire;
+        updateTimecodeDisplay();
+        executeEvent(event);
+        cueIndex = idx + 1;
+        updateCuePreview();
+      }, delay);
+      cuePlayTimers.push(handle);
+    }
+  }
+
+  // Final timer — fires after all waits, marks playback complete
+  const totalMs = accumulatedMs;
+  const endHandle = setTimeout(() => {
+    cueIsPlaying = false;
+    cueTimecodeMs = baseTimecodeMs + totalMs;
+    cueIndex = cueList.length;
+    updateTimecodeDisplay();
+  }, totalMs);
+  cuePlayTimers.push(endHandle);
+}
+
+function cueStop() {
+  cuePlayTimers.forEach(h => clearTimeout(h));
+  cuePlayTimers = [];
+  cueIsPlaying = false;
+  console.log(`[CueList] stopped at timecode ${msToTc(cueTimecodeMs)}`);
+}
+
+function cueReset() {
+  cueStop();
+  cueIndex = 0;
+  cueTimecodeMs = 0;
+  updateTimecodeDisplay();
+  updateCuePreview();
+}
+
+function cueStepFwd() {
+  if (cueIsPlaying) return;
+  let accMs = 0;
+  for (let i = cueIndex; i < cueList.length; i++) {
+    const event = cueList[i];
+    if (event.type === 'wait') {
+      accMs += event.ms;
+    } else {
+      cueTimecodeMs += accMs;
+      executeEvent(event);
+      cueIndex = i + 1;
+      updateTimecodeDisplay();
+      updateCuePreview();
+      return;
+    }
+  }
+  // Only waits remain (or list exhausted) — advance time and index
+  cueTimecodeMs += accMs;
+  cueIndex = cueList.length;
+  updateTimecodeDisplay();
+  updateCuePreview();
+}
+
+function cueStepBack() {
+  if (cueIsPlaying) return;
+  if (cueIndex === 0) return;
+
+  // Find the nearest non-wait event before the current position
+  let prevEventIdx = -1;
+  for (let i = cueIndex - 1; i >= 0; i--) {
+    if (cueList[i].type !== 'wait') {
+      prevEventIdx = i;
+      break;
+    }
+  }
+
+  if (prevEventIdx === -1) {
+    // Only waits before current position — rewind to beginning
+    cueIndex = 0;
+    cueTimecodeMs = 0;
+    updateTimecodeDisplay();
+    updateCuePreview();
+    return;
+  }
+
+  // Subtract the waits that immediately precede prevEventIdx
+  // (these were added to cueTimecodeMs when we stepped forward to it)
+  let accMs = 0;
+  for (let i = prevEventIdx - 1; i >= 0; i--) {
+    if (cueList[i].type === 'wait') {
+      accMs += cueList[i].ms;
+    } else {
+      break;
+    }
+  }
+
+  cueTimecodeMs -= accMs;
+  cueIndex = prevEventIdx;
+  updateTimecodeDisplay();
+  updateCuePreview();
+}
+
+// ---- initCueList ----
+function initCueList() {
+  updateTimecodeDisplay();
+
+  // Load default script
+  fetch('data/cue-test.txt')
+    .then(r => r.text())
+    .then(text => {
+      cueListText = text;
+      cueList = parseCueList(text);
+      console.log('[CueList] events:', cueList.length);
+      console.log('[CueList] first 3:', JSON.stringify(cueList.slice(0, 3), null, 2));
+      console.log('[CueList] last 3:', JSON.stringify(cueList.slice(-3), null, 2));
+    })
+    .catch(() => { /* no default script present — silently ignore */ });
+
+  // Transport buttons
+  const playBtn      = document.getElementById('cuePlayBtn');
+  const stopBtn      = document.getElementById('cueStopBtn');
+  const resetBtn     = document.getElementById('cueResetBtn');
+  const stepFwdBtn   = document.getElementById('cueStepFwdBtn');
+  const stepBackBtn  = document.getElementById('cueStepBackBtn');
+  if (playBtn)     playBtn.addEventListener('click',    cuePlay);
+  if (stopBtn)     stopBtn.addEventListener('click',    cueStop);
+  if (resetBtn)    resetBtn.addEventListener('click',   cueReset);
+  if (stepFwdBtn)  stepFwdBtn.addEventListener('click', cueStepFwd);
+  if (stepBackBtn) stepBackBtn.addEventListener('click',cueStepBack);
+
+  // Edit modal — inject into DOM once
+  const editOverlay = document.createElement('div');
+  editOverlay.id = 'cueEditOverlay';
+  editOverlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;align-items:center;justify-content:center;';
+  editOverlay.innerHTML =
+    '<div style="background:rgba(18,18,18,.97);border:1px solid rgba(255,255,255,.3);border-radius:14px;padding:22px 28px 24px;width:680px;max-width:92vw;color:#fff;font-family:Arial,Helvetica,sans-serif;position:relative;">' +
+      '<button id="cueEditClose" style="position:absolute;top:10px;right:14px;background:none;border:none;color:rgba(255,255,255,.7);font-size:20px;font-weight:800;cursor:pointer;line-height:1;padding:0">\xd7</button>' +
+      '<div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:10px">Cue List</div>' +
+      '<textarea id="cueEditTextarea" style="width:100%;box-sizing:border-box;height:380px;background:#0a0a0a;color:#ccc;border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:10px;font-family:monospace;font-size:13px;resize:vertical;"></textarea>' +
+      '<div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;">' +
+        '<button id="cueEditCopy" style="padding:5px 16px;">Copy</button>' +
+        '<button id="cueEditSave" style="padding:5px 16px;">Save</button>' +
+        '<button id="cueEditCancel" style="padding:5px 16px;">Cancel</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(editOverlay);
+
+  function cueEditEscHandler(e) {
+    if (e.key === 'Escape') { closeEditModal(); }
+  }
+  function openEditModal()  {
+    document.getElementById('cueEditTextarea').value = cueListText;
+    editOverlay.style.display = 'flex';
+    document.addEventListener('keydown', cueEditEscHandler);
+  }
+  function closeEditModal() {
+    editOverlay.style.display = 'none';
+    document.removeEventListener('keydown', cueEditEscHandler);
+  }
+
+  document.getElementById('cueEditClose').addEventListener('click',  closeEditModal);
+  document.getElementById('cueEditCancel').addEventListener('click', closeEditModal);
+  document.getElementById('cueEditCopy').addEventListener('click', () => {
+    navigator.clipboard.writeText(document.getElementById('cueEditTextarea').value);
+  });
+  editOverlay.addEventListener('click', e => { if (e.target === editOverlay) closeEditModal(); });
+  document.getElementById('cueEditSave').addEventListener('click', () => {
+    const text = document.getElementById('cueEditTextarea').value;
+    cueListText = text;
+    cueList = parseCueList(text);
+    closeEditModal();
+  });
+
+  const editBtn = document.getElementById('cueEditBtn');
+  if (editBtn) editBtn.addEventListener('click', openEditModal);
+
+  // Load button — file picker
+  const loadBtn = document.getElementById('cueLoadBtn');
+  if (loadBtn) {
+    loadBtn.addEventListener('click', () => {
+      const inp = document.createElement('input');
+      inp.type = 'file';
+      inp.accept = '.txt,.cue';
+      inp.style.display = 'none';
+      document.body.appendChild(inp);
+      inp.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) { document.body.removeChild(inp); return; }
+        const reader = new FileReader();
+        reader.onload = ev => {
+          cueListText = ev.target.result;
+          cueList = parseCueList(cueListText);
+          document.body.removeChild(inp);
+        };
+        reader.onerror = () => { document.body.removeChild(inp); };
+        reader.readAsText(file);
+      });
+      inp.click();
+    });
+  }
+}
