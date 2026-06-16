@@ -156,6 +156,25 @@ function parseCueList(text) {
       result.push({ type: 'transition', param: 'amount', value: parseFloat(transAmountMatch[1]), durationMs: tcToMs(transAmountMatch[2]) });
       continue;
     }
+
+    // play-tap NNNms
+    const playTapMatch = line.match(/^play-tap\s+(\d+(?:\.\d+)?)ms$/i);
+    if (playTapMatch) {
+      result.push({ type: 'play', action: 'tap', ms: parseFloat(playTapMatch[1]) });
+      continue;
+    }
+
+    // play-hold
+    if (/^play-hold$/i.test(line)) {
+      result.push({ type: 'play', action: 'hold' });
+      continue;
+    }
+
+    // play-release
+    if (/^play-release$/i.test(line)) {
+      result.push({ type: 'play', action: 'release' });
+      continue;
+    }
   }
 
   return result;
@@ -275,6 +294,18 @@ function executeEvent(event) {
       case 'amount':
         state.target.scale = event.value / 10;
         transition(event.durationMs / 1000);
+        break;
+    }
+  } else if (event.type === 'play') {
+    switch (event.action) {
+      case 'tap':
+        if (window.tap) tap(event.ms);
+        break;
+      case 'hold':
+        if (window.hold) hold();
+        break;
+      case 'release':
+        if (window.releaseFromCurrent) releaseFromCurrent();
         break;
     }
   }
