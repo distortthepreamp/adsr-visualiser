@@ -156,6 +156,32 @@ function drawKiosk(){
   lastDrawnAttackAngle = currentAttackAngle;
   lastDrawnDecayAngle  = currentDecayAngle;
 
+  // Switch background rectangles — drawn before darts so darts appear on top
+  const loudDecayOn = !!($('loudDecay') && $('loudDecay').checked);
+  const hpModeOn    = !!($('hpMode')    && $('hpMode').checked);
+  const switchRects = [];
+  if (!filterOn) switchRects.push({ y: 864, color: '#ffffff', param: 'loud-decay'   });
+  if (filterOn)  switchRects.push({ y: 744, color: '#ffffff', param: 'filter-decay' });
+  if (filterOn)  switchRects.push({ y: 248, color: '#0DCAF2', param: 'hp-mode'      });
+  const switchNowGlowing = activeKioskSwitch !== null && performance.now() < activeKioskSwitchUntil;
+  console.log(`[kiosk-draw] switchNowGlowing=${switchNowGlowing} activeKioskSwitch=${activeKioskSwitch} now=${performance.now().toFixed(0)} until=${activeKioskSwitchUntil.toFixed(0)}`);
+  if (!switchNowGlowing) activeKioskSwitch = null;
+  switchRects.forEach(({ y, color, param }) => {
+    const active = switchNowGlowing && activeKioskSwitch === param;
+    ctx.globalAlpha = active ? 1.0 : inactiveOpacity;
+    if (active && glowEnabled) {
+      ctx.shadowBlur  = glowRadius;
+      ctx.shadowColor = color;
+    }
+    console.log(`[kiosk-draw] rect param=${param} active=${active} globalAlpha=${ctx.globalAlpha} shadowBlur=${ctx.shadowBlur} shadowColor=${ctx.shadowColor}`);
+    ctx.beginPath();
+    ctx.rect(53, y - 30, 122, 60);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.shadowBlur  = 0;
+    ctx.globalAlpha = 1.0;
+  });
+
   KIOSK_KNOBS.forEach(knob => {
     if (knob.modes.includes('filter')   && !filterOn) return;
     if (knob.modes.includes('loudness') &&  filterOn) return;
@@ -171,9 +197,7 @@ function drawKiosk(){
     drawKnobPointer(ctx, knob.x, knob.y, angleDeg);
   });
 
-  // Switch indicators
-  const loudDecayOn = !!($('loudDecay') && $('loudDecay').checked);
-  const hpModeOn    = !!($('hpMode')    && $('hpMode').checked);
+  // Switch indicators (dart arrows)
   if (filterOn)  drawSwitch(ctx, 114, 248, hpModeOn,    'white');  // Filter Mode Lo/Hi
   if (filterOn)  drawSwitch(ctx, 114, 744, loudDecayOn, 'black');  // Filter Decay
   if (!filterOn) drawSwitch(ctx, 114, 864, loudDecayOn, 'black');  // Loud Decay
@@ -191,12 +215,17 @@ let kioskGlowRaf = null;
 // expiry check inside drawKiosk() has a chance to fire and clear the glow.
 function startKioskGlowLoop() {
   if (kioskGlowRaf !== null) cancelAnimationFrame(kioskGlowRaf);
+  let tickCount = 0;
   function tick() {
     kioskGlowRaf = null;
-    if (!kioskOpen) return;
+    if (!kioskOpen) { console.log('[kiosk-glow] loop stopped: kioskOpen=false'); return; }
+    const deadline = Math.max(activeKioskGlowUntil, activeKioskSwitchUntil);
+    console.log(`[kiosk-glow] tick #${++tickCount} now=${performance.now().toFixed(0)} switchUntil=${activeKioskSwitchUntil.toFixed(0)} glowUntil=${activeKioskGlowUntil.toFixed(0)} deadline=${deadline.toFixed(0)}`);
     drawKiosk();
-    if (performance.now() < activeKioskGlowUntil + 100) {
+    if (performance.now() < deadline + 100) {
       kioskGlowRaf = requestAnimationFrame(tick);
+    } else {
+      console.log('[kiosk-glow] loop exiting');
     }
   }
   kioskGlowRaf = requestAnimationFrame(tick);
@@ -227,6 +256,16 @@ window.kioskBeginTransition = function(fromA, toA, fromD, toD, durMs) {
 window.kioskNotifyKnob = function(param, durMs) {
   activeKioskKnob = [param];
   activeKioskGlowUntil = performance.now() + durMs + 1000;
+  startKioskGlowLoop();
+};
+
+let activeKioskSwitch = null;  // 'loud-decay', 'filter-decay', 'filter-mode'
+let activeKioskSwitchUntil = 0;
+
+window.kioskNotifySwitch = function(param) {
+  activeKioskSwitch = param;
+  activeKioskSwitchUntil = performance.now() + 1000;
+  console.log(`[kiosk-switch] kioskNotifySwitch called param=${param} until=${activeKioskSwitchUntil.toFixed(0)}`);
   startKioskGlowLoop();
 };
 

@@ -321,6 +321,10 @@ function initUIControls(){
   $('frequencyMode').addEventListener('change', () => { syncHpModeEnabled(); setMeterLevel(state.dotLevel); });
   $('hpMode').addEventListener('change', () => setMeterLevel(state.dotLevel));
 
+  // Kiosk switch glow — notify on manual checkbox changes
+  $('loudDecay').addEventListener('change', () => { if(window.kioskNotifySwitch) kioskNotifySwitch($('frequencyMode').checked ? 'filter-decay' : 'loud-decay'); });
+  $('hpMode').addEventListener('change', () => { if(window.kioskNotifySwitch) kioskNotifySwitch('hp-mode'); });
+
   // Linear time / zoom
   $('linearTime').addEventListener('change', syncLinearTimeScale);
   $('timelineZoom3x') && $('timelineZoom3x').addEventListener('change', () => { state.target.zoomFactor = $('timelineZoom3x').checked ? 3 : 1; transition(currentTransitionSec); });

@@ -244,16 +244,19 @@ function executeEvent(event) {
         $('loudDecay').checked = event.value;
         $('loudDecay').dispatchEvent(new Event('change'));
         render();
+        if (window.kioskNotifySwitch) kioskNotifySwitch('loud-decay');
         break;
       case 'filter-mode':
         $('frequencyMode').checked = event.value;
         $('frequencyMode').dispatchEvent(new Event('change'));
         render();
+        if (window.kioskNotifySwitch) kioskNotifySwitch('filter-mode');
         break;
       case 'filter-decay':
         $('loudDecay').checked = event.value;
         $('loudDecay').dispatchEvent(new Event('change'));
         render();
+        if (window.kioskNotifySwitch) kioskNotifySwitch('filter-decay');
         break;
       case 'hp-mode':
         $('hpMode').checked = event.value;
