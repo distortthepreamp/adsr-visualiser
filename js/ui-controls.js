@@ -277,10 +277,10 @@ function initUIControls(){
   });
 
   // Checkbox render-only listeners
-  ['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine'].forEach(id=>$(id).addEventListener('change',render));
+  ['loudDecay','keyboardControl','drawReleaseWhenZero','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine'].forEach(id=>$(id).addEventListener('change',render));
 
   // Checkbox debug log listeners
-  ['loudDecay','keyboardControl','drawReleaseWhenZero','showBounds','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine'].forEach(id=>{ const el=$(id); if(el) el.addEventListener('change', () => {
+  ['loudDecay','keyboardControl','drawReleaseWhenZero','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine'].forEach(id=>{ const el=$(id); if(el) el.addEventListener('change', () => {
     const chk = id2 => { const e2=$(id2); return e2 ? e2.checked : undefined; };
     logEvent('CHECKBOX', {
       id, checked: el.checked,
@@ -328,9 +328,9 @@ function initUIControls(){
   $('meterFillColorFilter').addEventListener('input',e=>document.documentElement.style.setProperty('--meterFillFilter', e.target.value));
   $('timeAxisStatedColor').addEventListener('input',e=>document.documentElement.style.setProperty('--timeAxisStatedColor', e.target.value));
   $('contourLineColor').addEventListener('input',e=>{ document.documentElement.style.setProperty('--contourLineColor', e.target.value); render(); });
-  $('attackColor').addEventListener('input',e=>document.documentElement.style.setProperty('--attackColor', e.target.value));
-  $('decayColor').addEventListener('input',e=>document.documentElement.style.setProperty('--decayColor', e.target.value));
-  $('releaseColor').addEventListener('input',e=>document.documentElement.style.setProperty('--releaseColor', e.target.value));
+  ['loudnessAttackColor','loudnessDecayColor','loudnessReleaseColor','filterAttackColor','filterDecayColor','filterReleaseColor'].forEach(id => {
+    const el = $(id); if(el) el.addEventListener('input', render);
+  });
 
   // Line widths / label sizes
   $('lineWidth').addEventListener('input',e=>{ const inp=e.target,c=Math.min(30,Math.max(4,isNaN(parseInt(inp.value))?14:parseInt(inp.value))); inp.value=c; document.documentElement.style.setProperty('--lineWidth',c); syncRadii(); });

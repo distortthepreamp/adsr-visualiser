@@ -264,12 +264,6 @@ function render(){
     if(bg){ const bbox=el.getBBox(); bg.setAttribute('x',bbox.x-4); bg.setAttribute('y',bbox.y-2); bg.setAttribute('width',bbox.width+8); bg.setAttribute('height',bbox.height+4); bg.setAttribute('fill','#ffffff'); bg.style.display=el.style.display; }
   }
 
-  // Bounds lines — fixed at absolute graph top/bottom, full SVG width
-  const showBounds = $('showBounds') && $('showBounds').checked;
-  const floorBound=$('floorBound'), ceilingBound=$('ceilingBound');
-  if(floorBound){ floorBound.style.display = showBounds ? '' : 'none'; }
-  if(ceilingBound){ ceilingBound.style.display = showBounds ? '' : 'none'; }
-
   // Meter box — fixed full graph height
   const meterBox=$('meterBox');
   if(meterBox){
@@ -385,6 +379,14 @@ function render(){
   if(loudDecayLabel) loudDecayLabel.textContent = freqMode ? 'Filter Decay' : 'Loud Decay';
   // Knob colours
   syncKnobColours(freqMode);
+  // A/D/R inner line colours — switch per mode
+  const _aEl = freqMode ? $('filterAttackColor')  : $('loudnessAttackColor');
+  const _dEl = freqMode ? $('filterDecayColor')   : $('loudnessDecayColor');
+  const _rEl = freqMode ? $('filterReleaseColor') : $('loudnessReleaseColor');
+  const _root = document.documentElement;
+  if(_aEl) _root.style.setProperty('--attackColor',  _aEl.value);
+  if(_dEl) _root.style.setProperty('--decayColor',   _dEl.value);
+  if(_rEl) _root.style.setProperty('--releaseColor', _rEl.value);
 
   // Keep resting meter fill in sync whenever no animation is running
   if(state.currentPhase === 'idle') hideDot();

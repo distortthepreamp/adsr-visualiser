@@ -213,7 +213,6 @@
         <div>
           <div id="loudDecayRow" class="row"><label><input id="loudDecay" type="checkbox"> <span id="loudDecayLabel">Loud Decay</span> (D)</label></div>
           <div class="row"><label><input id="drawReleaseWhenZero" type="checkbox"> Show Zero Release (R)</label></div>
-          <div class="row"><label><input id="showBounds" type="checkbox"> Show Max Min Lines (,)</label></div>
           <div class="row"><label><input id="showContour" type="checkbox" checked> Show Contour Top And Bottom (.)</label></div>
           <div class="row"><label><input id="frequencyMode" type="checkbox"> Filter Mode (F)</label></div>
           <div class="row"><label><input id="hpMode" type="checkbox"> LP/HP Mode (M)</label></div>
@@ -278,9 +277,11 @@
           <div class="row"><label><input id="meterGlow" type="checkbox" checked> Meter Glow</label><label>Glow R <input id="meterGlowRadius" type="number" min="0" max="60" step="1" value="5"></label><label><input id="meterScanlinesVisible" type="checkbox" checked> Scanlines</label></div>
           <div class="row"><label><input id="blobGlowEnabled" type="checkbox" checked> Blob Glow</label><label>Blob R <input id="blobGlowRadius" type="number" min="0" max="30" step="1" value="8"></label></div>
           <div class="row"><label>Meter L <input id="meterFillColor" type="color" value="#00ff00"></label><label>Meter F <input id="meterFillColorFilter" type="color" value="#00ffff"></label><label>Stated <input id="timeAxisStatedColor" type="color" value="#aaaaaa"></label><label>Contour <input id="contourLineColor" type="color" value="#ffff00"></label></div>
+          <div class="row"><label>L.Attack <input id="loudnessAttackColor" type="color" value="#ff0000"></label><label>L.Decay <input id="loudnessDecayColor" type="color" value="#ff0000"></label><label>L.Release <input id="loudnessReleaseColor" type="color" value="#ff0000"></label></div>
+          <div class="row"><label>F.Attack <input id="filterAttackColor" type="color" value="#00ffff"></label><label>F.Decay <input id="filterDecayColor" type="color" value="#ffff00"></label><label>F.Release <input id="filterReleaseColor" type="color" value="#ffff00"></label></div>
         </div>
       </div>
-      <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label><label>A <input id="attackColor" type="color" value="#ff6b6b"></label><label>D <input id="decayColor" type="color" value="#5fa8ff"></label><label>R <input id="releaseColor" type="color" value="#5fa8ff"></label></div>
+      <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:10px;align-items:center;flex-wrap:wrap">
         <label><input id="audioEnabled" type="checkbox" checked> A — Audio</label>
@@ -344,7 +345,6 @@
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">D</td><td style="padding:3px 0;font-size:13px;font-weight:700">Loud/Filter Decay</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">R</td><td style="padding:3px 0;font-size:13px;font-weight:700">Draw Release When Zero</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">Z</td><td style="padding:3px 0;font-size:13px;font-weight:700">Timeline Zoom x3</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">,</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Max Min Lines</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">.</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Contour Top And Bottom</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">F</td><td style="padding:3px 0;font-size:13px;font-weight:700">Filter Mode</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">M</td><td style="padding:3px 0;font-size:13px;font-weight:700">LP/HP Mode</td></tr>
@@ -501,7 +501,7 @@ setMeterLevel(state.dotLevel);
 logEvent('INIT', {
   a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale,
   loudDecay: $('loudDecay').checked, drawReleaseWhenZero: $('drawReleaseWhenZero').checked,
-  showBounds: $('showBounds').checked, showContour: $('showContour').checked,
+  showContour: $('showContour').checked,
   frequencyMode: $('frequencyMode').checked, hpMode: $('hpMode').checked,
   keyboardControl: $('keyboardControl').checked, showClipped: $('showClipped').checked,
   linearTime: $('linearTime').checked, analogueCurve: $('analogueCurve').checked,

@@ -6,7 +6,6 @@ function buildConfigSnapshot(){
     a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale,
     loudDecay: $('loudDecay').checked,
     drawReleaseWhenZero: $('drawReleaseWhenZero').checked,
-    showBounds: $('showBounds').checked,
     showContour: $('showContour').checked,
     frequencyMode: $('frequencyMode').checked,
     hpMode: $('hpMode').checked,
@@ -41,9 +40,12 @@ function buildConfigSnapshot(){
     liveAnimate: (document.querySelector('input[name="mode"]:checked') || {}).value || 'live',
     lineColor: $('lineColor').value,
     bgColor: $('bgColor').value,
-    attackColor: $('attackColor').value,
-    decayColor: $('decayColor').value,
-    releaseColor: $('releaseColor').value,
+    loudnessAttackColor: $('loudnessAttackColor').value,
+    loudnessDecayColor: $('loudnessDecayColor').value,
+    loudnessReleaseColor: $('loudnessReleaseColor').value,
+    filterAttackColor: $('filterAttackColor').value,
+    filterDecayColor: $('filterDecayColor').value,
+    filterReleaseColor: $('filterReleaseColor').value,
     meterFillColor: $('meterFillColor').value,
     meterFillColorFilter: $('meterFillColorFilter').value,
     timeAxisStatedColor: $('timeAxisStatedColor').value,
@@ -78,7 +80,7 @@ function loadConfigObject(cfg){
   state.target.tbSustainGap = state.tbSustainGap;
 
   // Checkboxes
-  ['loudDecay','drawReleaseWhenZero','showBounds','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine','meterGlow','meterScanlinesVisible','blobGlowEnabled','keepTapMarker','timelineZoom3x'].forEach(id => {
+  ['loudDecay','drawReleaseWhenZero','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine','meterGlow','meterScanlinesVisible','blobGlowEnabled','keepTapMarker','timelineZoom3x'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
   const restoredZoom = ($('timelineZoom3x') && $('timelineZoom3x').checked) ? 3 : 1;
@@ -118,7 +120,7 @@ function loadConfigObject(cfg){
   }
 
   // Colours (dispatch input to update CSS variables)
-  ['lineColor','bgColor','attackColor','decayColor','releaseColor','meterFillColor','meterFillColorFilter','timeAxisStatedColor','contourLineColor'].forEach(id => {
+  ['lineColor','bgColor','loudnessAttackColor','loudnessDecayColor','loudnessReleaseColor','filterAttackColor','filterDecayColor','filterReleaseColor','meterFillColor','meterFillColorFilter','timeAxisStatedColor','contourLineColor'].forEach(id => {
     if($(id) && cfg[id]){ $(id).value = cfg[id]; $(id).dispatchEvent(new Event('input')); }
   });
 

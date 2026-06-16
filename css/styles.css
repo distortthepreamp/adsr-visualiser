@@ -13,15 +13,24 @@
 :root{
   --bg:#00ff00;
   --fg:#ffffff;
+  --kioskLoudnessColor:#F20D0D;
+  --kioskFilterColor:#0DCAF2;
+  --kioskCutoffAmountColor:#E5F20D;
   --line:#ffffff;
   --lineWidth:14;
   --innerLineWidth:6;
   --labelSize:17;
   --h1Scale:1.0;
   --h2Scale:1.0;
-  --attackColor:#ff6b6b;
-  --decayColor:#5fa8ff;
-  --releaseColor:#5fa8ff;
+  --attackColor:#ff0000;
+  --decayColor:#ff0000;
+  --releaseColor:#ff0000;
+  --loudnessAttackColor:#ff0000;
+  --loudnessDecayColor:#ff0000;
+  --loudnessReleaseColor:#ff0000;
+  --filterAttackColor:#00ffff;
+  --filterDecayColor:#ffff00;
+  --filterReleaseColor:#ffff00;
   --meterFill:#00ff00;
   --boundsColor:#ffffff;
   --timeAxisEffectiveColor:#ffffff;

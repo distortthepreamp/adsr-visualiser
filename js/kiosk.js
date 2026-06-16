@@ -66,7 +66,7 @@ function drawSwitch(ctx, x, y, on, color) {
   ctx.fill();
 }
 
-function drawKnobPointer(ctx, cx, cy, angleDeg) {
+function drawKnobPointer(ctx, cx, cy, angleDeg, color) {
   const rad = (angleDeg - 90) * Math.PI / 180;
   const offset = KNOB_RADIUS - POINTER_LENGTH; // = -11
 
@@ -89,7 +89,7 @@ function drawKnobPointer(ctx, cx, cy, angleDeg) {
   ctx.lineTo(notchX, notchY);
   ctx.lineTo(backRightX, backRightY);
   ctx.closePath();
-  ctx.fillStyle = 'white';
+  ctx.fillStyle = '#ffffff';
   ctx.fill();
 }
 
@@ -102,6 +102,30 @@ function drawKiosk(){
   const filterOn = $('frequencyMode') && $('frequencyMode').checked;
   const panelImg = filterOn ? panelImgFilter : panelImgLoudness;
   ctx.drawImage(panelImg, 0, 0, canvas.width, canvas.height);
+
+  const _cs = getComputedStyle(document.documentElement);
+  const loudnessColor     = _cs.getPropertyValue('--kioskLoudnessColor').trim()     || '#F20D0D';
+  const filterColor       = _cs.getPropertyValue('--kioskFilterColor').trim()       || '#0DCAF2';
+  const cutoffAmountColor = _cs.getPropertyValue('--kioskCutoffAmountColor').trim() || '#E5F20D';
+
+  function drawKnobCircle(x, y, color) {
+    ctx.beginPath();
+    ctx.arc(x, y, KNOB_RADIUS, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+  }
+
+  if (!filterOn) {
+    drawKnobCircle(280, 864, loudnessColor);
+    drawKnobCircle(466, 864, loudnessColor);
+    drawKnobCircle(651, 864, loudnessColor);
+  } else {
+    drawKnobCircle(280, 618, filterColor);
+    drawKnobCircle(466, 618, filterColor);
+    drawKnobCircle(651, 618, filterColor);
+    drawKnobCircle(280, 371, cutoffAmountColor);
+    drawKnobCircle(651, 371, cutoffAmountColor);
+  }
 
   // Compute time-based eased angles for attack and decay
   const now = performance.now();
