@@ -4,6 +4,8 @@ const panelImgLoudness = new Image();
 panelImgLoudness.src = 'images/panel-loudness.png';
 const panelImgFilter = new Image();
 panelImgFilter.src = 'images/panel-filter.png';
+panelImgLoudness.addEventListener('load', () => { if(kioskOpen) drawKiosk(); });
+panelImgFilter.addEventListener('load',   () => { if(kioskOpen) drawKiosk(); });
 
 const KIOSK_KNOBS = [
   { id:'cutoff',   x:280, y:371,  getVal:()=> state.floor, curve: false, modes: ['filter']   },
@@ -161,7 +163,12 @@ function openKiosk(){
   const overlay = document.getElementById('kioskOverlay');
   if(overlay) overlay.style.display = 'flex';
   document.body.classList.add('kiosk-open');
-  drawKiosk();
+  const img = ($('frequencyMode') && $('frequencyMode').checked) ? panelImgFilter : panelImgLoudness;
+  if(img.complete) {
+    drawKiosk();
+  } else {
+    img.addEventListener('load', drawKiosk, { once: true });
+  }
 }
 
 function closeKiosk(){

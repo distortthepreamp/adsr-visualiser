@@ -63,8 +63,6 @@ function stopElapsedTimer() {
 
 function updateTimecodeDisplay() {
   const tc = msToTc(cueTimecodeMs);
-  const el = document.getElementById('cueTimecode');
-  if (el) el.textContent = tc;
   const svgCueEl = document.getElementById('svgCue');
   if (svgCueEl) svgCueEl.textContent = 'CUE: ' + tc;
   const svgParent = document.getElementById('svgTimecodes');
