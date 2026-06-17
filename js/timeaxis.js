@@ -173,11 +173,25 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   if(newStatedDecayDropEl){
     const showStatedDecayDrop = showStLines && ($('showTextbookUnderlay').checked || $('textbookAdsr').checked);
     if(showStatedDecayDrop){
-      newStatedDecayDropEl.setAttribute('x1',pts.pEnd.x); newStatedDecayDropEl.setAttribute('y1',drawPS.y);
+      const ulPSY = overrange ? Math.max(yFor(e.floor + state.s * e.scale), yFor(1)) : yFor(e.floor + state.s * e.scale); // uncapped stated sustain (matches underlay), ignoring Mimic 80% cap
+      newStatedDecayDropEl.setAttribute('x1',pts.pEnd.x); newStatedDecayDropEl.setAttribute('y1',ulPSY);
       newStatedDecayDropEl.setAttribute('x2',pts.pEnd.x); newStatedDecayDropEl.setAttribute('y2',graph.y0);
       newStatedDecayDropEl.style.display='';
     } else {
       newStatedDecayDropEl.style.display='none';
+    }
+  }
+  // Stated attack drop line: vertical from the (textbook/underlay) attack peak to the time axis
+  const newStatedAttackDropEl=$('newStatedAttackDrop');
+  if(newStatedAttackDropEl){
+    const showStatedAttackDrop = showStLines && ($('showTextbookUnderlay').checked || $('textbookAdsr').checked);
+    if(showStatedAttackDrop){
+      const tbPeakY = Math.max(pts.p1.y, yFor(1)); // attack peak y (= drawP1.y in non-clipped mode)
+      newStatedAttackDropEl.setAttribute('x1',pts.p1.x); newStatedAttackDropEl.setAttribute('y1',tbPeakY);
+      newStatedAttackDropEl.setAttribute('x2',pts.p1.x); newStatedAttackDropEl.setAttribute('y2',graph.y0);
+      newStatedAttackDropEl.style.display='';
+    } else {
+      newStatedAttackDropEl.style.display='none';
     }
   }
   // Dim drop line rows when their time axis equivalent is off
