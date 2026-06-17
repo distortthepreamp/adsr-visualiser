@@ -194,6 +194,18 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       newStatedAttackDropEl.style.display='none';
     }
   }
+  // Effective decay drop line: vertical from the Model D decay/sustain intercept (drawPS) to the time axis
+  const newEffectiveDecayDropEl=$('newEffectiveDecayDrop');
+  if(newEffectiveDecayDropEl){
+    const showEffectiveDecayDrop = ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && !textbookAdsr;
+    if(showEffectiveDecayDrop){
+      newEffectiveDecayDropEl.setAttribute('x1',drawPS.x); newEffectiveDecayDropEl.setAttribute('y1',drawPS.y);
+      newEffectiveDecayDropEl.setAttribute('x2',drawPS.x); newEffectiveDecayDropEl.setAttribute('y2',graph.y0);
+      newEffectiveDecayDropEl.style.display='';
+    } else {
+      newEffectiveDecayDropEl.style.display='none';
+    }
+  }
   // Dim drop line rows when their time axis equivalent is off
   const effLinesRow=$('showEffectiveLinesRow'), statedLinesRow=$('showStatedLinesRow');
   if(effLinesRow){ effLinesRow.style.opacity=showEffective?'':UI_DISABLED_OPACITY; effLinesRow.style.pointerEvents=showEffective?'':'none'; }

@@ -414,6 +414,7 @@ function initUIControls(){
   $('showPeakDischarge') && $('showPeakDischarge').addEventListener('change', render);
   $('showTextbookUnderlay') && $('showTextbookUnderlay').addEventListener('change', render);
   $('underlayColor') && $('underlayColor').addEventListener('change', render);
+  $('showNewEffectiveLines') && $('showNewEffectiveLines').addEventListener('change', render);
   $('clearBtn').addEventListener('click', () => { logEvent('ANIMATION', { action: 'clear' }); clearBlobAndMarker(); });
   $('keepTapMarker').addEventListener('change',()=>{ if(!$('keepTapMarker').checked) hideTapMarker(); });
 
