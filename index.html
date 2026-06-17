@@ -39,7 +39,7 @@
       </defs>
       <line id="amountLine" x1="80" y1="30" x2="1145" y2="30" style="stroke:var(--contourLineColor);stroke-width:1;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <line id="floorLine" x1="80" y1="445" x2="1145" y2="445" style="stroke:var(--contourLineColor);stroke-width:1;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
-      <line id="sustainMarker" x1="80" y1="445" x2="80" y2="445" style="stroke:var(--line);stroke-opacity:1;stroke-linecap:round;stroke-dasharray:1 14;vector-effect:non-scaling-stroke;" />
+      <line id="sustainMarker" x1="80" y1="445" x2="80" y2="445" />
       <line id="statedSustainLine" x1="80" y1="445" x2="80" y2="445" style="stroke:#00ffff;stroke-width:1;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
 <line id="tbSustainMarker" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
       <line id="tbModelDSustainLine" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
@@ -49,6 +49,8 @@
       <line id="newEffectiveDecayDrop" stroke="white" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
       <line id="newEffectiveAttackDrop" stroke="white" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
       <line id="newEffectiveAttackDropEnd" stroke="white" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
+      <line id="newEffectiveReleaseDrop" stroke="white" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
+      <line id="newStatedReleaseDrop" stroke="cyan" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
       <line id="gateTimeLine" stroke="#ff8800" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
       <text id="gateTimeLabel" fill="#ff8800" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <g id="envSegments">
@@ -276,7 +278,7 @@
       </div>
       <div class="row"><label><input id="keepTapMarker" type="checkbox" checked> Leave Tap Marker</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
-      <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Body <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label><label>H1 <input id="h1Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></label><label>H2 <input id="h2Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></label><label>Console <input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></label><label>Meter <input id="meterWidth" type="number" min="10" max="80" step="1" value="40"></label><label>Meter Stroke <input id="meterStrokeWidth" type="number" min="1" max="20" step="1" value="7"></label><label>TB Sustain Max <input id="tbSustainGapMax" type="number" min="15" max="30" step="1" value="15">%</label><label>VB W <input id="vbWidth" type="number" min="800" max="2400" step="10" value="1200"></label><label>VB H <input id="vbHeight" type="number" min="400" max="1200" step="10" value="625"></label><label>Inset <input id="graphLeft" type="number" min="80" max="400" step="10" value="220"></label></div>
+      <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Body <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label><label>H1 <input id="h1Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></label><label>H2 <input id="h2Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></label><label>Console <input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></label><label>Meter <input id="meterWidth" type="number" min="10" max="80" step="1" value="40"></label><label>Meter Stroke <input id="meterStrokeWidth" type="number" min="1" max="20" step="1" value="7"></label><label>TB Sustain Max <input id="tbSustainGapMax" type="number" min="15" max="30" step="1" value="15">%</label><label>VB W <input id="vbWidth" type="number" min="800" max="2400" step="10" value="1200"></label><label>VB H <input id="vbHeight" type="number" min="400" max="1200" step="10" value="625"></label><label>Inset <input id="graphLeft" type="number" min="0" max="400" step="10" value="10"></label></div>
       <div class="row" style="position:relative;">
         <label><input id="showOuterLine" type="checkbox" checked> Show Outer Line</label>
         <button id="advancedToggle" style="padding:4px 7px;min-height:unset;line-height:1.1;border-radius:6px;">Advanced</button>
@@ -439,7 +441,7 @@ const curve = [
   {p:0.58,t:1.000}, {p:0.75,t:5.000}, {p:0.90,t:10.000}, {p:1.00,t:12.000}
 ];
 const state = { a:.08, d:.25, s:.5, r:.5, floor:0, scale:1, tbSustainGap:SUSTAIN_GAP_MAX, zoomFactor:1, target:{a:.08,d:.25,s:.5,r:.5,floor:0,scale:1,tbSustainGap:SUSTAIN_GAP_MAX,zoomFactor:1}, anim:null, dotAnim:null, held:false, dotLevel:0, currentPhase:'idle', releaseFromDecay:false };
-let GRAPH_LEFT = 220;
+let GRAPH_LEFT = 10;
 const graph = { x0:GRAPH_LEFT, y0:445, w:905, h:415 };
 let METER_X = graph.x0 + graph.w + METER_GAP;  // 1145
 

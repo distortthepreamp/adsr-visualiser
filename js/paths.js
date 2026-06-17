@@ -33,8 +33,6 @@ function syncRadii(){
   document.getElementById('dot').setAttribute('r', Math.round(lw * 1.0));
   document.getElementById('tapMarker').setAttribute('r', Math.round(lw * 0.8));
   document.getElementById('sustainPoint').setAttribute('r', Math.round(lw * 0.57));
-  const ilw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--innerLineWidth')) || 6;
-  document.getElementById('sustainMarker').style.strokeWidth = ilw;
 }
 
 function render(){
@@ -361,6 +359,7 @@ function render(){
   $('sustainMarker').setAttribute('y1', drawPS.y);
   $('sustainMarker').setAttribute('x2', markerEndX);
   $('sustainMarker').setAttribute('y2', drawPS.y);
+  $('sustainMarker').style.stroke = ($('frequencyMode') && $('frequencyMode').checked) ? (($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00') : (($('loudnessDecayColor') && $('loudnessDecayColor').value) || '#ff0000');
   $('sustainMarker').style.display = textbookAdsr ? 'none' : '';
   $('sustainPoint').setAttribute('cx', drawPS.x);
   $('sustainPoint').setAttribute('cy', drawPS.y);
@@ -386,13 +385,15 @@ function render(){
         }
         statedSustainX = (lo + hi) / 2;
       }
+      const underlayCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
       statedSustainLineEl.setAttribute('x1', statedSustainX);
       statedSustainLineEl.setAttribute('y1', statedY);
       statedSustainLineEl.setAttribute('x2', markerEndX);
       statedSustainLineEl.setAttribute('y2', statedY);
+      statedSustainLineEl.style.stroke = underlayCol;
       statedSustainLineEl.style.display = '';
       const sslEl=$('statedSustainLabel');
-      if(sslEl){ sslEl.setAttribute('x', pts.pEnd.x); sslEl.setAttribute('y', statedY - 8); sslEl.setAttribute('text-anchor', 'start'); sslEl.setAttribute('style', 'fill:#00ffff;'); }
+      if(sslEl){ sslEl.setAttribute('x', pts.pEnd.x + 5); sslEl.setAttribute('y', statedY - 8); sslEl.setAttribute('text-anchor', 'start'); sslEl.setAttribute('style', 'fill:' + underlayCol + ';'); }
     } else {
       statedSustainLineEl.style.display = 'none';
       const sslEl=$('statedSustainLabel');
@@ -402,7 +403,7 @@ function render(){
 
   { const el=$('sLabel'), bg=$('sLabelBg');
     el.setAttribute('x', METER_X - 30); el.setAttribute('y', drawPS.y); el.setAttribute('dominant-baseline', 'middle'); el.removeAttribute('stroke'); el.removeAttribute('stroke-width'); el.removeAttribute('paint-order'); el.style.fill = '#000000'; el.style.display = textbookAdsr ? 'none' : ''; el.textContent = ($('keyboardControl') && $('keyboardControl').checked) ? 'MODEL D SUSTAIN' : 'SUSTAIN';
-    if(bg){ const bbox=el.getBBox(); bg.setAttribute('x',bbox.x-4); bg.setAttribute('y',bbox.y-2); bg.setAttribute('width',bbox.width+8); bg.setAttribute('height',bbox.height+4); bg.setAttribute('fill','#ffffff'); bg.style.display=el.style.display; }
+    if(bg){ const bbox=el.getBBox(); bg.setAttribute('x',bbox.x-4); bg.setAttribute('y',bbox.y-2); bg.setAttribute('width',bbox.width+8); bg.setAttribute('height',bbox.height+4); const decayCol = ($('frequencyMode') && $('frequencyMode').checked) ? (($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00') : (($('loudnessDecayColor') && $('loudnessDecayColor').value) || '#ff0000'); bg.setAttribute('fill', decayCol); bg.style.display=el.style.display; }
   }
 
   // Meter box — fixed full graph height

@@ -5,6 +5,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   const newStatedCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
   const newEffAttackCol = (freqMode ? ($('filterAttackColor') && $('filterAttackColor').value) : ($('loudnessAttackColor') && $('loudnessAttackColor').value)) || '#ffffff';
   const newEffDecayCol = (freqMode ? ($('filterDecayColor') && $('filterDecayColor').value) : ($('loudnessDecayColor') && $('loudnessDecayColor').value)) || '#ffffff';
+  const newEffReleaseCol = (freqMode ? ($('filterReleaseColor') && $('filterReleaseColor').value) : ($('loudnessReleaseColor') && $('loudnessReleaseColor').value)) || '#ffffff';
   const showNewStated=!!($('showNewStatedLines')&&$('showNewStatedLines').checked);
   // Stated decay drop line: vertical from the decay/sustain junction (pts.pEnd.x, drawPS.y) to the time axis
   const newStatedDecayDropEl=$('newStatedDecayDrop');
@@ -47,7 +48,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   // Effective attack drop line(s): descend from the attack peak (or ceiling crossings when clipped) to the time axis
   const newEffAttackDropEl=$('newEffectiveAttackDrop');
   const newEffAttackDropEndEl=$('newEffectiveAttackDropEnd');
-  const showNewEffAttack = ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && !textbookAdsr;
+  const showNewEffAttack = ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && !textbookAdsr && freqMode && overrange && showClipped;
   if(showNewEffAttack){
     const ceilY = yFor(1);
     if(showClipped && overrange){
@@ -80,5 +81,35 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   } else {
     if(newEffAttackDropEl) newEffAttackDropEl.style.display='none';
     if(newEffAttackDropEndEl) newEffAttackDropEndEl.style.display='none';
+  }
+  // Effective release drop line: descends from the green release curve's floor point to the time axis
+  const newEffReleaseDropEl=$('newEffectiveReleaseDrop');
+  if(newEffReleaseDropEl){
+    const showEffRelease = pts.e.releaseOn && ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && !textbookAdsr;
+    if(showEffRelease){
+      // green curve floor = last point of the drawn releaseOuter path (= rEnd.x + greenOffset, rEnd.y)
+      const relEl=document.getElementById('releaseOuter');
+      let fx=pts.pEnd.x, fy=yFor(pts.e.floor);
+      if(relEl && relEl.getTotalLength() > 0){ const p=relEl.getPointAtLength(relEl.getTotalLength()); fx=p.x; fy=p.y; }
+      newEffReleaseDropEl.setAttribute('x1',fx); newEffReleaseDropEl.setAttribute('y1',fy);
+      newEffReleaseDropEl.setAttribute('x2',fx); newEffReleaseDropEl.setAttribute('y2',graph.y0); newEffReleaseDropEl.setAttribute('stroke',newEffReleaseCol);
+      newEffReleaseDropEl.style.display='';
+    } else {
+      newEffReleaseDropEl.style.display='none';
+    }
+  }
+  // Stated release drop line: ascends from the textbook release floor point to the graph top
+  const newStatedReleaseDropEl=$('newStatedReleaseDrop');
+  if(newStatedReleaseDropEl){
+    const showStatedRelease = pts.e.releaseOn && showNewStated && ($('showTextbookUnderlay').checked || $('textbookAdsr').checked);
+    if(showStatedRelease){
+      const stRelX = pts.pEnd.x + graph.w * state.tbSustainGap + timeToPixels(mapTime(state.r), linearTimeOn);
+      const stRelY = yFor(pts.e.floor);
+      newStatedReleaseDropEl.setAttribute('x1',stRelX); newStatedReleaseDropEl.setAttribute('y1',stRelY);
+      newStatedReleaseDropEl.setAttribute('x2',stRelX); newStatedReleaseDropEl.setAttribute('y2',graph.y0-graph.h); newStatedReleaseDropEl.setAttribute('stroke',newStatedCol);
+      newStatedReleaseDropEl.style.display='';
+    } else {
+      newStatedReleaseDropEl.style.display='none';
+    }
   }
 }

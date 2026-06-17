@@ -58,7 +58,7 @@ function getEffective(){
 }
 function yFor(level){ return graph.y0 - level*graph.h; }
 function getLinearTotalMs(){
-  return 6000 / Math.max(1, state.zoomFactor);
+  return 8000 / Math.max(1, state.zoomFactor);
 }
 function timeToPixels(t, linearOn){
   return linearOn ? t * 1000 * (graph.w / getLinearTotalMs()) : displayTimeWidth(t);

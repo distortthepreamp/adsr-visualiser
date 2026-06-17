@@ -69,7 +69,7 @@ function buildConfigSnapshot(){
     tbSustainGapMax: Number($('tbSustainGapMax').value),
     vbWidth: Number($('vbWidth').value),
     vbHeight: Number($('vbHeight').value),
-    graphLeft: Number($('graphLeft') ? $('graphLeft').value : 220),
+    graphLeft: Number($('graphLeft') ? $('graphLeft').value : 10),
     activePresetIndex: window.getActivePresetIndex ? window.getActivePresetIndex() : -1,
     presetDirtyState: window.presetDirtyState || 'none',
     kioskOpen: kioskOpen,
@@ -150,7 +150,7 @@ function loadConfigObject(cfg){
   if($('vbHeight') && cfg.vbHeight !== undefined){ $('vbHeight').value = Math.round(Math.min(VB_HEIGHT_MAX, Math.max(VB_HEIGHT_MIN,  Number(cfg.vbHeight) || 595))  / 10) * 10; }
   VB_WIDTH   = Number(document.getElementById('vbWidth').value);
   VB_HEIGHT  = Number(document.getElementById('vbHeight').value);
-  if($('graphLeft') && cfg.graphLeft !== undefined){ $('graphLeft').value = Math.round(Math.min(400,Math.max(80,Number(cfg.graphLeft)||220))/10)*10; }
+  if($('graphLeft') && cfg.graphLeft !== undefined){ $('graphLeft').value = Math.round(Math.min(400,Math.max(0,Number(cfg.graphLeft)||10))/10)*10; }
   GRAPH_LEFT = Number(document.getElementById('graphLeft').value);
   recalcGeometry();
   if($('meterGlowRadius') && cfg.meterGlowRadius !== undefined){ $('meterGlowRadius').value = cfg.meterGlowRadius; }
