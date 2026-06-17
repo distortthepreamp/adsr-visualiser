@@ -190,10 +190,14 @@ function render(){
     const rStart = state.releaseFromDecay ? pts.p1 : (releaseStartPoint || drawPS);
     const rPath = drawReleasePath
       ? (curveAmt
-          ? `M ${rStart.x} ${rStart.y} C ${releaseStartHandle.x} ${releaseStartHandle.y} ${releaseEndHandle.x} ${releaseEndHandle.y} ${rEnd.x} ${rEnd.y}`
+          ? rcPolyline(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, false, 50, 3)
           : `M ${rStart.x} ${rStart.y} L ${rEnd.x} ${rEnd.y}`)
       : '';
-    ['releaseOuter','releaseInner'].forEach(id => $(id).setAttribute('d', rPath));
+    ['releaseOuter','releaseInner'].forEach(id => {
+      const el = $(id); if(!el) return;
+      el.setAttribute('d', rPath);
+      el.style.stroke = (curveAmt && drawReleasePath) ? '#ff00ff' : ''; // TEMP DEBUG: magenta full release curve
+    });
     ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d',''); el.style.display='none'; } });
     const tbSusMarkerMD=$('tbSustainMarker'); if(tbSusMarkerMD) tbSusMarkerMD.style.display='none';
     const tbMDLineMD=$('tbModelDSustainLine'); if(tbMDLineMD) tbMDLineMD.style.display='none';
