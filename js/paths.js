@@ -177,7 +177,7 @@ function render(){
       const tbFloorY    = yFor(e.floor);
       // Textbook never trapezoid-clips, so use ceiling-clamped peak/sustain y (ignoring showClipped).
       const ulP1Y = Math.max(pts.p1.y, ceilY);
-      const ulPSY = overrange ? Math.max(pts.pS.y, ceilY) : pts.pS.y;
+      const ulPSY = overrange ? Math.max(yFor(e.floor + state.s * e.scale), ceilY) : yFor(e.floor + state.s * e.scale); // stated (uncapped) sustain, ignoring Mimic 80% cap
       if(ua){ ua.setAttribute('d', `M ${pts.p0.x} ${pts.p0.y} L ${pts.p1.x} ${ulP1Y}`); ua.style.display=''; }
       if(ud){ ud.setAttribute('d', `M ${pts.p1.x} ${ulP1Y} L ${tbDecayEndX} ${ulPSY}`); ud.style.display=''; }
       if(us){ us.setAttribute('d', `M ${tbDecayEndX} ${ulPSY} L ${tbSusEndX} ${ulPSY}`); us.style.display=''; }

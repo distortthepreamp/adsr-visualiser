@@ -59,7 +59,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       taDecayStartEl.style.display='none'; taDecayStartEl.style.opacity='';
     }
     // timeAxisDecayEnd: stated row — textbook always; Model D only when Loud Decay ON
-    const showDecayEnd=showStated&&(textbookAdsr||e.releaseOn);
+    const showDecayEnd=false; // hidden: duplicates timeAxisDecayEndStated (full stated decay time at pEnd.x)
     if(showDecayEnd){
       const decayEndX=pts.pEnd.x;
       taDecayEndEl.setAttribute('x',decayEndX); taDecayEndEl.setAttribute('y',graph.y0+TIME_AXIS_STATED_OFFSET_Y);
@@ -72,7 +72,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   // timeAxisDecayEndEffective: effective row, drawPS.x in Model D, pts.pEnd.x in textbook
   const taDecayEndEffEl=$('timeAxisDecayEndEffective');
   if(taDecayEndEffEl){
-    const showDecayEndEff=showEffectiveVisible&&e.releaseOn;
+    const showDecayEndEff=showEffectiveVisible;
     if(showDecayEndEff){
       const effDecayEndX=textbookAdsr?pts.pEnd.x:drawPS.x;
       const effDecayFraction=textbookAdsr?1:Math.max(0,(drawPS.x-pts.p1.x)/(pts.dwFull||1));
@@ -89,9 +89,8 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   if(taDecayEndStatedEl){
     const showDecayEndSt=showStated&&e.releaseOn;
     if(showDecayEndSt){
-      const stDecayEndX=textbookAdsr?pts.pEnd.x:statedSustainX;
-      const stDecayFraction=textbookAdsr?1:Math.max(0,(statedSustainX-pts.p1.x)/(pts.dwFull||1));
-      const stDecayEndMs=Math.round((e.aT+e.dT*stDecayFraction)*1000);
+      const stDecayEndX = pts.pEnd.x;
+      const stDecayEndMs = Math.round((e.aT + e.dT) * 1000);
       taDecayEndStatedEl.setAttribute('x',stDecayEndX); taDecayEndStatedEl.setAttribute('y',graph.y0+TIME_AXIS_STATED_OFFSET_Y);
       taDecayEndStatedEl.textContent=stDecayEndMs+' ms';
       taDecayEndStatedEl.style.display=''; taDecayEndStatedEl.style.opacity='1';
@@ -115,7 +114,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       releaseEndMs=Math.round((e.aT+e.dT)*1000);
     }
     if(taReleaseEndEl){
-      const showReleaseEnd=showEffectiveVisible&&e.releaseOn;
+      const showReleaseEnd=false; // hidden: Model-D floor "release end" cluttered the effective row; decay-end-effective marks the sustain point
       if(showReleaseEnd){
         taReleaseEndEl.setAttribute('x',releaseEndX); taReleaseEndEl.setAttribute('y',taY);
         taReleaseEndEl.textContent=releaseEndMs+' ms';

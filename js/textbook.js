@@ -33,18 +33,20 @@ function tbComputeAnimPoints(){
 // tbSustainLabel positioning, and the sustain gap target update.
 function renderTextbookPaths({ pts, drawPS, drawP1, ceilY, showClipped, drawReleasePath, curveAmt, dSF, rSF, linearTimeOn }) {
   const e = pts.e;
+  // Always use the stated (uncapped) sustain level, ignoring the Mimic Model D 80% cap.
+  const tbSustainY = Math.max(yFor(e.floor + state.s * e.scale), ceilY);
   // Textbook sustain gap target update
   const collapse = $('tbSustainCollapse') && $('tbSustainCollapse').checked;
   state.target.tbSustainGap = collapse ? 0 : SUSTAIN_GAP_MAX;
   // Textbook ADSR: decay ends at fixed x (pts.pEnd.x), y-only varies with sustain level
-  const tbDecayEnd = { x: pts.pEnd.x, y: drawPS.y };
+  const tbDecayEnd = { x: pts.pEnd.x, y: tbSustainY };
   const tbDPath = showClipped
     ? buildPath(pts.p1.x + (pts.pEnd.x - pts.p1.x) * ((e.floor + e.scale - 1) / e.scale), ceilY, tbDecayEnd.x, tbDecayEnd.y, curveAmt, dSF)
     : buildPath(drawP1.x, drawP1.y, tbDecayEnd.x, tbDecayEnd.y, curveAmt, dSF);
   ['decayOuter','decayInner'].forEach(id => $(id).setAttribute('d', tbDPath));
   // Sustain segment: fixed-width horizontal line at sustain level y
   const sustainGap = graph.w * state.tbSustainGap;
-  const tbSusEnd = { x: pts.pEnd.x + sustainGap, y: drawPS.y };
+  const tbSusEnd = { x: pts.pEnd.x + sustainGap, y: tbSustainY };
   const tbSusDotted = $('tbSustainDotted') && $('tbSustainDotted').checked;
   if(tbSusDotted){
     ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d',''); el.style.display='none'; } });
@@ -53,15 +55,15 @@ function renderTextbookPaths({ pts, drawPS, drawP1, ceilY, showClipped, drawRele
       const smSrc=$('sustainMarker');
       if(smSrc) copySustainStyle(smSrc, tbSusMarker);
       if(drawReleasePath){
-        tbSusMarker.setAttribute('x1',pts.pEnd.x); tbSusMarker.setAttribute('y1',drawPS.y);
-        tbSusMarker.setAttribute('x2',tbSusEnd.x);  tbSusMarker.setAttribute('y2',drawPS.y);
+        tbSusMarker.setAttribute('x1',pts.pEnd.x); tbSusMarker.setAttribute('y1',tbSustainY);
+        tbSusMarker.setAttribute('x2',tbSusEnd.x);  tbSusMarker.setAttribute('y2',tbSustainY);
         tbSusMarker.style.display='';
       } else {
         tbSusMarker.style.display='none';
       }
     }
   } else {
-    const tbSusPath = drawReleasePath ? `M ${pts.pEnd.x} ${drawPS.y} L ${tbSusEnd.x} ${drawPS.y}` : '';
+    const tbSusPath = drawReleasePath ? `M ${pts.pEnd.x} ${tbSustainY} L ${tbSusEnd.x} ${tbSustainY}` : '';
     ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d', tbSusPath); el.style.display=''; } });
     const tbSusMarker=$('tbSustainMarker'); if(tbSusMarker) tbSusMarker.style.display='none';
   }
