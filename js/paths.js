@@ -175,11 +175,14 @@ function render(){
       const tbSusEndX   = pts.pEnd.x + tbSusGapPx;
       const tbRelEndX   = tbSusEndX + timeToPixels(mapTime(state.r), linearTimeOn);
       const tbFloorY    = yFor(e.floor);
-      if(ua){ ua.setAttribute('d', `M ${pts.p0.x} ${pts.p0.y} L ${drawP1.x} ${drawP1.y}`); ua.style.display=''; }
-      if(ud){ ud.setAttribute('d', `M ${drawP1.x} ${drawP1.y} L ${tbDecayEndX} ${drawPS.y}`); ud.style.display=''; }
-      if(us){ us.setAttribute('d', `M ${tbDecayEndX} ${drawPS.y} L ${tbSusEndX} ${drawPS.y}`); us.style.display=''; }
+      // Textbook never trapezoid-clips, so use ceiling-clamped peak/sustain y (ignoring showClipped).
+      const ulP1Y = Math.max(pts.p1.y, ceilY);
+      const ulPSY = overrange ? Math.max(pts.pS.y, ceilY) : pts.pS.y;
+      if(ua){ ua.setAttribute('d', `M ${pts.p0.x} ${pts.p0.y} L ${pts.p1.x} ${ulP1Y}`); ua.style.display=''; }
+      if(ud){ ud.setAttribute('d', `M ${pts.p1.x} ${ulP1Y} L ${tbDecayEndX} ${ulPSY}`); ud.style.display=''; }
+      if(us){ us.setAttribute('d', `M ${tbDecayEndX} ${ulPSY} L ${tbSusEndX} ${ulPSY}`); us.style.display=''; }
       if(ur){
-        if(drawReleasePath){ ur.setAttribute('d', `M ${tbSusEndX} ${drawPS.y} L ${tbRelEndX} ${tbFloorY}`); ur.style.display=''; }
+        if(drawReleasePath){ ur.setAttribute('d', `M ${tbSusEndX} ${ulPSY} L ${tbRelEndX} ${tbFloorY}`); ur.style.display=''; }
         else { ur.setAttribute('d',''); ur.style.display='none'; }
       }
     } else {
