@@ -182,15 +182,7 @@ button.v28-pressed,
   fill: var(--timeAxisEffectiveColor);
   opacity: 1;
 }
-.timeAxisStated {
-  font-family: 'UniversCondensed', Arial, Helvetica, sans-serif;
-  font-size: calc(var(--labelSize) * 1px);
-  fill: var(--timeAxisStatedColor);
-  opacity: 1;
-}
 
-.drop-line-effective { stroke: var(--timeAxisEffectiveColor); }
-.drop-line-stated    { stroke: var(--timeAxisStatedColor); }
 
 /* hide preset row 2 (N–Z) */
 #presetBtns button:nth-child(n+14) { display:none; }

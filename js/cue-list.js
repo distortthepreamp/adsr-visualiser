@@ -129,7 +129,7 @@ function parseCueList(text) {
     }
 
     // set <checkbox-param> on/off — single regex for remaining boolean params
-    const setBoolMatch = line.match(/^set\s+(filter-decay|hp-mode|mimic-sustain|analogue|linear-time|zoom-time|textbook|show-clipped|show-effective-times|show-stated-times|show-effective-lines|show-stated-lines|show-contour|tb-sustain-dotted|tb-sustain-collapse|tb-model-d-sustain)\s+(on|off)$/i);
+    const setBoolMatch = line.match(/^set\s+(filter-decay|hp-mode|mimic-sustain|analogue|linear-time|zoom-time|textbook|show-clipped|show-contour|tb-sustain-dotted|tb-sustain-collapse|tb-model-d-sustain)\s+(on|off)$/i);
     if (setBoolMatch) {
       result.push({ type: 'set', param: setBoolMatch[1].toLowerCase(), value: setBoolMatch[2].toLowerCase() === 'on' });
       continue;
@@ -282,22 +282,6 @@ function executeEvent(event) {
       case 'show-clipped':
         $('showClipped').checked = event.value;
         $('showClipped').dispatchEvent(new Event('change'));
-        break;
-      case 'show-effective-times':
-        $('showEffectiveTimes').checked = event.value;
-        $('showEffectiveTimes').dispatchEvent(new Event('change'));
-        break;
-      case 'show-stated-times':
-        $('showStatedTimes').checked = event.value;
-        $('showStatedTimes').dispatchEvent(new Event('change'));
-        break;
-      case 'show-effective-lines':
-        $('showEffectiveLines').checked = event.value;
-        $('showEffectiveLines').dispatchEvent(new Event('change'));
-        break;
-      case 'show-stated-lines':
-        $('showStatedLines').checked = event.value;
-        $('showStatedLines').dispatchEvent(new Event('change'));
         break;
       case 'show-contour':
         $('showContour').checked = event.value;
@@ -567,10 +551,6 @@ function generateStateSnapshot() {
   lines.push(`set zoom-time ${$('timelineZoom3x').checked ? 'on' : 'off'}`);
   lines.push(`set textbook ${$('textbookAdsr').checked ? 'on' : 'off'}`);
   lines.push(`set show-clipped ${$('showClipped').checked ? 'on' : 'off'}`);
-  lines.push(`set show-effective-times ${$('showEffectiveTimes').checked ? 'on' : 'off'}`);
-  lines.push(`set show-stated-times ${$('showStatedTimes').checked ? 'on' : 'off'}`);
-  lines.push(`set show-effective-lines ${$('showEffectiveLines').checked ? 'on' : 'off'}`);
-  lines.push(`set show-stated-lines ${$('showStatedLines').checked ? 'on' : 'off'}`);
   lines.push(`set show-contour ${$('showContour').checked ? 'on' : 'off'}`);
   lines.push(`set tb-sustain-dotted ${$('tbSustainDotted').checked ? 'on' : 'off'}`);
   lines.push(`set tb-sustain-collapse ${$('tbSustainCollapse').checked ? 'on' : 'off'}`);

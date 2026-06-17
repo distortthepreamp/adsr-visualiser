@@ -310,7 +310,7 @@ function initUIControls(){
   });
 
   // Checkbox render and debug log listeners
-  ['loudDecay','keyboardControl','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine'].forEach(id => {
+  ['loudDecay','keyboardControl','showContour','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine'].forEach(id => {
     const el = $(id); if(!el) return;
     el.addEventListener('change', render);
     el.addEventListener('change', () => {
@@ -415,6 +415,7 @@ function initUIControls(){
   $('showTextbookUnderlay') && $('showTextbookUnderlay').addEventListener('change', render);
   $('underlayColor') && $('underlayColor').addEventListener('change', render);
   $('showNewEffectiveLines') && $('showNewEffectiveLines').addEventListener('change', render);
+  $('showNewStatedLines') && $('showNewStatedLines').addEventListener('change', render);
   $('clearBtn').addEventListener('click', () => { logEvent('ANIMATION', { action: 'clear' }); clearBlobAndMarker(); });
   $('keepTapMarker').addEventListener('change',()=>{ if(!$('keepTapMarker').checked) hideTapMarker(); });
 

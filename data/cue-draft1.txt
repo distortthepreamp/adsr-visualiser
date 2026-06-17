@@ -15,10 +15,6 @@ set linear-time on
 set zoom-time on
 set textbook on
 set show-clipped on
-set show-effective-times on
-set show-stated-times off
-set show-effective-lines on
-set show-stated-lines off
 set show-contour on
 set tb-sustain-dotted off
 set tb-sustain-collapse off
@@ -29,9 +25,7 @@ set tb-model-d-sustain off
 
 # demonstrate textbook adsr
 wait 00:00:03:00
-set show-stated-times on
 wait 00:00:03:00
-set show-stated-lines on
 wait 00:00:03:00
 transition attack 600ms 00:00:02:00
 wait 00:00:03:00

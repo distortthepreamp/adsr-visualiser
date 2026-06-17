@@ -44,8 +44,6 @@
 <line id="tbSustainMarker" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
       <line id="tbModelDSustainLine" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
       <circle id="sustainPoint" class="tap-marker" cx="80" cy="445" style="opacity:.85" />
-      <g id="dropLinesEffective"></g>
-      <g id="dropLinesStated"></g>
       <line id="newStatedDecayDrop" stroke="cyan" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
       <line id="newStatedAttackDrop" stroke="cyan" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
       <line id="newEffectiveDecayDrop" stroke="white" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
@@ -83,20 +81,6 @@
       <text id="toolTitle" class="mode-label" x="600" y="-82" text-anchor="middle">DISTORT THE PREAMP: MODEL D CONTOUR VISUALISER</text>
       <text id="modeLabel" class="mode-label" x="80" y="0" text-anchor="start">LOUDNESS CONTOUR</text>
       <text id="svgTimecodes" x="0" y="0" text-anchor="end" font-family="'UniversCondensed',Arial,Helvetica,sans-serif" style="display:none"><tspan id="svgElapsed" fill="#00ffff">ELAPSED: 00:00:00</tspan><tspan id="svgCue" fill="#00ff00" dx="30">CUE: 00:00:00:00</tspan></text>
-      <text id="timeAxis0" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;">0</text>
-      <text id="timeAxis0Stated" x="80" y="465" text-anchor="middle" class="timeAxisStated" style="display:none;">0</text>
-      <text id="timeAxisAttack" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;"></text>
-      <text id="timeAxisAttackStated" x="80" y="465" text-anchor="middle" class="timeAxisStated" style="display:none;"></text>
-      <text id="timeAxisDecayStart" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;"></text>
-      <text id="timeAxisDecayEnd" x="80" y="465" text-anchor="middle" class="timeAxisStated" style="display:none;"></text>
-      <text id="timeAxisDecayEndEffective" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;"></text>
-      <text id="timeAxisDecayEndStated" x="80" y="465" text-anchor="middle" class="timeAxisStated" style="display:none;"></text>
-      <text id="timeAxisReleaseEnd" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;"></text>
-      <text id="timeAxisReleaseEndStated" x="80" y="465" text-anchor="middle" class="timeAxisStated" style="display:none;"></text>
-      <text id="timeAxisReleaseStart" x="80" y="465" text-anchor="middle" class="timeAxisEffective" style="display:none;"></text>
-      <text id="timeAxisReleaseStartStated" x="80" y="465" text-anchor="middle" class="timeAxisStated" style="display:none;"></text>
-      <text id="timeAxisEffectiveLabel" x="0" y="0" text-anchor="start" class="timeAxisEffective" style="display:none;">Effective Time / ms</text>
-      <text id="timeAxisStatedLabel"    x="0" y="0" text-anchor="start" class="timeAxisStated"    style="display:none;">Stated Time / ms</text>
       <text id="segFilterMode" class="mode-label" y="0" text-anchor="start" style="display:none">FILTER MODE: LO</text>
       <text id="segDecay"      class="mode-label" y="0" text-anchor="start">LOUD DECAY: OFF</text>
       <text id="segDisplay"    class="mode-label" y="0" text-anchor="start">DISPLAY: SCHEMATIC</text>
@@ -247,14 +231,11 @@
           <div id="tbSustainDottedRow" class="row"><label><input id="tbSustainDotted" type="checkbox" checked> Dotted Textbook ADSR Sustain ([)</label></div>
           <div id="tbSustainCollapseRow" class="row"><label><input id="tbSustainCollapse" type="checkbox"> Collapse Textbook ADSR Sustain (])</label></div>
           <div id="tbShowModelDSustainRow" class="row"><label><input id="tbShowModelDSustain" type="checkbox"> Show Model D Sustain (textbook) (\)</label></div>
-          <div class="row"><label><input id="showEffectiveTimes" type="checkbox"> Show Effective Times (;)</label></div>
-          <div class="row"><label><input id="showStatedTimes" type="checkbox"> Show Stated Times (')</label></div>
           <div class="row"><label><input type="checkbox" id="showGateTime"> Show Gate Time</label></div>
           <div class="row"><label><input type="checkbox" id="showPeakDischarge"> Show Peak Discharge</label></div>
           <div class="row"><label><input type="checkbox" id="showTextbookUnderlay"> Show Textbook Underlay</label></div>
-          <div id="showEffectiveLinesRow" class="row"><label><input id="showEffectiveLines" type="checkbox"> Show Effective Drop Lines (⇧;)</label></div>
           <div class="row"><label><input type="checkbox" id="showNewEffectiveLines"> Show New Effective Drop Lines</label></div>
-          <div id="showStatedLinesRow" class="row"><label><input id="showStatedLines" type="checkbox"> Show Stated Drop Lines (⇧')</label></div>
+          <div class="row"><label><input type="checkbox" id="showNewStatedLines"> Show New Stated Drop Lines</label></div>
         </div>
       </div>
       <hr style="border-color:rgba(255,255,255,.25)">
@@ -537,9 +518,7 @@ logEvent('INIT', {
   linearTime: $('linearTime').checked, analogueCurve: $('analogueCurve').checked,
   textbookAdsr: $('textbookAdsr').checked, tbSustainDotted: $('tbSustainDotted').checked,
   tbSustainCollapse: $('tbSustainCollapse').checked, tbShowModelDSustain: $('tbShowModelDSustain').checked,
-  showOuterLine: $('showOuterLine').checked, showEffectiveTimes: $('showEffectiveTimes').checked,
-  showStatedTimes: $('showStatedTimes').checked, showEffectiveLines: $('showEffectiveLines').checked,
-  showStatedLines: $('showStatedLines').checked
+  showOuterLine: $('showOuterLine').checked
 });
 
 </script>
