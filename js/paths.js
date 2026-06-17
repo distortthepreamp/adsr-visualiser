@@ -108,7 +108,9 @@ function render(){
     ceilRightPath= `M ${p1x} ${ceilY} L ${ceilDecayX} ${ceilY}`;
     dPath        = buildPath(ceilDecayX, ceilY, drawPS.x, drawPS.y, curveAmt, dSF);
   } else {
-    aPath         = buildPath(pts.p0.x, pts.p0.y, drawP1.x, drawP1.y, curveAmt, aSF);
+    aPath         = curveAmt
+      ? rcPolyline(pts.p0.x, pts.p0.y, drawP1.x, drawP1.y, true, 50, 3)
+      : buildPath(pts.p0.x, pts.p0.y, drawP1.x, drawP1.y, curveAmt, aSF);
     ceilLeftPath  = '';
     ceilRightPath = '';
     dPath         = buildPath(drawP1.x, drawP1.y, drawPS.x, drawPS.y, curveAmt, dSF);
@@ -179,7 +181,7 @@ function render(){
       : drawP1.x;
     const dStartY = showClipped ? ceilY : drawP1.y;
     if(curveAmt){
-      dPath = `M ${dStartX} ${dStartY} C ${dStartX + h_decay} ${dStartY} ${decayEndHandle.x} ${decayEndHandle.y} ${drawPS.x} ${drawPS.y}`;
+      dPath = rcPolyline(dStartX, dStartY, drawPS.x, drawPS.y, false, 50, 3);
     } else {
       dPath = `M ${dStartX} ${dStartY} L ${drawPS.x} ${drawPS.y}`;
     }
