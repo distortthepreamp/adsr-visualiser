@@ -278,6 +278,10 @@ function render(){
       gateCloseX = pts.p1.x + (pts.pEnd.x - pts.p1.x) * gfd;
     }
     if(gateCloseX > pts.pS.x) gateCloseX = pts.pS.x;
+    // y at gateCloseX, sampled from the drawn attack or decay curve (top of the orange release curve)
+    const gcPathEl = document.getElementById(gateCloseX < pts.p1.x ? 'attackOuter' : 'decayOuter');
+    let gateCloseY = gcPathEl ? getYFromPath(gcPathEl, gateCloseX) : null;
+    if(gateCloseY === null) gateCloseY = drawPS.y;
 
     // #tapReleaseOrange: RC release trajectory from the tap gate-close point. Built exactly
     // like the green release (releaseOuter): the full peak→floor RC curve shifted so its
@@ -286,10 +290,6 @@ function render(){
     const tapReleaseOrangeEl = $('tapReleaseOrange');
     if(tapReleaseOrangeEl){
       if(drawReleasePath && curveAmt){
-        // y at gateCloseX, sampled from the drawn attack or decay curve
-        const gcPathEl = document.getElementById(gateCloseX < pts.p1.x ? 'attackOuter' : 'decayOuter');
-        let gateCloseY = gcPathEl ? getYFromPath(gcPathEl, gateCloseX) : null;
-        if(gateCloseY === null) gateCloseY = drawPS.y;
         const magentaXAtGate = rcPolylineXAtY(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, gateCloseY, false, 200, 3);
         const orangeOffset = gateCloseX - magentaXAtGate;
         const gateReleaseClipRect = $('gateReleaseClipRect');
@@ -317,7 +317,7 @@ function render(){
         gateTimeLineEl.setAttribute('x1', gateCloseX);
         gateTimeLineEl.setAttribute('x2', gateCloseX);
         gateTimeLineEl.setAttribute('y1', gateTopY);
-        gateTimeLineEl.setAttribute('y2', graph.y0);
+        gateTimeLineEl.setAttribute('y2', gateCloseY);
         gateTimeLineEl.style.display = '';
       }
       if(gateTimeLabelEl){
