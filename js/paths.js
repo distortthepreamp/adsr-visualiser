@@ -198,6 +198,26 @@ function render(){
       el.setAttribute('d', rPath);
       el.style.stroke = (curveAmt && drawReleasePath) ? '#ff00ff' : ''; // TEMP DEBUG: magenta full release curve
     });
+    // TEMP DEBUG: second release curve drawn from the sustain intercept (green).
+    const sustainReleaseClipRect = $('sustainReleaseClipRect');
+    if(sustainReleaseClipRect){
+      sustainReleaseClipRect.setAttribute('x', graph.x0);
+      sustainReleaseClipRect.setAttribute('y', drawPS.y);
+      sustainReleaseClipRect.setAttribute('width', graph.w);
+      sustainReleaseClipRect.setAttribute('height', graph.y0 - drawPS.y);
+    }
+    const releaseFromSustainEl = $('releaseFromSustain');
+    if(releaseFromSustainEl){
+      if(curveAmt && drawReleasePath){
+        const magentaXAtSustain = rcPolylineXAtY(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, drawPS.y, false, 200, 3);
+        const greenOffset = drawPS.x - magentaXAtSustain;
+        releaseFromSustainEl.setAttribute('d', rcPolyline(pts.p1.x + greenOffset, pts.p1.y, rEnd.x + greenOffset, rEnd.y, false, 50, 3));
+        releaseFromSustainEl.setAttribute('clip-path', 'url(#sustainReleaseClip)');
+        releaseFromSustainEl.style.display = '';
+      } else {
+        releaseFromSustainEl.style.display = 'none';
+      }
+    }
     ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d',''); el.style.display='none'; } });
     const tbSusMarkerMD=$('tbSustainMarker'); if(tbSusMarkerMD) tbSusMarkerMD.style.display='none';
     const tbMDLineMD=$('tbModelDSustainLine'); if(tbMDLineMD) tbMDLineMD.style.display='none';
