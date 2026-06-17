@@ -226,27 +226,28 @@ function render(){
         fullReferenceReleaseEl.style.display = 'none';
       }
     }
+    // Shared gate-close geometry — used by the orange tap-release curve and Show Gate Time.
+    // gateCloseX = where the blob sits when the gate closes (attack → decay time mapping,
+    // parked at the sustain x since gate-high never descends below sustain).
+    const gateTapMs = ($('tapCustomMs') && Number($('tapCustomMs').value)) || 200;
+    const gateTSec = gateTapMs / 1000;
+    let gateCloseX;
+    if(e.aT > 0 && gateTSec <= e.aT){
+      gateCloseX = pts.p0.x + (pts.p1.x - pts.p0.x) * (gateTSec / e.aT);
+    } else {
+      const gfd = e.dT > 0 ? Math.min(1, (gateTSec - e.aT) / e.dT) : 1;
+      gateCloseX = pts.p1.x + (pts.pEnd.x - pts.p1.x) * gfd;
+    }
+    if(gateCloseX > pts.pS.x) gateCloseX = pts.pS.x;
+
     // #tapReleaseOrange: RC release trajectory from the tap gate-close point.
     const tapReleaseOrangeEl = $('tapReleaseOrange');
     if(tapReleaseOrangeEl){
       if(drawReleasePath && curveAmt){
-        const tapMs = ($('tapCustomMs') && Number($('tapCustomMs').value)) || 200;
-        const tSec = tapMs / 1000;
-        // x where the blob sits when the gate closes (attack → decay time mapping, parked at sustain)
-        let gateCloseX;
-        if(e.aT > 0 && tSec <= e.aT){
-          gateCloseX = pts.p0.x + (pts.p1.x - pts.p0.x) * (tSec / e.aT);
-        } else {
-          const fd = e.dT > 0 ? Math.min(1, (tSec - e.aT) / e.dT) : 1;
-          gateCloseX = pts.p1.x + (pts.pEnd.x - pts.p1.x) * fd;
-        }
-        if(gateCloseX > pts.pS.x) gateCloseX = pts.pS.x; // gate-high never goes below sustain
-        // y at that x, sampled from the drawn attack or decay curve
+        // y at gateCloseX, sampled from the drawn attack or decay curve
         const gcPathEl = document.getElementById(gateCloseX < pts.p1.x ? 'attackOuter' : 'decayOuter');
         let gateCloseY = gcPathEl ? getYFromPath(gcPathEl, gateCloseX) : null;
         if(gateCloseY === null) gateCloseY = drawPS.y;
-        const magentaXAtSustain = rcPolylineXAtY(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, drawPS.y, false, 200, 3);
-        const greenOffset = drawPS.x - magentaXAtSustain;
         tapReleaseOrangeEl.setAttribute('d', rcPolyline(gateCloseX, gateCloseY, gateCloseX + (rEnd.x - pts.p1.x), rEnd.y, false, 50, 3));
         tapReleaseOrangeEl.style.stroke = '#ff8800'; // forced debug colour
         tapReleaseOrangeEl.style.display = '';
@@ -254,12 +255,38 @@ function render(){
         tapReleaseOrangeEl.style.display = 'none';
       }
     }
+    // Show Gate Time: vertical dotted line + label at the gate-close x.
+    const showGateTime = $('showGateTime') && $('showGateTime').checked;
+    const gateTimeLineEl = $('gateTimeLine');
+    const gateTimeLabelEl = $('gateTimeLabel');
+    if(showGateTime){
+      const gateTopY = graph.y0 - graph.h;
+      if(gateTimeLineEl){
+        gateTimeLineEl.setAttribute('x1', gateCloseX);
+        gateTimeLineEl.setAttribute('x2', gateCloseX);
+        gateTimeLineEl.setAttribute('y1', gateTopY);
+        gateTimeLineEl.setAttribute('y2', graph.y0);
+        gateTimeLineEl.style.display = '';
+      }
+      if(gateTimeLabelEl){
+        gateTimeLabelEl.setAttribute('x', gateCloseX);
+        gateTimeLabelEl.setAttribute('y', gateTopY - 10);
+        gateTimeLabelEl.setAttribute('text-anchor', 'middle');
+        gateTimeLabelEl.textContent = 'Gate = ' + gateTapMs + 'ms';
+        gateTimeLabelEl.style.display = '';
+      }
+    } else {
+      if(gateTimeLineEl) gateTimeLineEl.style.display = 'none';
+      if(gateTimeLabelEl) gateTimeLabelEl.style.display = 'none';
+    }
     ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d',''); el.style.display='none'; } });
     const tbSusMarkerMD=$('tbSustainMarker'); if(tbSusMarkerMD) tbSusMarkerMD.style.display='none';
     const tbMDLineMD=$('tbModelDSustainLine'); if(tbMDLineMD) tbMDLineMD.style.display='none';
     const tbSusLblMD=$('tbSustainLabel'); if(tbSusLblMD) tbSusLblMD.style.display='none';
   } else {
     renderTextbookPaths({ pts, drawPS, drawP1, ceilY, showClipped, drawReleasePath, curveAmt, dSF, rSF, linearTimeOn });
+    $('tapReleaseOrange').setAttribute('d', '');
+    $('fullReferenceRelease').setAttribute('d', '');
   }
 
   // Show/hide outer lines based on showOuterLine checkbox
