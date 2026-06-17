@@ -103,7 +103,7 @@ function render(){
     let ceilDecayX  = pts.p1.x + (pts.pEnd.x - pts.p1.x) * f_d;
     if (ceilDecayX > pts.pS.x) ceilDecayX = pts.pS.x;
     const p1x = pts.p1.x;
-    aPath        = buildPath(pts.p0.x, pts.p0.y, ceilAttackX, ceilY, curveAmt, aSF);
+    aPath        = curveAmt ? rcPolyline(pts.p0.x, pts.p0.y, ceilAttackX, ceilY, true, 50, 3) : buildPath(pts.p0.x, pts.p0.y, ceilAttackX, ceilY, 0, aSF);
     ceilLeftPath = `M ${ceilAttackX} ${ceilY} L ${p1x} ${ceilY}`;
     ceilRightPath= `M ${p1x} ${ceilY} L ${ceilDecayX} ${ceilY}`;
     dPath        = buildPath(ceilDecayX, ceilY, drawPS.x, drawPS.y, curveAmt, dSF);
