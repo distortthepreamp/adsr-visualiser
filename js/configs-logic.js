@@ -31,6 +31,10 @@ function buildConfigSnapshot(){
     blobGlowEnabled: $('blobGlowEnabled') ? $('blobGlowEnabled').checked : true,
     keepTapMarker: $('keepTapMarker') ? $('keepTapMarker').checked : true,
     timelineZoom3x: $('timelineZoom3x') ? $('timelineZoom3x').checked : false,
+    timelineZoom6x: $('timelineZoom6x') ? $('timelineZoom6x').checked : false,
+    timelineZoom12x: $('timelineZoom12x') ? $('timelineZoom12x').checked : false,
+    timelineZoom24x: $('timelineZoom24x') ? $('timelineZoom24x').checked : false,
+    timelineZoom48x: $('timelineZoom48x') ? $('timelineZoom48x').checked : false,
     blobGlowRadius: Number($('blobGlowRadius') ? $('blobGlowRadius').value : 8),
     curveAmount: Number($('curveAmount').value),
     audioEnabled: $('audioEnabled').checked,
@@ -83,10 +87,14 @@ function loadConfigObject(cfg){
   state.target.tbSustainGap = state.tbSustainGap;
 
   // Checkboxes
-  ['loudDecay','drawReleaseWhenZero','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine','meterGlow','meterScanlinesVisible','blobGlowEnabled','keepTapMarker','timelineZoom3x','kioskKnobGlow'].forEach(id => {
+  ['loudDecay','drawReleaseWhenZero','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine','meterGlow','meterScanlinesVisible','blobGlowEnabled','keepTapMarker','timelineZoom3x','timelineZoom6x','timelineZoom12x','timelineZoom24x','timelineZoom48x','kioskKnobGlow'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
-  const restoredZoom = ($('timelineZoom3x') && $('timelineZoom3x').checked) ? 3 : 1;
+  const restoredZoom = ($('timelineZoom48x') && $('timelineZoom48x').checked) ? 48
+    : ($('timelineZoom24x') && $('timelineZoom24x').checked) ? 24
+    : ($('timelineZoom12x') && $('timelineZoom12x').checked) ? 12
+    : ($('timelineZoom6x') && $('timelineZoom6x').checked) ? 6
+    : ($('timelineZoom3x') && $('timelineZoom3x').checked) ? 3 : 1;
   state.zoomFactor = restoredZoom; state.target.zoomFactor = restoredZoom;
   syncHpModeEnabled();
   syncAnalogueCurve();
@@ -265,7 +273,7 @@ function initConfigsLogic(){
     return `${cfg.name}: ${newLabel}`;
   });
 
-  $('exportConfigsBtn').addEventListener('click', () => downloadJSON(CONFIGS, 'configs-export.json'));
+  $('exportConfigsBtn').addEventListener('click', () => downloadJSON(CONFIGS, 'configs.json'));
 
   $('importConfigsBtn').addEventListener('click', () => {
     const inp = document.createElement('input');
