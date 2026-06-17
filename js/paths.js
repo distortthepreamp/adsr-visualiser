@@ -161,6 +161,32 @@ function render(){
     ? Math.min(1, (rEnd.x - drawPS.x) / (graph.w * 0.3))
     : Math.min(1, e.rT * 1000 / 500);
 
+  // Textbook ADSR underlay — faint straight-line A/D/S/R behind the main curves.
+  // Shown only in non-textbook mode when the toggle is on.
+  {
+    const showUnderlay = !textbookAdsr && $('showTextbookUnderlay') && $('showTextbookUnderlay').checked;
+    const ua=$('underlayAttack'), ud=$('underlayDecay'), us=$('underlaySustain'), ur=$('underlayRelease');
+    if(showUnderlay){
+      // Mirror renderTextbookPaths() geometry exactly (straight A/D/S/R) so the underlay
+      // matches the textbook ADSR: decay ends at pEnd.x, sustain is a fixed-width gap, and
+      // release spans rwFull from there down to the floor.
+      const tbSusGapPx = graph.w * state.tbSustainGap;
+      const tbDecayEndX = pts.pEnd.x;
+      const tbSusEndX   = pts.pEnd.x + tbSusGapPx;
+      const tbRelEndX   = tbSusEndX + timeToPixels(mapTime(state.r), linearTimeOn);
+      const tbFloorY    = yFor(e.floor);
+      if(ua){ ua.setAttribute('d', `M ${pts.p0.x} ${pts.p0.y} L ${drawP1.x} ${drawP1.y}`); ua.style.display=''; }
+      if(ud){ ud.setAttribute('d', `M ${drawP1.x} ${drawP1.y} L ${tbDecayEndX} ${drawPS.y}`); ud.style.display=''; }
+      if(us){ us.setAttribute('d', `M ${tbDecayEndX} ${drawPS.y} L ${tbSusEndX} ${drawPS.y}`); us.style.display=''; }
+      if(ur){
+        if(drawReleasePath){ ur.setAttribute('d', `M ${tbSusEndX} ${drawPS.y} L ${tbRelEndX} ${tbFloorY}`); ur.style.display=''; }
+        else { ur.setAttribute('d',''); ur.style.display='none'; }
+      }
+    } else {
+      [ua,ud,us,ur].forEach(el => { if(el){ el.setAttribute('d',''); el.style.display='none'; } });
+    }
+  }
+
   if(!textbookAdsr){
     // Model D: C1 continuity at pS using natural decay slope
     const dPeakY = showClipped ? ceilY : drawP1.y;

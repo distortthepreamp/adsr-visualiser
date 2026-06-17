@@ -49,6 +49,10 @@
       <line id="gateTimeLine" stroke="#ff8800" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
       <text id="gateTimeLabel" fill="#ff8800" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <g id="envSegments">
+        <path id="underlayAttack" fill="none" stroke="white" stroke-opacity="0.5" stroke-width="2"/>
+        <path id="underlayDecay" fill="none" stroke="white" stroke-opacity="0.5" stroke-width="2"/>
+        <path id="underlaySustain" fill="none" stroke="white" stroke-opacity="0.5" stroke-width="2" stroke-dasharray="4,4"/>
+        <path id="underlayRelease" fill="none" stroke="white" stroke-opacity="0.5" stroke-width="2"/>
         <path id="fullReferenceRelease" fill="none" stroke="#00ffff" style="stroke-width:var(--lineWidth)"/>
         <path id="tapReleaseOrange" fill="none" stroke="#ff8800" style="stroke-width:var(--lineWidth)"/>
         <path id="sustainSegOuter" class="env-outer" d="" style="display:none" />
@@ -244,6 +248,7 @@
           <div class="row"><label><input id="showStatedTimes" type="checkbox"> Show Stated Times (')</label></div>
           <div class="row"><label><input type="checkbox" id="showGateTime"> Show Gate Time</label></div>
           <div class="row"><label><input type="checkbox" id="showPeakDischarge"> Show Peak Discharge</label></div>
+          <div class="row"><label><input type="checkbox" id="showTextbookUnderlay"> Show Textbook Underlay</label></div>
           <div id="showEffectiveLinesRow" class="row"><label><input id="showEffectiveLines" type="checkbox"> Show Effective Drop Lines (⇧;)</label></div>
           <div id="showStatedLinesRow" class="row"><label><input id="showStatedLines" type="checkbox"> Show Stated Drop Lines (⇧')</label></div>
         </div>

@@ -412,6 +412,7 @@ function initUIControls(){
   $('tapCustomMs') && $('tapCustomMs').addEventListener('input', render); // keep the orange tap-release curve / gate-time line live
   $('showGateTime') && $('showGateTime').addEventListener('change', render);
   $('showPeakDischarge') && $('showPeakDischarge').addEventListener('change', render);
+  $('showTextbookUnderlay') && $('showTextbookUnderlay').addEventListener('change', render);
   $('clearBtn').addEventListener('click', () => { logEvent('ANIMATION', { action: 'clear' }); clearBlobAndMarker(); });
   $('keepTapMarker').addEventListener('change',()=>{ if(!$('keepTapMarker').checked) hideTapMarker(); });
 
