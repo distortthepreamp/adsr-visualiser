@@ -214,15 +214,18 @@ function render(){
       if(greenAnalogueRelease) el.setAttribute('clip-path', 'url(#sustainReleaseClip)');
       else el.removeAttribute('clip-path');
     });
-    // #fullReferenceRelease: full peak→floor reference curve (cyan, unclipped).
+    // #fullReferenceRelease: full peak→floor reference curve (cyan, unclipped). Only shown
+    // when Show Peak Discharge is checked.
+    const showPeakDischarge = $('showPeakDischarge') && $('showPeakDischarge').checked;
     const fullReferenceReleaseEl = $('fullReferenceRelease');
     if(fullReferenceReleaseEl){
-      if(curveAmt && drawReleasePath){
+      if(showPeakDischarge && curveAmt && drawReleasePath){
         fullReferenceReleaseEl.setAttribute('d', rcPolyline(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, false, 50, 3));
         fullReferenceReleaseEl.removeAttribute('clip-path');
         fullReferenceReleaseEl.style.stroke = '#00ffff';
         fullReferenceReleaseEl.style.display = '';
       } else {
+        fullReferenceReleaseEl.setAttribute('d', '');
         fullReferenceReleaseEl.style.display = 'none';
       }
     }
