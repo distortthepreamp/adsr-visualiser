@@ -226,6 +226,33 @@ function render(){
         releaseFromSustainEl.style.display = 'none';
       }
     }
+    // #tapReleaseOrange: RC release trajectory from the tap gate-close point.
+    const tapReleaseOrangeEl = $('tapReleaseOrange');
+    if(tapReleaseOrangeEl){
+      if(drawReleasePath && curveAmt){
+        const tapMs = ($('tapCustomMs') && Number($('tapCustomMs').value)) || 200;
+        const tSec = tapMs / 1000;
+        // x where the blob sits when the gate closes (attack → decay time mapping, parked at sustain)
+        let gateCloseX;
+        if(e.aT > 0 && tSec <= e.aT){
+          gateCloseX = pts.p0.x + (pts.p1.x - pts.p0.x) * (tSec / e.aT);
+        } else {
+          const fd = e.dT > 0 ? Math.min(1, (tSec - e.aT) / e.dT) : 1;
+          gateCloseX = pts.p1.x + (pts.pEnd.x - pts.p1.x) * fd;
+        }
+        if(gateCloseX > pts.pS.x) gateCloseX = pts.pS.x; // gate-high never goes below sustain
+        // y at that x, sampled from the drawn attack or decay curve
+        const gcPathEl = document.getElementById(gateCloseX < pts.p1.x ? 'attackOuter' : 'decayOuter');
+        let gateCloseY = gcPathEl ? getYFromPath(gcPathEl, gateCloseX) : null;
+        if(gateCloseY === null) gateCloseY = drawPS.y;
+        const magentaXAtSustain = rcPolylineXAtY(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, drawPS.y, false, 200, 3);
+        const greenOffset = drawPS.x - magentaXAtSustain;
+        tapReleaseOrangeEl.setAttribute('d', rcPolyline(gateCloseX, gateCloseY, gateCloseX + greenOffset + (rEnd.x - pts.p1.x), rEnd.y, false, 50, 3));
+        tapReleaseOrangeEl.style.display = '';
+      } else {
+        tapReleaseOrangeEl.style.display = 'none';
+      }
+    }
     ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d',''); el.style.display='none'; } });
     const tbSusMarkerMD=$('tbSustainMarker'); if(tbSusMarkerMD) tbSusMarkerMD.style.display='none';
     const tbMDLineMD=$('tbModelDSustainLine'); if(tbMDLineMD) tbMDLineMD.style.display='none';

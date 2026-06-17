@@ -405,6 +405,7 @@ function initUIControls(){
   $('tap500Btn').addEventListener('click', () => setTapMode('tap500','tap500Btn'));
   $('tap1sBtn').addEventListener('click', () => setTapMode('tap1000','tap1sBtn'));
   $('tapModeHoldBtn').addEventListener('click', () => setTapMode('hold','tapModeHoldBtn'));
+  $('tapCustomMs') && $('tapCustomMs').addEventListener('input', render); // keep the orange tap-release curve live
   $('clearBtn').addEventListener('click', () => { logEvent('ANIMATION', { action: 'clear' }); clearBlobAndMarker(); });
   $('keepTapMarker').addEventListener('change',()=>{ if(!$('keepTapMarker').checked) hideTapMarker(); });
 
