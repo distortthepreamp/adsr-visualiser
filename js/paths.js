@@ -188,17 +188,19 @@ function render(){
     ['decayOuter','decayInner'].forEach(id => $(id).setAttribute('d', dPath));
     const releaseEndHandle = { x: rEnd.x - h_release, y: rEnd.y };
     const rStart = state.releaseFromDecay ? pts.p1 : (releaseStartPoint || drawPS);
-    const rPath = drawReleasePath
-      ? (curveAmt
-          ? rcPolyline(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, false, 50, 3)
-          : `M ${rStart.x} ${rStart.y} L ${rEnd.x} ${rEnd.y}`)
-      : '';
-    ['releaseOuter','releaseInner'].forEach(id => {
-      const el = $(id); if(!el) return;
-      el.setAttribute('d', rPath);
-      el.style.stroke = (curveAmt && drawReleasePath) ? '#ff00ff' : ''; // TEMP DEBUG: magenta full release curve
-    });
-    // TEMP DEBUG: second release curve drawn from the sustain intercept (green).
+    // releaseOuter/releaseInner: green RC discharge from drawPS — the full peak→floor curve
+    // shifted right so its sustain-level crossing lands at drawPS.x, clipped to below sustain.
+    const greenAnalogueRelease = !!(curveAmt && drawReleasePath);
+    let rPath = '';
+    if(drawReleasePath){
+      if(curveAmt){
+        const magentaXAtSustain = rcPolylineXAtY(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, drawPS.y, false, 200, 3);
+        const greenOffset = drawPS.x - magentaXAtSustain;
+        rPath = rcPolyline(pts.p1.x + greenOffset, pts.p1.y, rEnd.x + greenOffset, rEnd.y, false, 50, 3);
+      } else {
+        rPath = `M ${rStart.x} ${rStart.y} L ${rEnd.x} ${rEnd.y}`;
+      }
+    }
     const sustainReleaseClipRect = $('sustainReleaseClipRect');
     if(sustainReleaseClipRect){
       sustainReleaseClipRect.setAttribute('x', graph.x0);
@@ -206,13 +208,20 @@ function render(){
       sustainReleaseClipRect.setAttribute('width', graph.w);
       sustainReleaseClipRect.setAttribute('height', graph.y0 - drawPS.y);
     }
+    ['releaseOuter','releaseInner'].forEach(id => {
+      const el = $(id); if(!el) return;
+      el.setAttribute('d', rPath);
+      el.style.stroke = ''; // normal release colour
+      if(greenAnalogueRelease) el.setAttribute('clip-path', 'url(#sustainReleaseClip)');
+      else el.removeAttribute('clip-path');
+    });
+    // #releaseFromSustain: full peak→floor reference curve (magenta, unclipped).
     const releaseFromSustainEl = $('releaseFromSustain');
     if(releaseFromSustainEl){
       if(curveAmt && drawReleasePath){
-        const magentaXAtSustain = rcPolylineXAtY(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, drawPS.y, false, 200, 3);
-        const greenOffset = drawPS.x - magentaXAtSustain;
-        releaseFromSustainEl.setAttribute('d', rcPolyline(pts.p1.x + greenOffset, pts.p1.y, rEnd.x + greenOffset, rEnd.y, false, 50, 3));
-        releaseFromSustainEl.setAttribute('clip-path', 'url(#sustainReleaseClip)');
+        releaseFromSustainEl.setAttribute('d', rcPolyline(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, false, 50, 3));
+        releaseFromSustainEl.removeAttribute('clip-path');
+        releaseFromSustainEl.style.stroke = '#ff00ff';
         releaseFromSustainEl.style.display = '';
       } else {
         releaseFromSustainEl.style.display = 'none';
