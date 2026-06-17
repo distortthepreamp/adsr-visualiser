@@ -59,6 +59,7 @@ function buildConfigSnapshot(){
     meterFillColorFilter: $('meterFillColorFilter').value,
     timeAxisStatedColor: $('timeAxisStatedColor').value,
     contourLineColor: $('contourLineColor') ? $('contourLineColor').value : '#ffff00',
+    underlayColor: $('underlayColor') ? $('underlayColor').value : '#ffffff',
     lineWidth: Number($('lineWidth').value),
     innerLineWidth: Number($('innerLineWidth').value),
     labelSize: Number($('labelSize').value),
@@ -133,7 +134,7 @@ function loadConfigObject(cfg){
   }
 
   // Colours (dispatch input to update CSS variables)
-  ['lineColor','bgColor','loudnessAttackColor','loudnessDecayColor','loudnessReleaseColor','filterAttackColor','filterDecayColor','filterReleaseColor','meterFillColor','meterFillColorFilter','timeAxisStatedColor','contourLineColor'].forEach(id => {
+  ['lineColor','bgColor','loudnessAttackColor','loudnessDecayColor','loudnessReleaseColor','filterAttackColor','filterDecayColor','filterReleaseColor','meterFillColor','meterFillColorFilter','timeAxisStatedColor','contourLineColor','underlayColor'].forEach(id => {
     if($(id) && cfg[id]){ $(id).value = cfg[id]; $(id).dispatchEvent(new Event('input')); }
   });
 

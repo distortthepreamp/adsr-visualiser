@@ -46,13 +46,14 @@
       <circle id="sustainPoint" class="tap-marker" cx="80" cy="445" style="opacity:.85" />
       <g id="dropLinesEffective"></g>
       <g id="dropLinesStated"></g>
+      <line id="newStatedDecayDrop" stroke="cyan" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
       <line id="gateTimeLine" stroke="#ff8800" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
       <text id="gateTimeLabel" fill="#ff8800" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <g id="envSegments">
-        <path id="underlayAttack" fill="none" stroke="white" stroke-opacity="0.5" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:round"/>
-        <path id="underlayDecay" fill="none" stroke="white" stroke-opacity="0.5" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:round"/>
-        <path id="underlaySustain" fill="none" stroke="white" stroke-opacity="0.5" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:round" stroke-dasharray="4,4"/>
-        <path id="underlayRelease" fill="none" stroke="white" stroke-opacity="0.5" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:round"/>
+        <path id="underlayAttack" fill="none" stroke="white" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:round"/>
+        <path id="underlayDecay" fill="none" stroke="white" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:round"/>
+        <path id="underlaySustain" fill="none" stroke="white" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:round" stroke-dasharray="4,4"/>
+        <path id="underlayRelease" fill="none" stroke="white" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:round"/>
         <path id="fullReferenceRelease" fill="none" stroke="#00ffff" style="stroke-width:var(--lineWidth)"/>
         <path id="tapReleaseOrange" fill="none" stroke="#ff8800" style="stroke-width:var(--lineWidth)"/>
         <path id="sustainSegOuter" class="env-outer" d="" style="display:none" />
@@ -300,6 +301,7 @@
           <div class="row"><label>Meter L <input id="meterFillColor" type="color" value="#00ff00"></label><label>Meter F <input id="meterFillColorFilter" type="color" value="#00ffff"></label><label>Stated <input id="timeAxisStatedColor" type="color" value="#aaaaaa"></label><label>Contour <input id="contourLineColor" type="color" value="#ffff00"></label></div>
           <div class="row"><label>L.Attack <input id="loudnessAttackColor" type="color" value="#ff0000"></label><label>L.Decay <input id="loudnessDecayColor" type="color" value="#ff0000"></label><label>L.Release <input id="loudnessReleaseColor" type="color" value="#ff0000"></label></div>
           <div class="row"><label>F.Attack <input id="filterAttackColor" type="color" value="#00ffff"></label><label>F.Decay <input id="filterDecayColor" type="color" value="#ffff00"></label><label>F.Release <input id="filterReleaseColor" type="color" value="#ffff00"></label></div>
+          <div class="row"><label>Underlay <input type="color" id="underlayColor" value="#ffffff"></label></div>
         </div>
       </div>
       <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label></div>

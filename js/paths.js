@@ -178,6 +178,7 @@ function render(){
       // Textbook never trapezoid-clips, so use ceiling-clamped peak/sustain y (ignoring showClipped).
       const ulP1Y = Math.max(pts.p1.y, ceilY);
       const ulPSY = overrange ? Math.max(yFor(e.floor + state.s * e.scale), ceilY) : yFor(e.floor + state.s * e.scale); // stated (uncapped) sustain, ignoring Mimic 80% cap
+      const ulColor = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
       if(ua){ ua.setAttribute('d', `M ${pts.p0.x} ${pts.p0.y} L ${pts.p1.x} ${ulP1Y}`); ua.style.display=''; }
       if(ud){ ud.setAttribute('d', `M ${pts.p1.x} ${ulP1Y} L ${tbDecayEndX} ${ulPSY}`); ud.style.display=''; }
       if(us){ us.setAttribute('d', `M ${tbDecayEndX} ${ulPSY} L ${tbSusEndX} ${ulPSY}`); us.style.display=''; }
@@ -185,6 +186,7 @@ function render(){
         if(drawReleasePath){ ur.setAttribute('d', `M ${tbSusEndX} ${ulPSY} L ${tbRelEndX} ${tbFloorY}`); ur.style.display=''; }
         else { ur.setAttribute('d',''); ur.style.display='none'; }
       }
+      [ua,ud,us,ur].forEach(el=>{ if(el) el.style.stroke=ulColor; });
     } else {
       [ua,ud,us,ur].forEach(el => { if(el){ el.setAttribute('d',''); el.style.display='none'; } });
     }
@@ -239,10 +241,12 @@ function render(){
       sustainReleaseClipRect.setAttribute('width', graph.w);
       sustainReleaseClipRect.setAttribute('height', graph.y0 - drawPS.y);
     }
+    const _relColorEl = ($('frequencyMode') && $('frequencyMode').checked) ? $('filterReleaseColor') : $('loudnessReleaseColor');
+    const relColor = _relColorEl ? _relColorEl.value : '';
     ['releaseOuter','releaseInner'].forEach(id => {
       const el = $(id); if(!el) return;
       el.setAttribute('d', rPath);
-      el.style.stroke = '#00ff00'; // forced debug colour
+      el.style.stroke = relColor; // loudness/filter release colour from the Advanced pickers
       if(greenAnalogueRelease) el.setAttribute('clip-path', 'url(#sustainReleaseClip)');
       else el.removeAttribute('clip-path');
     });

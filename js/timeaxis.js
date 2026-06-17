@@ -30,9 +30,11 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       taAttackX=pts.p1.x;
       taAttackMs=Math.round(e.aT*1000);
     }
+    const statedAttackMs=Math.round(e.aT*1000);
+    const showAttackEff=showEffectiveVisible && (taAttackMs!==statedAttackMs); // hide effective attack when it equals the stated attack time
     timeAxisAttackEl.setAttribute('x',taAttackX); timeAxisAttackEl.setAttribute('y',taY);
     timeAxisAttackEl.textContent=taAttackMs+' ms';
-    timeAxisAttackEl.style.display=showEffectiveVisible?'':'none'; timeAxisAttackEl.style.opacity=showEffectiveVisible?'1':'';
+    timeAxisAttackEl.style.display=showAttackEff?'':'none'; timeAxisAttackEl.style.opacity=showAttackEff?'1':'';
   }
   const timeAxisAttackStatedEl=$('timeAxisAttackStated');
   if(timeAxisAttackStatedEl){
@@ -166,8 +168,21 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   }
   updateDropLineGroup('dropLinesEffective',['timeAxisAttack','timeAxisDecayStart','timeAxisDecayEndEffective'],showEffLines,'drop-line-effective');
   updateDropLineGroup('dropLinesStated',['timeAxisAttackStated','timeAxisDecayEndStated','timeAxisReleaseStartStated'],showStLines,'drop-line-stated');
+  // Stated decay drop line: vertical from the decay/sustain junction (pts.pEnd.x, drawPS.y) to the time axis
+  const newStatedDecayDropEl=$('newStatedDecayDrop');
+  if(newStatedDecayDropEl){
+    const showStatedDecayDrop = showStLines && ($('showTextbookUnderlay').checked || $('textbookAdsr').checked);
+    if(showStatedDecayDrop){
+      newStatedDecayDropEl.setAttribute('x1',pts.pEnd.x); newStatedDecayDropEl.setAttribute('y1',drawPS.y);
+      newStatedDecayDropEl.setAttribute('x2',pts.pEnd.x); newStatedDecayDropEl.setAttribute('y2',graph.y0);
+      newStatedDecayDropEl.style.display='';
+    } else {
+      newStatedDecayDropEl.style.display='none';
+    }
+  }
   // Dim drop line rows when their time axis equivalent is off
   const effLinesRow=$('showEffectiveLinesRow'), statedLinesRow=$('showStatedLinesRow');
   if(effLinesRow){ effLinesRow.style.opacity=showEffective?'':UI_DISABLED_OPACITY; effLinesRow.style.pointerEvents=showEffective?'':'none'; }
-  if(statedLinesRow){ statedLinesRow.style.opacity=showStated?'':UI_DISABLED_OPACITY; statedLinesRow.style.pointerEvents=showStated?'':'none'; }
+  const statedLinesActive=showStated||($('showTextbookUnderlay')&&$('showTextbookUnderlay').checked)||($('textbookAdsr')&&$('textbookAdsr').checked);
+  if(statedLinesRow){ statedLinesRow.style.opacity=statedLinesActive?'':UI_DISABLED_OPACITY; statedLinesRow.style.pointerEvents=statedLinesActive?'':'none'; }
 }
