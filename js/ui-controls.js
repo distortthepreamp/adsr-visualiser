@@ -169,7 +169,11 @@ function setTapMode(mode, btnId){
   const tapModeBtns = ['tapMode50Btn','tapMode100Btn','tapMode200Btn','tap500Btn','tap1sBtn','tapModeCustomBtn','tapModeHoldBtn'];
   tapMode = mode;
   tapModeBtns.forEach(id => { const b=$(id); if(b){ b.style.background=''; b.style.color=''; } });
-  const b=$(btnId); if(b){ b.style.background=BTN_ACTIVE_BG; b.style.color=BTN_ACTIVE_FG; }
+  // Preset taps are quicksets for the custom value, not independent modes — the Custom
+  // button is the persistent active tap mode and stays highlighted; only Hold highlights
+  // its own button. (btnId retained for call-site compatibility.)
+  const activeId = mode === 'hold' ? 'tapModeHoldBtn' : 'tapModeCustomBtn';
+  const b=$(activeId); if(b){ b.style.background=BTN_ACTIVE_BG; b.style.color=BTN_ACTIVE_FG; }
   const customRow=$('tapCustomRow');
   if(customRow) customRow.style.display = mode==='tapCustom' ? '' : 'none';
 }
@@ -398,12 +402,12 @@ function initUIControls(){
   $('customTransitionTime').addEventListener('input',()=>{ currentTransitionSec=Number($('customTransitionTime').value)||3; });
 
   // Tap mode buttons
-  $('tapMode50Btn').addEventListener('click', () => setTapMode('tap50','tapMode50Btn'));
-  $('tapMode100Btn').addEventListener('click', () => setTapMode('tap100','tapMode100Btn'));
-  $('tapMode200Btn').addEventListener('click', () => setTapMode('tap200','tapMode200Btn'));
+  $('tapMode50Btn').addEventListener('click', () => { $('tapCustomMs').value = 50; setTapMode('tapCustom','tapModeCustomBtn'); render(); });
+  $('tapMode100Btn').addEventListener('click', () => { $('tapCustomMs').value = 100; setTapMode('tapCustom','tapModeCustomBtn'); render(); });
+  $('tapMode200Btn').addEventListener('click', () => { $('tapCustomMs').value = 200; setTapMode('tapCustom','tapModeCustomBtn'); render(); });
   $('tapModeCustomBtn').addEventListener('click', () => setTapMode('tapCustom','tapModeCustomBtn'));
-  $('tap500Btn').addEventListener('click', () => setTapMode('tap500','tap500Btn'));
-  $('tap1sBtn').addEventListener('click', () => setTapMode('tap1000','tap1sBtn'));
+  $('tap500Btn').addEventListener('click', () => { $('tapCustomMs').value = 500; setTapMode('tapCustom','tapModeCustomBtn'); render(); });
+  $('tap1sBtn').addEventListener('click', () => { $('tapCustomMs').value = 1000; setTapMode('tapCustom','tapModeCustomBtn'); render(); });
   $('tapModeHoldBtn').addEventListener('click', () => setTapMode('hold','tapModeHoldBtn'));
   $('tapCustomMs') && $('tapCustomMs').addEventListener('input', render); // keep the orange tap-release curve / gate-time line live
   $('showGateTime') && $('showGateTime').addEventListener('change', render);
