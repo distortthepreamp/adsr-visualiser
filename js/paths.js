@@ -210,20 +210,20 @@ function render(){
     ['releaseOuter','releaseInner'].forEach(id => {
       const el = $(id); if(!el) return;
       el.setAttribute('d', rPath);
-      el.style.stroke = ''; // normal release colour
+      el.style.stroke = '#00ff00'; // forced debug colour
       if(greenAnalogueRelease) el.setAttribute('clip-path', 'url(#sustainReleaseClip)');
       else el.removeAttribute('clip-path');
     });
-    // #releaseFromSustain: full peak→floor reference curve (magenta, unclipped).
-    const releaseFromSustainEl = $('releaseFromSustain');
-    if(releaseFromSustainEl){
+    // #fullReferenceRelease: full peak→floor reference curve (cyan, unclipped).
+    const fullReferenceReleaseEl = $('fullReferenceRelease');
+    if(fullReferenceReleaseEl){
       if(curveAmt && drawReleasePath){
-        releaseFromSustainEl.setAttribute('d', rcPolyline(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, false, 50, 3));
-        releaseFromSustainEl.removeAttribute('clip-path');
-        releaseFromSustainEl.style.stroke = '#ff00ff';
-        releaseFromSustainEl.style.display = '';
+        fullReferenceReleaseEl.setAttribute('d', rcPolyline(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, false, 50, 3));
+        fullReferenceReleaseEl.removeAttribute('clip-path');
+        fullReferenceReleaseEl.style.stroke = '#00ffff';
+        fullReferenceReleaseEl.style.display = '';
       } else {
-        releaseFromSustainEl.style.display = 'none';
+        fullReferenceReleaseEl.style.display = 'none';
       }
     }
     // #tapReleaseOrange: RC release trajectory from the tap gate-close point.
@@ -247,7 +247,8 @@ function render(){
         if(gateCloseY === null) gateCloseY = drawPS.y;
         const magentaXAtSustain = rcPolylineXAtY(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, drawPS.y, false, 200, 3);
         const greenOffset = drawPS.x - magentaXAtSustain;
-        tapReleaseOrangeEl.setAttribute('d', rcPolyline(gateCloseX, gateCloseY, gateCloseX + greenOffset + (rEnd.x - pts.p1.x), rEnd.y, false, 50, 3));
+        tapReleaseOrangeEl.setAttribute('d', rcPolyline(gateCloseX, gateCloseY, gateCloseX + (rEnd.x - pts.p1.x), rEnd.y, false, 50, 3));
+        tapReleaseOrangeEl.style.stroke = '#ff8800'; // forced debug colour
         tapReleaseOrangeEl.style.display = '';
       } else {
         tapReleaseOrangeEl.style.display = 'none';
