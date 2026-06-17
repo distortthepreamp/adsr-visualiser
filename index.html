@@ -44,6 +44,7 @@
       <g id="dropLinesEffective"></g>
       <g id="dropLinesStated"></g>
       <g id="envSegments">
+        <path id="releaseFromSustain" fill="none" stroke="#00ff00" stroke-width="3"/>
         <path id="sustainSegOuter" class="env-outer" d="" style="display:none" />
         <path id="releaseOuter" class="env-outer" d="" />
         <path id="decayOuter" class="env-outer" d="" />
@@ -56,7 +57,6 @@
         <path id="ceilLeftInner" class="env-inner attack-inner" d="" style="display:none" />
         <path id="ceilRightInner" class="env-inner decay-inner" d="" style="display:none" />
         <path id="attackInner" class="env-inner attack-inner" d="" />
-        <path id="releaseFromSustain" fill="none" stroke="#00ff00" stroke-width="3"/>
       </g>
       <circle id="tapMarker" class="tap-marker" cx="80" cy="445" />
       <line id="floorBound"   x1="0" y1="445" x2="1200" y2="445" style="stroke:var(--boundsColor);stroke-width:7;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
@@ -216,7 +216,6 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 12px;">
         <div>
           <div id="loudDecayRow" class="row"><label><input id="loudDecay" type="checkbox"> <span id="loudDecayLabel">Loud Decay</span> (D)</label></div>
-          <div class="row"><label><input id="drawReleaseWhenZero" type="checkbox"> Show Zero Release (R)</label></div>
           <div class="row"><label><input id="showContour" type="checkbox" checked> Show Contour Top And Bottom (.)</label></div>
           <div class="row"><label><input id="frequencyMode" type="checkbox"> Filter Mode (F)</label></div>
           <div class="row"><label><input id="hpMode" type="checkbox"> LP/HP Mode (M)</label></div>
@@ -354,7 +353,6 @@
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">L</td><td style="padding:3px 0;font-size:13px;font-weight:700">Live/Animate</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">A</td><td style="padding:3px 0;font-size:13px;font-weight:700">Audio</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">D</td><td style="padding:3px 0;font-size:13px;font-weight:700">Loud/Filter Decay</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">R</td><td style="padding:3px 0;font-size:13px;font-weight:700">Draw Release When Zero</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">Z</td><td style="padding:3px 0;font-size:13px;font-weight:700">Timeline Zoom x3</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">.</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Contour Top And Bottom</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">F</td><td style="padding:3px 0;font-size:13px;font-weight:700">Filter Mode</td></tr>
@@ -514,7 +512,7 @@ setMeterLevel(state.dotLevel);
 
 logEvent('INIT', {
   a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale,
-  loudDecay: $('loudDecay').checked, drawReleaseWhenZero: $('drawReleaseWhenZero').checked,
+  loudDecay: $('loudDecay').checked,
   showContour: $('showContour').checked,
   frequencyMode: $('frequencyMode').checked, hpMode: $('hpMode').checked,
   keyboardControl: $('keyboardControl').checked, showClipped: $('showClipped').checked,

@@ -14,7 +14,6 @@ set analogue on
 set linear-time on
 set zoom-time on
 set textbook on
-set zero-release on
 set show-clipped on
 set show-effective-times on
 set show-stated-times off

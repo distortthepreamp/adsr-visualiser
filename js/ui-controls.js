@@ -306,7 +306,7 @@ function initUIControls(){
   });
 
   // Checkbox render and debug log listeners
-  ['loudDecay','keyboardControl','drawReleaseWhenZero','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine'].forEach(id => {
+  ['loudDecay','keyboardControl','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine'].forEach(id => {
     const el = $(id); if(!el) return;
     el.addEventListener('change', render);
     el.addEventListener('change', () => {
@@ -319,7 +319,7 @@ function initUIControls(){
           frequencyMode: chk('frequencyMode'), hpMode: chk('hpMode'),
           showClipped: chk('showClipped'), analogueCurve: chk('analogueCurve'),
           textbookAdsr: chk('textbookAdsr'), linearTime: chk('linearTime'),
-          drawReleaseWhenZero: chk('drawReleaseWhenZero'), tbSustainCollapse: chk('tbSustainCollapse')
+          tbSustainCollapse: chk('tbSustainCollapse')
         },
         geometry: window._lastRenderGeometry || null
       });

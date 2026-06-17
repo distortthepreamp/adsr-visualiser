@@ -5,7 +5,6 @@ function buildConfigSnapshot(){
     version: 1,
     a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale,
     loudDecay: $('loudDecay').checked,
-    drawReleaseWhenZero: $('drawReleaseWhenZero').checked,
     showContour: $('showContour').checked,
     frequencyMode: $('frequencyMode').checked,
     hpMode: $('hpMode').checked,
@@ -87,7 +86,7 @@ function loadConfigObject(cfg){
   state.target.tbSustainGap = state.tbSustainGap;
 
   // Checkboxes
-  ['loudDecay','drawReleaseWhenZero','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine','meterGlow','meterScanlinesVisible','blobGlowEnabled','keepTapMarker','timelineZoom3x','timelineZoom6x','timelineZoom12x','timelineZoom24x','timelineZoom48x','kioskKnobGlow'].forEach(id => {
+  ['loudDecay','showContour','showEffectiveTimes','showStatedTimes','showEffectiveLines','showStatedLines','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','showOuterLine','meterGlow','meterScanlinesVisible','blobGlowEnabled','keepTapMarker','timelineZoom3x','timelineZoom6x','timelineZoom12x','timelineZoom24x','timelineZoom48x','kioskKnobGlow'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
   const restoredZoom = ($('timelineZoom48x') && $('timelineZoom48x').checked) ? 48

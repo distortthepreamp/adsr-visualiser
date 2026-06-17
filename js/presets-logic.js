@@ -42,7 +42,6 @@ function initPresetsLogic(){
     logEvent('PRESET', { action: 'load', index: idx, name: preset.name });
     // Restore checkbox states if saved in preset
     if(preset.loudDecay !== undefined) $('loudDecay').checked = preset.loudDecay;
-    if(preset.drawReleaseWhenZero !== undefined) $('drawReleaseWhenZero').checked = preset.drawReleaseWhenZero;
     if(preset.filterMode !== undefined) $('frequencyMode').checked = preset.filterMode;
     if(preset.lpHp !== undefined) $('hpMode').checked = preset.lpHp;
     if(preset.keyboardControl !== undefined) $('keyboardControl').checked = preset.keyboardControl;
@@ -108,7 +107,6 @@ function initPresetsLogic(){
     preset.floor = parseFloat((state.floor * 10).toFixed(1));
     preset.scale = parseFloat((state.scale * 10).toFixed(1));
     preset.loudDecay = $('loudDecay').checked;
-    preset.drawReleaseWhenZero = $('drawReleaseWhenZero').checked;
     preset.filterMode = $('frequencyMode').checked;
     preset.lpHp = $('hpMode').checked;
     preset.keyboardControl = $('keyboardControl').checked;

@@ -15,7 +15,6 @@ set analogue off
 set linear-time on
 set zoom-time off
 set textbook off
-set zero-release off
 set show-clipped off
 
 # Cue sequence

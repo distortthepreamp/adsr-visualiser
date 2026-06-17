@@ -129,7 +129,7 @@ function parseCueList(text) {
     }
 
     // set <checkbox-param> on/off — single regex for remaining boolean params
-    const setBoolMatch = line.match(/^set\s+(filter-decay|hp-mode|mimic-sustain|analogue|linear-time|zoom-time|textbook|zero-release|show-clipped|show-effective-times|show-stated-times|show-effective-lines|show-stated-lines|show-contour|tb-sustain-dotted|tb-sustain-collapse|tb-model-d-sustain)\s+(on|off)$/i);
+    const setBoolMatch = line.match(/^set\s+(filter-decay|hp-mode|mimic-sustain|analogue|linear-time|zoom-time|textbook|show-clipped|show-effective-times|show-stated-times|show-effective-lines|show-stated-lines|show-contour|tb-sustain-dotted|tb-sustain-collapse|tb-model-d-sustain)\s+(on|off)$/i);
     if (setBoolMatch) {
       result.push({ type: 'set', param: setBoolMatch[1].toLowerCase(), value: setBoolMatch[2].toLowerCase() === 'on' });
       continue;
@@ -278,10 +278,6 @@ function executeEvent(event) {
       case 'textbook':
         $('textbookAdsr').checked = event.value;
         $('textbookAdsr').dispatchEvent(new Event('change'));
-        break;
-      case 'zero-release':
-        $('drawReleaseWhenZero').checked = event.value;
-        $('drawReleaseWhenZero').dispatchEvent(new Event('change'));
         break;
       case 'show-clipped':
         $('showClipped').checked = event.value;
@@ -570,7 +566,6 @@ function generateStateSnapshot() {
   lines.push(`set linear-time ${$('linearTime').checked ? 'on' : 'off'}`);
   lines.push(`set zoom-time ${$('timelineZoom3x').checked ? 'on' : 'off'}`);
   lines.push(`set textbook ${$('textbookAdsr').checked ? 'on' : 'off'}`);
-  lines.push(`set zero-release ${$('drawReleaseWhenZero').checked ? 'on' : 'off'}`);
   lines.push(`set show-clipped ${$('showClipped').checked ? 'on' : 'off'}`);
   lines.push(`set show-effective-times ${$('showEffectiveTimes').checked ? 'on' : 'off'}`);
   lines.push(`set show-stated-times ${$('showStatedTimes').checked ? 'on' : 'off'}`);

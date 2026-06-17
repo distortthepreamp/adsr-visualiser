@@ -130,8 +130,7 @@ function render(){
   });
   ['decayOuter','decayInner'].forEach(id => $(id).setAttribute('d', dPath));
 
-  const drawZeroRelease = $('drawReleaseWhenZero') && $('drawReleaseWhenZero').checked;
-  const drawReleasePath = pts.e.releaseOn || drawZeroRelease;
+  const drawReleasePath = pts.e.releaseOn;
   let rEnd;
   if(overrange && e.releaseOn){
     const f_attack = (1 - e.floor) / e.scale;

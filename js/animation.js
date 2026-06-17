@@ -177,7 +177,7 @@ function releaseFromCurrent(){
   if(!e.releaseOn){ clearBlobAndMarker(); return; }
 
   const pts=computePoints();
-  const startX = Number($('dot').getAttribute('cx'));
+  let startX = Number($('dot').getAttribute('cx'));
   const startY = Number($('dot').getAttribute('cy'));
   let startLevel;
   if(state.held && state.currentPhase === 'sustain'){
@@ -233,7 +233,15 @@ function releaseFromCurrent(){
   const floorY = yFor(pts.e.floor);
   const remainingY = floorY - pts.pS.y;
   const tSlope = (slopeY !== 0) ? remainingY / slopeY : 1;
-  const endX = pts.pS.x + slopeX * tSlope;
+  // Land where the drawn release path (releaseOuter) actually ends. With the analogue RC
+  // release that is the horizontally-offset curve's floor point (right of the chord floor),
+  // so the blob follows the curve all the way down and lands on it instead of snapping.
+  // For non-analogue / overrange the path end equals the chord floor, so this is a no-op.
+  let endX = pts.pS.x + slopeX * tSlope;
+  const releaseEndEl = document.getElementById('releaseOuter');
+  if(releaseEndEl && releaseEndEl.getTotalLength() > 0){
+    endX = releaseEndEl.getPointAtLength(releaseEndEl.getTotalLength()).x;
+  }
   const end = { x: endX, y: floorY, level: 0 };
   const dur = Math.max(MIN_RELEASE_MS, e.dT * startLevel * 1000);
   // If gate ended before the release slope (mid-attack or before sustain), snap the
