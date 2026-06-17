@@ -240,7 +240,10 @@ function render(){
     }
     if(gateCloseX > pts.pS.x) gateCloseX = pts.pS.x;
 
-    // #tapReleaseOrange: RC release trajectory from the tap gate-close point.
+    // #tapReleaseOrange: RC release trajectory from the tap gate-close point. Built exactly
+    // like the green release (releaseOuter): the full peak→floor RC curve shifted so its
+    // crossing at the gate-close level lands at gateCloseX, then clipped below that level.
+    // When the gate closes at the sustain level this coincides with the green curve.
     const tapReleaseOrangeEl = $('tapReleaseOrange');
     if(tapReleaseOrangeEl){
       if(drawReleasePath && curveAmt){
@@ -248,7 +251,17 @@ function render(){
         const gcPathEl = document.getElementById(gateCloseX < pts.p1.x ? 'attackOuter' : 'decayOuter');
         let gateCloseY = gcPathEl ? getYFromPath(gcPathEl, gateCloseX) : null;
         if(gateCloseY === null) gateCloseY = drawPS.y;
-        tapReleaseOrangeEl.setAttribute('d', rcPolyline(gateCloseX, gateCloseY, gateCloseX + (rEnd.x - pts.p1.x), rEnd.y, false, 50, 3));
+        const magentaXAtGate = rcPolylineXAtY(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, gateCloseY, false, 200, 3);
+        const orangeOffset = gateCloseX - magentaXAtGate;
+        const gateReleaseClipRect = $('gateReleaseClipRect');
+        if(gateReleaseClipRect){
+          gateReleaseClipRect.setAttribute('x', graph.x0);
+          gateReleaseClipRect.setAttribute('y', gateCloseY);
+          gateReleaseClipRect.setAttribute('width', graph.w);
+          gateReleaseClipRect.setAttribute('height', graph.y0 - gateCloseY);
+        }
+        tapReleaseOrangeEl.setAttribute('d', rcPolyline(pts.p1.x + orangeOffset, pts.p1.y, rEnd.x + orangeOffset, rEnd.y, false, 50, 3));
+        tapReleaseOrangeEl.setAttribute('clip-path', 'url(#gateReleaseClip)');
         tapReleaseOrangeEl.style.stroke = '#ff8800'; // forced debug colour
         tapReleaseOrangeEl.style.display = '';
       } else {
