@@ -216,11 +216,14 @@ function render(){
     // releaseOuter/releaseInner: green RC discharge from drawPS — the full peak→floor curve
     // shifted right so its sustain-level crossing lands at drawPS.x, clipped to below sustain.
     const greenAnalogueRelease = !!(curveAmt && drawReleasePath);
+    // Release starts at the end of the textbook sustain gap (matching the underlay), not at drawPS.x.
+    const releaseStartX = pts.pEnd.x + graph.w * state.tbSustainGap;
+    const releaseStartY = drawPS.y;
     let rPath = '';
     if(drawReleasePath){
       if(curveAmt){
-        const magentaXAtSustain = rcPolylineXAtY(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, drawPS.y, false, 200, 3);
-        const greenOffset = drawPS.x - magentaXAtSustain;
+        const magentaXAtSustain = rcPolylineXAtY(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, releaseStartY, false, 200, 3);
+        const greenOffset = releaseStartX - magentaXAtSustain;
         rPath = rcPolyline(pts.p1.x + greenOffset, pts.p1.y, rEnd.x + greenOffset, rEnd.y, false, 50, 3);
       } else {
         rPath = `M ${rStart.x} ${rStart.y} L ${rEnd.x} ${rEnd.y}`;
@@ -228,7 +231,7 @@ function render(){
     }
     const sustainReleaseClipRect = $('sustainReleaseClipRect');
     if(sustainReleaseClipRect){
-      sustainReleaseClipRect.setAttribute('x', graph.x0);
+      sustainReleaseClipRect.setAttribute('x', releaseStartX);
       sustainReleaseClipRect.setAttribute('y', drawPS.y);
       sustainReleaseClipRect.setAttribute('width', graph.w);
       sustainReleaseClipRect.setAttribute('height', graph.y0 - drawPS.y);
