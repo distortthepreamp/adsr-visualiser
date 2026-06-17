@@ -46,6 +46,8 @@
       <circle id="sustainPoint" class="tap-marker" cx="80" cy="445" style="opacity:.85" />
       <g id="dropLinesEffective"></g>
       <g id="dropLinesStated"></g>
+      <line id="gateTimeLine" stroke="#ff8800" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
+      <text id="gateTimeLabel" fill="#ff8800" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <g id="envSegments">
         <path id="fullReferenceRelease" fill="none" stroke="#00ffff" style="stroke-width:var(--lineWidth)"/>
         <path id="tapReleaseOrange" fill="none" stroke="#ff8800" style="stroke-width:var(--lineWidth)"/>
@@ -62,8 +64,6 @@
         <path id="ceilRightInner" class="env-inner decay-inner" d="" style="display:none" />
         <path id="attackInner" class="env-inner attack-inner" d="" />
       </g>
-      <line id="gateTimeLine" stroke="#ff8800" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
-      <text id="gateTimeLabel" fill="#ff8800" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <circle id="tapMarker" class="tap-marker" cx="80" cy="445" />
       <line id="floorBound"   x1="0" y1="445" x2="1200" y2="445" style="stroke:var(--boundsColor);stroke-width:7;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <line id="ceilingBound" x1="0" y1="30"  x2="1200" y2="30"  style="stroke:var(--boundsColor);stroke-width:7;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
