@@ -64,6 +64,14 @@ function timeToPixels(t, linearOn){
   return linearOn ? t * 1000 * (graph.w / getLinearTotalMs()) : displayTimeWidth(t);
 }
 
+function pixelsToTimeSec(px, linearOn){
+  if(px <= 0) return 0;
+  if(linearOn) return px * getLinearTotalMs() / (1000 * graph.w);
+  let lo = 0, hi = 12;
+  for(let i = 0; i < 52; i++){ const mid=(lo+hi)/2; if(displayTimeWidth(mid)<px) lo=mid; else hi=mid; }
+  return (lo+hi)/2;
+}
+
 function computePoints(){
   const e=getEffective();
   const linearTimeEl = document.getElementById('linearTime');

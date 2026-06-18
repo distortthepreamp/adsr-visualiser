@@ -55,14 +55,24 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   }
   // Effective decay drop line: vertical from the Model D decay/sustain intercept (drawPS) to the time axis
   const newEffectiveDecayDropEl=$('newEffectiveDecayDrop');
+  const newEffectiveDecayTimeLabelEl=$('newEffectiveDecayTime');
   if(newEffectiveDecayDropEl){
     const showEffectiveDecayDrop = ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && !textbookAdsr;
     if(showEffectiveDecayDrop){
       newEffectiveDecayDropEl.setAttribute('x1',drawPS.x); newEffectiveDecayDropEl.setAttribute('y1',drawPS.y);
       newEffectiveDecayDropEl.setAttribute('x2',drawPS.x); newEffectiveDecayDropEl.setAttribute('y2',graph.y0); newEffectiveDecayDropEl.setAttribute('stroke',newEffDecayCol);
       newEffectiveDecayDropEl.style.display='';
+      if(newEffectiveDecayTimeLabelEl){
+        newEffectiveDecayTimeLabelEl.setAttribute('x', drawPS.x);
+        newEffectiveDecayTimeLabelEl.setAttribute('y', graph.y0+18);
+        newEffectiveDecayTimeLabelEl.setAttribute('text-anchor', 'middle');
+        newEffectiveDecayTimeLabelEl.setAttribute('fill', newEffDecayCol);
+        newEffectiveDecayTimeLabelEl.textContent = 'D = ' + Math.round(pixelsToTimeSec(drawPS.x - pts.p1.x, linearTimeOn) * 1000) + 'ms';
+        newEffectiveDecayTimeLabelEl.style.display='';
+      }
     } else {
       newEffectiveDecayDropEl.style.display='none';
+      if(newEffectiveDecayTimeLabelEl) newEffectiveDecayTimeLabelEl.style.display='none';
     }
   }
   // Effective attack drop line(s): descend from the attack peak (or ceiling crossings when clipped) to the time axis
@@ -120,6 +130,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   }
   // Stated release drop line: ascends from the textbook release floor point to the graph top
   const newStatedReleaseDropEl=$('newStatedReleaseDrop');
+  const newStatedReleaseTimeLabelEl=$('newStatedReleaseTime');
   if(newStatedReleaseDropEl){
     const showStatedRelease = pts.e.releaseOn && showNewStated && ($('showTextbookUnderlay').checked || $('textbookAdsr').checked);
     if(showStatedRelease){
@@ -128,8 +139,17 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       newStatedReleaseDropEl.setAttribute('x1',stRelX); newStatedReleaseDropEl.setAttribute('y1',stRelY);
       newStatedReleaseDropEl.setAttribute('x2',stRelX); newStatedReleaseDropEl.setAttribute('y2',graph.y0-graph.h); newStatedReleaseDropEl.setAttribute('stroke',newStatedCol);
       newStatedReleaseDropEl.style.display='';
+      if(newStatedReleaseTimeLabelEl){
+        newStatedReleaseTimeLabelEl.setAttribute('x', stRelX);
+        newStatedReleaseTimeLabelEl.setAttribute('y', graph.y0-graph.h-10);
+        newStatedReleaseTimeLabelEl.setAttribute('text-anchor', 'middle');
+        newStatedReleaseTimeLabelEl.setAttribute('fill', newStatedCol);
+        newStatedReleaseTimeLabelEl.textContent = 'R = ' + Math.round(msFromPosition(state.r)) + 'ms';
+        newStatedReleaseTimeLabelEl.style.display='';
+      }
     } else {
       newStatedReleaseDropEl.style.display='none';
+      if(newStatedReleaseTimeLabelEl) newStatedReleaseTimeLabelEl.style.display='none';
     }
   }
 }
