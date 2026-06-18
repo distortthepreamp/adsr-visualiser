@@ -73,7 +73,8 @@ function buildConfigSnapshot(){
     activePresetIndex: window.getActivePresetIndex ? window.getActivePresetIndex() : -1,
     presetDirtyState: window.presetDirtyState || 'none',
     kioskOpen: kioskOpen,
-    showCues: $('showCues') ? $('showCues').checked : false
+    showCues: $('showCues') ? $('showCues').checked : false,
+    timeLabelGutter: Number($('timeLabelGutter') ? $('timeLabelGutter').value : 0)
   };
 }
 
@@ -157,6 +158,7 @@ function loadConfigObject(cfg){
   if($('blobGlowRadius') && cfg.blobGlowRadius !== undefined){ $('blobGlowRadius').value = cfg.blobGlowRadius; }
   if($('kioskKnobGlowRadius') && cfg.kioskKnobGlowRadius !== undefined){ $('kioskKnobGlowRadius').value = cfg.kioskKnobGlowRadius; }
   if($('kioskInactiveOpacity') && cfg.kioskInactiveOpacity !== undefined){ $('kioskInactiveOpacity').value = cfg.kioskInactiveOpacity; }
+  if($('timeLabelGutter') && cfg.timeLabelGutter !== undefined){ $('timeLabelGutter').value = cfg.timeLabelGutter; }
 
   // Preset highlight
   if(window.restorePresetHighlight){

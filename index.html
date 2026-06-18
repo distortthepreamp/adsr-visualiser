@@ -53,6 +53,7 @@
       <line id="newEffectiveAttackDrop" stroke="white" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
       <line id="newEffectiveAttackDropEnd" stroke="white" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
       <line id="newEffectiveReleaseDrop" stroke="white" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
+      <text id="newEffectiveReleaseTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <line id="newStatedReleaseDrop" stroke="cyan" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
       <text id="newStatedReleaseTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <line id="gateTimeLine" stroke="#ff8800" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
@@ -293,7 +294,7 @@
           <div class="row"><label>Meter L <input id="meterFillColor" type="color" value="#00ff00"></label><label>Meter F <input id="meterFillColorFilter" type="color" value="#00ffff"></label><label>Stated <input id="timeAxisStatedColor" type="color" value="#aaaaaa"></label><label>Contour <input id="contourLineColor" type="color" value="#ffff00"></label></div>
           <div class="row"><label>L.Attack <input id="loudnessAttackColor" type="color" value="#ff0000"></label><label>L.Decay <input id="loudnessDecayColor" type="color" value="#ff0000"></label><label>L.Release <input id="loudnessReleaseColor" type="color" value="#ff0000"></label></div>
           <div class="row"><label>F.Attack <input id="filterAttackColor" type="color" value="#00ffff"></label><label>F.Decay <input id="filterDecayColor" type="color" value="#ffff00"></label><label>F.Release <input id="filterReleaseColor" type="color" value="#ffff00"></label></div>
-          <div class="row"><label>Underlay <input type="color" id="underlayColor" value="#ffffff"></label></div>
+          <div class="row"><label>Underlay <input type="color" id="underlayColor" value="#ffffff"></label><label>Label Gutter <input id="timeLabelGutter" type="number" min="0" step="1" value="0"></label></div>
         </div>
       </div>
       <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label></div>

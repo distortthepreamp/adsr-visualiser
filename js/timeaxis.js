@@ -1,7 +1,13 @@
 // ---- Time axis drop lines ----
 // Called from render() with pre-computed geometry values.
+const TIME_LABEL_STATED_Y_OFFSET    = -10; // px above the graph top (stated labels)
+const TIME_LABEL_EFFECTIVE_Y_OFFSET =  18; // px below the time axis (effective labels)
+
 function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, linearTimeOn, drawPS, statedSustainX) {
   // Drop lines (individual elements, gated by the new drop-line checkboxes)
+  const timeLabelGutter = Math.max(0, Number(($('timeLabelGutter') && $('timeLabelGutter').value) || 0));
+  const statedLabelY    = graph.y0 - graph.h + TIME_LABEL_STATED_Y_OFFSET - timeLabelGutter;
+  const effectiveLabelY = graph.y0 + TIME_LABEL_EFFECTIVE_Y_OFFSET + timeLabelGutter;
   const newStatedCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
   const newEffAttackCol = (freqMode ? ($('filterAttackColor') && $('filterAttackColor').value) : ($('loudnessAttackColor') && $('loudnessAttackColor').value)) || '#ffffff';
   const newEffDecayCol = (freqMode ? ($('filterDecayColor') && $('filterDecayColor').value) : ($('loudnessDecayColor') && $('loudnessDecayColor').value)) || '#ffffff';
@@ -19,7 +25,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       newStatedDecayDropEl.style.display='';
       if(newStatedDecayTimeLabelEl){
         newStatedDecayTimeLabelEl.setAttribute('x', pts.pEnd.x);
-        newStatedDecayTimeLabelEl.setAttribute('y', graph.y0-graph.h-10);
+        newStatedDecayTimeLabelEl.setAttribute('y', statedLabelY);
         newStatedDecayTimeLabelEl.setAttribute('text-anchor', 'middle');
         newStatedDecayTimeLabelEl.setAttribute('fill', newStatedCol);
         newStatedDecayTimeLabelEl.textContent = 'D = ' + Math.round(msFromPosition(state.d)) + 'ms';
@@ -42,7 +48,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       newStatedAttackDropEl.style.display='';
       if(newStatedAttackTimeLabelEl){
         newStatedAttackTimeLabelEl.setAttribute('x', pts.p1.x);
-        newStatedAttackTimeLabelEl.setAttribute('y', graph.y0-graph.h-10);
+        newStatedAttackTimeLabelEl.setAttribute('y', statedLabelY);
         newStatedAttackTimeLabelEl.setAttribute('text-anchor', 'middle');
         newStatedAttackTimeLabelEl.setAttribute('fill', newStatedCol);
         newStatedAttackTimeLabelEl.textContent = 'A = ' + Math.round(msFromPosition(state.a)) + 'ms';
@@ -64,7 +70,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       newEffectiveDecayDropEl.style.display='';
       if(newEffectiveDecayTimeLabelEl){
         newEffectiveDecayTimeLabelEl.setAttribute('x', drawPS.x);
-        newEffectiveDecayTimeLabelEl.setAttribute('y', graph.y0+18);
+        newEffectiveDecayTimeLabelEl.setAttribute('y', effectiveLabelY);
         newEffectiveDecayTimeLabelEl.setAttribute('text-anchor', 'middle');
         newEffectiveDecayTimeLabelEl.setAttribute('fill', newEffDecayCol);
         newEffectiveDecayTimeLabelEl.textContent = 'D = ' + Math.round(pixelsToTimeSec(drawPS.x - pts.p1.x, linearTimeOn) * 1000) + 'ms';
@@ -114,6 +120,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   }
   // Effective release drop line: descends from the green release curve's floor point to the time axis
   const newEffReleaseDropEl=$('newEffectiveReleaseDrop');
+  const newEffectiveReleaseTimeLabelEl=$('newEffectiveReleaseTime');
   if(newEffReleaseDropEl){
     const showEffRelease = pts.e.releaseOn && ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && !textbookAdsr;
     if(showEffRelease){
@@ -124,8 +131,19 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       newEffReleaseDropEl.setAttribute('x1',fx); newEffReleaseDropEl.setAttribute('y1',fy);
       newEffReleaseDropEl.setAttribute('x2',fx); newEffReleaseDropEl.setAttribute('y2',graph.y0); newEffReleaseDropEl.setAttribute('stroke',newEffReleaseCol);
       newEffReleaseDropEl.style.display='';
+      if(newEffectiveReleaseTimeLabelEl){
+        const releaseStartX = pts.pEnd.x + graph.w * state.tbSustainGap;
+        const effRelPx = fx - releaseStartX;
+        newEffectiveReleaseTimeLabelEl.setAttribute('x', fx);
+        newEffectiveReleaseTimeLabelEl.setAttribute('y', effectiveLabelY);
+        newEffectiveReleaseTimeLabelEl.setAttribute('text-anchor', 'middle');
+        newEffectiveReleaseTimeLabelEl.setAttribute('fill', newEffReleaseCol);
+        newEffectiveReleaseTimeLabelEl.textContent = 'R = ' + Math.round(pixelsToTimeSec(effRelPx, linearTimeOn) * 1000) + 'ms';
+        newEffectiveReleaseTimeLabelEl.style.display='';
+      }
     } else {
       newEffReleaseDropEl.style.display='none';
+      if(newEffectiveReleaseTimeLabelEl) newEffectiveReleaseTimeLabelEl.style.display='none';
     }
   }
   // Stated release drop line: ascends from the textbook release floor point to the graph top
@@ -141,7 +159,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       newStatedReleaseDropEl.style.display='';
       if(newStatedReleaseTimeLabelEl){
         newStatedReleaseTimeLabelEl.setAttribute('x', stRelX);
-        newStatedReleaseTimeLabelEl.setAttribute('y', graph.y0-graph.h-10);
+        newStatedReleaseTimeLabelEl.setAttribute('y', statedLabelY);
         newStatedReleaseTimeLabelEl.setAttribute('text-anchor', 'middle');
         newStatedReleaseTimeLabelEl.setAttribute('fill', newStatedCol);
         newStatedReleaseTimeLabelEl.textContent = 'R = ' + Math.round(msFromPosition(state.r)) + 'ms';

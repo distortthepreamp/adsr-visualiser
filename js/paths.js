@@ -319,8 +319,9 @@ function render(){
         gateTimeLineEl.style.display = '';
       }
       if(gateTimeLabelEl){
+        const timeLabelGutter = Math.max(0, Number(($('timeLabelGutter') && $('timeLabelGutter').value) || 0));
         gateTimeLabelEl.setAttribute('x', gateCloseX);
-        gateTimeLabelEl.setAttribute('y', gateTopY - 10);
+        gateTimeLabelEl.setAttribute('y', gateTopY + TIME_LABEL_STATED_Y_OFFSET - timeLabelGutter);
         gateTimeLabelEl.setAttribute('text-anchor', 'middle');
         gateTimeLabelEl.textContent = 'Gate = ' + gateTapMs + 'ms';
         gateTimeLabelEl.style.display = '';
