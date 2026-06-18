@@ -53,6 +53,8 @@ function render(){
   const ceilY = yFor(1);
   const overrange = e.scale > 0.0001 && e.floor + e.scale > 1.0001;
   const textbookAdsr = $('textbookAdsr') && $('textbookAdsr').checked;
+  const showModelDOverlay = $('showModelD') ? $('showModelD').checked : true;
+  const overlayOff = !showModelDOverlay;
   const showClipped = !textbookAdsr && overrange && $('showClipped') && $('showClipped').checked;
 
   const drawP1 = showClipped
@@ -115,7 +117,7 @@ function render(){
   }
 
   const show = showClipped ? '' : 'none';
-  ['attackOuter','attackInner'].forEach(id => $(id).setAttribute('d', aPath));
+  ['attackOuter','attackInner'].forEach(id => { $(id).setAttribute('d', aPath); $(id).style.display = overlayOff ? 'none' : ''; });
   ['ceilLeftOuter','ceilRightOuter'].forEach((id,i) => {
     const el=$(id); if(!el) return;
     el.setAttribute('d', i===0 ? ceilLeftPath : ceilRightPath);
@@ -126,7 +128,7 @@ function render(){
     el.setAttribute('d', i===0 ? ceilLeftPath : ceilRightPath);
     el.style.display = show;
   });
-  ['decayOuter','decayInner'].forEach(id => $(id).setAttribute('d', dPath));
+  ['decayOuter','decayInner'].forEach(id => { $(id).setAttribute('d', dPath); $(id).style.display = overlayOff ? 'none' : ''; });
 
   const drawReleasePath = pts.e.releaseOn;
   let rEnd;
@@ -245,6 +247,7 @@ function render(){
       const el = $(id); if(!el) return;
       el.setAttribute('d', rPath);
       el.style.stroke = relColor; // loudness/filter release colour from the Advanced pickers
+      el.style.display = overlayOff ? 'none' : '';
       if(greenAnalogueRelease) el.setAttribute('clip-path', 'url(#sustainReleaseClip)');
       else el.removeAttribute('clip-path');
     });
@@ -253,7 +256,7 @@ function render(){
     const showPeakDischarge = $('showPeakDischarge') && $('showPeakDischarge').checked;
     const fullReferenceReleaseEl = $('fullReferenceRelease');
     if(fullReferenceReleaseEl){
-      if(showPeakDischarge && curveAmt && drawReleasePath){
+      if(showPeakDischarge && curveAmt && drawReleasePath && !overlayOff){
         fullReferenceReleaseEl.setAttribute('d', rcPolyline(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, false, 50, 3));
         fullReferenceReleaseEl.removeAttribute('clip-path');
         fullReferenceReleaseEl.style.stroke = '#00ffff';
@@ -332,7 +335,7 @@ function render(){
     }
     {
       const susSegPath = drawReleasePath ? `M ${drawPS.x} ${drawPS.y} L ${releaseStartX} ${drawPS.y}` : '';
-      ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d', susSegPath); el.style.display = drawReleasePath ? '' : 'none'; } });
+      ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d', susSegPath); el.style.display = (drawReleasePath && !overlayOff) ? '' : 'none'; } });
     }
     const tbSusMarkerMD=$('tbSustainMarker'); if(tbSusMarkerMD) tbSusMarkerMD.style.display='none';
     const tbMDLineMD=$('tbModelDSustainLine'); if(tbMDLineMD) tbMDLineMD.style.display='none';
@@ -364,10 +367,10 @@ function render(){
   $('sustainMarker').setAttribute('x2', markerEndX);
   $('sustainMarker').setAttribute('y2', drawPS.y);
   $('sustainMarker').style.stroke = ($('frequencyMode') && $('frequencyMode').checked) ? (($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00') : (($('loudnessDecayColor') && $('loudnessDecayColor').value) || '#ff0000');
-  $('sustainMarker').style.display = textbookAdsr ? 'none' : '';
+  $('sustainMarker').style.display = (textbookAdsr || overlayOff) ? 'none' : '';
   $('sustainPoint').setAttribute('cx', drawPS.x);
   $('sustainPoint').setAttribute('cy', drawPS.y);
-  $('sustainPoint').style.display = textbookAdsr ? 'none' : '';
+  $('sustainPoint').style.display = (textbookAdsr || overlayOff) ? 'none' : '';
 
   const kcOn = $('keyboardControl') && $('keyboardControl').checked;
   let statedSustainX = drawPS.x; // uncapped sustain x; equals drawPS.x when kc OFF
@@ -406,7 +409,7 @@ function render(){
   }
 
   { const el=$('sLabel'), bg=$('sLabelBg');
-    el.setAttribute('x', METER_X - 30); el.setAttribute('y', drawPS.y); el.setAttribute('dominant-baseline', 'middle'); el.removeAttribute('stroke'); el.removeAttribute('stroke-width'); el.removeAttribute('paint-order'); el.style.fill = '#000000'; el.style.display = textbookAdsr ? 'none' : ''; el.textContent = ($('keyboardControl') && $('keyboardControl').checked) ? 'MODEL D SUSTAIN' : 'SUSTAIN';
+    el.setAttribute('x', METER_X - 30); el.setAttribute('y', drawPS.y); el.setAttribute('dominant-baseline', 'middle'); el.removeAttribute('stroke'); el.removeAttribute('stroke-width'); el.removeAttribute('paint-order'); el.style.fill = '#000000'; el.style.display = (textbookAdsr || overlayOff) ? 'none' : ''; el.textContent = ($('keyboardControl') && $('keyboardControl').checked) ? 'MODEL D SUSTAIN' : 'SUSTAIN';
     if(bg){ const bbox=el.getBBox(); bg.setAttribute('x',bbox.x-4); bg.setAttribute('y',bbox.y-2); bg.setAttribute('width',bbox.width+8); bg.setAttribute('height',bbox.height+4); const decayCol = ($('frequencyMode') && $('frequencyMode').checked) ? (($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00') : (($('loudnessDecayColor') && $('loudnessDecayColor').value) || '#ff0000'); bg.setAttribute('fill', decayCol); bg.style.display=el.style.display; }
   }
 
@@ -495,7 +498,7 @@ function render(){
   if(svgTimecodesEl){ svgTimecodesEl.setAttribute('x',METER_X-10); svgTimecodesEl.setAttribute('y',GRAPH_TOP_BASE-90); svgTimecodesEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
   const toolTitleEl=$('toolTitle');
   if(toolTitleEl){ toolTitleEl.setAttribute('x',VB_WIDTH/2); toolTitleEl.setAttribute('y',GRAPH_TOP_BASE-173); toolTitleEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
-  updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, linearTimeOn, drawPS, statedSustainX);
+  updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, linearTimeOn, drawPS, statedSustainX, showModelDOverlay);
 
   const segY = GRAPH_TOP_BASE - 45;
   const segStart = 10;

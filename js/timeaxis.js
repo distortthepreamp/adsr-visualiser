@@ -3,8 +3,10 @@
 const TIME_LABEL_STATED_Y_OFFSET    = -10; // px above the graph top (stated labels)
 const TIME_LABEL_EFFECTIVE_Y_OFFSET =  18; // px below the time axis (effective labels)
 
-function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, linearTimeOn, drawPS, statedSustainX) {
+function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, linearTimeOn, drawPS, statedSustainX, showModelDOverlay) {
   // Drop lines (individual elements, gated by the new drop-line checkboxes)
+  // effectiveOn: false when textbook mode is active OR when the Model D overlay is hidden.
+  const effectiveOn = !textbookAdsr && (showModelDOverlay !== false);
   const timeLabelGutter = Math.max(0, Number(($('timeLabelGutter') && $('timeLabelGutter').value) || 0));
   const statedLabelY    = graph.y0 - graph.h + TIME_LABEL_STATED_Y_OFFSET - timeLabelGutter;
   const effectiveLabelY = graph.y0 + TIME_LABEL_EFFECTIVE_Y_OFFSET + timeLabelGutter;
@@ -63,7 +65,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   const newEffectiveDecayDropEl=$('newEffectiveDecayDrop');
   const newEffectiveDecayTimeLabelEl=$('newEffectiveDecayTime');
   if(newEffectiveDecayDropEl){
-    const showEffectiveDecayDrop = ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && !textbookAdsr;
+    const showEffectiveDecayDrop = ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && effectiveOn;
     if(showEffectiveDecayDrop){
       newEffectiveDecayDropEl.setAttribute('x1',drawPS.x); newEffectiveDecayDropEl.setAttribute('y1',drawPS.y);
       newEffectiveDecayDropEl.setAttribute('x2',drawPS.x); newEffectiveDecayDropEl.setAttribute('y2',graph.y0); newEffectiveDecayDropEl.setAttribute('stroke',newEffDecayCol);
@@ -84,7 +86,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   // Effective attack drop line(s): descend from the attack peak (or ceiling crossings when clipped) to the time axis
   const newEffAttackDropEl=$('newEffectiveAttackDrop');
   const newEffAttackDropEndEl=$('newEffectiveAttackDropEnd');
-  const showNewEffAttack = ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && !textbookAdsr && freqMode && overrange && showClipped;
+  const showNewEffAttack = ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && effectiveOn && freqMode && overrange && showClipped;
   if(showNewEffAttack){
     const ceilY = yFor(1);
     if(showClipped && overrange){
@@ -122,7 +124,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   const newEffReleaseDropEl=$('newEffectiveReleaseDrop');
   const newEffectiveReleaseTimeLabelEl=$('newEffectiveReleaseTime');
   if(newEffReleaseDropEl){
-    const showEffRelease = pts.e.releaseOn && ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && !textbookAdsr;
+    const showEffRelease = pts.e.releaseOn && ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && effectiveOn;
     if(showEffRelease){
       // green curve floor = last point of the drawn releaseOuter path (= rEnd.x + greenOffset, rEnd.y)
       const relEl=document.getElementById('releaseOuter');
