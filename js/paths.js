@@ -329,7 +329,10 @@ function render(){
       if(gateTimeLineEl) gateTimeLineEl.style.display = 'none';
       if(gateTimeLabelEl) gateTimeLabelEl.style.display = 'none';
     }
-    ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d',''); el.style.display='none'; } });
+    {
+      const susSegPath = drawReleasePath ? `M ${drawPS.x} ${drawPS.y} L ${releaseStartX} ${drawPS.y}` : '';
+      ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d', susSegPath); el.style.display = drawReleasePath ? '' : 'none'; } });
+    }
     const tbSusMarkerMD=$('tbSustainMarker'); if(tbSusMarkerMD) tbSusMarkerMD.style.display='none';
     const tbMDLineMD=$('tbModelDSustainLine'); if(tbMDLineMD) tbMDLineMD.style.display='none';
     const tbSusLblMD=$('tbSustainLabel'); if(tbSusLblMD) tbSusLblMD.style.display='none';
