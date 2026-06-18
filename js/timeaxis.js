@@ -9,6 +9,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   const showNewStated=!!($('showNewStatedLines')&&$('showNewStatedLines').checked);
   // Stated decay drop line: vertical from the decay/sustain junction (pts.pEnd.x, drawPS.y) to the time axis
   const newStatedDecayDropEl=$('newStatedDecayDrop');
+  const newStatedDecayTimeLabelEl=$('newStatedDecayTime');
   if(newStatedDecayDropEl){
     const showStatedDecayDrop = showNewStated && ($('showTextbookUnderlay').checked || $('textbookAdsr').checked);
     if(showStatedDecayDrop){
@@ -16,12 +17,22 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       newStatedDecayDropEl.setAttribute('x1',pts.pEnd.x); newStatedDecayDropEl.setAttribute('y1',graph.y0-graph.h);
       newStatedDecayDropEl.setAttribute('x2',pts.pEnd.x); newStatedDecayDropEl.setAttribute('y2',ulPSY); newStatedDecayDropEl.setAttribute('stroke',newStatedCol);
       newStatedDecayDropEl.style.display='';
+      if(newStatedDecayTimeLabelEl){
+        newStatedDecayTimeLabelEl.setAttribute('x', pts.pEnd.x);
+        newStatedDecayTimeLabelEl.setAttribute('y', graph.y0-graph.h-10);
+        newStatedDecayTimeLabelEl.setAttribute('text-anchor', 'middle');
+        newStatedDecayTimeLabelEl.setAttribute('fill', newStatedCol);
+        newStatedDecayTimeLabelEl.textContent = 'D = ' + Math.round(msFromPosition(state.d)) + 'ms';
+        newStatedDecayTimeLabelEl.style.display='';
+      }
     } else {
       newStatedDecayDropEl.style.display='none';
+      if(newStatedDecayTimeLabelEl) newStatedDecayTimeLabelEl.style.display='none';
     }
   }
   // Stated attack drop line: vertical from the (textbook/underlay) attack peak to the time axis
   const newStatedAttackDropEl=$('newStatedAttackDrop');
+  const newStatedAttackTimeLabelEl=$('newStatedAttackTime');
   if(newStatedAttackDropEl){
     const showStatedAttackDrop = showNewStated && ($('showTextbookUnderlay').checked || $('textbookAdsr').checked);
     if(showStatedAttackDrop){
@@ -29,8 +40,17 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       newStatedAttackDropEl.setAttribute('x1',pts.p1.x); newStatedAttackDropEl.setAttribute('y1',graph.y0-graph.h);
       newStatedAttackDropEl.setAttribute('x2',pts.p1.x); newStatedAttackDropEl.setAttribute('y2',tbPeakY); newStatedAttackDropEl.setAttribute('stroke',newStatedCol);
       newStatedAttackDropEl.style.display='';
+      if(newStatedAttackTimeLabelEl){
+        newStatedAttackTimeLabelEl.setAttribute('x', pts.p1.x);
+        newStatedAttackTimeLabelEl.setAttribute('y', graph.y0-graph.h-10);
+        newStatedAttackTimeLabelEl.setAttribute('text-anchor', 'middle');
+        newStatedAttackTimeLabelEl.setAttribute('fill', newStatedCol);
+        newStatedAttackTimeLabelEl.textContent = 'A = ' + Math.round(msFromPosition(state.a)) + 'ms';
+        newStatedAttackTimeLabelEl.style.display='';
+      }
     } else {
       newStatedAttackDropEl.style.display='none';
+      if(newStatedAttackTimeLabelEl) newStatedAttackTimeLabelEl.style.display='none';
     }
   }
   // Effective decay drop line: vertical from the Model D decay/sustain intercept (drawPS) to the time axis
