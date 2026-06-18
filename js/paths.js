@@ -487,15 +487,17 @@ function render(){
   const meterCX = meterX + meterW/2;
   const titleEl=$('meterLabelTitle');
   if(titleEl){ titleEl.textContent=freqMode?'FREQ':'VOL'; titleEl.setAttribute('x',meterCX); titleEl.setAttribute('y',meterAbsTop-18); titleEl.style.display=''; }
+  // These text anchors are intentionally fixed to GRAPH_TOP_BASE (the top of the staging area).
+  // They do NOT follow GRAPH_TOP_EXTRA — only the graph and its time labels move with the gutter.
   const modeLabelEl=$('modeLabel');
-  if(modeLabelEl){ modeLabelEl.textContent=freqMode?'FILTER CONTOUR':'LOUDNESS CONTOUR'; modeLabelEl.setAttribute('x',10); modeLabelEl.setAttribute('y',yFor(1)-90); modeLabelEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
+  if(modeLabelEl){ modeLabelEl.textContent=freqMode?'FILTER CONTOUR':'LOUDNESS CONTOUR'; modeLabelEl.setAttribute('x',10); modeLabelEl.setAttribute('y',GRAPH_TOP_BASE-90); modeLabelEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
   const svgTimecodesEl=$('svgTimecodes');
-  if(svgTimecodesEl){ svgTimecodesEl.setAttribute('x',METER_X-10); svgTimecodesEl.setAttribute('y',yFor(1)-90); svgTimecodesEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
+  if(svgTimecodesEl){ svgTimecodesEl.setAttribute('x',METER_X-10); svgTimecodesEl.setAttribute('y',GRAPH_TOP_BASE-90); svgTimecodesEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
   const toolTitleEl=$('toolTitle');
-  if(toolTitleEl){ toolTitleEl.setAttribute('x',VB_WIDTH/2); toolTitleEl.setAttribute('y',yFor(1)-173); toolTitleEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
+  if(toolTitleEl){ toolTitleEl.setAttribute('x',VB_WIDTH/2); toolTitleEl.setAttribute('y',GRAPH_TOP_BASE-173); toolTitleEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
   updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, linearTimeOn, drawPS, statedSustainX);
 
-  const segY = yFor(1) - 45;
+  const segY = GRAPH_TOP_BASE - 45;
   const segStart = 10;
   const segEnd = METER_X;
   const segSpacing = (segEnd - segStart) / 5;

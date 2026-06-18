@@ -283,7 +283,7 @@
       </div>
       <div class="row"><label><input id="keepTapMarker" type="checkbox" checked> Leave Tap Marker</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
-      <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Body <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label><label>H1 <input id="h1Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></label><label>H2 <input id="h2Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></label><label>Console <input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></label><label>Meter <input id="meterWidth" type="number" min="10" max="80" step="1" value="40"></label><label>Meter Stroke <input id="meterStrokeWidth" type="number" min="1" max="20" step="1" value="7"></label><label>TB Sustain Max <input id="tbSustainGapMax" type="number" min="15" max="30" step="1" value="15">%</label><label>VB W <input id="vbWidth" type="number" min="800" max="2400" step="10" value="1200"></label><label>VB H <input id="vbHeight" type="number" min="400" max="1200" step="10" value="625"></label><label>Inset <input id="graphLeft" type="number" min="0" max="400" step="10" value="10"></label></div>
+      <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Body <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label><label>H1 <input id="h1Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></label><label>H2 <input id="h2Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></label><label>Console <input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></label><label>Meter <input id="meterWidth" type="number" min="10" max="80" step="1" value="40"></label><label>Meter Stroke <input id="meterStrokeWidth" type="number" min="1" max="20" step="1" value="7"></label><label>TB Sustain Max <input id="tbSustainGapMax" type="number" min="15" max="30" step="1" value="15">%</label><label>VB W <input id="vbWidth" type="number" min="800" max="2400" step="10" value="1200"></label><label>VB H <input id="vbHeight" type="number" min="400" max="1200" step="10" value="625"></label><label>Graph Margin L <input id="graphLeft" type="number" min="0" max="400" step="10" value="10"></label><label>Graph Margin T <input id="graphTop" type="number" min="0" max="400" step="10" value="0"></label></div>
       <div class="row" style="position:relative;">
         <label><input id="showOuterLine" type="checkbox" checked> Show Outer Line</label>
         <button id="advancedToggle" style="padding:4px 7px;min-height:unset;line-height:1.1;border-radius:6px;">Advanced</button>
@@ -468,15 +468,16 @@ let METER_X = graph.x0 + graph.w + METER_GAP;  // 1145
 
 // Right padding  = VB_WIDTH  - graph.x0 - graph.w - METER_GAP - METER_W = 1200-220-905-20-40 = 15
 // Bottom padding = VB_HEIGHT - graph.y0                                  = 595-445           = 150
-// Graph top      = graph.y0  - graph.h                                   = 445-415           = 30 (fixed)
+// Graph top      = graph.y0  - graph.h                                   = 445-415           = 30 + GRAPH_TOP_EXTRA
 const GRAPH_RIGHT_PAD  = 15;
 const GRAPH_BOTTOM_PAD = 180;  // clearance = VB_Y_ORIGIN + GRAPH_BOTTOM_PAD = -110+180 = 70px below graph floor
-const GRAPH_TOP        = 30;
+const GRAPH_TOP_BASE   = 30;
+let   GRAPH_TOP_EXTRA  = 0;
 function recalcGeometry(){
   graph.x0 = GRAPH_LEFT;
   graph.w  = VB_WIDTH  - graph.x0 - METER_GAP - METER_W - GRAPH_RIGHT_PAD;
   graph.y0 = VB_HEIGHT - GRAPH_BOTTOM_PAD;
-  graph.h  = graph.y0  - GRAPH_TOP;
+  graph.h  = graph.y0  - GRAPH_TOP_BASE - GRAPH_TOP_EXTRA;
   METER_X  = graph.x0  + graph.w + METER_GAP;
   const svgEl = document.getElementById('svg');
   if(svgEl) svgEl.style.aspectRatio = `${VB_WIDTH} / ${VB_HEIGHT + Math.abs(VB_Y_ORIGIN)}`;

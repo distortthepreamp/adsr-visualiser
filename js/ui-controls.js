@@ -390,6 +390,7 @@ function initUIControls(){
   $('vbWidth').addEventListener('change', e => { const inp=e.target,c=Math.round(Math.min(VB_WIDTH_MAX,Math.max(VB_WIDTH_MIN,isNaN(parseInt(inp.value))?1200:parseInt(inp.value)))/10)*10; inp.value=c; VB_WIDTH=c; recalcGeometry(); render(); });
   $('vbHeight').addEventListener('change', e => { const inp=e.target,c=Math.round(Math.min(VB_HEIGHT_MAX,Math.max(VB_HEIGHT_MIN,isNaN(parseInt(inp.value))?595:parseInt(inp.value)))/10)*10; inp.value=c; VB_HEIGHT=c; recalcGeometry(); render(); });
   $('graphLeft').addEventListener('change', e => { const inp=e.target,c=Math.round(Math.min(400,Math.max(0,isNaN(parseInt(inp.value))?10:parseInt(inp.value)))/10)*10; inp.value=c; GRAPH_LEFT=c; recalcGeometry(); render(); });
+  $('graphTop').addEventListener('change', e => { const inp=e.target,c=Math.round(Math.min(400,Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value)))/10)*10; inp.value=c; GRAPH_TOP_EXTRA=c; recalcGeometry(); render(); });
 
   // Transition buttons
   $('transInstantBtn').addEventListener('click',()=>{ setTransMode(0.001,'transInstantBtn'); transition(0.001); });

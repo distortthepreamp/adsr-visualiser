@@ -70,6 +70,7 @@ function buildConfigSnapshot(){
     vbWidth: Number($('vbWidth').value),
     vbHeight: Number($('vbHeight').value),
     graphLeft: Number($('graphLeft') ? $('graphLeft').value : 10),
+    graphTop: Number($('graphTop') ? $('graphTop').value : 0),
     activePresetIndex: window.getActivePresetIndex ? window.getActivePresetIndex() : -1,
     presetDirtyState: window.presetDirtyState || 'none',
     kioskOpen: kioskOpen,
@@ -153,6 +154,8 @@ function loadConfigObject(cfg){
   VB_HEIGHT  = Number(document.getElementById('vbHeight').value);
   if($('graphLeft') && cfg.graphLeft !== undefined){ $('graphLeft').value = Math.round(Math.min(400,Math.max(0,Number(cfg.graphLeft)||10))/10)*10; }
   GRAPH_LEFT = Number(document.getElementById('graphLeft').value);
+  if($('graphTop') && cfg.graphTop !== undefined){ $('graphTop').value = Math.round(Math.min(400,Math.max(0,Number(cfg.graphTop)||0))/10)*10; }
+  GRAPH_TOP_EXTRA = Number(document.getElementById('graphTop') ? document.getElementById('graphTop').value : 0);
   recalcGeometry();
   if($('meterGlowRadius') && cfg.meterGlowRadius !== undefined){ $('meterGlowRadius').value = cfg.meterGlowRadius; }
   if($('blobGlowRadius') && cfg.blobGlowRadius !== undefined){ $('blobGlowRadius').value = cfg.blobGlowRadius; }
