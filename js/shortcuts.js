@@ -34,6 +34,7 @@ const tag = document.activeElement ? document.activeElement.tagName : '';
       if(e.key === 'Escape') hideHelp();
       return;
     }
+    if(isExpertOpen()){ if(e.key === 'Escape') closeExpert(); return; }
     if(isAdvancedOpen()){ if(e.key === 'Escape') closeAdvanced(); return; }
     if(e.key === 'Escape') return;
     if(e.key === '?'){ showHelp(); return; }

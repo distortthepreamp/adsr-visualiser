@@ -500,21 +500,11 @@ function render(){
   let _statedY = null; // elevated for geometry logging
   const statedSustainLineEl = $('statedSustainLine');
   if(statedSustainLineEl){
-    if(kcOn && !textbookAdsr){
+    if(kcOn && !textbookAdsr && !clipAtGateOn){
       const floorY = yFor(pts.e.floor);
       const statedY = floorY - (floorY - drawPS.y) * KC_SUSTAIN_SCALE;
       _statedY = statedY;
-      const decayPathEl = document.getElementById('decayInner');
-      statedSustainX = pts.p1.x + (drawPS.x - pts.p1.x) * KC_SUSTAIN_SCALE; // geometric fallback
-      if(decayPathEl){
-        let lo = pts.p1.x, hi = drawPS.x;
-        for(let i = 0; i < 32; i++){
-          const mid = (lo + hi) / 2;
-          const y = getYFromPath(decayPathEl, mid);
-          if(y === null || y < statedY) lo = mid; else hi = mid;
-        }
-        statedSustainX = (lo + hi) / 2;
-      }
+      statedSustainX = pts.pEnd.x + graph.w * state.tbSustainGap;
       const underlayCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
       statedSustainLineEl.setAttribute('x1', statedSustainX);
       statedSustainLineEl.setAttribute('y1', statedY);

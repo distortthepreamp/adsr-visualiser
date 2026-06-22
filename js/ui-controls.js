@@ -183,6 +183,11 @@ function openAdvanced(){ $('advancedPopup').style.display=''; $('advancedToggle'
 function closeAdvanced(){ $('advancedPopup').style.display='none'; $('advancedToggle').style.background=''; $('advancedToggle').style.color=''; }
 function isAdvancedOpen(){ return $('advancedPopup').style.display !== 'none'; }
 
+// ---- Expert popup helpers ----
+function openExpert(){ $('expertPopup').style.display=''; $('expertToggle').style.background=BTN_ACTIVE_BG; $('expertToggle').style.color=BTN_ACTIVE_FG; }
+function closeExpert(){ $('expertPopup').style.display='none'; $('expertToggle').style.background=''; $('expertToggle').style.color=''; }
+function isExpertOpen(){ return $('expertPopup').style.display !== 'none'; }
+
 // ---- Sync helpers (also called from loadConfigObject) ----
 function syncHpModeEnabled(){
   const freqOn = $('frequencyMode') && $('frequencyMode').checked;
@@ -442,10 +447,13 @@ function initUIControls(){
     });
   });
 
+  // Expert popup
+  $('expertToggle').addEventListener('click', e => { e.stopPropagation(); isExpertOpen() ? closeExpert() : openExpert(); });
+  $('expertPopup').addEventListener('click', e => e.stopPropagation());
   // Advanced popup
   $('advancedToggle').addEventListener('click', e => { e.stopPropagation(); isAdvancedOpen() ? closeAdvanced() : openAdvanced(); });
   $('advancedPopup').addEventListener('click', e => e.stopPropagation());
-  document.addEventListener('click', () => { if(isAdvancedOpen()) closeAdvanced(); });
+  document.addEventListener('click', () => { if(isAdvancedOpen()) closeAdvanced(); if(isExpertOpen()) closeExpert(); });
 
   // Note mode buttons
   Object.entries(noteFreqs).forEach(([btnId, freq]) => {

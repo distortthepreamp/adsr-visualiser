@@ -231,15 +231,21 @@
           <div class="row"><label><input id="showContour" type="checkbox" checked> Show Contour Top And Bottom (.)</label></div>
           <div class="row"><label><input id="frequencyMode" type="checkbox"> Filter Mode (F)</label></div>
           <div class="row"><label><input id="hpMode" type="checkbox"> LP/HP Mode (M)</label></div>
-          <div class="row"><label><input id="keyboardControl" type="checkbox"> Mimic Model D Sustain (80%) (S)</label></div>
-          <div id="showClippedRow" class="row"><label><input id="showClipped" type="checkbox"> Show Clipped Shape (C)</label></div>
           <div class="row"><label><input id="linearTime" type="checkbox"> Linear Time (X)</label></div>
           <div class="row"><label id="timelineZoom3xLabel" style="opacity:0.35;pointer-events:none"><input id="timelineZoom3x" type="checkbox"> Zoom x3 (2s)</label></div>
           <div class="row"><label id="timelineZoom6xLabel" style="opacity:0.35;pointer-events:none"><input type="checkbox" id="timelineZoom6x"> Zoom x6 (1s)</label></div>
           <div class="row"><label id="timelineZoom12xLabel" style="opacity:0.35;pointer-events:none"><input type="checkbox" id="timelineZoom12x"> Zoom x12 (500ms)</label></div>
           <div class="row"><label id="timelineZoom24xLabel" style="opacity:0.35;pointer-events:none"><input type="checkbox" id="timelineZoom24x"> Zoom x24 (250ms)</label></div>
           <div class="row"><label id="timelineZoom48xLabel" style="opacity:0.35;pointer-events:none"><input type="checkbox" id="timelineZoom48x"> Zoom x48 (125ms)</label></div>
-          <div id="analogueCurveRow" class="row" style="align-items:center;gap:6px"><label><input id="analogueCurve" type="checkbox"> Analogue (B)</label><input id="curveAmount" type="range" min="0" max="100" value="40" style="width:80px;opacity:0.35"><span id="curveAmountVal" style="font-size:13px;min-width:20px;text-align:right;opacity:0.35">40</span></div>
+          <div class="row" style="position:relative;">
+            <button id="expertToggle" style="padding:4px 7px;min-height:unset;line-height:1.1;border-radius:6px;">Expert</button>
+            <div id="expertPopup" style="display:none;position:absolute;bottom:calc(100% + 6px);left:0;background:#1c1c1c;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:8px;z-index:200;min-width:260px;">
+              <div id="showClippedRow" class="row"><label><input id="showClipped" type="checkbox"> Show Clipped Shape (C)</label></div>
+              <div class="row"><label><input type="checkbox" id="clipAtGate"> Clip at Gate</label></div>
+              <div class="row"><label><input id="keyboardControl" type="checkbox"> Mimic Model D Sustain (80%) (S)</label></div>
+              <div id="analogueCurveRow" class="row" style="align-items:center;gap:6px"><label><input id="analogueCurve" type="checkbox"> Analogue (B)</label><input id="curveAmount" type="range" min="0" max="100" value="40" style="width:80px;opacity:0.35"><span id="curveAmountVal" style="font-size:13px;min-width:20px;text-align:right;opacity:0.35">40</span></div>
+            </div>
+          </div>
         </div>
         <div>
           <div class="row"><label><input id="textbookAdsr" type="checkbox"> Textbook ADSR</label></div>
@@ -247,7 +253,6 @@
           <div id="tbSustainCollapseRow" class="row"><label><input id="tbSustainCollapse" type="checkbox"> Collapse Textbook ADSR Sustain (])</label></div>
           <div id="tbShowModelDSustainRow" class="row"><label><input id="tbShowModelDSustain" type="checkbox"> Show Model D Sustain (textbook) (\)</label></div>
           <div class="row"><label><input type="checkbox" id="showGateTime"> Show Gate Time</label></div>
-          <div class="row"><label><input type="checkbox" id="clipAtGate"> Clip at Gate</label></div>
           <div class="row"><label><input type="checkbox" id="showPeakDischarge"> Show Peak Discharge</label></div>
           <div class="row" style="gap:6px;align-items:center"><label><input type="checkbox" id="underlayA" checked> Underlay A</label><label><input type="checkbox" id="underlayD" checked> D</label><label><input type="checkbox" id="underlayS" checked> S</label><label><input type="checkbox" id="underlayR" checked> R</label><button id="underlayShowAll" style="padding:2px 6px;min-height:unset;line-height:1.1;border-radius:4px;font-size:11px">Show All</button><button id="underlayHideAll" style="padding:2px 6px;min-height:unset;line-height:1.1;border-radius:4px;font-size:11px">Hide All</button></div>
           <div class="row"><label><input type="checkbox" id="showNewEffectiveLines"> Show New Effective Drop Lines</label></div>
