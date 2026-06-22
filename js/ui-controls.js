@@ -25,12 +25,14 @@ function syncControls(){
   $('releaseKnob').style.setProperty('--deg', (-135 + vals.r*270)+'deg');
   $('floorKnob').style.setProperty('--deg', (-135 + vals.floor*270)+'deg');
   $('scaleKnob').style.setProperty('--deg', (-135 + vals.scale*270)+'deg');
+  if($('gateKnob')) $('gateKnob').style.setProperty('--deg', (-135 + vals.gate*270)+'deg');
   $('attackTarget').textContent=mode==='animate' ? 'Target: '+fmtTime(mapTime(state.target.a)) : '';
   $('decayTarget').textContent=mode==='animate' ? 'Target: '+fmtTime(mapTime(state.target.d)) : '';
   $('sustainTarget').textContent=mode==='animate' ? 'Target: '+Math.round(($('keyboardControl').checked?state.target.s*.8:state.target.s)*100)+'%' : '';
   $('releaseTarget').textContent=mode==='animate' ? 'Target: '+fmtTime(mapTime(state.target.r)) : '';
   $('floorTarget').textContent=mode==='animate' ? 'Target: '+formatSustainScale(state.target.floor) : '';
   $('scaleTarget').textContent=mode==='animate' ? 'Target: '+formatSustainScale(state.target.scale) : '';
+  if($('gateTarget')) $('gateTarget').textContent=mode==='animate' ? 'Target: '+Math.round(gateMsFromPosition(state.target.gate))+'ms' : '';
   $('modeHint').textContent = mode==='live' ? 'Live Mode: Knobs Update The Graph Immediately.' : 'Animate Mode: Knobs Set Targets. Press Transition To Morph The Graph.';
   patchSustainReadouts();
   { const linearOn = $('linearTime') && $('linearTime').checked; ZOOM_LABEL_IDS.forEach(id => { const zl = $(id); if(zl){ zl.style.opacity = linearOn ? '' : UI_DISABLED_OPACITY; zl.style.pointerEvents = linearOn ? '' : 'none'; } }); }
@@ -78,7 +80,7 @@ function transition(durSec){
   hideTapMarker();
   if(durSec===undefined) durSec=currentTransitionSec;
   const dur=durSec*1000;
-  const start={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale,tbSustainGap:state.tbSustainGap,zoomFactor:state.zoomFactor}, end={...state.target};
+  const start={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale,gate:state.gate,tbSustainGap:state.tbSustainGap,zoomFactor:state.zoomFactor}, end={...state.target};
   if(window.kioskBeginTransition) window.kioskBeginTransition(start.a, end.a, start.d, end.d, dur);
   if(window.kioskNotifyKnob && dur > 0) {
     if(Math.abs(end.s     - start.s)     > 0.0001) window.kioskNotifyKnob('sustain', dur);
@@ -88,11 +90,12 @@ function transition(durSec){
   const startAms=mapTime(start.a)*1000, endAms=mapTime(end.a)*1000;
   const startDms=mapTime(start.d)*1000, endDms=mapTime(end.d)*1000;
   const startRms=mapTime(start.r)*1000, endRms=mapTime(end.r)*1000;
+  const startGms=gateMsFromPosition(start.gate), endGms=gateMsFromPosition(end.gate);
   cancelAnimationFrame(state.anim);
-  state.a=start.a; state.d=start.d; state.s=start.s; state.r=start.r; state.floor=start.floor; state.scale=start.scale; state.tbSustainGap=start.tbSustainGap; state.zoomFactor=start.zoomFactor;
+  state.a=start.a; state.d=start.d; state.s=start.s; state.r=start.r; state.floor=start.floor; state.scale=start.scale; state.gate=start.gate; state.tbSustainGap=start.tbSustainGap; state.zoomFactor=start.zoomFactor;
   render();
   if(dur <= 0){
-    state.a=end.a; state.d=end.d; state.s=end.s; state.r=end.r; state.floor=end.floor; state.scale=end.scale; state.tbSustainGap=end.tbSustainGap; state.zoomFactor=end.zoomFactor;
+    state.a=end.a; state.d=end.d; state.s=end.s; state.r=end.r; state.floor=end.floor; state.scale=end.scale; state.gate=end.gate; state.tbSustainGap=end.tbSustainGap; state.zoomFactor=end.zoomFactor;
     render();
     return;
   }
@@ -107,10 +110,11 @@ function transition(durSec){
     state.r=positionFromMs(startRms+(endRms-startRms)*k);
     state.floor=start.floor+(end.floor-start.floor)*k;
     state.scale=start.scale+(end.scale-start.scale)*k;
+    state.gate=gatePositionFromMs(startGms+(endGms-startGms)*k);
     state.tbSustainGap=start.tbSustainGap+(end.tbSustainGap-start.tbSustainGap)*k;
     state.zoomFactor=start.zoomFactor+(end.zoomFactor-start.zoomFactor)*k;
     render();
-    if(f<1) state.anim=requestAnimationFrame(step); else { state.a=end.a; state.d=end.d; state.s=end.s; state.r=end.r; state.floor=end.floor; state.scale=end.scale; state.tbSustainGap=end.tbSustainGap; state.zoomFactor=end.zoomFactor; render(); }
+    if(f<1) state.anim=requestAnimationFrame(step); else { state.a=end.a; state.d=end.d; state.s=end.s; state.r=end.r; state.floor=end.floor; state.scale=end.scale; state.gate=end.gate; state.tbSustainGap=end.tbSustainGap; state.zoomFactor=end.zoomFactor; render(); }
   }
   state.anim=requestAnimationFrame(step);
 }
@@ -409,15 +413,24 @@ function initUIControls(){
   $('transitionBtn').addEventListener('click',()=>{ currentTransitionSec=Number($('customTransitionTime').value)||3; transition(currentTransitionSec); });
   $('customTransitionTime').addEventListener('input',()=>{ currentTransitionSec=Number($('customTransitionTime').value)||3; });
 
-  // Tap mode buttons
-  $('tapMode50Btn').addEventListener('click', () => { $('tapCustomMs').value = 50; setTapMode('tapCustom','tapModeCustomBtn'); render(); });
-  $('tapMode100Btn').addEventListener('click', () => { $('tapCustomMs').value = 100; setTapMode('tapCustom','tapModeCustomBtn'); render(); });
-  $('tapMode200Btn').addEventListener('click', () => { $('tapCustomMs').value = 200; setTapMode('tapCustom','tapModeCustomBtn'); render(); });
+  // Tap mode buttons — preset buttons snap the gate knob to their ms value
+  $('tapMode50Btn').addEventListener('click', () => { state.gate=gatePositionFromMs(50); state.target.gate=state.gate; setTapMode('tapCustom','tapModeCustomBtn'); render(); refreshNumericInputs(); });
+  $('tapMode100Btn').addEventListener('click', () => { state.gate=gatePositionFromMs(100); state.target.gate=state.gate; setTapMode('tapCustom','tapModeCustomBtn'); render(); refreshNumericInputs(); });
+  $('tapMode200Btn').addEventListener('click', () => { state.gate=gatePositionFromMs(200); state.target.gate=state.gate; setTapMode('tapCustom','tapModeCustomBtn'); render(); refreshNumericInputs(); });
   $('tapModeCustomBtn').addEventListener('click', () => setTapMode('tapCustom','tapModeCustomBtn'));
-  $('tap500Btn').addEventListener('click', () => { $('tapCustomMs').value = 500; setTapMode('tapCustom','tapModeCustomBtn'); render(); });
-  $('tap1sBtn').addEventListener('click', () => { $('tapCustomMs').value = 1000; setTapMode('tapCustom','tapModeCustomBtn'); render(); });
+  $('tap500Btn').addEventListener('click', () => { state.gate=gatePositionFromMs(500); state.target.gate=state.gate; setTapMode('tapCustom','tapModeCustomBtn'); render(); refreshNumericInputs(); });
+  $('tap1sBtn').addEventListener('click', () => { state.gate=gatePositionFromMs(1000); state.target.gate=state.gate; setTapMode('tapCustom','tapModeCustomBtn'); render(); refreshNumericInputs(); });
   $('tapModeHoldBtn').addEventListener('click', () => setTapMode('hold','tapModeHoldBtn'));
-  $('tapCustomMs') && $('tapCustomMs').addEventListener('input', render); // keep the orange tap-release curve / gate-time line live
+  // Gate knob quickset buttons — set target and transition, matching the other knobs' quicksets
+  document.querySelectorAll('.quickset-btn[data-knob="gate"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const ms = Number(btn.dataset.value);
+      state.target.tbSustainGap = state.tbSustainGap;
+      state.target.gate = gatePositionFromMs(ms);
+      transition(currentTransitionSec);
+      if(window.markPresetDirty) markPresetDirty();
+    });
+  });
   $('showGateTime') && $('showGateTime').addEventListener('change', render);
   $('clipAtGate') && $('clipAtGate').addEventListener('change', render);
   $('showPeakDischarge') && $('showPeakDischarge').addEventListener('change', render);

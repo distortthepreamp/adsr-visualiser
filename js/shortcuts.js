@@ -44,8 +44,7 @@ const tag = document.activeElement ? document.activeElement.tagName : '';
         if(state.currentPhase === 'hold' || state.currentPhase === 'sustain'){ releaseFromCurrent(); }
         else { hold(); }
       } else {
-        const ms = tapMode === 'tap50' ? 50 : tapMode === 'tap100' ? 100 : tapMode === 'tap500' ? 500 : tapMode === 'tap1000' ? 1000 : tapMode === 'tapCustom' ? (Number($('tapCustomMs').value)||200) : 200;
-        tap(ms);
+        tap(Math.round(gateMsFromPosition(state.gate)));
       }
     } else if(e.key === '1' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey){ setTapMode('tap50','tapMode50Btn');
     } else if(e.key === '2' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey){ setTapMode('tap100','tapMode100Btn');

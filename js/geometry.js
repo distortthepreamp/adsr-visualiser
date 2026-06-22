@@ -30,6 +30,9 @@ function positionFromMs(ms){
   return curve[curve.length - 1].p;
 }
 function msFromPosition(p){ return Math.round(mapTime(p) * 1000); }
+// Gate-time exponential mapping: 0..1 → 20..5000ms (smooth, not piecewise)
+function gateMsFromPosition(p){ return 20 * Math.pow(5000/20, clamp(p)); }
+function gatePositionFromMs(ms){ return clamp(Math.log(Math.max(20, Math.min(5000, ms)) / 20) / Math.log(5000/20)); }
 function fmtTime(t){
   if(t < .001) return '0 ms';
   if(t < 1) return Math.round(t*1000)+' ms';

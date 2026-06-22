@@ -16,7 +16,7 @@ const typedDisplay = {
 };
 
 // Assigned inside initKnobs() so DOM exists; used by refreshNumericInputs() etc.
-let attackInput, decayInput, releaseInput, sustainInput, floorInput, scaleInput;
+let attackInput, decayInput, releaseInput, sustainInput, floorInput, scaleInput, gateInput;
 
 // ---- Mode / object helpers ----
 function currentMode(){
@@ -28,7 +28,7 @@ function activeObject(){
 }
 
 function syncTargetToLive(){
-  state.target = { ...state.target, a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale, tbSustainGap: state.tbSustainGap };
+  state.target = { ...state.target, a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale, gate: state.gate, tbSustainGap: state.tbSustainGap };
 }
 
 // ---- Numeric display helpers ----
@@ -115,6 +115,9 @@ function refreshNumericInputs(){
     const v = obj.scale * 10;
     scaleInput.value = fmtScaleValue(v);
   }
+  if (gateInput && document.activeElement !== gateInput) {
+    gateInput.value = Math.round(gateMsFromPosition(obj.gate));
+  }
   patchSustainReadouts();
 }
 
@@ -157,6 +160,21 @@ function commitScale(){
   requestAnimationFrame(refreshNumericInputs);
 }
 
+function commitGate(){
+  if (!gateInput) return;
+  if(window.markPresetDirty) markPresetDirty();
+  const ms = Math.max(20, Math.min(5000, Math.round(Number(gateInput.value) || 200)));
+  gateInput.value = ms;
+  logEvent('COMMIT', { knob: 'gate', value: ms });
+  const obj = activeObject();
+  obj.gate = gatePositionFromMs(ms);
+  if (currentMode() === 'live') {
+    syncTargetToLive();
+    render();
+  } else { syncControls(); }
+  requestAnimationFrame(refreshNumericInputs);
+}
+
 function clearTypedForSlider(which){
   typedDisplay[currentMode()][which] = null;
 }
@@ -187,6 +205,7 @@ function initKnobs(){
   sustainInput = ensureInputAfter('sustainTarget', 'sustainScaleInput','type="number" min="0" max="10" step="0.1"');
   floorInput   = ensureInputAfter('floorTarget',   'floorScaleInput',  'type="number" min="0" max="10" step="0.1"');
   scaleInput   = ensureInputAfter('scaleTarget',   'scaleScaleInput',  'type="number" min="0" max="10" step="0.1"');
+  gateInput    = ensureInputAfter('gateTarget',    'gateMsInput',      'type="number" min="20" max="5000" step="1"');
 
   if (attackInput) {
     attackInput.addEventListener('change', () => commitTime('a', attackInput));
@@ -212,6 +231,10 @@ function initKnobs(){
     scaleInput.addEventListener('change', commitScale);
     scaleInput.addEventListener('keydown', e => { if (e.key === 'Enter') commitScale(); });
   }
+  if (gateInput) {
+    gateInput.addEventListener('change', commitGate);
+    gateInput.addEventListener('keydown', e => { if (e.key === 'Enter') commitGate(); });
+  }
 
   document.querySelectorAll('input[name="mode"]').forEach(el => {
     el.addEventListener('change', () => setTimeout(refreshNumericInputs, 0));
@@ -231,6 +254,7 @@ function initKnobs(){
     { knobId: 'releaseKnob', field: 'r',     isTime: true  },
     { knobId: 'floorKnob',   field: 'floor', isTime: false },
     { knobId: 'scaleKnob',   field: 'scale', isTime: false },
+    { knobId: 'gateKnob',   field: 'gate',  isTime: true  },
   ].forEach(({ knobId, field, isTime }) => {
     const knob = $(knobId);
     knob.style.cursor = 'ns-resize';
@@ -276,6 +300,7 @@ window.commitTime         = commitTime;
 window.commitSustain      = commitSustain;
 window.commitFloor        = commitFloor;
 window.commitScale        = commitScale;
+window.commitGate         = commitGate;
 window.addPointerFeedback = addPointerFeedback;
 
 })();

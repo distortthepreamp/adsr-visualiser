@@ -90,13 +90,16 @@ svg{width:100%; height:auto; display:block; overflow:visible;}
   backdrop-filter:blur(2px);
   overflow:hidden;
 }
-.knobs{display:grid; grid-template-columns:repeat(6,1fr); gap:6px; align-items:start;}
+.knobs{display:grid; grid-template-columns:repeat(7,1fr); gap:6px; align-items:start;}
 .knobBox{text-align:center;}
 .knobLabel{letter-spacing:.03em; margin-bottom:1px;}
 .knob{
   width:56px; height:56px; margin:0 auto 2px; border-radius:50%;
   background:radial-gradient(circle at 36% 30%, #8b2020, #4a0a0a 68%, #1a0000 100%);
   border:3px solid rgba(255,255,255,.8); position:relative;
+}
+.knob-green{
+  background:radial-gradient(circle at 36% 30%, #208b20, #0a4a0a 68%, #001a00 100%);
 }
 .knob::after{
   content:""; position:absolute; left:50%; top:5px; width:3px; height:21px; border-radius:3px;

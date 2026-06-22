@@ -63,7 +63,7 @@ function render(){
   // post-block loose elements can use them.
   const showGateTime = $('showGateTime') && $('showGateTime').checked;
   const clipAtGateOn = showGateTime && $('clipAtGate') && $('clipAtGate').checked;
-  const gateTapMs = ($('tapCustomMs') && Number($('tapCustomMs').value)) || 200;
+  const gateTapMs = Math.round(gateMsFromPosition(state.gate));
   const gateTSec = gateTapMs / 1000;
   let gateCloseX;
   if(e.aT > 0 && gateTSec <= e.aT){
