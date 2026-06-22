@@ -85,19 +85,7 @@ function setDot(pt, visible=true){
   setMeterLevel(pt.y);
 }
 
-function hideTapMarker(){
-  const marker=$('tapMarker');
-  if(marker) marker.style.opacity=0;
-}
 
-function setTapMarker(pt){
-  const marker=$('tapMarker');
-  if(!marker) return;
-  if(!$('keepTapMarker') || !$('keepTapMarker').checked){ hideTapMarker(); return; }
-  marker.setAttribute('cx',pt.x);
-  marker.setAttribute('cy',pt.y);
-  marker.style.opacity=1;
-}
 
 // ---- Release ----
 
@@ -235,7 +223,6 @@ function clearBlobAndMarker(){
   $('dot').style.animation='none';
   hideDot();
   hideDotStated();
-  hideTapMarker();
   state.held=false;
   state.currentPhase='idle';
   state.dotLevel=0;

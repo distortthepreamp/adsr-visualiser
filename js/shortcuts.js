@@ -42,7 +42,8 @@ const tag = document.activeElement ? document.activeElement.tagName : '';
       e.preventDefault();
       const gateShown = $('showGateTime') && $('showGateTime').checked;
       if(!gateShown){
-        if(state.currentPhase === 'hold' || state.currentPhase === 'sustain'){ releaseFromCurrent(); }
+        if(state.currentPhase === 'sustain'){ releaseFromCurrent(); }
+        else if(state.currentPhase === 'hold' || state.currentPhase === 'release'){ clearBlobAndMarker(); }
         else { hold(); }
       } else {
         tap(Math.round(gateMsFromPosition(state.gate)));

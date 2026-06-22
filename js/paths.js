@@ -34,7 +34,6 @@ function syncRadii(){
   document.getElementById('dot').setAttribute('r', Math.round(lw * bs));
   const dotStated = document.getElementById('dotStated');
   if(dotStated) dotStated.setAttribute('r', Math.round(lw * bs));
-  document.getElementById('tapMarker').setAttribute('r', Math.round(lw * 0.8));
   document.getElementById('sustainPoint').setAttribute('r', Math.round(lw * 0.57));
 }
 
@@ -492,7 +491,8 @@ function render(){
   const meterAbsBottom = graph.y0;          // yFor(0) = 445
 
   const markerEndX = meterX;
-  $('sustainMarker').setAttribute('x1', drawPS.x);
+  const sustainTickLen = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sustainTickLength')) || 30;
+  $('sustainMarker').setAttribute('x1', markerEndX - sustainTickLen);
   $('sustainMarker').setAttribute('y1', drawPS.y);
   $('sustainMarker').setAttribute('x2', markerEndX);
   $('sustainMarker').setAttribute('y2', drawPS.y);
@@ -513,24 +513,15 @@ function render(){
       _statedY = statedY;
       statedSustainX = pts.pEnd.x + graph.w * state.tbSustainGap;
       const underlayCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
-      statedSustainLineEl.setAttribute('x1', statedSustainX);
+      statedSustainLineEl.setAttribute('x1', markerEndX - sustainTickLen);
       statedSustainLineEl.setAttribute('y1', statedY);
       statedSustainLineEl.setAttribute('x2', markerEndX);
       statedSustainLineEl.setAttribute('y2', statedY);
       statedSustainLineEl.style.stroke = underlayCol;
       statedSustainLineEl.style.display = '';
-      const sslEl=$('statedSustainLabel');
-      if(sslEl){ sslEl.setAttribute('x', pts.pEnd.x + 5); sslEl.setAttribute('y', statedY - 8); sslEl.setAttribute('text-anchor', 'start'); sslEl.setAttribute('style', 'fill:' + underlayCol + ';'); }
     } else {
       statedSustainLineEl.style.display = 'none';
-      const sslEl=$('statedSustainLabel');
-      if(sslEl) sslEl.style.display = 'none';
     }
-  }
-
-  { const el=$('sLabel'), bg=$('sLabelBg');
-    el.setAttribute('x', METER_X - 30); el.setAttribute('y', drawPS.y); el.setAttribute('dominant-baseline', 'middle'); el.removeAttribute('stroke'); el.removeAttribute('stroke-width'); el.removeAttribute('paint-order'); el.style.fill = '#000000'; el.style.display = (textbookAdsr || !legS) ? 'none' : ''; el.textContent = ($('keyboardControl') && $('keyboardControl').checked) ? 'MODEL D SUSTAIN' : 'SUSTAIN';
-    if(bg){ const bbox=el.getBBox(); bg.setAttribute('x',bbox.x-4); bg.setAttribute('y',bbox.y-2); bg.setAttribute('width',bbox.width+8); bg.setAttribute('height',bbox.height+4); const decayCol = ($('frequencyMode') && $('frequencyMode').checked) ? (($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00') : (($('loudnessDecayColor') && $('loudnessDecayColor').value) || '#ff0000'); bg.setAttribute('fill', decayCol); bg.style.display=el.style.display; }
   }
 
   // Clip at Gate: hide loose elements whose anchor x >= gateCloseX.
@@ -542,9 +533,6 @@ function render(){
       const x = parseFloat(el.getAttribute(attr));
       if(x >= gateCloseX) el.style.display='none';
     });
-    // sLabel/sLabelBg — anchor x is METER_X-30, always right of gate
-    { const el=$('sLabel'); if(el && parseFloat(el.getAttribute('x')) >= gateCloseX) el.style.display='none'; }
-    { const el=$('sLabelBg'); if(el && el.style.display !== 'none'){ const lbl=$('sLabel'); if(lbl && lbl.style.display==='none') el.style.display='none'; } }
   }
 
   // Meter box — fixed full graph height

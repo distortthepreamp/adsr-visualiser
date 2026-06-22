@@ -28,7 +28,7 @@ const MASTER_GAIN = 0.7;             // default master output gain
 
   const noteBtnIds = ['noteE1Btn','noteE2Btn','noteC4Btn','noteA4Btn','noteCustomToggle'];
 
-  function audioEnabled(){ return !!($('audioEnabled')&&$('audioEnabled').checked); }
+  function audioEnabled(){ return !!($('audioEnabled')&&$('audioEnabled').checked&&!($('sloMo')&&$('sloMo').checked)); }
 
   function setNoteMode(btnId, freq){
     noteMode = btnId;

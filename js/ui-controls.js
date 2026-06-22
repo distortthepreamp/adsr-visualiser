@@ -76,7 +76,6 @@ function transition(durSec){
   clearBlobAndMarker();
   animationToken++;
   const myAnimationToken = animationToken;
-  hideTapMarker();
   if(durSec===undefined) durSec=currentTransitionSec;
   const dur=durSec*1000;
   const start={a:state.a,d:state.d,s:state.s,r:state.r,floor:state.floor,scale:state.scale,gate:state.gate,tbSustainGap:state.tbSustainGap,zoomFactor:state.zoomFactor}, end={...state.target};
@@ -428,7 +427,7 @@ function initUIControls(){
   $('modelShowAll') && $('modelShowAll').addEventListener('click', () => { ['modelA','modelD','modelS','modelR'].forEach(id => { if($(id)) $(id).checked = true; }); render(); });
   $('modelHideAll') && $('modelHideAll').addEventListener('click', () => { ['modelA','modelD','modelS','modelR'].forEach(id => { if($(id)) $(id).checked = false; }); render(); });
   $('clearBtn').addEventListener('click', () => { logEvent('ANIMATION', { action: 'clear' }); clearBlobAndMarker(); });
-  $('keepTapMarker').addEventListener('change',()=>{ if(!$('keepTapMarker').checked) hideTapMarker(); });
+  $('sloMo') && $('sloMo').addEventListener('change', () => { if($('sloMo').checked) audioCut(); });
 
   // Quick-set buttons
   document.querySelectorAll('.quickset-btn').forEach(btn => {

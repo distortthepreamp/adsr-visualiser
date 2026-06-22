@@ -33,7 +33,6 @@ function buildConfigSnapshot(){
     kioskInactiveOpacity: Number($('kioskInactiveOpacity') ? $('kioskInactiveOpacity').value : 70),
     meterScanlinesVisible: $('meterScanlinesVisible') ? $('meterScanlinesVisible').checked : true,
     blobGlowEnabled: $('blobGlowEnabled') ? $('blobGlowEnabled').checked : true,
-    keepTapMarker: $('keepTapMarker') ? $('keepTapMarker').checked : true,
     timelineZoom3x: $('timelineZoom3x') ? $('timelineZoom3x').checked : false,
     timelineZoom6x: $('timelineZoom6x') ? $('timelineZoom6x').checked : false,
     timelineZoom12x: $('timelineZoom12x') ? $('timelineZoom12x').checked : false,
@@ -97,7 +96,7 @@ function loadConfigObject(cfg){
   state.target.tbSustainGap = state.tbSustainGap;
 
   // Checkboxes
-  ['loudDecay','showContour','showNewEffectiveLines','showNewStatedLines','modelA','modelD','modelS','modelR','showGateTime','clipAtGate','showPeakDischarge','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','linkRToD','dottedMarkers','meterGlow','meterScanlinesVisible','blobGlowEnabled','keepTapMarker','timelineZoom3x','timelineZoom6x','timelineZoom12x','timelineZoom24x','timelineZoom48x','kioskKnobGlow'].forEach(id => {
+  ['loudDecay','showContour','showNewEffectiveLines','showNewStatedLines','modelA','modelD','modelS','modelR','showGateTime','clipAtGate','showPeakDischarge','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','linkRToD','dottedMarkers','meterGlow','meterScanlinesVisible','blobGlowEnabled','timelineZoom3x','timelineZoom6x','timelineZoom12x','timelineZoom24x','timelineZoom48x','kioskKnobGlow'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
   const restoredZoom = ($('timelineZoom48x') && $('timelineZoom48x').checked) ? 48
