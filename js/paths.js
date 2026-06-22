@@ -471,7 +471,7 @@ function render(){
     } }
     {
       const susSegPath = `M ${drawPS.x} ${drawPS.y} L ${releaseStartX} ${drawPS.y}`;
-      { const el=$('sustainSegInner'); if(el){ el.setAttribute('d', susSegPath); el.style.opacity = (drawReleasePath && legS) ? '' : '0'; } }
+      { const el=$('sustainSegInner'); if(el){ el.setAttribute('d', susSegPath); el.style.opacity = legS ? '' : '0'; } }
     }
     const tbSusMarkerMD=$('tbSustainMarker'); if(tbSusMarkerMD) tbSusMarkerMD.style.display='none';
     const tbMDLineMD=$('tbModelDSustainLine'); if(tbMDLineMD) tbMDLineMD.style.display='none';
@@ -648,25 +648,6 @@ function render(){
   if(toolTitleEl){ toolTitleEl.setAttribute('x',VB_WIDTH/2); toolTitleEl.setAttribute('y',GRAPH_TOP_BASE-173); toolTitleEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
   updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, linearTimeOn, drawPS, statedSustainX, {legA, legD, legR}, clipAtGateOn ? gateCloseX : null);
 
-  const segY = GRAPH_TOP_BASE - 45;
-  const segStart = 10;
-  const segEnd = METER_X;
-  const segSpacing = (segEnd - segStart) / 5;
-  const segFontSize = 'calc(var(--labelSize) * var(--h2Scale) * 1px)';
-  ['segDisplay','segSustain','segClipping','segDecay','segFilterMode'].forEach((id, i) => {
-    const el = document.getElementById(id);
-    if(el){ el.setAttribute('x', segStart + segSpacing * i); el.style.fontSize = segFontSize; }
-  });
-  const segFilterModeEl=$('segFilterMode');
-  if(segFilterModeEl){ segFilterModeEl.setAttribute('y',segY); segFilterModeEl.style.display=freqMode?'':'none'; segFilterModeEl.textContent=isHP?'FILTER MODE: HI':'FILTER MODE: LO'; segFilterModeEl.style.opacity=1; }
-  const segDecayEl=$('segDecay');
-  if(segDecayEl){ const ldOn=$('loudDecay')&&$('loudDecay').checked; segDecayEl.setAttribute('y',segY); segDecayEl.style.display=''; segDecayEl.textContent=(freqMode?'FILTER DECAY':'LOUD DECAY')+(ldOn?': ON':': OFF'); segDecayEl.style.opacity=ldOn?1:STATUS_DIM_OPACITY; }
-  const segDisplayEl=$('segDisplay');
-  if(segDisplayEl){ segDisplayEl.setAttribute('y',segY); segDisplayEl.style.display=''; segDisplayEl.textContent=textbookAdsr?'DISPLAY: TEXTBOOK':analogueOn?'DISPLAY: RC MODELLED':'DISPLAY: SCHEMATIC'; segDisplayEl.style.opacity=(textbookAdsr||analogueOn)?1:STATUS_DIM_OPACITY; }
-  const segSustainEl=$('segSustain');
-  if(segSustainEl){ const kcOn=$('keyboardControl')&&$('keyboardControl').checked; const tbCollapse=$('tbSustainCollapse')&&$('tbSustainCollapse').checked; segSustainEl.setAttribute('y',segY); segSustainEl.style.display=''; segSustainEl.textContent=(textbookAdsr&&!tbCollapse)?'SUSTAIN: TEXTBOOK':kcOn?'SUSTAIN: CORRECTED':'SUSTAIN: SCHEMATIC'; segSustainEl.style.opacity=((textbookAdsr&&!tbCollapse)||kcOn)?1:STATUS_DIM_OPACITY; }
-  const segClippingEl=$('segClipping');
-  if(segClippingEl){ segClippingEl.setAttribute('y',segY); segClippingEl.style.display=freqMode?'':'none'; if(textbookAdsr){ segClippingEl.textContent='PEAK: TEXTBOOK'; segClippingEl.style.opacity=1; } else if(showClipped){ segClippingEl.textContent='PEAK: CORRECTED'; segClippingEl.style.opacity=1; } else { segClippingEl.textContent='PEAK: SCHEMATIC'; segClippingEl.style.opacity=STATUS_DIM_OPACITY; } }
   // Cutoff/Amount knobs: active only in Filter Mode
   const floorBox=$('floorKnobBox'), scaleBox=$('scaleKnobBox');
   if(floorBox) floorBox.style.opacity=freqMode?'':UI_DISABLED_OPACITY;
@@ -690,7 +671,14 @@ function render(){
   if(_gEl) _root.style.setProperty('--gateColor',    _gEl.value);
 
   // Keep resting meter fill in sync whenever no animation is running
-  if(state.currentPhase === 'idle') hideDot();
+  if(state.currentPhase === 'idle'){
+    hideDot();
+    hideDotStated();
+    // Resting meter: filter mode → cutoff floor; loudness mode → empty
+    const restingY = freqMode ? yFor(e.floor) : graph.y0;
+    setMeterLevel(restingY);
+    setMeterLevelStated(restingY);
+  }
 
   syncControls();
   updateButtonStates();
