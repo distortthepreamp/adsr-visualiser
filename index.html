@@ -232,6 +232,7 @@
         <button id="cuePlayBtn" style="padding:3px 7px;min-height:unset;line-height:1.1;border-radius:6px">Play</button>
         <button id="cueStopBtn" style="padding:3px 7px;min-height:unset;line-height:1.1;border-radius:6px">Stop</button>
         <button id="cueResetBtn" style="padding:3px 7px;min-height:unset;line-height:1.1;border-radius:6px">Reset</button>
+        <button id="cueHelpBtn" style="padding:3px 7px;min-height:unset;line-height:1.1;border-radius:6px">Cue Help</button>
       </div>
     </div>
 
@@ -417,6 +418,78 @@
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">⌃⌥ 1–6</td><td style="padding:3px 0;font-size:13px;font-weight:700">Cutoff presets</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800;white-space:nowrap">⌥⌘ 1–6</td><td style="padding:3px 0;font-size:13px;font-weight:700">Amount presets</td></tr>
         </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cue Help modal -->
+<div id="cueHelpOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;align-items:center;justify-content:center;">
+  <div id="cueHelpModal" style="background:rgba(18,18,18,.97);border:1px solid rgba(255,255,255,.3);border-radius:14px;padding:22px 28px 24px;min-width:780px;max-width:90vw;max-height:85vh;overflow-y:auto;color:#fff;font-family:Arial,Helvetica,sans-serif;position:relative;">
+    <button id="cueHelpClose" style="position:absolute;top:10px;right:14px;background:none;border:none;color:rgba(255,255,255,.7);font-size:20px;font-weight:800;cursor:pointer;line-height:1;padding:0">×</button>
+    <div style="font-size:14px;font-weight:800;letter-spacing:.06em;margin-bottom:16px">Cue Script Reference</div>
+    <div style="display:flex;gap:0;">
+      <!-- LEFT COLUMN -->
+      <div style="flex:1;padding-right:20px;">
+        <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:6px">Timing</div>
+        <pre style="margin:0 0 14px;font-size:12px;line-height:1.5;color:#ccc">wait HH:MM:SS:FF          pause (timecode @ 24fps)</pre>
+
+        <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:6px">Set Values (instant)</div>
+        <pre style="margin:0 0 14px;font-size:12px;line-height:1.5;color:#ccc">set attack NNNms          (also: decay, release)
+set sustain N             0–10
+set gate NNNms
+set cutoff N              0–10
+set amount N              0–10</pre>
+
+        <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:6px">Transition (smooth, ease in/out)</div>
+        <pre style="margin:0 0 14px;font-size:12px;line-height:1.5;color:#ccc">transition &lt;param&gt; &lt;value&gt; HH:MM:SS:FF
+params: attack decay sustain
+        release gate cutoff amount
+(run in parallel; use wait to sequence)</pre>
+
+        <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:6px">Toggles (on|off)</div>
+        <pre style="margin:0;font-size:12px;line-height:1.5;color:#ccc">set loud-decay on|off
+set filter-mode on|off
+set hp-mode on|off
+set mimic-sustain on|off
+set analogue on|off
+set linear-time on|off
+set show-clipped on|off
+set show-contour on|off
+set show-gate-time on|off</pre>
+      </div>
+      <!-- DIVIDER -->
+      <div style="width:1px;background:rgba(255,255,255,.15);flex-shrink:0;"></div>
+      <!-- RIGHT COLUMN -->
+      <div style="flex:1;padding-left:20px;">
+        <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:6px">Visibility (on|off)</div>
+        <pre style="margin:0 0 14px;font-size:12px;line-height:1.5;color:#ccc">set textbook attack on|off
+set textbook decay on|off
+set textbook sustain on|off
+set textbook release on|off
+set actual attack on|off
+set actual decay on|off
+set actual sustain on|off
+set actual release on|off
+set textbook show-all | hide-all
+set actual   show-all | hide-all</pre>
+
+        <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:6px">Zoom (on|off — mutually exclusive)</div>
+        <pre style="margin:0 0 14px;font-size:12px;line-height:1.5;color:#ccc">set zoom-x3 on|off
+set zoom-x6 on|off
+set zoom-x12 on|off
+set zoom-x24 on|off
+set zoom-x48 on|off</pre>
+
+        <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:6px">Playback</div>
+        <pre style="margin:0 0 14px;font-size:12px;line-height:1.5;color:#ccc">play-tap NNNms [Note]
+play-hold [Note]
+play-release
+notes: E1 E2 C4 A4</pre>
+
+        <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:6px">Comments</div>
+        <pre style="margin:0;font-size:12px;line-height:1.5;color:#ccc"># comment line
+(blank lines ignored)</pre>
       </div>
     </div>
   </div>

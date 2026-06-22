@@ -5,6 +5,8 @@
 
 function showHelp(){ $('helpOverlay').style.display='flex'; }
 function hideHelp(){ $('helpOverlay').style.display='none'; }
+function showCueHelp(){ $('cueHelpOverlay').style.display='flex'; }
+function hideCueHelp(){ $('cueHelpOverlay').style.display='none'; }
 
 function toggleCheckbox(id){
   const el=$(id); if(!el) return;
@@ -25,11 +27,18 @@ function initShortcuts(){
   $('helpBtn').addEventListener('click', showHelp);
   $('helpClose').addEventListener('click', hideHelp);
   $('helpOverlay').addEventListener('click', e => { if(e.target===$('helpOverlay')) hideHelp(); });
+  if($('cueHelpBtn')) $('cueHelpBtn').addEventListener('click', showCueHelp);
+  if($('cueHelpClose')) $('cueHelpClose').addEventListener('click', hideCueHelp);
+  if($('cueHelpOverlay')) $('cueHelpOverlay').addEventListener('click', e => { if(e.target===$('cueHelpOverlay')) hideCueHelp(); });
 
   // Keyboard shortcuts
   document.addEventListener('keydown', e => {
 const tag = document.activeElement ? document.activeElement.tagName : '';
     if(['INPUT','SELECT','TEXTAREA'].includes(tag)) return;
+    if($('cueHelpOverlay') && $('cueHelpOverlay').style.display !== 'none'){
+      if(e.key === 'Escape') hideCueHelp();
+      return;
+    }
     if($('helpOverlay').style.display !== 'none'){
       if(e.key === 'Escape') hideHelp();
       return;
