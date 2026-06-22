@@ -390,6 +390,8 @@ function initUIControls(){
   $('meterWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(80,Math.max(10,isNaN(parseInt(inp.value))?40:parseInt(inp.value))); inp.value=c; METER_W=c; recalcGeometry(); render(); });
   $('meterStrokeWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(20,Math.max(1,isNaN(parseInt(inp.value))?7:parseInt(inp.value))); inp.value=c; METER_STROKE_W=c; render(); });
   $('timeLabelGutter').addEventListener('input', e => { const inp=e.target,c=Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value)); inp.value=c; render(); });
+  $('markerLineWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(8,Math.max(1,isNaN(parseFloat(inp.value))?1:Math.round(parseFloat(inp.value)*2)/2)); inp.value=c; document.documentElement.style.setProperty('--markerLineWidth',c); });
+  $('dottedMarkers').addEventListener('change', () => { document.documentElement.style.setProperty('--markerDash', $('dottedMarkers').checked ? '4 4' : 'none'); });
   $('tbSustainGapMax').addEventListener('input', e => { const inp=e.target,c=Math.min(30,Math.max(15,isNaN(parseInt(inp.value))?15:parseInt(inp.value))); inp.value=c; SUSTAIN_GAP_MAX=c/100; render(); });
   $('vbWidth').addEventListener('change', e => { const inp=e.target,c=Math.round(Math.min(VB_WIDTH_MAX,Math.max(VB_WIDTH_MIN,isNaN(parseInt(inp.value))?1200:parseInt(inp.value)))/10)*10; inp.value=c; VB_WIDTH=c; recalcGeometry(); render(); });
   $('vbHeight').addEventListener('change', e => { const inp=e.target,c=Math.round(Math.min(VB_HEIGHT_MAX,Math.max(VB_HEIGHT_MIN,isNaN(parseInt(inp.value))?595:parseInt(inp.value)))/10)*10; inp.value=c; VB_HEIGHT=c; recalcGeometry(); render(); });

@@ -26,6 +26,8 @@
   --decayColor:#ff0000;
   --releaseColor:#ff0000;
   --gateColor:#ff8800;
+  --markerLineWidth:1;
+  --markerDash:4 4;
   --loudnessAttackColor:#ff0000;
   --loudnessDecayColor:#ff0000;
   --loudnessReleaseColor:#ff0000;
@@ -61,11 +63,10 @@ svg{width:100%; height:auto; display:block; overflow:visible;}
 .decay-inner{stroke:var(--decayColor);}
 .release-inner{stroke:var(--releaseColor);}
 .env-dot{fill:var(--line); stroke:none; opacity:0;}
+.marker-line{stroke-width:var(--markerLineWidth); stroke-dasharray:var(--markerDash); vector-effect:non-scaling-stroke;}
 #sustainMarker {
   stroke-opacity: 1;
   stroke-linecap: round;
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
 }
 @keyframes blobPulse{from{opacity:1} to{opacity:.4}}
 .tap-marker{fill:var(--line); stroke:none; opacity:0;}

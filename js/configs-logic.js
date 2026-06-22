@@ -64,6 +64,8 @@ function buildConfigSnapshot(){
     contourLineColor: $('contourLineColor') ? $('contourLineColor').value : '#ffff00',
     underlayColor: $('underlayColor') ? $('underlayColor').value : '#ffffff',
     innerLineWidth: Number($('innerLineWidth').value),
+    markerLineWidth: Number($('markerLineWidth') ? $('markerLineWidth').value : 1),
+    dottedMarkers: $('dottedMarkers') ? $('dottedMarkers').checked : true,
     labelSize: Number($('labelSize').value),
     h1Scale: Number($('h1Scale') ? $('h1Scale').value : 1.0),
     h2Scale: Number($('h2Scale') ? $('h2Scale').value : 1.0),
@@ -94,7 +96,7 @@ function loadConfigObject(cfg){
   state.target.tbSustainGap = state.tbSustainGap;
 
   // Checkboxes
-  ['loudDecay','showContour','showNewEffectiveLines','showNewStatedLines','modelA','modelD','modelS','modelR','showGateTime','clipAtGate','showPeakDischarge','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','meterGlow','meterScanlinesVisible','blobGlowEnabled','keepTapMarker','timelineZoom3x','timelineZoom6x','timelineZoom12x','timelineZoom24x','timelineZoom48x','kioskKnobGlow'].forEach(id => {
+  ['loudDecay','showContour','showNewEffectiveLines','showNewStatedLines','modelA','modelD','modelS','modelR','showGateTime','clipAtGate','showPeakDischarge','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','dottedMarkers','meterGlow','meterScanlinesVisible','blobGlowEnabled','keepTapMarker','timelineZoom3x','timelineZoom6x','timelineZoom12x','timelineZoom24x','timelineZoom48x','kioskKnobGlow'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
   const restoredZoom = ($('timelineZoom48x') && $('timelineZoom48x').checked) ? 48
@@ -144,6 +146,8 @@ function loadConfigObject(cfg){
 
   // Line widths
   if($('innerLineWidth') && cfg.innerLineWidth !== undefined){ $('innerLineWidth').value = cfg.innerLineWidth; $('innerLineWidth').dispatchEvent(new Event('input')); }
+  if($('markerLineWidth') && cfg.markerLineWidth !== undefined){ $('markerLineWidth').value = cfg.markerLineWidth; $('markerLineWidth').dispatchEvent(new Event('input')); }
+  if(cfg.dottedMarkers !== undefined) document.documentElement.style.setProperty('--markerDash', cfg.dottedMarkers ? '4 4' : 'none');
   if($('labelSize') && cfg.labelSize !== undefined){ $('labelSize').value = cfg.labelSize; $('labelSize').dispatchEvent(new Event('input')); }
   if($('h1Scale') && cfg.h1Scale !== undefined){ const v=Math.min(3.0,Math.max(1.0,Number(cfg.h1Scale)||1.0)); $('h1Scale').value=v.toFixed(1); document.documentElement.style.setProperty('--h1Scale',v); }
   if($('h2Scale') && cfg.h2Scale !== undefined){ const v=Math.min(3.0,Math.max(1.0,Number(cfg.h2Scale)||1.0)); $('h2Scale').value=v.toFixed(1); document.documentElement.style.setProperty('--h2Scale',v); }

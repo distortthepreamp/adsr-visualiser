@@ -42,32 +42,32 @@
       </defs>
       <line id="amountLine" x1="80" y1="30" x2="1145" y2="30" style="stroke:var(--contourLineColor);stroke-width:1;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <line id="floorLine" x1="80" y1="445" x2="1145" y2="445" style="stroke:var(--contourLineColor);stroke-width:1;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
-      <line id="sustainMarker" x1="80" y1="445" x2="80" y2="445" />
-      <line id="statedSustainLine" x1="80" y1="445" x2="80" y2="445" style="stroke:#00ffff;stroke-width:1;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
+      <line id="sustainMarker" class="marker-line" x1="80" y1="445" x2="80" y2="445" />
+      <line id="statedSustainLine" class="marker-line" x1="80" y1="445" x2="80" y2="445" style="stroke:#00ffff;stroke-opacity:1;display:none;" />
 <line id="tbSustainMarker" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
       <line id="tbModelDSustainLine" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
       <circle id="sustainPoint" class="tap-marker" cx="80" cy="445" style="opacity:.85" />
-      <line id="newStatedDecayDrop" stroke="cyan" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
+      <line id="newStatedDecayDrop" class="marker-line" stroke="cyan" style="display:none"/>
       <text id="newStatedDecayTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
-      <line id="newStatedAttackDrop" stroke="cyan" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
+      <line id="newStatedAttackDrop" class="marker-line" stroke="cyan" style="display:none"/>
       <text id="newStatedAttackTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
-      <line id="newEffectiveDecayDrop" stroke="white" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
+      <line id="newEffectiveDecayDrop" class="marker-line" stroke="white" style="display:none"/>
       <text id="newEffectiveDecayTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
-      <line id="newEffectiveAttackDrop" stroke="white" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
+      <line id="newEffectiveAttackDrop" class="marker-line" stroke="white" style="display:none"/>
       <text id="newEffectiveAttackTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
-      <line id="newEffectiveAttackDropEnd" stroke="white" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
+      <line id="newEffectiveAttackDropEnd" class="marker-line" stroke="white" style="display:none"/>
       <text id="newEffectiveClipTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
-      <line id="newEffectiveReleaseDrop" stroke="white" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
+      <line id="newEffectiveReleaseDrop" class="marker-line" stroke="white" style="display:none"/>
       <text id="newEffectiveReleaseTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
-      <line id="newStatedReleaseDrop" stroke="cyan" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
+      <line id="newStatedReleaseDrop" class="marker-line" stroke="cyan" style="display:none"/>
       <text id="newStatedReleaseTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
-      <line id="gateTimeLine" stroke-width="1" stroke-dasharray="4,4" style="display:none;stroke:var(--gateColor)"/>
-      <line id="gateEffectiveHoriz" stroke-width="1" stroke-dasharray="4,4" style="display:none;stroke:var(--gateColor)"/>
-      <line id="gateStatedHoriz" stroke-width="1" stroke-dasharray="4,4" style="display:none;stroke:var(--gateColor)"/>
+      <line id="gateTimeLine" class="marker-line" style="display:none;stroke:var(--gateColor)"/>
+      <line id="gateEffectiveHoriz" class="marker-line" style="display:none;stroke:var(--gateColor)"/>
+      <line id="gateStatedHoriz" class="marker-line" style="display:none;stroke:var(--gateColor)"/>
       <line id="gateStatedRelease" stroke="white" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;display:none"/>
-      <line id="gateStatedReleaseDrop" stroke="cyan" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
+      <line id="gateStatedReleaseDrop" class="marker-line" stroke="cyan" style="display:none"/>
       <text id="gateStatedReleaseTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
-      <line id="gateEffectiveReleaseDrop" stroke="white" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
+      <line id="gateEffectiveReleaseDrop" class="marker-line" stroke="white" style="display:none"/>
       <text id="gateEffectiveReleaseTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <text id="gateTimeLabel" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px);fill:var(--gateColor)"/>
       <g id="envSegments">
@@ -306,7 +306,7 @@
           <div class="row"><label>Meter L <input id="meterFillColor" type="color" value="#00ff00"></label><label>Meter F <input id="meterFillColorFilter" type="color" value="#00ffff"></label><label>Stated <input id="timeAxisStatedColor" type="color" value="#aaaaaa"></label><label>Contour <input id="contourLineColor" type="color" value="#ffff00"></label></div>
           <div class="row"><label>L.Attack <input id="loudnessAttackColor" type="color" value="#ff0000"></label><label>L.Decay <input id="loudnessDecayColor" type="color" value="#ff0000"></label><label>L.Release <input id="loudnessReleaseColor" type="color" value="#ff0000"></label><label>L.Gate <input id="loudnessGateColor" type="color" value="#ff8800"></label></div>
           <div class="row"><label>F.Attack <input id="filterAttackColor" type="color" value="#00ffff"></label><label>F.Decay <input id="filterDecayColor" type="color" value="#ffff00"></label><label>F.Release <input id="filterReleaseColor" type="color" value="#ffff00"></label><label>F.Gate <input id="filterGateColor" type="color" value="#ff8800"></label></div>
-          <div class="row"><label>Underlay <input type="color" id="underlayColor" value="#ffffff"></label><label>Label Gutter <input id="timeLabelGutter" type="number" min="0" step="1" value="0"></label></div>
+          <div class="row"><label>Underlay <input type="color" id="underlayColor" value="#ffffff"></label><label>Label Gutter <input id="timeLabelGutter" type="number" min="0" step="1" value="0"></label><label>Marker W <input id="markerLineWidth" type="number" min="1" max="8" step="0.5" value="1"></label><label><input id="dottedMarkers" type="checkbox" checked> Dotted Markers</label></div>
         </div>
       </div>
       <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label></div>

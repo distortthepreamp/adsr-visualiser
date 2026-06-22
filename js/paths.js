@@ -577,7 +577,7 @@ function render(){
     floorLine.style.display = showContour ? '' : 'none';
   }
   if(amountLine){
-    amountLine.setAttribute('x1', pts.p1.x);
+    amountLine.setAttribute('x1', (showGateTime && gateCloseX < pts.p1.x) ? gateCloseX : pts.p1.x);
     amountLine.setAttribute('y1', amountY);
     amountLine.setAttribute('x2', meterLeftX);
     amountLine.setAttribute('y2', amountY);
