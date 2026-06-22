@@ -7,63 +7,7 @@ const PATH_BISECT_ITERATIONS  = 32;     // binary search depth for SVG path Y sa
 const GLOW_PULSE_PERIOD_MS    = 400;    // period of the sustain blob glow pulse animation
 const MIN_RELEASE_MS          = 20;     // minimum release/decay animation duration in ms
 
-// ---- Point geometry helpers ----
-
-function pointOnAttackDecay(ms){
-  const pts=computePoints(), e=pts.e; const t=ms/1000;
-
-  if(e.aT > INSTANT_PHASE_THRESHOLD && t <= e.aT){
-    const f=clamp(t/e.aT);
-    return { x:pts.p0.x+(pts.p1.x-pts.p0.x)*f, y:pts.p0.y+(pts.p1.y-pts.p0.y)*f, level:f, phase:'attack' };
-  }
-
-  const after = e.aT <= INSTANT_PHASE_THRESHOLD ? t : t-e.aT;
-  const f=e.dT<=INSTANT_PHASE_THRESHOLD ? 1 : clamp(after/e.dT);
-  const level=1-f;
-  const phase = level <= e.s + .0001 ? 'sustain' : 'decay';
-  return { x:pts.p1.x+(pts.pEnd.x-pts.p1.x)*f, y:yFor(e.floor+level*e.scale), level, phase };
-}
-
-// Gate-high behaviour: attack, then decay only until the sustain level.
-// If the gate is still high after that, the blob parks at the sustain intersection.
-function pointWhileGateHigh(ms){
-  const pts=computePoints(), e=pts.e;
-  const pt = pointOnAttackDecay(ms);
-  if(pt.phase === 'sustain' || (pt.phase !== 'attack' && pt.level <= e.s + .0001)){
-    return { x:pts.pS.x, y:pts.pS.y, level:e.s, phase:'decay' };
-  }
-  return pt;
-}
-
-// Sample the actual rendered decay curve y at the sustain park x, so the blob
-// doesn't jump in analogue curve mode where pts.pS.y is geometrically computed.
-function sampledSustainPoint(pt){
-  if(pt.phase !== 'sustain') return pt;
-  const decayPathEl = document.getElementById('decayInner');
-  const sampledY = decayPathEl ? getYFromPath(decayPathEl, pt.x) : pt.y;
-  return { x: pt.x, y: sampledY, level: pt.level, phase: 'sustain' };
-}
-
-// Gate-high point for textbook mode: attack to peak, decay to sustain level (not floor).
-function pointWhileGateHighTextbook(ms){
-  const tb=tbComputeAnimPoints();
-  const e=tb.e;
-  const t=ms/1000;
-  const floorY=yFor(e.floor);
-  if(e.aT>INSTANT_PHASE_THRESHOLD && t<=e.aT){
-    const f=clamp(t/e.aT);
-    return {x:graph.x0+(tb.tbAttackEnd.x-graph.x0)*f, y:floorY+(tb.tbAttackEnd.y-floorY)*f, level:f, phase:'attack'};
-  }
-  const afterAttack=e.aT<=INSTANT_PHASE_THRESHOLD?t:t-e.aT;
-  const f=e.dT<=INSTANT_PHASE_THRESHOLD?1:clamp(afterAttack/e.dT);
-  if(f>=1) return {x:tb.tbDecayEnd.x, y:tb.tbDecayEnd.y, level:e.s, phase:'sustain'};
-  const level=1-f*(1-e.s);
-  return {
-    x:tb.tbAttackEnd.x+(tb.tbDecayEnd.x-tb.tbAttackEnd.x)*f,
-    y:tb.tbAttackEnd.y+(tb.tbDecayEnd.y-tb.tbAttackEnd.y)*f,
-    level, phase:'decay'
-  };
-}
+// (Legacy point geometry helpers removed — effectivePos/statedPos now handle all phases)
 
 // ---- Blob glow ----
 
@@ -132,16 +76,7 @@ function setDot(pt, visible=true){
   if(!visible){ hideDot(); return; }
   dot.style.visibility='visible';
   dot.setAttribute('cx',pt.x);
-  let dotY = pt.y;
-  if(pt.phase === 'attack' || pt.phase === 'decay' || pt.phase === 'release'){
-    const pathId = pt.phase === 'attack' ? 'attackInner' : pt.phase === 'decay' ? 'decayInner' : 'releaseInner';
-    const pathEl = document.getElementById(pathId);
-    if(pathEl){
-      const sampled = getYFromPath(pathEl, pt.x);
-      if(sampled !== null) dotY = sampled;
-    }
-  }
-  dot.setAttribute('cy', dotY);
+  dot.setAttribute('cy', pt.y);
   dot.style.opacity='1';
   dot.style.fill = getComputedStyle(document.documentElement).getPropertyValue('--attackColor').trim() || '#ff0000';
   applyBlobGlow();
@@ -313,58 +248,85 @@ function clearBlobAndMarker(){
 
 function tap(ms){
   logEvent('ANIMATION', { action: 'tap', ms: Number(ms) || 200 });
-  if(state.currentPhase === 'hold' || state.currentPhase === 'sustain') clearBlobAndMarker();
+  if(state.currentPhase === 'hold' || state.currentPhase === 'sustain' || state.currentPhase === 'release') clearBlobAndMarker();
   releaseStartPoint=null;
-  hideDot();
-  hideTapMarker();
   if(audioEnabled()){ initAudio(); audioGateOpen(); }
   animationToken++;
   const myAnimationToken = animationToken;
   cancelAnimationFrame(state.dotAnim);
-  const tapMs=Number(ms)||200;
-  const t0=performance.now();
-  state.held=false;
-  state.currentPhase='tap';
+  hideDot();
+  hideDotStated();
+  state.held = false;
+  state.currentPhase = 'tap';
   updateButtonStates();
-  if($('textbookAdsr') && $('textbookAdsr').checked){
-    function tbTapStep(now){
-      if(myAnimationToken !== animationToken) return;
-      const elapsed=now-t0;
-      if(elapsed < tapMs){
-        const pt=pointWhileGateHighTextbook(elapsed);
-        setDot(pt.phase==='sustain'?{x:pt.x,y:pt.y,level:pt.level,phase:'decay'}:pt, true);
-        state.dotAnim=requestAnimationFrame(tbTapStep);
-      } else {
-        const landing=pointWhileGateHighTextbook(tapMs);
-        const landPt=landing.phase==='sustain'?{x:landing.x,y:landing.y,level:landing.level,phase:'decay'}:landing;
-        setDot(landPt, true);
-        releaseFromCurrent();
-      }
-    }
-    requestAnimationFrame(tbTapStep);
-    return;
-  }
+
+  const tapMs = Number(ms) || 200;
+  const e = getEffective();
+  let tPlay = 0;
+  let prevNow = null;
+  let releaseT;           // set when gate closes
+  // Determine release mode: if gate closes during sustain, use sustain-origin; else gate-origin
+  let releaseMode;        // set at gate close
+
   function step(now){
-    if (myAnimationToken !== animationToken) return;
-    const elapsed=now-t0;
-    if(elapsed < tapMs){ setDot(sampledSustainPoint(pointWhileGateHigh(elapsed)), true); state.dotAnim=requestAnimationFrame(step); }
-    else {
-      const landing=sampledSustainPoint(pointWhileGateHigh(tapMs));
-      setDot(landing, true);
-      const e=getEffective();
-      if(!e.releaseOn){ setTapMarker({x: Number($('dot').getAttribute('cx')), y: Number($('dot').getAttribute('cy')), level: landing.level}); }
-      if(e.releaseOn){
-        releaseFromCurrent();
-      } else {
-        cancelAnimationFrame(state.dotAnim);
+    if(myAnimationToken !== animationToken) return;
+    if(prevNow !== null){
+      tPlay += (now - prevNow) * animRate();
+    }
+    prevNow = now;
+
+    // Auto-trigger release at gate time
+    if(releaseT === undefined && tPlay >= tapMs){
+      releaseT = tapMs;   // release starts exactly at gate time (not current tPlay which may overshoot)
+      audioGateClose();
+      // Determine release mode: if the blob is at sustain, use sustain-origin; else gate-origin
+      const posAtGate = effectivePos(tapMs);
+      releaseMode = posAtGate.phase === 'sustain' ? 'sustain' : 'gate';
+      if(!e.releaseOn){
+        // No release — end at gate point
+        const effEnd = effectivePos(tapMs);
+        const stEnd = statedPos(tapMs);
+        setDot(effEnd, true);
+        setDotStated(stEnd, true);
+        // Brief flash then vanish
         audioCut();
         hideDot();
-        state.held=false;
-        state.currentPhase='idle';
-        state.dotLevel=landing.level;
+        hideDotStated();
+        state.currentPhase = 'idle';
+        state.dotLevel = 0;
         updateButtonStates();
+        return;
       }
+      state.currentPhase = 'release';
     }
+
+    // Position both blobs
+    const pos = effectivePos(tPlay, releaseT, releaseMode);
+    const spos = statedPos(tPlay, releaseT, releaseMode);
+
+    // Effective blob
+    setDot(pos, true);
+    const effVis = effLegVisible(pos.phase);
+    $('dot').style.opacity = effVis ? '1' : '0';
+    if(!effVis) $('dot').removeAttribute('filter');
+
+    // Stated blob
+    setDotStated(spos, true);
+    const sVis = statedLegVisible(spos.phase);
+    $('dotStated').style.opacity = sVis ? '1' : '0';
+    if(!sVis) $('dotStated').removeAttribute('filter');
+
+    // Release completion
+    if(pos.done && spos.done){
+      hideDot();
+      hideDotStated();
+      audioCut();
+      state.currentPhase = 'idle';
+      state.dotLevel = 0;
+      updateButtonStates();
+      return;
+    }
+    state.dotAnim = requestAnimationFrame(step);
   }
   requestAnimationFrame(step);
 }
@@ -373,7 +335,8 @@ function tap(ms){
 // Given playback time t (ms since note-on), return {x, y, phase, level} on the effective curve.
 // If releaseT is provided and t >= releaseT, the blob is in release phase, sampling releaseInner.
 // x is geometric; y is sampled from the rendered path.
-function effectivePos(t, releaseT){
+// releaseMode: 'sustain' = hold release from sustain (releaseInner), 'gate' = tap release from gate point (tapReleaseOrange)
+function effectivePos(t, releaseT, releaseMode){
   const pts = computePoints(), e = pts.e;
   const tSec = t / 1000;
   let x, phase, level;
@@ -383,21 +346,49 @@ function effectivePos(t, releaseT){
     const relDurMs = Math.max(MIN_RELEASE_MS, e.rT * 1000);
     const rf = clamp((t - releaseT) / relDurMs);
     phase = 'release';
+    // Shared x from elapsed release time — both blobs advance at the same pixel rate.
+    const linearTimeOn = $('linearTime') && $('linearTime').checked;
+    const elapsedRelSec = (t - releaseT) / 1000;
+    if(releaseMode === 'gate'){
+      // Gate-origin release: shared x from gateCloseX + time-mapped pixels
+      const relTSec = releaseT / 1000;
+      let gcX;
+      if(e.aT > INSTANT_PHASE_THRESHOLD && relTSec <= e.aT){
+        gcX = pts.p0.x + (pts.p1.x - pts.p0.x) * clamp(relTSec / e.aT);
+      } else {
+        const gfd = e.dT > INSTANT_PHASE_THRESHOLD ? clamp((relTSec - e.aT) / e.dT) : 1;
+        gcX = pts.p1.x + (pts.pEnd.x - pts.p1.x) * gfd;
+      }
+      if(gcX > pts.pS.x) gcX = pts.pS.x;
+      x = gcX + timeToPixels(elapsedRelSec, linearTimeOn);
+      const relEl = document.getElementById('tapReleaseOrange');
+      let endX = gcX;
+      if(relEl && relEl.getTotalLength() > 0){
+        endX = relEl.getPointAtLength(relEl.getTotalLength()).x;
+      }
+      const done = x >= endX;
+      if(done) x = endX;
+      let y = null;
+      if(relEl) y = getYFromPath(relEl, x);
+      level = e.s * (1 - rf);
+      if(y === null) y = yFor(e.floor + level * e.scale);
+      return { x, y, phase, level, done };
+    }
+    // Sustain-origin release: shared x from releaseStartX + time-mapped pixels
     level = e.s * (1 - rf);
-    // x: interpolate from release start (end of sustain gap) to release curve endpoint
-    // The blob jumps from its sustain park to releaseStartX — the sustain plateau is not elapsed time.
     const relEl = document.getElementById('releaseInner');
     const startX = pts.pEnd.x + graph.w * state.tbSustainGap;
+    x = startX + timeToPixels(elapsedRelSec, linearTimeOn);
     let endX = startX;
     if(relEl && relEl.getTotalLength() > 0){
       endX = relEl.getPointAtLength(relEl.getTotalLength()).x;
     }
-    x = startX + (endX - startX) * rf;
-    // y: sample releaseInner
+    const done = x >= endX;
+    if(done) x = endX;
     let y = null;
     if(relEl) y = getYFromPath(relEl, x);
     if(y === null) y = yFor(e.floor + level * e.scale);
-    return { x, y, phase, level, done: rf >= 1 };
+    return { x, y, phase, level, done };
   }
 
   // Attack phase
@@ -439,8 +430,8 @@ function effectivePos(t, releaseT){
 // ---- t-based stated (textbook) position ----
 // Same t and phase logic as effectivePos, but samples underlay paths for y and parks
 // at the UNCAPPED stated sustain level (not the mimic-80% level).
-// If releaseT is provided and t >= releaseT, the blob is in release phase, sampling underlayRelease.
-function statedPos(t, releaseT){
+// releaseMode: 'sustain' = hold release (underlayRelease), 'gate' = tap release (gateStatedRelease)
+function statedPos(t, releaseT, releaseMode){
   const pts = computePoints(), e = pts.e;
   const tSec = t / 1000;
   let x, phase, level;
@@ -450,21 +441,49 @@ function statedPos(t, releaseT){
     const relDurMs = Math.max(MIN_RELEASE_MS, e.rT * 1000);
     const rf = clamp((t - releaseT) / relDurMs);
     phase = 'release';
+    // Shared x from elapsed release time — same pixel rate as effectivePos for vertical alignment.
+    const linearTimeOn = $('linearTime') && $('linearTime').checked;
+    const elapsedRelSec = (t - releaseT) / 1000;
+    if(releaseMode === 'gate'){
+      // Gate-origin release: shared x from gateCloseX + time-mapped pixels
+      const relTSec = releaseT / 1000;
+      let gcX;
+      if(e.aT > INSTANT_PHASE_THRESHOLD && relTSec <= e.aT){
+        gcX = pts.p0.x + (pts.p1.x - pts.p0.x) * clamp(relTSec / e.aT);
+      } else {
+        const gfd = e.dT > INSTANT_PHASE_THRESHOLD ? clamp((relTSec - e.aT) / e.dT) : 1;
+        gcX = pts.p1.x + (pts.pEnd.x - pts.p1.x) * gfd;
+      }
+      if(gcX > pts.pS.x) gcX = pts.pS.x;
+      x = gcX + timeToPixels(elapsedRelSec, linearTimeOn);
+      const relEl = document.getElementById('gateStatedRelease');
+      let endX = gcX;
+      if(relEl && relEl.getTotalLength && relEl.getTotalLength() > 0){
+        endX = relEl.getPointAtLength(relEl.getTotalLength()).x;
+      }
+      const done = x >= endX;
+      if(done) x = endX;
+      let y = null;
+      if(relEl && relEl.getTotalLength && relEl.getTotalLength() > 0) y = getYFromPath(relEl, x);
+      level = e.s * (1 - rf);
+      if(y === null) y = yFor(e.floor + level * e.scale);
+      return { x, y, phase, level, done };
+    }
+    // Sustain-origin release: shared x from release start + time-mapped pixels
     level = e.s * (1 - rf);
-    // x: interpolate from release start (end of stated sustain gap) to underlay release endpoint
-    // The blob jumps from its sustain park to the release start — the sustain plateau is not elapsed time.
     const relEl = document.getElementById('underlayRelease');
     const startX = pts.pEnd.x + graph.w * state.tbSustainGap;
+    x = startX + timeToPixels(elapsedRelSec, linearTimeOn);
     let endX = startX;
     if(relEl && relEl.getTotalLength() > 0){
       endX = relEl.getPointAtLength(relEl.getTotalLength()).x;
     }
-    x = startX + (endX - startX) * rf;
-    // y: sample underlayRelease
+    const done = x >= endX;
+    if(done) x = endX;
     let y = null;
     if(relEl) y = getYFromPath(relEl, x);
     if(y === null) y = yFor(e.floor + level * e.scale);
-    return { x, y, phase, level, done: rf >= 1 };
+    return { x, y, phase, level, done };
   }
 
   // Attack phase
@@ -585,8 +604,8 @@ function hold(){
     prevNow = now;
 
     // Position both blobs
-    const pos = effectivePos(tPlay, releaseT);
-    const spos = statedPos(tPlay, releaseT);
+    const pos = effectivePos(tPlay, releaseT, 'sustain');
+    const spos = statedPos(tPlay, releaseT, 'sustain');
 
     // Effective blob
     setDot(pos, true);

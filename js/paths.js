@@ -48,6 +48,9 @@ function render(){
   const ceilingBoundEl = document.getElementById('ceilingBound');
   if(ceilingBoundEl) ceilingBoundEl.setAttribute('x2', VB_WIDTH);
 
+  // Link R to D: force state.r to mirror state.d so all downstream reads see D's value
+  if($('linkRToD') && $('linkRToD').checked){ state.r = state.d; state.target.r = state.target.d; }
+
   syncRadii();
   const pts=computePoints();
   // Draw the envelope as separate A/D/R segments. Each segment is drawn twice:
@@ -97,9 +100,10 @@ function render(){
     if (drawPS.x < cDX) drawPS = { x: cDX, y: ceilY, level: drawPS.level };
   }
 
+  const linkRToD = $('linkRToD') && $('linkRToD').checked;
   const releaseBox = $('releaseKnobBox');
-  if(releaseBox){ releaseBox.style.opacity = textbookAdsr ? '1' : UI_DISABLED_OPACITY; releaseBox.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
-  const releaseLegendEl=$('releaseLegend'); if(releaseLegendEl) releaseLegendEl.style.opacity=textbookAdsr?'1':UI_DISABLED_OPACITY;
+  if(releaseBox){ releaseBox.style.opacity = linkRToD ? UI_DISABLED_OPACITY : '1'; releaseBox.style.pointerEvents = linkRToD ? 'none' : 'auto'; }
+  const releaseLegendEl=$('releaseLegend'); if(releaseLegendEl) releaseLegendEl.style.opacity=linkRToD?UI_DISABLED_OPACITY:'1';
   const loudDecayRow = $('loudDecayRow');
   if(loudDecayRow){ loudDecayRow.style.opacity = textbookAdsr ? UI_DISABLED_OPACITY : '1'; loudDecayRow.style.pointerEvents = textbookAdsr ? 'none' : 'auto'; }
   const showClippedRow = $('showClippedRow');

@@ -311,7 +311,7 @@ function initUIControls(){
   });
 
   // Checkbox render and debug log listeners
-  ['loudDecay','keyboardControl','showContour','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain'].forEach(id => {
+  ['loudDecay','keyboardControl','showContour','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','linkRToD'].forEach(id => {
     const el = $(id); if(!el) return;
     el.addEventListener('change', render);
     el.addEventListener('change', () => {
