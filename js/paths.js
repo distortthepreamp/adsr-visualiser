@@ -289,7 +289,7 @@ function render(){
     // crossing at the gate-close level lands at gateCloseX, then clipped below that level.
     // When the gate closes at the sustain level this coincides with the green curve.
     // Gate RC discharge geometry — computed once, used by tapReleaseOrange and the effective GR descender.
-    const gateRCActive = !!(drawReleasePath && curveAmt);
+    const gateRCActive = !!(drawReleasePath && curveAmt && showGateTime);
     let orangeDischargeEndX = 0;
     if(gateRCActive){
       const magentaXAtGate = rcPolylineXAtY(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, gateCloseY, false, 200, 3);
@@ -337,7 +337,7 @@ function render(){
       if(gateEffReleaseTimeEl) gateEffReleaseTimeEl.style.display = 'none';
     }
     // Textbook (stated) gate-release line + ascender drop line and GR label.
-    const showStatedGateRelease = drawReleasePath && $('underlayR') && $('underlayR').checked;
+    const showStatedGateRelease = showGateTime && drawReleasePath && $('underlayR') && $('underlayR').checked;
     const gateRelEndX = gateCloseX + timeToPixels(mapTime(state.r), linearTimeOn);
     const gateRelEndY = yFor(pts.e.floor);
     const ulCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
