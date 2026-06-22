@@ -127,7 +127,7 @@ input[type=number]{width:62px; border:1px solid white; background:rgba(0,0,0,.25
 hr{margin:3px 0;}
 
 /* transport button layout */
-#tapModeHoldBtn, #clearBtn {
+#clearBtn {
   padding: 4px 7px;
   min-height: unset;
   line-height: 1.1;

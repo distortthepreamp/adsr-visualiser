@@ -42,7 +42,6 @@ function buildConfigSnapshot(){
     blobGlowRadius: Number($('blobGlowRadius') ? $('blobGlowRadius').value : 8),
     curveAmount: Number($('curveAmount').value),
     audioEnabled: $('audioEnabled').checked,
-    holdMode: state.holdMode,
     noteMode: noteMode,
     noteCustomHz: Number($('noteCustomHz').value),
     transitionSec: currentTransitionSec,
@@ -92,7 +91,6 @@ function loadConfigObject(cfg){
   // State
   state.a = cfg.a; state.d = cfg.d; state.s = cfg.s; state.r = cfg.r !== undefined ? cfg.r : 0.5; state.floor = cfg.floor; state.scale = cfg.scale;
   if(cfg.gate !== undefined){ state.gate = cfg.gate; state.target.gate = cfg.gate; }
-  if(cfg.holdMode !== undefined) state.holdMode = cfg.holdMode;
   state.target.a = cfg.a; state.target.d = cfg.d; state.target.s = cfg.s; state.target.r = state.r; state.target.floor = cfg.floor; state.target.scale = cfg.scale;
   const _tbCollapse = cfg.tbSustainCollapse ? true : false;
   state.tbSustainGap = _tbCollapse ? 0 : SUSTAIN_GAP_MAX;
@@ -121,9 +119,6 @@ function loadConfigObject(cfg){
 
   // Audio enabled
   if($('audioEnabled') && cfg.audioEnabled !== undefined) $('audioEnabled').checked = cfg.audioEnabled;
-
-  // Hold mode
-  syncHoldButton();
 
   // Note mode
   if(cfg.noteMode){

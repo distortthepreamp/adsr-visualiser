@@ -167,13 +167,6 @@ function updateButtonStates(){
   // stub — reserved for future button state sync
 }
 
-// ---- Hold mode styling ----
-function syncHoldButton(){
-  const b=$('tapModeHoldBtn'); if(!b) return;
-  if(state.holdMode){ b.style.background=BTN_ACTIVE_BG; b.style.color=BTN_ACTIVE_FG; }
-  else { b.style.background=''; b.style.color=''; }
-}
-
 // ---- Advanced popup helpers ----
 function openAdvanced(){ $('advancedPopup').style.display=''; $('advancedToggle').style.background=BTN_ACTIVE_BG; $('advancedToggle').style.color=BTN_ACTIVE_FG; }
 function closeAdvanced(){ $('advancedPopup').style.display='none'; $('advancedToggle').style.background=''; $('advancedToggle').style.color=''; }
@@ -406,8 +399,6 @@ function initUIControls(){
   $('transitionBtn').addEventListener('click',()=>{ currentTransitionSec=Number($('customTransitionTime').value)||3; transition(currentTransitionSec); });
   $('customTransitionTime').addEventListener('input',()=>{ currentTransitionSec=Number($('customTransitionTime').value)||3; });
 
-  // Hold button — toggles state.holdMode
-  $('tapModeHoldBtn').addEventListener('click', () => { state.holdMode = !state.holdMode; syncHoldButton(); });
   // Gate knob quickset buttons — set target and transition, matching the other knobs' quicksets
   document.querySelectorAll('.quickset-btn[data-knob="gate"]').forEach(btn => {
     btn.addEventListener('click', () => {

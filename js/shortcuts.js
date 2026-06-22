@@ -40,13 +40,13 @@ const tag = document.activeElement ? document.activeElement.tagName : '';
     if(e.key === '?'){ showHelp(); return; }
     if(e.key === ' '){
       e.preventDefault();
-      if(state.holdMode){
+      const gateShown = $('showGateTime') && $('showGateTime').checked;
+      if(!gateShown){
         if(state.currentPhase === 'hold' || state.currentPhase === 'sustain'){ releaseFromCurrent(); }
         else { hold(); }
       } else {
         tap(Math.round(gateMsFromPosition(state.gate)));
       }
-    } else if(e.key === 'h' || e.key === 'H'){ state.holdMode = !state.holdMode; syncHoldButton();
     } else if(e.key === 'Enter'){
       e.preventDefault();
       transition(currentTransitionSec);
