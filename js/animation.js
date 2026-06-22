@@ -70,14 +70,15 @@ function pointWhileGateHighTextbook(ms){
 function blobGlowRadius(){ return Math.max(0, Number(($('blobGlowRadius')&&$('blobGlowRadius').value)||8)); }
 
 function applyBlobGlow(){
-  const dot=$('dot'), feBlur=$('blobGlowBlur');
-  if(!dot) return;
+  const dot=$('dot'), dotS=$('dotStated'), feBlur=$('blobGlowBlur');
   const on=$('blobGlowEnabled')&&$('blobGlowEnabled').checked;
   if(on){
     if(feBlur) feBlur.setAttribute('stdDeviation', blobGlowRadius());
-    dot.setAttribute('filter','url(#blobGlow)');
+    if(dot) dot.setAttribute('filter','url(#blobGlow)');
+    if(dotS) dotS.setAttribute('filter','url(#blobGlow)');
   } else {
-    dot.removeAttribute('filter');
+    if(dot) dot.removeAttribute('filter');
+    if(dotS) dotS.removeAttribute('filter');
   }
 }
 
@@ -142,6 +143,7 @@ function setDot(pt, visible=true){
   }
   dot.setAttribute('cy', dotY);
   dot.style.opacity='1';
+  dot.style.fill = getComputedStyle(document.documentElement).getPropertyValue('--attackColor').trim() || '#ff0000';
   applyBlobGlow();
   state.dotLevel=pt.level;
   setMeterLevel(pt.level);
@@ -171,6 +173,7 @@ function releaseFromCurrent(){
   const dot=$('dot'); dot.style.animation='none'; dot.style.opacity='1';
   cancelAnimationFrame(state.dotAnim);
   stopGlowPulse();
+  hideDotStated();
   const e=getEffective();
 
   // Loud Decay OFF: no release phase — blob vanishes instantly.
@@ -287,6 +290,7 @@ function clearBlobAndMarker(){
   audioCut();
   $('dot').style.animation='none';
   hideDot();
+  hideDotStated();
   hideTapMarker();
   state.held=false;
   state.currentPhase='idle';
@@ -399,6 +403,68 @@ function effectivePos(t){
   return { x, y, phase, level };
 }
 
+// ---- t-based stated (textbook) position ----
+// Same t and phase logic as effectivePos, but samples underlay paths for y and parks
+// at the UNCAPPED stated sustain level (not the mimic-80% level).
+function statedPos(t){
+  const pts = computePoints(), e = pts.e;
+  const tSec = t / 1000;
+  let x, phase, level;
+  // Attack phase
+  if(e.aT > INSTANT_PHASE_THRESHOLD && tSec <= e.aT){
+    const f = clamp(tSec / e.aT);
+    x = pts.p0.x + (pts.p1.x - pts.p0.x) * f;
+    level = f;
+    phase = 'attack';
+  } else {
+    // Decay phase — full stated decay traversal to pts.pEnd.x (park when f >= 1)
+    const after = e.aT <= INSTANT_PHASE_THRESHOLD ? tSec : tSec - e.aT;
+    const f = e.dT <= INSTANT_PHASE_THRESHOLD ? 1 : clamp(after / e.dT);
+    level = 1 - f;
+    if(f >= 1){
+      // Stated sustain park — at the full decay endpoint, uncapped sustain y
+      x = pts.pEnd.x;
+      level = e.s;
+      phase = 'sustain';
+    } else {
+      x = pts.p1.x + (pts.pEnd.x - pts.p1.x) * f;
+      phase = 'decay';
+    }
+  }
+  // Sample underlay paths for y
+  let y;
+  if(phase === 'sustain'){
+    const udEl = document.getElementById('underlayDecay');
+    y = udEl ? getYFromPath(udEl, x) : null;
+    if(y === null) y = yFor(e.floor + level * e.scale);
+  } else {
+    const pathId = phase === 'attack' ? 'underlayAttack' : 'underlayDecay';
+    const pathEl = document.getElementById(pathId);
+    y = pathEl ? getYFromPath(pathEl, x) : null;
+    if(y === null) y = yFor(e.floor + level * e.scale);
+  }
+  return { x, y, phase, level };
+}
+
+// ---- Stated blob helpers ----
+function setDotStated(pt, visible){
+  const el = $('dotStated');
+  if(!el) return;
+  if(!visible){ hideDotStated(); return; }
+  el.style.visibility = 'visible';
+  el.setAttribute('cx', pt.x);
+  el.setAttribute('cy', pt.y);
+  el.style.opacity = '1';
+  // Colour from underlay picker
+  const ulCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
+  el.style.fill = ulCol;
+}
+
+function hideDotStated(){
+  const el = $('dotStated');
+  if(el){ el.style.opacity = 0; el.style.visibility = 'hidden'; el.removeAttribute('filter'); }
+}
+
 // ---- Slo-mo rate ----
 function animRate(){ return ($('sloMo') && $('sloMo').checked) ? 0.1 : 1; }
 
@@ -410,6 +476,7 @@ function hold(){
   if(audioEnabled()){ initAudio(); audioGateOpen(); }
   cancelAnimationFrame(state.dotAnim);
   hideDot();
+  hideDotStated();
   state.held = true;
   state.currentPhase = 'hold';
   updateButtonStates();
@@ -417,6 +484,8 @@ function hold(){
   // t-based clock: t = playback time in ms, advanced by (realDelta * rate) each frame
   let tPlay = 0;
   let prevNow = null;
+  let effParked = false;
+  let statedParked = false;
 
   function step(now){
     if(myAnimationToken !== animationToken) return;
@@ -426,16 +495,31 @@ function hold(){
     }
     prevNow = now;
 
-    const pos = effectivePos(tPlay);
-    setDot(pos, true);
+    // Effective blob
+    if(!effParked){
+      const pos = effectivePos(tPlay);
+      setDot(pos, true);
+      if(pos.phase === 'sustain'){
+        $('dot').style.animation = 'none';
+        startGlowPulse();
+        effParked = true;
+      }
+    }
 
-    if(pos.phase === 'sustain'){
-      // Arrived at sustain — park and start glow pulse
-      $('dot').style.animation = 'none';
-      startGlowPulse();
+    // Stated blob
+    if(!statedParked){
+      const spos = statedPos(tPlay);
+      setDotStated(spos, true);
+      if(spos.phase === 'sustain'){
+        applyBlobGlow();
+        statedParked = true;
+      }
+    }
+
+    // Both parked → enter sustain state, stop loop
+    if(effParked && statedParked){
       state.currentPhase = 'sustain';
       updateButtonStates();
-      // Don't schedule another frame — blob stays parked until release
       return;
     }
     state.dotAnim = requestAnimationFrame(step);

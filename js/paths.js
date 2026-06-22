@@ -30,7 +30,10 @@ function buildPath(x0, y0, x1, y1, curve, scaleFactor, hStartOverride, hEndOverr
 }
 function syncRadii(){
   const lw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--innerLineWidth')) || 6;
-  document.getElementById('dot').setAttribute('r', Math.round(lw * 1.0));
+  const bs = parseFloat(($('blobScale') && $('blobScale').value) || 3);
+  document.getElementById('dot').setAttribute('r', Math.round(lw * bs));
+  const dotStated = document.getElementById('dotStated');
+  if(dotStated) dotStated.setAttribute('r', Math.round(lw * bs));
   document.getElementById('tapMarker').setAttribute('r', Math.round(lw * 0.8));
   document.getElementById('sustainPoint').setAttribute('r', Math.round(lw * 0.57));
 }

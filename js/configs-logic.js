@@ -67,6 +67,7 @@ function buildConfigSnapshot(){
     dottedMarkers: $('dottedMarkers') ? $('dottedMarkers').checked : true,
     labelSize: Number($('labelSize').value),
     h1Scale: Number($('h1Scale') ? $('h1Scale').value : 1.0),
+    blobScale: Number($('blobScale') ? $('blobScale').value : 3),
     h2Scale: Number($('h2Scale') ? $('h2Scale').value : 1.0),
     consoleScale: Number($('consoleScale').value),
     meterWidth: Number($('meterWidth').value),
@@ -150,6 +151,7 @@ function loadConfigObject(cfg){
   if($('labelSize') && cfg.labelSize !== undefined){ $('labelSize').value = cfg.labelSize; $('labelSize').dispatchEvent(new Event('input')); }
   if($('h1Scale') && cfg.h1Scale !== undefined){ const v=Math.min(3.0,Math.max(1.0,Number(cfg.h1Scale)||1.0)); $('h1Scale').value=v.toFixed(1); document.documentElement.style.setProperty('--h1Scale',v); }
   if($('h2Scale') && cfg.h2Scale !== undefined){ const v=Math.min(3.0,Math.max(1.0,Number(cfg.h2Scale)||1.0)); $('h2Scale').value=v.toFixed(1); document.documentElement.style.setProperty('--h2Scale',v); }
+  if($('blobScale') && cfg.blobScale !== undefined){ $('blobScale').value = Math.min(8,Math.max(1,Number(cfg.blobScale)||3)); syncRadii(); }
   if($('consoleScale') && cfg.consoleScale !== undefined){ $('consoleScale').value = cfg.consoleScale; syncConsoleScale(); }
   if($('meterWidth') && cfg.meterWidth !== undefined){ $('meterWidth').value = cfg.meterWidth; METER_W = Math.max(10, Math.min(80, Number(cfg.meterWidth) || 40)); }
   if($('meterStrokeWidth') && cfg.meterStrokeWidth !== undefined){ $('meterStrokeWidth').value = cfg.meterStrokeWidth; METER_STROKE_W = Math.max(1, Math.min(20, Number(cfg.meterStrokeWidth) || 7)); }
