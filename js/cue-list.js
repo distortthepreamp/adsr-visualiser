@@ -128,10 +128,45 @@ function parseCueList(text) {
       continue;
     }
 
-    // set <checkbox-param> on/off — single regex for remaining boolean params
-    const setBoolMatch = line.match(/^set\s+(filter-decay|hp-mode|mimic-sustain|analogue|linear-time|zoom-time|textbook|show-clipped|show-contour|tb-sustain-dotted|tb-sustain-collapse|tb-model-d-sustain)\s+(on|off)$/i);
+    // set <checkbox-param> on/off — single regex for boolean params
+    const setBoolMatch = line.match(/^set\s+(filter-decay|hp-mode|mimic-sustain|analogue|linear-time|show-clipped|show-contour|show-gate-time)\s+(on|off)$/i);
     if (setBoolMatch) {
       result.push({ type: 'set', param: setBoolMatch[1].toLowerCase(), value: setBoolMatch[2].toLowerCase() === 'on' });
+      continue;
+    }
+
+    // set zoom-x3|x6|x12|x24|x48 on/off — explicit zoom levels
+    const setZoomMatch = line.match(/^set\s+(zoom-x3|zoom-x6|zoom-x12|zoom-x24|zoom-x48)\s+(on|off)$/i);
+    if (setZoomMatch) {
+      result.push({ type: 'set', param: setZoomMatch[1].toLowerCase(), value: setZoomMatch[2].toLowerCase() === 'on' });
+      continue;
+    }
+
+    // set textbook attack|decay|sustain|release on/off — underlay per-leg visibility
+    const setTextbookLegMatch = line.match(/^set\s+textbook\s+(attack|decay|sustain|release)\s+(on|off)$/i);
+    if (setTextbookLegMatch) {
+      result.push({ type: 'set', param: 'textbook-' + setTextbookLegMatch[1].toLowerCase(), value: setTextbookLegMatch[2].toLowerCase() === 'on' });
+      continue;
+    }
+
+    // set textbook show-all|hide-all — underlay bulk visibility
+    const setTextbookBulkMatch = line.match(/^set\s+textbook\s+(show-all|hide-all)$/i);
+    if (setTextbookBulkMatch) {
+      result.push({ type: 'set', param: 'textbook-' + setTextbookBulkMatch[1].toLowerCase() });
+      continue;
+    }
+
+    // set actual attack|decay|sustain|release on/off — model per-leg visibility
+    const setActualLegMatch = line.match(/^set\s+actual\s+(attack|decay|sustain|release)\s+(on|off)$/i);
+    if (setActualLegMatch) {
+      result.push({ type: 'set', param: 'actual-' + setActualLegMatch[1].toLowerCase(), value: setActualLegMatch[2].toLowerCase() === 'on' });
+      continue;
+    }
+
+    // set actual show-all|hide-all — model bulk visibility
+    const setActualBulkMatch = line.match(/^set\s+actual\s+(show-all|hide-all)$/i);
+    if (setActualBulkMatch) {
+      result.push({ type: 'set', param: 'actual-' + setActualBulkMatch[1].toLowerCase() });
       continue;
     }
 
@@ -233,99 +268,76 @@ function parseCueList(text) {
 function executeEvent(event) {
   console.log(`[CueList] executing ${event.type} ${event.param ?? ''} ${event.value ?? ''} at ${msToTc(cueTimecodeMs)}`);
   if (event.type === 'set') {
+    // Helper: operate a checkbox control
+    const setCheckbox = (id) => { const el=$(id); if(el){ el.checked=event.value; el.dispatchEvent(new Event('change',{bubbles:true})); } };
+    // Helper: operate a knob via its commit path
+    const setKnobInput = (inputId, val, commitFn, commitArg) => {
+      const inp=document.getElementById(inputId); if(!inp) return;
+      inp.value=val; commitFn(commitArg||undefined, commitArg?inp:undefined);
+    };
     switch (event.param) {
+      // Knob params — operate the real commit path
       case 'attack':
-        state.a = positionFromMs(event.value);
-        state.target.a = state.a;
-        render();
+        { const inp=document.getElementById('attackMsInput'); if(inp){ inp.value=event.value; commitTime('a',inp); } }
         break;
       case 'decay':
-        state.d = positionFromMs(event.value);
-        state.target.d = state.d;
-        render();
-        break;
-      case 'sustain':
-        state.s = event.value / 10;
-        state.target.s = state.s;
-        render();
+        { const inp=document.getElementById('decayMsInput'); if(inp){ inp.value=event.value; commitTime('d',inp); } }
         break;
       case 'release':
-        state.r = positionFromMs(event.value);
-        state.target.r = state.r;
-        render();
+        { const inp=document.getElementById('releaseMsInput'); if(inp){ inp.value=event.value; commitTime('r',inp); } }
+        break;
+      case 'sustain':
+        { const inp=document.getElementById('sustainScaleInput'); if(inp){ inp.value=event.value; commitSustain(); } }
         break;
       case 'gate':
-        state.gate = gatePositionFromMs(event.value);
-        state.target.gate = state.gate;
-        render();
+        { const inp=document.getElementById('gateMsInput'); if(inp){ inp.value=event.value; commitGate(); } }
         break;
+      case 'cutoff':
+        { const inp=document.getElementById('floorScaleInput'); if(inp){ inp.value=event.value; commitFloor(); } }
+        break;
+      case 'amount':
+        { const inp=document.getElementById('scaleScaleInput'); if(inp){ inp.value=event.value; commitScale(); } }
+        break;
+      // Checkbox params — set .checked + dispatch change
       case 'loud-decay':
-        $('loudDecay').checked = event.value;
-        $('loudDecay').dispatchEvent(new Event('change'));
+        setCheckbox('loudDecay');
         if (window.kioskNotifySwitch) kioskNotifySwitch('loud-decay');
         break;
       case 'filter-mode':
-        $('frequencyMode').checked = event.value;
-        $('frequencyMode').dispatchEvent(new Event('change'));
+        setCheckbox('frequencyMode');
         if (window.kioskNotifySwitch) kioskNotifySwitch('filter-mode');
         break;
       case 'filter-decay':
-        $('loudDecay').checked = event.value;
-        $('loudDecay').dispatchEvent(new Event('change'));
+        setCheckbox('loudDecay');
         if (window.kioskNotifySwitch) kioskNotifySwitch('filter-decay');
         break;
-      case 'hp-mode':
-        $('hpMode').checked = event.value;
-        $('hpMode').dispatchEvent(new Event('change'));
-        break;
-      case 'mimic-sustain':
-        $('keyboardControl').checked = event.value;
-        $('keyboardControl').dispatchEvent(new Event('change'));
-        break;
-      case 'analogue':
-        $('analogueCurve').checked = event.value;
-        $('analogueCurve').dispatchEvent(new Event('change'));
-        break;
-      case 'linear-time':
-        $('linearTime').checked = event.value;
-        $('linearTime').dispatchEvent(new Event('change'));
-        break;
-      case 'zoom-time':
-        $('timelineZoom3x').checked = event.value;
-        $('timelineZoom3x').dispatchEvent(new Event('change'));
-        break;
-      case 'textbook':
-        $('textbookAdsr').checked = event.value;
-        $('textbookAdsr').dispatchEvent(new Event('change'));
-        break;
-      case 'show-clipped':
-        $('showClipped').checked = event.value;
-        $('showClipped').dispatchEvent(new Event('change'));
-        break;
-      case 'show-contour':
-        $('showContour').checked = event.value;
-        $('showContour').dispatchEvent(new Event('change'));
-        break;
-      case 'tb-sustain-dotted':
-        $('tbSustainDotted').checked = event.value;
-        $('tbSustainDotted').dispatchEvent(new Event('change'));
-        break;
-      case 'tb-sustain-collapse':
-        $('tbSustainCollapse').checked = event.value;
-        $('tbSustainCollapse').dispatchEvent(new Event('change'));
-        break;
-      case 'tb-model-d-sustain':
-        $('tbShowModelDSustain').checked = event.value;
-        $('tbShowModelDSustain').dispatchEvent(new Event('change'));
-        break;
-      case 'cutoff':
-        state.target.floor = event.value / 10;
-        transition(0);
-        break;
-      case 'amount':
-        state.target.scale = event.value / 10;
-        transition(0);
-        break;
+      case 'hp-mode':        setCheckbox('hpMode'); break;
+      case 'mimic-sustain':  setCheckbox('keyboardControl'); break;
+      case 'analogue':       setCheckbox('analogueCurve'); break;
+      case 'linear-time':    setCheckbox('linearTime'); break;
+      case 'show-clipped':   setCheckbox('showClipped'); break;
+      case 'show-contour':   setCheckbox('showContour'); break;
+      case 'show-gate-time': setCheckbox('showGateTime'); break;
+      // Explicit zoom levels
+      case 'zoom-x3':  setCheckbox('timelineZoom3x'); break;
+      case 'zoom-x6':  setCheckbox('timelineZoom6x'); break;
+      case 'zoom-x12': setCheckbox('timelineZoom12x'); break;
+      case 'zoom-x24': setCheckbox('timelineZoom24x'); break;
+      case 'zoom-x48': setCheckbox('timelineZoom48x'); break;
+      // Textbook (underlay) per-leg visibility
+      case 'textbook-attack':  setCheckbox('underlayA'); break;
+      case 'textbook-decay':   setCheckbox('underlayD'); break;
+      case 'textbook-sustain': setCheckbox('underlayS'); break;
+      case 'textbook-release': setCheckbox('underlayR'); break;
+      case 'textbook-show-all': { const b=$('underlayShowAll'); if(b) b.click(); } break;
+      case 'textbook-hide-all': { const b=$('underlayHideAll'); if(b) b.click(); } break;
+      // Actual (model) per-leg visibility
+      case 'actual-attack':  setCheckbox('modelA'); break;
+      case 'actual-decay':   setCheckbox('modelD'); break;
+      case 'actual-sustain': setCheckbox('modelS'); break;
+      case 'actual-release': setCheckbox('modelR'); break;
+      case 'actual-show-all': { const b=$('modelShowAll'); if(b) b.click(); } break;
+      case 'actual-hide-all': { const b=$('modelHideAll'); if(b) b.click(); } break;
     }
   } else if (event.type === 'transition') {
     switch (event.param) {
@@ -572,13 +584,23 @@ function generateStateSnapshot() {
   lines.push(`set mimic-sustain ${$('keyboardControl').checked ? 'on' : 'off'}`);
   lines.push(`set analogue ${$('analogueCurve').checked ? 'on' : 'off'}`);
   lines.push(`set linear-time ${$('linearTime').checked ? 'on' : 'off'}`);
-  lines.push(`set zoom-time ${$('timelineZoom3x').checked ? 'on' : 'off'}`);
-  lines.push(`set textbook ${$('textbookAdsr').checked ? 'on' : 'off'}`);
   lines.push(`set show-clipped ${$('showClipped').checked ? 'on' : 'off'}`);
   lines.push(`set show-contour ${$('showContour').checked ? 'on' : 'off'}`);
-  lines.push(`set tb-sustain-dotted ${$('tbSustainDotted').checked ? 'on' : 'off'}`);
-  lines.push(`set tb-sustain-collapse ${$('tbSustainCollapse').checked ? 'on' : 'off'}`);
-  lines.push(`set tb-model-d-sustain ${$('tbShowModelDSustain').checked ? 'on' : 'off'}`);
+  lines.push(`set show-gate-time ${$('showGateTime').checked ? 'on' : 'off'}`);
+  // Zoom levels
+  [['timelineZoom3x','zoom-x3'],['timelineZoom6x','zoom-x6'],['timelineZoom12x','zoom-x12'],['timelineZoom24x','zoom-x24'],['timelineZoom48x','zoom-x48']].forEach(([id,cmd]) => {
+    if($(id)) lines.push(`set ${cmd} ${$(id).checked ? 'on' : 'off'}`);
+  });
+  // Textbook (underlay) leg visibility
+  lines.push(`set textbook attack ${$('underlayA').checked ? 'on' : 'off'}`);
+  lines.push(`set textbook decay ${$('underlayD').checked ? 'on' : 'off'}`);
+  lines.push(`set textbook sustain ${$('underlayS').checked ? 'on' : 'off'}`);
+  lines.push(`set textbook release ${$('underlayR').checked ? 'on' : 'off'}`);
+  // Actual (model) leg visibility
+  lines.push(`set actual attack ${$('modelA').checked ? 'on' : 'off'}`);
+  lines.push(`set actual decay ${$('modelD').checked ? 'on' : 'off'}`);
+  lines.push(`set actual sustain ${$('modelS').checked ? 'on' : 'off'}`);
+  lines.push(`set actual release ${$('modelR').checked ? 'on' : 'off'}`);
   return lines.join('\n');
 }
 
