@@ -356,43 +356,89 @@ function tap(ms){
   requestAnimationFrame(step);
 }
 
+// ---- t-based effective position ----
+// Given playback time t (ms since note-on), return {x, y, phase, level} on the effective curve.
+// x is geometric; y is sampled from the rendered path.
+function effectivePos(t){
+  const pts = computePoints(), e = pts.e;
+  const tSec = t / 1000;
+  let x, phase, level;
+  // Attack phase
+  if(e.aT > INSTANT_PHASE_THRESHOLD && tSec <= e.aT){
+    const f = clamp(tSec / e.aT);
+    x = pts.p0.x + (pts.p1.x - pts.p0.x) * f;
+    level = f;
+    phase = 'attack';
+  } else {
+    // Decay phase (until sustain level)
+    const after = e.aT <= INSTANT_PHASE_THRESHOLD ? tSec : tSec - e.aT;
+    const f = e.dT <= INSTANT_PHASE_THRESHOLD ? 1 : clamp(after / e.dT);
+    level = 1 - f;
+    if(level <= e.s + 0.0001){
+      // Sustain — park at sustain point
+      x = pts.pS.x;
+      level = e.s;
+      phase = 'sustain';
+    } else {
+      x = pts.p1.x + (pts.pEnd.x - pts.p1.x) * f;
+      phase = 'decay';
+    }
+  }
+  // Sample rendered path for y
+  let y;
+  if(phase === 'sustain'){
+    const decayPathEl = document.getElementById('decayInner');
+    y = decayPathEl ? getYFromPath(decayPathEl, x) : yFor(e.floor + level * e.scale);
+    if(y === null) y = yFor(e.floor + level * e.scale);
+  } else {
+    const pathId = phase === 'attack' ? 'attackInner' : 'decayInner';
+    const pathEl = document.getElementById(pathId);
+    y = pathEl ? getYFromPath(pathEl, x) : yFor(e.floor + level * e.scale);
+    if(y === null) y = yFor(e.floor + level * e.scale);
+  }
+  return { x, y, phase, level };
+}
+
+// ---- Slo-mo rate ----
+function animRate(){ return ($('sloMo') && $('sloMo').checked) ? 0.1 : 1; }
+
 function hold(){
   logEvent('ANIMATION', { action: 'hold' });
-  releaseStartPoint=null;
+  releaseStartPoint = null;
   animationToken++;
   const myAnimationToken = animationToken;
-  hideTapMarker();
   if(audioEnabled()){ initAudio(); audioGateOpen(); }
   cancelAnimationFrame(state.dotAnim);
-  const pts=computePoints(), e=pts.e;
-  const dur=(e.aT + e.dT*(1-e.s))*1000;
-  const t0=performance.now();
-  hideDot(); state.held=true; state.currentPhase='hold'; updateButtonStates();
-  if($('textbookAdsr') && $('textbookAdsr').checked){
-    const tbDur=(e.aT+e.dT)*1000;
-    function tbHoldStep(now){
-      if(myAnimationToken !== animationToken) return;
-      const elapsed=now-t0;
-      const pt=pointWhileGateHighTextbook(elapsed);
-      setDot(pt.phase==='sustain'?{x:pt.x,y:pt.y,level:pt.level,phase:'decay'}:pt, true);
-      if(elapsed < tbDur){ state.dotAnim=requestAnimationFrame(tbHoldStep); }
-      else {
-        const tb=tbComputeAnimPoints();
-        const decayPathEl=document.getElementById('decayInner');
-        const sampledY=decayPathEl?getYFromPath(decayPathEl,tb.tbDecayEnd.x):tb.tbDecayEnd.y;
-        setDot({x:tb.tbDecayEnd.x,y:sampledY,level:tb.e.s,phase:'decay'},true);
-        $('dot').style.animation='none';
-        startGlowPulse();
-        state.currentPhase='sustain'; updateButtonStates();
-      }
-    }
-    requestAnimationFrame(tbHoldStep);
-    return;
-  }
+  hideDot();
+  state.held = true;
+  state.currentPhase = 'hold';
+  updateButtonStates();
+
+  // t-based clock: t = playback time in ms, advanced by (realDelta * rate) each frame
+  let tPlay = 0;
+  let prevNow = null;
+
   function step(now){
-    if (myAnimationToken !== animationToken) return;
-    const elapsed=now-t0; setDot(sampledSustainPoint(pointWhileGateHigh(elapsed)), true);
-    if(elapsed < dur) state.dotAnim=requestAnimationFrame(step); else { const decayPathEl=document.getElementById('decayInner'); const sampledY=decayPathEl?getYFromPath(decayPathEl,pts.pS.x):pts.pS.y; const parkPoint={x:pts.pS.x,y:sampledY,level:pts.pS.level,phase:'decay'}; setDot(parkPoint,true); $('dot').style.animation='none'; startGlowPulse(); state.currentPhase='sustain'; updateButtonStates(); }
+    if(myAnimationToken !== animationToken) return;
+    if(prevNow !== null){
+      const realDelta = now - prevNow;
+      tPlay += realDelta * animRate();
+    }
+    prevNow = now;
+
+    const pos = effectivePos(tPlay);
+    setDot(pos, true);
+
+    if(pos.phase === 'sustain'){
+      // Arrived at sustain — park and start glow pulse
+      $('dot').style.animation = 'none';
+      startGlowPulse();
+      state.currentPhase = 'sustain';
+      updateButtonStates();
+      // Don't schedule another frame — blob stays parked until release
+      return;
+    }
+    state.dotAnim = requestAnimationFrame(step);
   }
   requestAnimationFrame(step);
 }
