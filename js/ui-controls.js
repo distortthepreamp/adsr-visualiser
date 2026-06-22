@@ -128,39 +128,45 @@ function setTransMode(durSec, activeBtnId){
   if(row) row.style.display = activeBtnId==='transCustomToggle' ? '' : 'none';
 }
 
-// ---- setMeterLevel — updates the meter fill to reflect the current level ----
-function setMeterLevel(level){
-  const fill=$('meterFill');
+// ---- setMeterFill — core: updates a given fill rect from a blob's y coordinate ----
+function setMeterFill(fill, blobY, fillColor){
   if(!fill) return;
-  const e=getEffective();
-  const mx=METER_X, mw=METER_W;
-  const bottomAbsY=graph.y0;
-  const topAbsY=graph.y0-graph.h;
-  const levelY = Math.max(yFor(e.floor+level*e.scale), yFor(1));
+  const ceilY = yFor(1);
+  const floorY = graph.y0;
+  // Clamp blobY to the graph area
+  const levelY = Math.max(blobY, ceilY);
   const isHP=$('hpMode')&&$('hpMode').checked;
+  fill.style.fill=fillColor;
+  const glowR = Math.max(0, Number(($('meterGlowRadius')&&$('meterGlowRadius').value)||20));
+  fill.style.filter=($('meterGlow')&&$('meterGlow').checked) ? `drop-shadow(0 0 ${glowR}px ${fillColor}) drop-shadow(0 0 ${glowR*2}px ${fillColor})` : '';
+  if(!isHP){
+    const h=Math.max(0, floorY - levelY);
+    fill.setAttribute('y', levelY); fill.setAttribute('height', h);
+  } else {
+    fill.setAttribute('y', String(ceilY));
+    fill.setAttribute('height', String(Math.max(0, levelY - ceilY)));
+  }
+}
+// ---- setMeterLevel — effective (right half), driven by blob y ----
+function setMeterLevel(blobY){
   const freqModeOn=$('frequencyMode')&&$('frequencyMode').checked;
   const fillColor=freqModeOn
     ? (getComputedStyle(document.documentElement).getPropertyValue('--meterFillFilter').trim()||'#00ffff')
     : (getComputedStyle(document.documentElement).getPropertyValue('--meterFill').trim()||'#00ff00');
-  fill.style.fill=fillColor;
-  const glowR = Math.max(0, Number(($('meterGlowRadius')&&$('meterGlowRadius').value)||20));
-  fill.style.filter=($('meterGlow')&&$('meterGlow').checked) ? `drop-shadow(0 0 ${glowR}px ${fillColor}) drop-shadow(0 0 ${glowR*2}px ${fillColor})` : '';
-  fill.setAttribute('x',mx); fill.setAttribute('width',mw);
-  if(!isHP){
-    const h=Math.max(0,bottomAbsY-levelY);
-    fill.setAttribute('y',levelY); fill.setAttribute('height',h);
-  } else {
-    const topY = yFor(1);
-    fill.setAttribute('y', String(topY));
-    fill.setAttribute('height', String(Math.max(0, levelY - topY)));
-  }
+  setMeterFill($('meterFill'), blobY, fillColor);
+}
+// ---- setMeterLevelStated — stated (left half), driven by blob y ----
+function setMeterLevelStated(blobY){
+  const ulCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
+  setMeterFill($('meterFillStated'), blobY, ulCol);
 }
 
 function hideDot(){
   const dot=$('dot');
   dot.style.opacity=0;
   dot.style.visibility='hidden';
-  setMeterLevel(0);
+  state.dotY=graph.y0;
+  setMeterLevel(graph.y0);
 }
 
 function updateButtonStates(){
@@ -331,8 +337,8 @@ function initUIControls(){
   });
 
   // Meter / blob glow
-  $('meterGlow').addEventListener('change', () => setMeterLevel(state.dotLevel));
-  $('meterGlowRadius').addEventListener('input', e => { const inp=e.target,c=Math.min(60,Math.max(0,isNaN(parseInt(inp.value))?5:parseInt(inp.value))); inp.value=c; setMeterLevel(state.dotLevel); });
+  $('meterGlow').addEventListener('change', () => setMeterLevel(state.dotY || graph.y0));
+  $('meterGlowRadius').addEventListener('input', e => { const inp=e.target,c=Math.min(60,Math.max(0,isNaN(parseInt(inp.value))?5:parseInt(inp.value))); inp.value=c; setMeterLevel(state.dotY || graph.y0); });
   $('meterScanlinesVisible').addEventListener('change', render);
   $('blobGlowEnabled').addEventListener('change', () => { applyBlobGlow(); if(state.currentPhase==='sustain') startGlowPulse(); else stopGlowPulse(); });
   $('blobGlowRadius').addEventListener('input', e => { const inp=e.target,c=Math.min(30,Math.max(0,isNaN(parseInt(inp.value))?8:parseInt(inp.value))); inp.value=c; applyBlobGlow(); if(state.currentPhase==='sustain') startGlowPulse(); });
@@ -341,8 +347,8 @@ function initUIControls(){
   $('kioskInactiveOpacity').addEventListener('input', e => { const inp=e.target,c=Math.min(100,Math.max(0,isNaN(parseInt(inp.value))?70:parseInt(inp.value))); inp.value=c; if(window.kioskDrawIfOpen) kioskDrawIfOpen(); });
 
   // Filter mode
-  $('frequencyMode').addEventListener('change', () => { syncHpModeEnabled(); setMeterLevel(state.dotLevel); });
-  $('hpMode').addEventListener('change', () => setMeterLevel(state.dotLevel));
+  $('frequencyMode').addEventListener('change', () => { syncHpModeEnabled(); setMeterLevel(state.dotY || graph.y0); });
+  $('hpMode').addEventListener('change', () => setMeterLevel(state.dotY || graph.y0));
 
   // Kiosk switch glow — notify on manual checkbox changes
   $('loudDecay').addEventListener('change', () => { if(window.kioskNotifySwitch) kioskNotifySwitch($('frequencyMode').checked ? 'filter-decay' : 'loud-decay'); });

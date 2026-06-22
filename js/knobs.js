@@ -141,7 +141,7 @@ function commitFloor(){
     syncTargetToLive();
     render();
   } else { syncControls(); }
-  setMeterLevel(state.dotLevel);
+  setMeterLevel(state.dotY || graph.y0);
   requestAnimationFrame(refreshNumericInputs);
 }
 

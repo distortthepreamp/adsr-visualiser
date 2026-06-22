@@ -81,7 +81,8 @@ function setDot(pt, visible=true){
   dot.style.fill = getComputedStyle(document.documentElement).getPropertyValue('--attackColor').trim() || '#ff0000';
   applyBlobGlow();
   state.dotLevel=pt.level;
-  setMeterLevel(pt.level);
+  state.dotY=pt.y;
+  setMeterLevel(pt.y);
 }
 
 function hideTapMarker(){
@@ -534,11 +535,13 @@ function setDotStated(pt, visible){
   // Colour from underlay picker
   const ulCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
   el.style.fill = ulCol;
+  setMeterLevelStated(pt.y);
 }
 
 function hideDotStated(){
   const el = $('dotStated');
   if(el){ el.style.opacity = 0; el.style.visibility = 'hidden'; el.removeAttribute('filter'); }
+  setMeterLevelStated(graph.y0);
 }
 
 // ---- Per-leg blob visibility ----

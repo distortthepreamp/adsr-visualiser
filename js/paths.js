@@ -559,8 +559,22 @@ function render(){
     meterClipRect.setAttribute('x',meterX); meterClipRect.setAttribute('y',meterAbsTop);
     meterClipRect.setAttribute('width',meterW); meterClipRect.setAttribute('height',graph.h);
   }
+  // Split meter: left half = stated, right half = effective
+  const halfW = meterW / 2;
+  const meterClipLeftRect=$('meterClipLeftRect');
+  if(meterClipLeftRect){
+    meterClipLeftRect.setAttribute('x',meterX); meterClipLeftRect.setAttribute('y',meterAbsTop);
+    meterClipLeftRect.setAttribute('width',halfW); meterClipLeftRect.setAttribute('height',graph.h);
+  }
+  const meterClipRightRect=$('meterClipRightRect');
+  if(meterClipRightRect){
+    meterClipRightRect.setAttribute('x',meterX+halfW); meterClipRightRect.setAttribute('y',meterAbsTop);
+    meterClipRightRect.setAttribute('width',halfW); meterClipRightRect.setAttribute('height',graph.h);
+  }
+  const meterFillStatedEl=$('meterFillStated');
+  if(meterFillStatedEl){ meterFillStatedEl.setAttribute('x',meterX); meterFillStatedEl.setAttribute('width',halfW); meterFillStatedEl.setAttribute('clip-path','url(#meterClipLeft)'); }
   const meterFillEl=$('meterFill');
-  if(meterFillEl) meterFillEl.setAttribute('clip-path','url(#meterClip)');
+  if(meterFillEl){ meterFillEl.setAttribute('x',meterX+halfW); meterFillEl.setAttribute('width',halfW); meterFillEl.setAttribute('clip-path','url(#meterClipRight)'); }
   const meterScanlinesEl=$('meterScanlinesRect');
   if(meterScanlinesEl){
     meterScanlinesEl.setAttribute('x',meterX); meterScanlinesEl.setAttribute('y',meterAbsTop);
