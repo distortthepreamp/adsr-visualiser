@@ -149,6 +149,13 @@ function parseCueList(text) {
       continue;
     }
 
+    // set gate NNNms
+    const setGateMatch = line.match(/^set\s+gate\s+(\d+(?:\.\d+)?)ms$/i);
+    if (setGateMatch) {
+      result.push({ type: 'set', param: 'gate', value: parseFloat(setGateMatch[1]) });
+      continue;
+    }
+
     // transition attack NNNms HH:MM:SS:FF
     const transAttackMatch = line.match(/^transition\s+attack\s+(\d+(?:\.\d+)?)ms\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
     if (transAttackMatch) {
@@ -188,6 +195,13 @@ function parseCueList(text) {
     const transAmountMatch = line.match(/^transition\s+amount\s+(\d+(?:\.\d+)?)\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
     if (transAmountMatch) {
       result.push({ type: 'transition', param: 'amount', value: parseFloat(transAmountMatch[1]), durationMs: tcToMs(transAmountMatch[2]) });
+      continue;
+    }
+
+    // transition gate NNNms HH:MM:SS:FF
+    const transGateMatch = line.match(/^transition\s+gate\s+(\d+(?:\.\d+)?)ms\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
+    if (transGateMatch) {
+      result.push({ type: 'transition', param: 'gate', value: parseFloat(transGateMatch[1]), durationMs: tcToMs(transGateMatch[2]) });
       continue;
     }
 
@@ -238,6 +252,11 @@ function executeEvent(event) {
       case 'release':
         state.r = positionFromMs(event.value);
         state.target.r = state.r;
+        render();
+        break;
+      case 'gate':
+        state.gate = gatePositionFromMs(event.value);
+        state.target.gate = state.gate;
         render();
         break;
       case 'loud-decay':
@@ -324,6 +343,10 @@ function executeEvent(event) {
         break;
       case 'release':
         state.target.r = positionFromMs(event.value);
+        transition(event.durationMs / 1000);
+        break;
+      case 'gate':
+        state.target.gate = gatePositionFromMs(event.value);
         transition(event.durationMs / 1000);
         break;
       case 'cutoff':
@@ -542,6 +565,7 @@ function generateStateSnapshot() {
   lines.push(`set release ${Math.round(msFromPosition(state.r))}ms`);
   lines.push(`set cutoff ${Math.round(state.floor * 10)}`);
   lines.push(`set amount ${Math.round(state.scale * 10)}`);
+  lines.push(`set gate ${Math.round(gateMsFromPosition(state.gate))}ms`);
   lines.push(`set loud-decay ${$('loudDecay').checked ? 'on' : 'off'}`);
   lines.push(`set filter-mode ${$('frequencyMode').checked ? 'on' : 'off'}`);
   lines.push(`set hp-mode ${$('hpMode').checked ? 'on' : 'off'}`);
