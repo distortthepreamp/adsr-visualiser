@@ -465,6 +465,28 @@ function hideDotStated(){
   if(el){ el.style.opacity = 0; el.style.visibility = 'hidden'; el.removeAttribute('filter'); }
 }
 
+// ---- Per-leg blob visibility ----
+// Returns true if the effective blob's current phase's leg is on.
+function effLegVisible(phase){
+  switch(phase){
+    case 'attack':  return $('modelA') ? $('modelA').checked : true;
+    case 'decay':   return $('modelD') ? $('modelD').checked : true;
+    case 'sustain': return $('modelS') ? $('modelS').checked : true;
+    case 'release': return $('modelR') ? $('modelR').checked : true;
+    default: return true;
+  }
+}
+// Returns true if the stated blob's current phase's leg is on.
+function statedLegVisible(phase){
+  switch(phase){
+    case 'attack':  return $('underlayA') ? $('underlayA').checked : true;
+    case 'decay':   return $('underlayD') ? $('underlayD').checked : true;
+    case 'sustain': return $('underlayS') ? $('underlayS').checked : true;
+    case 'release': return $('underlayR') ? $('underlayR').checked : true;
+    default: return true;
+  }
+}
+
 // ---- Slo-mo rate ----
 function animRate(){ return ($('sloMo') && $('sloMo').checked) ? 0.1 : 1; }
 
@@ -495,25 +517,43 @@ function hold(){
     }
     prevNow = now;
 
-    // Effective blob
+    // Effective blob — always traject, visibility follows current phase's leg
     if(!effParked){
       const pos = effectivePos(tPlay);
       setDot(pos, true);
+      const effVis = effLegVisible(pos.phase);
+      $('dot').style.opacity = effVis ? '1' : '0';
+      if(!effVis) $('dot').removeAttribute('filter');
       if(pos.phase === 'sustain'){
         $('dot').style.animation = 'none';
-        startGlowPulse();
+        if(effVis) startGlowPulse();
         effParked = true;
       }
+    } else {
+      // Parked at sustain — re-check leg visibility each frame
+      const effVis = effLegVisible('sustain');
+      $('dot').style.opacity = effVis ? '1' : '0';
+      if(!effVis) $('dot').removeAttribute('filter');
+      else applyBlobGlow();
     }
 
-    // Stated blob
+    // Stated blob — always traject, visibility follows current phase's leg
     if(!statedParked){
       const spos = statedPos(tPlay);
       setDotStated(spos, true);
+      const sVis = statedLegVisible(spos.phase);
+      $('dotStated').style.opacity = sVis ? '1' : '0';
+      if(!sVis) $('dotStated').removeAttribute('filter');
       if(spos.phase === 'sustain'){
-        applyBlobGlow();
+        if(sVis) applyBlobGlow();
         statedParked = true;
       }
+    } else {
+      // Parked at sustain — re-check leg visibility each frame
+      const sVis = statedLegVisible('sustain');
+      $('dotStated').style.opacity = sVis ? '1' : '0';
+      if(!sVis) $('dotStated').removeAttribute('filter');
+      else applyBlobGlow();
     }
 
     // Both parked → enter sustain state, stop loop
