@@ -40,18 +40,13 @@ const tag = document.activeElement ? document.activeElement.tagName : '';
     if(e.key === '?'){ showHelp(); return; }
     if(e.key === ' '){
       e.preventDefault();
-      if(tapMode === 'hold'){
+      if(state.holdMode){
         if(state.currentPhase === 'hold' || state.currentPhase === 'sustain'){ releaseFromCurrent(); }
         else { hold(); }
       } else {
         tap(Math.round(gateMsFromPosition(state.gate)));
       }
-    } else if(e.key === '1' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey){ setTapMode('tap50','tapMode50Btn');
-    } else if(e.key === '2' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey){ setTapMode('tap100','tapMode100Btn');
-    } else if(e.key === '3' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey){ setTapMode('tap200','tapMode200Btn');
-    } else if(e.key === '4' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey){ setTapMode('tap500', 'tap500Btn');
-    } else if(e.key === '5' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey){ setTapMode('tap1000', 'tap1sBtn');
-    } else if(e.key === 'h' || e.key === 'H'){ setTapMode('hold','tapModeHoldBtn');
+    } else if(e.key === 'h' || e.key === 'H'){ state.holdMode = !state.holdMode; syncHoldButton();
     } else if(e.key === 'Enter'){
       e.preventDefault();
       transition(currentTransitionSec);

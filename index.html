@@ -295,17 +295,8 @@
 
     <div class="panel">
       <div class="row">
-        <button id="tapMode50Btn">Tap 50</button>
-        <button id="tapMode100Btn">Tap 100</button>
-        <button id="tapMode200Btn">Tap 200</button>
-        <button id="tap500Btn">Tap 500</button>
-        <button id="tap1sBtn">Tap 1s</button>
-        <button id="tapModeCustomBtn">Custom</button>
         <button id="tapModeHoldBtn">Hold</button>
         <button id="clearBtn">Clear</button>
-      </div>
-      <div id="tapCustomRow" class="row" style="display:none">
-        <label>ms <input id="tapCustomMs" type="number" min="20" max="5000" step="10" value="200"></label>
       </div>
       <div class="row"><label><input id="keepTapMarker" type="checkbox" checked> Leave Tap Marker</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
@@ -469,7 +460,7 @@ const curve = [
   {p:0.00,t:0}, {p:0.08,t:0.010}, {p:0.25,t:0.200}, {p:0.42,t:0.600},
   {p:0.58,t:1.000}, {p:0.75,t:5.000}, {p:0.90,t:10.000}, {p:1.00,t:12.000}
 ];
-const state = { a:.08, d:.25, s:.5, r:.5, floor:0, scale:1, gate:gatePositionFromMs(200), tbSustainGap:SUSTAIN_GAP_MAX, zoomFactor:1, target:{a:.08,d:.25,s:.5,r:.5,floor:0,scale:1,gate:gatePositionFromMs(200),tbSustainGap:SUSTAIN_GAP_MAX,zoomFactor:1}, anim:null, dotAnim:null, held:false, dotLevel:0, currentPhase:'idle', releaseFromDecay:false };
+const state = { a:.08, d:.25, s:.5, r:.5, floor:0, scale:1, gate:gatePositionFromMs(200), holdMode:false, tbSustainGap:SUSTAIN_GAP_MAX, zoomFactor:1, target:{a:.08,d:.25,s:.5,r:.5,floor:0,scale:1,gate:gatePositionFromMs(200),tbSustainGap:SUSTAIN_GAP_MAX,zoomFactor:1}, anim:null, dotAnim:null, held:false, dotLevel:0, currentPhase:'idle', releaseFromDecay:false };
 let GRAPH_LEFT = 10;
 const graph = { x0:GRAPH_LEFT, y0:445, w:905, h:415 };
 let METER_X = graph.x0 + graph.w + METER_GAP;  // 1145
@@ -537,7 +528,6 @@ render();
 refreshNumericInputs();
 addPointerFeedback();
 setTransMode(1, 'trans1Btn');
-setTapMode('tap200','tapMode200Btn');
 setNoteMode('noteA4Btn', 440);
 
 if(window.loadConfigByIndex) window.loadConfigByIndex(0);

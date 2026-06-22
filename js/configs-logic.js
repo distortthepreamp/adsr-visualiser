@@ -3,7 +3,7 @@ function buildConfigSnapshot(){
   return {
     dtpConfig: true,
     version: 1,
-    a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale,
+    a: state.a, d: state.d, s: state.s, r: state.r, floor: state.floor, scale: state.scale, gate: state.gate,
     loudDecay: $('loudDecay').checked,
     showContour: $('showContour').checked,
     frequencyMode: $('frequencyMode').checked,
@@ -41,8 +41,7 @@ function buildConfigSnapshot(){
     blobGlowRadius: Number($('blobGlowRadius') ? $('blobGlowRadius').value : 8),
     curveAmount: Number($('curveAmount').value),
     audioEnabled: $('audioEnabled').checked,
-    tapMode: tapMode,
-    tapCustomMs: Number($('tapCustomMs').value),
+    holdMode: state.holdMode,
     noteMode: noteMode,
     noteCustomHz: Number($('noteCustomHz').value),
     transitionSec: currentTransitionSec,
@@ -90,6 +89,8 @@ function loadConfigObject(cfg){
 
   // State
   state.a = cfg.a; state.d = cfg.d; state.s = cfg.s; state.r = cfg.r !== undefined ? cfg.r : 0.5; state.floor = cfg.floor; state.scale = cfg.scale;
+  if(cfg.gate !== undefined){ state.gate = cfg.gate; state.target.gate = cfg.gate; }
+  if(cfg.holdMode !== undefined) state.holdMode = cfg.holdMode;
   state.target.a = cfg.a; state.target.d = cfg.d; state.target.s = cfg.s; state.target.r = state.r; state.target.floor = cfg.floor; state.target.scale = cfg.scale;
   const _tbCollapse = cfg.tbSustainCollapse ? true : false;
   state.tbSustainGap = _tbCollapse ? 0 : SUSTAIN_GAP_MAX;
@@ -109,7 +110,6 @@ function loadConfigObject(cfg){
   syncAnalogueCurve();
 
   // Numeric inputs
-  if($('tapCustomMs') && cfg.tapCustomMs !== undefined) $('tapCustomMs').value = cfg.tapCustomMs;
   if($('noteCustomHz') && cfg.noteCustomHz !== undefined) $('noteCustomHz').value = cfg.noteCustomHz;
   if($('curveAmount') && cfg.curveAmount !== undefined){
     $('curveAmount').value = cfg.curveAmount;
@@ -120,9 +120,8 @@ function loadConfigObject(cfg){
   // Audio enabled
   if($('audioEnabled') && cfg.audioEnabled !== undefined) $('audioEnabled').checked = cfg.audioEnabled;
 
-  // Tap mode
-  const tapBtnMap = {tap50:'tapMode50Btn', tap100:'tapMode100Btn', tap200:'tapMode200Btn', tap500:'tap500Btn', tap1000:'tap1sBtn', tapCustom:'tapModeCustomBtn', hold:'tapModeHoldBtn'};
-  if(cfg.tapMode && tapBtnMap[cfg.tapMode]) setTapMode(cfg.tapMode, tapBtnMap[cfg.tapMode]);
+  // Hold mode
+  syncHoldButton();
 
   // Note mode
   if(cfg.noteMode){

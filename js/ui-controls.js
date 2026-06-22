@@ -12,8 +12,7 @@ const BTN_ACTIVE_BG  = '#ffffff';
 const BTN_ACTIVE_FG  = '#111111';
 const BTN_PARTIAL_BG = 'rgba(255,255,255,0.35)';
 
-// ---- Transport modal state ----
-let tapMode = 'tap200';
+// ---- Transport state ----
 
 // ---- syncControls — sync knob/slider/readout display to state ----
 function syncControls(){
@@ -168,18 +167,11 @@ function updateButtonStates(){
   // stub — reserved for future button state sync
 }
 
-// ---- setTapMode ----
-function setTapMode(mode, btnId){
-  const tapModeBtns = ['tapMode50Btn','tapMode100Btn','tapMode200Btn','tap500Btn','tap1sBtn','tapModeCustomBtn','tapModeHoldBtn'];
-  tapMode = mode;
-  tapModeBtns.forEach(id => { const b=$(id); if(b){ b.style.background=''; b.style.color=''; } });
-  // Preset taps are quicksets for the custom value, not independent modes — the Custom
-  // button is the persistent active tap mode and stays highlighted; only Hold highlights
-  // its own button. (btnId retained for call-site compatibility.)
-  const activeId = mode === 'hold' ? 'tapModeHoldBtn' : 'tapModeCustomBtn';
-  const b=$(activeId); if(b){ b.style.background=BTN_ACTIVE_BG; b.style.color=BTN_ACTIVE_FG; }
-  const customRow=$('tapCustomRow');
-  if(customRow) customRow.style.display = mode==='tapCustom' ? '' : 'none';
+// ---- Hold mode styling ----
+function syncHoldButton(){
+  const b=$('tapModeHoldBtn'); if(!b) return;
+  if(state.holdMode){ b.style.background=BTN_ACTIVE_BG; b.style.color=BTN_ACTIVE_FG; }
+  else { b.style.background=''; b.style.color=''; }
 }
 
 // ---- Advanced popup helpers ----
@@ -413,14 +405,8 @@ function initUIControls(){
   $('transitionBtn').addEventListener('click',()=>{ currentTransitionSec=Number($('customTransitionTime').value)||3; transition(currentTransitionSec); });
   $('customTransitionTime').addEventListener('input',()=>{ currentTransitionSec=Number($('customTransitionTime').value)||3; });
 
-  // Tap mode buttons — preset buttons snap the gate knob to their ms value
-  $('tapMode50Btn').addEventListener('click', () => { state.gate=gatePositionFromMs(50); state.target.gate=state.gate; setTapMode('tapCustom','tapModeCustomBtn'); render(); refreshNumericInputs(); });
-  $('tapMode100Btn').addEventListener('click', () => { state.gate=gatePositionFromMs(100); state.target.gate=state.gate; setTapMode('tapCustom','tapModeCustomBtn'); render(); refreshNumericInputs(); });
-  $('tapMode200Btn').addEventListener('click', () => { state.gate=gatePositionFromMs(200); state.target.gate=state.gate; setTapMode('tapCustom','tapModeCustomBtn'); render(); refreshNumericInputs(); });
-  $('tapModeCustomBtn').addEventListener('click', () => setTapMode('tapCustom','tapModeCustomBtn'));
-  $('tap500Btn').addEventListener('click', () => { state.gate=gatePositionFromMs(500); state.target.gate=state.gate; setTapMode('tapCustom','tapModeCustomBtn'); render(); refreshNumericInputs(); });
-  $('tap1sBtn').addEventListener('click', () => { state.gate=gatePositionFromMs(1000); state.target.gate=state.gate; setTapMode('tapCustom','tapModeCustomBtn'); render(); refreshNumericInputs(); });
-  $('tapModeHoldBtn').addEventListener('click', () => setTapMode('hold','tapModeHoldBtn'));
+  // Hold button — toggles state.holdMode
+  $('tapModeHoldBtn').addEventListener('click', () => { state.holdMode = !state.holdMode; syncHoldButton(); });
   // Gate knob quickset buttons — set target and transition, matching the other knobs' quicksets
   document.querySelectorAll('.quickset-btn[data-knob="gate"]').forEach(btn => {
     btn.addEventListener('click', () => {
