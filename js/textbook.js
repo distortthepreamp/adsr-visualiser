@@ -50,7 +50,7 @@ function renderTextbookPaths({ pts, drawPS, drawP1, ceilY, showClipped, drawRele
   const tbSusEnd = { x: pts.pEnd.x + sustainGap, y: tbSustainY };
   const tbSusDotted = $('tbSustainDotted') && $('tbSustainDotted').checked;
   if(tbSusDotted){
-    { const el=$('sustainSegInner'); if(el){ el.setAttribute('d',''); el.style.display='none'; } }
+    { const el=$('sustainSegInner'); if(el){ const p=drawReleasePath?`M ${pts.pEnd.x} ${tbSustainY} L ${tbSusEnd.x} ${tbSustainY}`:`M ${pts.pEnd.x} ${tbSustainY} L ${pts.pEnd.x} ${tbSustainY}`; el.setAttribute('d',p); el.style.opacity='0'; } }
     const tbSusMarker=$('tbSustainMarker');
     if(tbSusMarker){
       const smSrc=$('sustainMarker');
@@ -64,8 +64,8 @@ function renderTextbookPaths({ pts, drawPS, drawP1, ceilY, showClipped, drawRele
       }
     }
   } else {
-    const tbSusPath = drawReleasePath ? `M ${pts.pEnd.x} ${tbSustainY} L ${tbSusEnd.x} ${tbSustainY}` : '';
-    { const el=$('sustainSegInner'); if(el){ el.setAttribute('d', tbSusPath); el.style.display=''; } }
+    const tbSusPath = drawReleasePath ? `M ${pts.pEnd.x} ${tbSustainY} L ${tbSusEnd.x} ${tbSustainY}` : `M ${pts.pEnd.x} ${tbSustainY} L ${pts.pEnd.x} ${tbSustainY}`;
+    { const el=$('sustainSegInner'); if(el){ el.setAttribute('d', tbSusPath); el.style.opacity=''; } }
     const tbSusMarker=$('tbSustainMarker'); if(tbSusMarker) tbSusMarker.style.display='none';
   }
   // Release: starts from end of sustain segment, spans rwFull to the right

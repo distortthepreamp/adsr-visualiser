@@ -145,10 +145,10 @@ function render(){
   }
 
   const show = showClipped ? '' : 'none';
-  { const el=$('attackInner'); if(el){ el.setAttribute('d', aPath); el.style.display = legA ? '' : 'none'; } }
-  { const el=$('ceilLeftInner'); if(el){ el.setAttribute('d', ceilLeftPath); el.style.display = (showClipped && legA) ? '' : 'none'; } }
-  { const el=$('ceilRightInner'); if(el){ el.setAttribute('d', ceilRightPath); el.style.display = (showClipped && legD) ? '' : 'none'; } }
-  { const el=$('decayInner'); if(el){ el.setAttribute('d', dPath); el.style.display = legD ? '' : 'none'; } }
+  { const el=$('attackInner'); if(el){ el.setAttribute('d', aPath); el.style.opacity = legA ? '' : '0'; } }
+  { const el=$('ceilLeftInner'); if(el){ el.setAttribute('d', ceilLeftPath); el.style.opacity = (showClipped && legA) ? '' : '0'; } }
+  { const el=$('ceilRightInner'); if(el){ el.setAttribute('d', ceilRightPath); el.style.opacity = (showClipped && legD) ? '' : '0'; } }
+  { const el=$('decayInner'); if(el){ el.setAttribute('d', dPath); el.style.opacity = legD ? '' : '0'; } }
 
   const drawReleasePath = pts.e.releaseOn;
   let rEnd;
@@ -189,24 +189,20 @@ function render(){
     const showS = !textbookAdsr && $('underlayS') && $('underlayS').checked;
     const showR = !textbookAdsr && $('underlayR') && $('underlayR').checked;
     const ua=$('underlayAttack'), ud=$('underlayDecay'), us=$('underlaySustain'), ur=$('underlayRelease');
-    const anyLeg = showA || showD || showS || showR;
-    if(anyLeg){
-      const tbSusGapPx = graph.w * state.tbSustainGap;
-      const tbDecayEndX = pts.pEnd.x;
-      const tbSusEndX   = pts.pEnd.x + tbSusGapPx;
-      const tbRelEndX   = tbSusEndX + timeToPixels(mapTime(state.r), linearTimeOn);
-      const tbFloorY    = yFor(e.floor);
-      const ulP1Y = Math.max(pts.p1.y, ceilY);
-      const ulPSY = overrange ? Math.max(yFor(e.floor + state.s * e.scale), ceilY) : yFor(e.floor + state.s * e.scale);
-      const ulColor = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
-      if(ua){ if(showA){ ua.setAttribute('d', `M ${pts.p0.x} ${pts.p0.y} L ${pts.p1.x} ${ulP1Y}`); ua.style.display=''; } else { ua.setAttribute('d',''); ua.style.display='none'; } }
-      if(ud){ if(showD){ ud.setAttribute('d', `M ${pts.p1.x} ${ulP1Y} L ${tbDecayEndX} ${ulPSY}`); ud.style.display=''; } else { ud.setAttribute('d',''); ud.style.display='none'; } }
-      if(us){ if(showS){ us.setAttribute('d', `M ${tbDecayEndX} ${ulPSY} L ${tbSusEndX} ${ulPSY}`); us.style.display=''; } else { us.setAttribute('d',''); us.style.display='none'; } }
-      if(ur){ if(showR && drawReleasePath){ ur.setAttribute('d', `M ${tbSusEndX} ${ulPSY} L ${tbRelEndX} ${tbFloorY}`); ur.style.display=''; } else { ur.setAttribute('d',''); ur.style.display='none'; } }
-      [ua,ud,us,ur].forEach(el=>{ if(el) el.style.stroke=ulColor; });
-    } else {
-      [ua,ud,us,ur].forEach(el => { if(el){ el.setAttribute('d',''); el.style.display='none'; } });
-    }
+    // Always compute and set real d; toggle opacity for visibility
+    const tbSusGapPx = graph.w * state.tbSustainGap;
+    const tbDecayEndX = pts.pEnd.x;
+    const tbSusEndX   = pts.pEnd.x + tbSusGapPx;
+    const tbRelEndX   = tbSusEndX + timeToPixels(mapTime(state.r), linearTimeOn);
+    const tbFloorY    = yFor(e.floor);
+    const ulP1Y = Math.max(pts.p1.y, ceilY);
+    const ulPSY = overrange ? Math.max(yFor(e.floor + state.s * e.scale), ceilY) : yFor(e.floor + state.s * e.scale);
+    const ulColor = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
+    if(ua){ ua.setAttribute('d', `M ${pts.p0.x} ${pts.p0.y} L ${pts.p1.x} ${ulP1Y}`); ua.style.opacity = showA ? '' : '0'; }
+    if(ud){ ud.setAttribute('d', `M ${pts.p1.x} ${ulP1Y} L ${tbDecayEndX} ${ulPSY}`); ud.style.opacity = showD ? '' : '0'; }
+    if(us){ us.setAttribute('d', `M ${tbDecayEndX} ${ulPSY} L ${tbSusEndX} ${ulPSY}`); us.style.opacity = showS ? '' : '0'; }
+    if(ur){ ur.setAttribute('d', drawReleasePath ? `M ${tbSusEndX} ${ulPSY} L ${tbRelEndX} ${tbFloorY}` : `M ${tbSusEndX} ${ulPSY} L ${tbSusEndX} ${ulPSY}`); ur.style.opacity = (showR && drawReleasePath) ? '' : '0'; }
+    [ua,ud,us,ur].forEach(el=>{ if(el) el.style.stroke=ulColor; });
   }
 
   if(!textbookAdsr){
@@ -263,7 +259,7 @@ function render(){
     { const el = $('releaseInner'); if(el){
       el.setAttribute('d', rPath);
       el.style.stroke = relColor;
-      el.style.display = legR ? '' : 'none';
+      el.style.opacity = legR ? '' : '0';
       // clip-path is set later by the Clip at Gate block (handles both gateEnvClip and sustainReleaseClip)
     } }
     // #fullReferenceRelease: full peak→floor reference curve (cyan, unclipped). Only shown
@@ -271,15 +267,13 @@ function render(){
     const showPeakDischarge = $('showPeakDischarge') && $('showPeakDischarge').checked;
     const fullReferenceReleaseEl = $('fullReferenceRelease');
     if(fullReferenceReleaseEl){
-      if(showPeakDischarge && curveAmt && drawReleasePath){
+      // Always compute d so the path stays sample-able; toggle opacity for visibility
+      if(curveAmt && drawReleasePath){
         fullReferenceReleaseEl.setAttribute('d', rcPolyline(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, false, 50, 3));
-        fullReferenceReleaseEl.removeAttribute('clip-path');
-        fullReferenceReleaseEl.style.stroke = '#00ffff';
-        fullReferenceReleaseEl.style.display = '';
-      } else {
-        fullReferenceReleaseEl.setAttribute('d', '');
-        fullReferenceReleaseEl.style.display = 'none';
       }
+      fullReferenceReleaseEl.removeAttribute('clip-path');
+      fullReferenceReleaseEl.style.stroke = '#00ffff';
+      fullReferenceReleaseEl.style.opacity = (showPeakDischarge && curveAmt && drawReleasePath) ? '' : '0';
     }
     // gateCloseX is hoisted above the Model D block; sample the effective curve y here.
     // y at gateCloseX, sampled from the drawn attack or decay curve (top of the orange release curve)
@@ -310,11 +304,11 @@ function render(){
         tapReleaseOrangeEl.setAttribute('d', rcPolyline(pts.p1.x + orangeOffset, pts.p1.y, rEnd.x + orangeOffset, rEnd.y, false, 50, 3));
         tapReleaseOrangeEl.setAttribute('clip-path', 'url(#gateReleaseClip)');
         tapReleaseOrangeEl.style.stroke = relColor;
-        tapReleaseOrangeEl.style.display = '';
+        tapReleaseOrangeEl.style.opacity = '';
       }
     } else {
       const tapReleaseOrangeEl = $('tapReleaseOrange');
-      if(tapReleaseOrangeEl) tapReleaseOrangeEl.style.display = 'none';
+      if(tapReleaseOrangeEl) tapReleaseOrangeEl.style.opacity = '0';
     }
     // Effective GR descender: vertical at the RC discharge floor-crossing, from floor to graph.y0
     const gateEffReleaseDropEl = $('gateEffectiveReleaseDrop');
@@ -466,16 +460,16 @@ function render(){
       else el.removeAttribute('clip-path');
     } }
     {
-      const susSegPath = drawReleasePath ? `M ${drawPS.x} ${drawPS.y} L ${releaseStartX} ${drawPS.y}` : '';
-      { const el=$('sustainSegInner'); if(el){ el.setAttribute('d', susSegPath); el.style.display = (drawReleasePath && legS) ? '' : 'none'; } }
+      const susSegPath = `M ${drawPS.x} ${drawPS.y} L ${releaseStartX} ${drawPS.y}`;
+      { const el=$('sustainSegInner'); if(el){ el.setAttribute('d', susSegPath); el.style.opacity = (drawReleasePath && legS) ? '' : '0'; } }
     }
     const tbSusMarkerMD=$('tbSustainMarker'); if(tbSusMarkerMD) tbSusMarkerMD.style.display='none';
     const tbMDLineMD=$('tbModelDSustainLine'); if(tbMDLineMD) tbMDLineMD.style.display='none';
     const tbSusLblMD=$('tbSustainLabel'); if(tbSusLblMD) tbSusLblMD.style.display='none';
   } else {
     renderTextbookPaths({ pts, drawPS, drawP1, ceilY, showClipped, drawReleasePath, curveAmt, dSF, rSF, linearTimeOn });
-    $('tapReleaseOrange').setAttribute('d', '');
-    $('fullReferenceRelease').setAttribute('d', '');
+    $('tapReleaseOrange').style.opacity = '0';
+    $('fullReferenceRelease').style.opacity = '0';
   }
 
   // Sustain as a horizontal level guide extending to the right from

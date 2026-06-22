@@ -242,7 +242,7 @@ function releaseFromCurrent(){
   // For non-analogue / overrange the path end equals the chord floor, so this is a no-op.
   let endX = pts.pS.x + slopeX * tSlope;
   const releaseEndEl = document.getElementById('releaseInner');
-  if(releaseEndEl && releaseEndEl.getTotalLength() > 0){
+  if(e.releaseOn && releaseEndEl && releaseEndEl.getTotalLength() > 0){
     endX = releaseEndEl.getPointAtLength(releaseEndEl.getTotalLength()).x;
   }
   const end = { x: endX, y: floorY, level: 0 };

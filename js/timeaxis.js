@@ -163,7 +163,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       // green curve floor = last point of the drawn releaseInner path (= rEnd.x + greenOffset, rEnd.y)
       const relEl=document.getElementById('releaseInner');
       let fx=pts.pEnd.x, fy=yFor(pts.e.floor);
-      if(relEl && relEl.getTotalLength() > 0){ const p=relEl.getPointAtLength(relEl.getTotalLength()); fx=p.x; fy=p.y; }
+      if(effR && relEl && relEl.getTotalLength() > 0){ const p=relEl.getPointAtLength(relEl.getTotalLength()); fx=p.x; fy=p.y; }
       newEffReleaseDropEl.setAttribute('x1',fx); newEffReleaseDropEl.setAttribute('y1',fy);
       newEffReleaseDropEl.setAttribute('x2',fx); newEffReleaseDropEl.setAttribute('y2',graph.y0); newEffReleaseDropEl.setAttribute('stroke',newEffReleaseCol);
       newEffReleaseDropEl.style.display='';
