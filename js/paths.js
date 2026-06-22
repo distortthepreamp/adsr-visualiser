@@ -286,9 +286,12 @@ function render(){
     // crossing at the gate-close level lands at gateCloseX, then clipped below that level.
     // When the gate closes at the sustain level this coincides with the green curve.
     // Gate RC discharge geometry — computed once, used by tapReleaseOrange and the effective GR descender.
-    const gateRCActive = !!(drawReleasePath && curveAmt && showGateTime);
+    // Gate RC geometry — always populated when drawReleasePath && curveAmt (sample-able by blobs).
+    // Visibility gated additionally by showGateTime.
+    const gateRCPopulated = !!(drawReleasePath && curveAmt);
+    const gateRCVisible = !!(gateRCPopulated && showGateTime);
     let orangeDischargeEndX = 0;
-    if(gateRCActive){
+    if(gateRCPopulated){
       const magentaXAtGate = rcPolylineXAtY(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, gateCloseY, false, 200, 3);
       const orangeOffset = gateCloseX - magentaXAtGate;
       orangeDischargeEndX = rEnd.x + orangeOffset;
@@ -304,7 +307,7 @@ function render(){
         tapReleaseOrangeEl.setAttribute('d', rcPolyline(pts.p1.x + orangeOffset, pts.p1.y, rEnd.x + orangeOffset, rEnd.y, false, 50, 3));
         tapReleaseOrangeEl.setAttribute('clip-path', 'url(#gateReleaseClip)');
         tapReleaseOrangeEl.style.stroke = relColor;
-        tapReleaseOrangeEl.style.opacity = '';
+        tapReleaseOrangeEl.style.opacity = gateRCVisible ? '' : '0';
       }
     } else {
       const tapReleaseOrangeEl = $('tapReleaseOrange');
@@ -313,7 +316,7 @@ function render(){
     // Effective GR descender: vertical at the RC discharge floor-crossing, from floor to graph.y0
     const gateEffReleaseDropEl = $('gateEffectiveReleaseDrop');
     const gateEffReleaseTimeEl = $('gateEffectiveReleaseTime');
-    if(gateRCActive && legR){
+    if(gateRCVisible && legR){
       const timeLabelGutter = Math.max(0, Number(($('timeLabelGutter') && $('timeLabelGutter').value) || 0));
       if(gateEffReleaseDropEl){
         gateEffReleaseDropEl.setAttribute('x1', orangeDischargeEndX); gateEffReleaseDropEl.setAttribute('y1', rEnd.y);
@@ -334,22 +337,25 @@ function render(){
       if(gateEffReleaseTimeEl) gateEffReleaseTimeEl.style.display = 'none';
     }
     // Textbook (stated) gate-release line + ascender drop line and GR label.
-    const showStatedGateRelease = showGateTime && drawReleasePath && $('underlayR') && $('underlayR').checked;
+    // Stated gate-release — coords always populated when drawReleasePath (sample-able by blobs).
+    // Visibility gated additionally by showGateTime.
+    const statedGatePopulated = !!(drawReleasePath && $('underlayR') && $('underlayR').checked);
+    const showStatedGateRelease = !!(statedGatePopulated && showGateTime);
     const gateRelEndX = gateCloseX + timeToPixels(mapTime(state.r), linearTimeOn);
     const gateRelEndY = yFor(pts.e.floor);
     const ulCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
     const gateStatedReleaseEl = $('gateStatedRelease');
     if(gateStatedReleaseEl){
       // Sample the stated (underlay) curve y at gateCloseX
-      const gsRelPathEl = showStatedGateRelease ? document.getElementById(gateCloseX < pts.p1.x ? 'underlayAttack' : 'underlayDecay') : null;
+      const gsRelPathEl = statedGatePopulated ? document.getElementById(gateCloseX < pts.p1.x ? 'underlayAttack' : 'underlayDecay') : null;
       const gateStatedStartY = gsRelPathEl ? getYFromPath(gsRelPathEl, gateCloseX) : null;
-      if(showStatedGateRelease && gateStatedStartY !== null){
+      if(statedGatePopulated && gateStatedStartY !== null){
         gateStatedReleaseEl.setAttribute('x1', gateCloseX);
         gateStatedReleaseEl.setAttribute('y1', gateStatedStartY);
         gateStatedReleaseEl.setAttribute('x2', gateRelEndX);
         gateStatedReleaseEl.setAttribute('y2', gateRelEndY);
         gateStatedReleaseEl.style.stroke = ulCol;
-        gateStatedReleaseEl.style.display = '';
+        gateStatedReleaseEl.style.display = showStatedGateRelease ? '' : 'none';
       } else {
         gateStatedReleaseEl.style.display = 'none';
       }
