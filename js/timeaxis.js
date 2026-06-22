@@ -63,6 +63,16 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       if(newStatedAttackTimeLabelEl) newStatedAttackTimeLabelEl.style.display='none';
     }
   }
+  // Hoisted clipping geometry — used by the effective decay label and attack drop lines/labels.
+  const isClipped = showClipped && overrange && freqMode;
+  let ceilAttackX = 0, ceilDecayX = 0;
+  if(isClipped){
+    const f_a = (1 - pts.e.floor) / pts.e.scale;
+    const f_d = (pts.e.floor + pts.e.scale - 1) / pts.e.scale;
+    ceilAttackX = pts.p0.x + (pts.p1.x - pts.p0.x) * f_a;
+    ceilDecayX = pts.p1.x + (pts.pEnd.x - pts.p1.x) * f_d;
+    if(ceilDecayX > pts.pS.x) ceilDecayX = pts.pS.x;
+  }
   // Effective decay drop line: vertical from the Model D decay/sustain intercept (drawPS) to the time axis
   const newEffectiveDecayDropEl=$('newEffectiveDecayDrop');
   const newEffectiveDecayTimeLabelEl=$('newEffectiveDecayTime');
@@ -73,11 +83,12 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       newEffectiveDecayDropEl.setAttribute('x2',drawPS.x); newEffectiveDecayDropEl.setAttribute('y2',graph.y0); newEffectiveDecayDropEl.setAttribute('stroke',newEffDecayCol);
       newEffectiveDecayDropEl.style.display='';
       if(newEffectiveDecayTimeLabelEl){
+        const decayStartX = isClipped ? ceilDecayX : pts.p1.x;
         newEffectiveDecayTimeLabelEl.setAttribute('x', drawPS.x);
         newEffectiveDecayTimeLabelEl.setAttribute('y', effectiveLabelY);
         newEffectiveDecayTimeLabelEl.setAttribute('text-anchor', 'middle');
         newEffectiveDecayTimeLabelEl.setAttribute('fill', newEffDecayCol);
-        newEffectiveDecayTimeLabelEl.textContent = 'D = ' + Math.round(pixelsToTimeSec(drawPS.x - pts.p1.x, linearTimeOn) * 1000) + 'ms';
+        newEffectiveDecayTimeLabelEl.textContent = 'D = ' + Math.round(pixelsToTimeSec(drawPS.x - decayStartX, linearTimeOn) * 1000) + 'ms';
         newEffectiveDecayTimeLabelEl.style.display='';
       }
     } else {
@@ -85,42 +96,63 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       if(newEffectiveDecayTimeLabelEl) newEffectiveDecayTimeLabelEl.style.display='none';
     }
   }
-  // Effective attack drop line(s): descend from the attack peak (or ceiling crossings when clipped) to the time axis
+  // Effective clipping drop lines and labels — left pair (attack leg), right pair (decay leg).
+  // Both pairs require the common clipping condition; only the leg flag differs.
   const newEffAttackDropEl=$('newEffectiveAttackDrop');
+  const newEffAttackTimeLabelEl=$('newEffectiveAttackTime');
   const newEffAttackDropEndEl=$('newEffectiveAttackDropEnd');
-  const showNewEffAttack = ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && effA && freqMode && overrange && showClipped;
-  if(showNewEffAttack){
-    const ceilY = yFor(1);
-    if(showClipped && overrange){
-      // Case 2: clipping active — two lines, at the attack→ceiling and ceiling→decay crossings
-      const f_a = (1 - pts.e.floor) / pts.e.scale;
-      const f_d = (pts.e.floor + pts.e.scale - 1) / pts.e.scale;
-      const ceilAttackX = pts.p0.x + (pts.p1.x - pts.p0.x) * f_a;
-      let ceilDecayX = pts.p1.x + (pts.pEnd.x - pts.p1.x) * f_d;
-      if(ceilDecayX > pts.pS.x) ceilDecayX = pts.pS.x;
-      if(newEffAttackDropEl){
-        newEffAttackDropEl.setAttribute('x1',ceilAttackX); newEffAttackDropEl.setAttribute('y1',ceilY);
-        newEffAttackDropEl.setAttribute('x2',ceilAttackX); newEffAttackDropEl.setAttribute('y2',graph.y0); newEffAttackDropEl.setAttribute('stroke',newEffAttackCol);
-        newEffAttackDropEl.style.display='';
-      }
-      if(newEffAttackDropEndEl){
-        newEffAttackDropEndEl.setAttribute('x1',ceilDecayX); newEffAttackDropEndEl.setAttribute('y1',ceilY);
-        newEffAttackDropEndEl.setAttribute('x2',ceilDecayX); newEffAttackDropEndEl.setAttribute('y2',graph.y0); newEffAttackDropEndEl.setAttribute('stroke',newEffAttackCol);
-        newEffAttackDropEndEl.style.display='';
-      }
-    } else {
-      // Case 1: no clipping — single line at the attack peak
-      const drawP1Y = Math.max(pts.p1.y, ceilY);
-      if(newEffAttackDropEl){
-        newEffAttackDropEl.setAttribute('x1',pts.p1.x); newEffAttackDropEl.setAttribute('y1',drawP1Y);
-        newEffAttackDropEl.setAttribute('x2',pts.p1.x); newEffAttackDropEl.setAttribute('y2',graph.y0); newEffAttackDropEl.setAttribute('stroke',newEffAttackCol);
-        newEffAttackDropEl.style.display='';
-      }
-      if(newEffAttackDropEndEl) newEffAttackDropEndEl.style.display='none';
+  const newEffClipTimeLabelEl=$('newEffectiveClipTime');
+  const effLinesOn = ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked);
+  const clipBase = effLinesOn && freqMode && overrange && showClipped && isClipped;
+  const ceilY = yFor(1);
+  // Left pair: attack line + A label (modelA leg)
+  const showLeftClip = clipBase && effA;
+  if(showLeftClip){
+    if(newEffAttackDropEl){
+      newEffAttackDropEl.setAttribute('x1',ceilAttackX); newEffAttackDropEl.setAttribute('y1',ceilY);
+      newEffAttackDropEl.setAttribute('x2',ceilAttackX); newEffAttackDropEl.setAttribute('y2',graph.y0); newEffAttackDropEl.setAttribute('stroke',newEffAttackCol);
+      newEffAttackDropEl.style.display='';
+    }
+    if(newEffAttackTimeLabelEl){
+      newEffAttackTimeLabelEl.setAttribute('x', ceilAttackX);
+      newEffAttackTimeLabelEl.setAttribute('y', effectiveLabelY);
+      newEffAttackTimeLabelEl.setAttribute('text-anchor', 'middle');
+      newEffAttackTimeLabelEl.setAttribute('fill', newEffAttackCol);
+      newEffAttackTimeLabelEl.textContent = 'A = ' + Math.round(pixelsToTimeSec(ceilAttackX - pts.p0.x, linearTimeOn) * 1000) + 'ms';
+      newEffAttackTimeLabelEl.style.display='';
     }
   } else {
     if(newEffAttackDropEl) newEffAttackDropEl.style.display='none';
+    if(newEffAttackTimeLabelEl) newEffAttackTimeLabelEl.style.display='none';
+  }
+  // Right pair: decay-side clipping line + C label (modelD leg)
+  const showRightClip = clipBase && effD;
+  if(showRightClip){
+    if(newEffAttackDropEndEl){
+      newEffAttackDropEndEl.setAttribute('x1',ceilDecayX); newEffAttackDropEndEl.setAttribute('y1',ceilY);
+      newEffAttackDropEndEl.setAttribute('x2',ceilDecayX); newEffAttackDropEndEl.setAttribute('y2',graph.y0); newEffAttackDropEndEl.setAttribute('stroke',newEffAttackCol);
+      newEffAttackDropEndEl.style.display='';
+    }
+    if(newEffClipTimeLabelEl){
+      newEffClipTimeLabelEl.setAttribute('x', ceilDecayX);
+      newEffClipTimeLabelEl.setAttribute('y', effectiveLabelY);
+      newEffClipTimeLabelEl.setAttribute('text-anchor', 'middle');
+      newEffClipTimeLabelEl.setAttribute('fill', newEffAttackCol);
+      newEffClipTimeLabelEl.textContent = 'C = ' + Math.round(pixelsToTimeSec(ceilDecayX - ceilAttackX, linearTimeOn) * 1000) + 'ms';
+      newEffClipTimeLabelEl.style.display='';
+    }
+  } else {
     if(newEffAttackDropEndEl) newEffAttackDropEndEl.style.display='none';
+    if(newEffClipTimeLabelEl) newEffClipTimeLabelEl.style.display='none';
+  }
+  // Non-clipped attack line (single line at attack peak, no labels — only when attack leg on + clipping conditions met but not actually clipped)
+  if(effLinesOn && effA && freqMode && overrange && showClipped && !isClipped){
+    const drawP1Y = Math.max(pts.p1.y, ceilY);
+    if(newEffAttackDropEl){
+      newEffAttackDropEl.setAttribute('x1',pts.p1.x); newEffAttackDropEl.setAttribute('y1',drawP1Y);
+      newEffAttackDropEl.setAttribute('x2',pts.p1.x); newEffAttackDropEl.setAttribute('y2',graph.y0); newEffAttackDropEl.setAttribute('stroke',newEffAttackCol);
+      newEffAttackDropEl.style.display='';
+    }
   }
   // Effective release drop line: descends from the green release curve's floor point to the time axis
   const newEffReleaseDropEl=$('newEffectiveReleaseDrop');
