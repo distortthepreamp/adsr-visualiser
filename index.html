@@ -61,22 +61,22 @@
       <text id="newEffectiveReleaseTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <line id="newStatedReleaseDrop" stroke="cyan" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
       <text id="newStatedReleaseTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
-      <line id="gateTimeLine" stroke="#ff8800" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
-      <line id="gateEffectiveHoriz" stroke="#ff8800" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
-      <line id="gateStatedHoriz" stroke="#ff8800" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
+      <line id="gateTimeLine" stroke-width="1" stroke-dasharray="4,4" style="display:none;stroke:var(--gateColor)"/>
+      <line id="gateEffectiveHoriz" stroke-width="1" stroke-dasharray="4,4" style="display:none;stroke:var(--gateColor)"/>
+      <line id="gateStatedHoriz" stroke-width="1" stroke-dasharray="4,4" style="display:none;stroke:var(--gateColor)"/>
       <line id="gateStatedRelease" stroke="white" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;display:none"/>
       <line id="gateStatedReleaseDrop" stroke="cyan" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
       <text id="gateStatedReleaseTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <line id="gateEffectiveReleaseDrop" stroke="white" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
       <text id="gateEffectiveReleaseTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
-      <text id="gateTimeLabel" fill="#ff8800" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
+      <text id="gateTimeLabel" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px);fill:var(--gateColor)"/>
       <g id="envSegments">
         <path id="underlayAttack" fill="none" stroke="white" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:round"/>
         <path id="underlayDecay" fill="none" stroke="white" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:round"/>
         <path id="underlaySustain" fill="none" stroke="white" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:round" stroke-dasharray="4,4"/>
         <path id="underlayRelease" fill="none" stroke="white" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:round"/>
-        <path id="fullReferenceRelease" fill="none" stroke="#00ffff" style="stroke-width:var(--innerLineWidth)"/>
-        <path id="tapReleaseOrange" fill="none" stroke="#ff8800" style="stroke-width:var(--innerLineWidth)"/>
+        <path id="fullReferenceRelease" fill="none" stroke="#00ffff" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke"/>
+        <path id="tapReleaseOrange" fill="none" stroke="#ff8800" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke"/>
         <path id="sustainSegInner" class="env-inner decay-inner" d="" style="display:none" />
         <path id="releaseInner" class="env-inner release-inner" d="" />
         <path id="decayInner" class="env-inner decay-inner" d="" />
@@ -304,8 +304,8 @@
           <div class="row"><label><input id="blobGlowEnabled" type="checkbox" checked> Blob Glow</label><label>Blob R <input id="blobGlowRadius" type="number" min="0" max="30" step="1" value="8"></label></div>
           <div class="row"><label><input id="kioskKnobGlow" type="checkbox" checked> Knob Glow</label><label>Knob Glow R <input id="kioskKnobGlowRadius" type="number" min="0" max="100" step="1" value="40"></label><label>Inactive Knob <input id="kioskInactiveOpacity" type="number" min="0" max="100" step="5" value="70">%</label></div>
           <div class="row"><label>Meter L <input id="meterFillColor" type="color" value="#00ff00"></label><label>Meter F <input id="meterFillColorFilter" type="color" value="#00ffff"></label><label>Stated <input id="timeAxisStatedColor" type="color" value="#aaaaaa"></label><label>Contour <input id="contourLineColor" type="color" value="#ffff00"></label></div>
-          <div class="row"><label>L.Attack <input id="loudnessAttackColor" type="color" value="#ff0000"></label><label>L.Decay <input id="loudnessDecayColor" type="color" value="#ff0000"></label><label>L.Release <input id="loudnessReleaseColor" type="color" value="#ff0000"></label></div>
-          <div class="row"><label>F.Attack <input id="filterAttackColor" type="color" value="#00ffff"></label><label>F.Decay <input id="filterDecayColor" type="color" value="#ffff00"></label><label>F.Release <input id="filterReleaseColor" type="color" value="#ffff00"></label></div>
+          <div class="row"><label>L.Attack <input id="loudnessAttackColor" type="color" value="#ff0000"></label><label>L.Decay <input id="loudnessDecayColor" type="color" value="#ff0000"></label><label>L.Release <input id="loudnessReleaseColor" type="color" value="#ff0000"></label><label>L.Gate <input id="loudnessGateColor" type="color" value="#ff8800"></label></div>
+          <div class="row"><label>F.Attack <input id="filterAttackColor" type="color" value="#00ffff"></label><label>F.Decay <input id="filterDecayColor" type="color" value="#ffff00"></label><label>F.Release <input id="filterReleaseColor" type="color" value="#ffff00"></label><label>F.Gate <input id="filterGateColor" type="color" value="#ff8800"></label></div>
           <div class="row"><label>Underlay <input type="color" id="underlayColor" value="#ffffff"></label><label>Label Gutter <input id="timeLabelGutter" type="number" min="0" step="1" value="0"></label></div>
         </div>
       </div>

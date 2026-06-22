@@ -661,10 +661,12 @@ function render(){
   const _aEl = freqMode ? $('filterAttackColor')  : $('loudnessAttackColor');
   const _dEl = freqMode ? $('filterDecayColor')   : $('loudnessDecayColor');
   const _rEl = freqMode ? $('filterReleaseColor') : $('loudnessReleaseColor');
+  const _gEl = freqMode ? $('filterGateColor')    : $('loudnessGateColor');
   const _root = document.documentElement;
   if(_aEl) _root.style.setProperty('--attackColor',  _aEl.value);
   if(_dEl) _root.style.setProperty('--decayColor',   _dEl.value);
   if(_rEl) _root.style.setProperty('--releaseColor', _rEl.value);
+  if(_gEl) _root.style.setProperty('--gateColor',    _gEl.value);
 
   // Keep resting meter fill in sync whenever no animation is running
   if(state.currentPhase === 'idle') hideDot();

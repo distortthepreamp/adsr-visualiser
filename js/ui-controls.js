@@ -377,7 +377,7 @@ function initUIControls(){
   $('meterFillColorFilter').addEventListener('input',e=>document.documentElement.style.setProperty('--meterFillFilter', e.target.value));
   $('timeAxisStatedColor').addEventListener('input',e=>document.documentElement.style.setProperty('--timeAxisStatedColor', e.target.value));
   $('contourLineColor').addEventListener('input',e=>{ document.documentElement.style.setProperty('--contourLineColor', e.target.value); render(); });
-  ['loudnessAttackColor','loudnessDecayColor','loudnessReleaseColor','filterAttackColor','filterDecayColor','filterReleaseColor'].forEach(id => {
+  ['loudnessAttackColor','loudnessDecayColor','loudnessReleaseColor','loudnessGateColor','filterAttackColor','filterDecayColor','filterReleaseColor','filterGateColor'].forEach(id => {
     const el = $(id); if(el) el.addEventListener('input', render);
   });
 

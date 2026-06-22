@@ -56,6 +56,8 @@ function buildConfigSnapshot(){
     filterAttackColor: $('filterAttackColor').value,
     filterDecayColor: $('filterDecayColor').value,
     filterReleaseColor: $('filterReleaseColor').value,
+    loudnessGateColor: $('loudnessGateColor') ? $('loudnessGateColor').value : '#ff8800',
+    filterGateColor: $('filterGateColor') ? $('filterGateColor').value : '#ff8800',
     meterFillColor: $('meterFillColor').value,
     meterFillColorFilter: $('meterFillColorFilter').value,
     timeAxisStatedColor: $('timeAxisStatedColor').value,
@@ -136,7 +138,7 @@ function loadConfigObject(cfg){
   }
 
   // Colours (dispatch input to update CSS variables)
-  ['lineColor','bgColor','loudnessAttackColor','loudnessDecayColor','loudnessReleaseColor','filterAttackColor','filterDecayColor','filterReleaseColor','meterFillColor','meterFillColorFilter','timeAxisStatedColor','contourLineColor','underlayColor'].forEach(id => {
+  ['lineColor','bgColor','loudnessAttackColor','loudnessDecayColor','loudnessReleaseColor','loudnessGateColor','filterAttackColor','filterDecayColor','filterReleaseColor','filterGateColor','meterFillColor','meterFillColorFilter','timeAxisStatedColor','contourLineColor','underlayColor'].forEach(id => {
     if($(id) && cfg[id]){ $(id).value = cfg[id]; $(id).dispatchEvent(new Event('input')); }
   });
 
