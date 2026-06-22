@@ -298,17 +298,37 @@ function render(){
         tapReleaseOrangeEl.style.display = 'none';
       }
     }
-    // Show Gate Time: vertical dotted line + label at the gate-close x.
+    // Show Gate Time: vertical dotted line + label at the gate-close x,
+    // with crossings on both effective and stated curves and horizontals to the meter.
     const showGateTime = $('showGateTime') && $('showGateTime').checked;
     const gateTimeLineEl = $('gateTimeLine');
     const gateTimeLabelEl = $('gateTimeLabel');
+    const gateEffHorizEl = $('gateEffectiveHoriz');
+    const gateStatedHorizEl = $('gateStatedHoriz');
     if(showGateTime){
       const gateTopY = graph.y0 - graph.h;
+      // Stated-curve y at gateCloseX (mirrors effective sampling but on underlay paths)
+      const isAttackPhase = gateCloseX < pts.p1.x;
+      const gsPathEl = document.getElementById(isAttackPhase ? 'underlayAttack' : 'underlayDecay');
+      const gateStatedYRaw = gsPathEl ? getYFromPath(gsPathEl, gateCloseX) : null;
+      // Per-leg visibility for each crossing
+      const effLegOn = isAttackPhase ? legA : legD;
+      const statedLegOn = isAttackPhase
+        ? (!textbookAdsr && $('underlayA') && $('underlayA').checked)
+        : (!textbookAdsr && $('underlayD') && $('underlayD').checked);
+      const effVisible = effLegOn && (gateCloseY !== null);
+      const statedVisible = statedLegOn && (gateStatedYRaw !== null);
+      // Vertical bottom extent
+      let gateBottomY;
+      if(effVisible && statedVisible) gateBottomY = Math.max(gateCloseY, gateStatedYRaw);
+      else if(effVisible) gateBottomY = gateCloseY;
+      else if(statedVisible) gateBottomY = gateStatedYRaw;
+      else gateBottomY = graph.y0;
       if(gateTimeLineEl){
         gateTimeLineEl.setAttribute('x1', gateCloseX);
         gateTimeLineEl.setAttribute('x2', gateCloseX);
         gateTimeLineEl.setAttribute('y1', gateTopY);
-        gateTimeLineEl.setAttribute('y2', gateCloseY);
+        gateTimeLineEl.setAttribute('y2', gateBottomY);
         gateTimeLineEl.style.display = '';
       }
       if(gateTimeLabelEl){
@@ -319,9 +339,31 @@ function render(){
         gateTimeLabelEl.textContent = 'Gate = ' + gateTapMs + 'ms';
         gateTimeLabelEl.style.display = '';
       }
+      // Horizontal from effective crossing to the meter
+      if(gateEffHorizEl){
+        if(effVisible){
+          gateEffHorizEl.setAttribute('x1', gateCloseX); gateEffHorizEl.setAttribute('y1', gateCloseY);
+          gateEffHorizEl.setAttribute('x2', METER_X);    gateEffHorizEl.setAttribute('y2', gateCloseY);
+          gateEffHorizEl.style.display = '';
+        } else {
+          gateEffHorizEl.style.display = 'none';
+        }
+      }
+      // Horizontal from stated crossing to the meter
+      if(gateStatedHorizEl){
+        if(statedVisible){
+          gateStatedHorizEl.setAttribute('x1', gateCloseX);     gateStatedHorizEl.setAttribute('y1', gateStatedYRaw);
+          gateStatedHorizEl.setAttribute('x2', METER_X);        gateStatedHorizEl.setAttribute('y2', gateStatedYRaw);
+          gateStatedHorizEl.style.display = '';
+        } else {
+          gateStatedHorizEl.style.display = 'none';
+        }
+      }
     } else {
       if(gateTimeLineEl) gateTimeLineEl.style.display = 'none';
       if(gateTimeLabelEl) gateTimeLabelEl.style.display = 'none';
+      if(gateEffHorizEl) gateEffHorizEl.style.display = 'none';
+      if(gateStatedHorizEl) gateStatedHorizEl.style.display = 'none';
     }
     {
       const susSegPath = drawReleasePath ? `M ${drawPS.x} ${drawPS.y} L ${releaseStartX} ${drawPS.y}` : '';
