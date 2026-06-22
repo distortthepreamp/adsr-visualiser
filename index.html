@@ -26,6 +26,9 @@
         <clipPath id="gateReleaseClip">
           <rect id="gateReleaseClipRect" x="0" y="0" width="0" height="0"/>
         </clipPath>
+        <clipPath id="gateEnvClip">
+          <rect id="gateEnvClipRect" x="0" y="0" width="0" height="0"/>
+        </clipPath>
         <pattern id="scanlines" x="0" y="0" width="100%" height="4" patternUnits="userSpaceOnUse">
           <rect x="0" y="0" width="100%" height="2" fill="black" opacity="0.3"/>
         </pattern>
@@ -61,6 +64,11 @@
       <line id="gateTimeLine" stroke="#ff8800" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
       <line id="gateEffectiveHoriz" stroke="#ff8800" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
       <line id="gateStatedHoriz" stroke="#ff8800" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
+      <line id="gateStatedRelease" stroke="white" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;display:none"/>
+      <line id="gateStatedReleaseDrop" stroke="cyan" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
+      <text id="gateStatedReleaseTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
+      <line id="gateEffectiveReleaseDrop" stroke="white" stroke-width="1" stroke-dasharray="4,4" style="display:none"/>
+      <text id="gateEffectiveReleaseTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <text id="gateTimeLabel" fill="#ff8800" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <g id="envSegments">
         <path id="underlayAttack" fill="none" stroke="white" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:round"/>
@@ -239,6 +247,7 @@
           <div id="tbSustainCollapseRow" class="row"><label><input id="tbSustainCollapse" type="checkbox"> Collapse Textbook ADSR Sustain (])</label></div>
           <div id="tbShowModelDSustainRow" class="row"><label><input id="tbShowModelDSustain" type="checkbox"> Show Model D Sustain (textbook) (\)</label></div>
           <div class="row"><label><input type="checkbox" id="showGateTime"> Show Gate Time</label></div>
+          <div class="row"><label><input type="checkbox" id="clipAtGate"> Clip at Gate</label></div>
           <div class="row"><label><input type="checkbox" id="showPeakDischarge"> Show Peak Discharge</label></div>
           <div class="row" style="gap:6px;align-items:center"><label><input type="checkbox" id="underlayA" checked> Underlay A</label><label><input type="checkbox" id="underlayD" checked> D</label><label><input type="checkbox" id="underlayS" checked> S</label><label><input type="checkbox" id="underlayR" checked> R</label><button id="underlayShowAll" style="padding:2px 6px;min-height:unset;line-height:1.1;border-radius:4px;font-size:11px">Show All</button><button id="underlayHideAll" style="padding:2px 6px;min-height:unset;line-height:1.1;border-radius:4px;font-size:11px">Hide All</button></div>
           <div class="row"><label><input type="checkbox" id="showNewEffectiveLines"> Show New Effective Drop Lines</label></div>

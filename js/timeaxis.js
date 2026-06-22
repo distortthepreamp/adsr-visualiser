@@ -3,7 +3,7 @@
 const TIME_LABEL_STATED_Y_OFFSET    = -10; // px above the graph top (stated labels)
 const TIME_LABEL_EFFECTIVE_Y_OFFSET =  18; // px below the time axis (effective labels)
 
-function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, linearTimeOn, drawPS, statedSustainX, modelLegs) {
+function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, linearTimeOn, drawPS, statedSustainX, modelLegs, clipGateX) {
   // Drop lines (individual elements, gated by the new drop-line checkboxes)
   // Per-leg effective flags: false when textbook mode is active OR when the leg is hidden.
   const effA = !textbookAdsr && (modelLegs ? modelLegs.legA !== false : true);
@@ -205,5 +205,19 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
       newStatedReleaseDropEl.style.display='none';
       if(newStatedReleaseTimeLabelEl) newStatedReleaseTimeLabelEl.style.display='none';
     }
+  }
+  // Clip at Gate: hide drop lines and time labels whose anchor x >= clipGateX.
+  // Applied as a post-pass after all normal visibility logic.
+  if(clipGateX !== null){
+    ['newStatedDecayDrop','newStatedDecayTime','newStatedAttackDrop','newStatedAttackTime',
+     'newStatedReleaseDrop','newStatedReleaseTime',
+     'newEffectiveDecayDrop','newEffectiveDecayTime',
+     'newEffectiveAttackDrop','newEffectiveAttackTime',
+     'newEffectiveAttackDropEnd','newEffectiveClipTime',
+     'newEffectiveReleaseDrop','newEffectiveReleaseTime'].forEach(id => {
+      const el=$(id); if(!el || el.style.display==='none') return;
+      const x = parseFloat(el.getAttribute('x') || el.getAttribute('x1'));
+      if(x >= clipGateX) el.style.display='none';
+    });
   }
 }

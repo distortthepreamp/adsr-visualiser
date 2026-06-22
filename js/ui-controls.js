@@ -412,6 +412,7 @@ function initUIControls(){
   $('tapModeHoldBtn').addEventListener('click', () => setTapMode('hold','tapModeHoldBtn'));
   $('tapCustomMs') && $('tapCustomMs').addEventListener('input', render); // keep the orange tap-release curve / gate-time line live
   $('showGateTime') && $('showGateTime').addEventListener('change', render);
+  $('clipAtGate') && $('clipAtGate').addEventListener('change', render);
   $('showPeakDischarge') && $('showPeakDischarge').addEventListener('change', render);
   ['underlayA','underlayD','underlayS','underlayR'].forEach(id => { $(id) && $(id).addEventListener('change', render); });
   $('underlayShowAll') && $('underlayShowAll').addEventListener('click', () => { ['underlayA','underlayD','underlayS','underlayR'].forEach(id => { if($(id)) $(id).checked = true; }); render(); });

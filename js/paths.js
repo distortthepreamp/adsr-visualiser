@@ -59,6 +59,29 @@ function render(){
   const legR = $('modelR') ? $('modelR').checked : true;
   const showClipped = !textbookAdsr && overrange && $('showClipped') && $('showClipped').checked;
 
+  // Gate-close x and clip-at-gate flag — hoisted so both the Model D block and the
+  // post-block loose elements can use them.
+  const showGateTime = $('showGateTime') && $('showGateTime').checked;
+  const clipAtGateOn = showGateTime && $('clipAtGate') && $('clipAtGate').checked;
+  const gateTapMs = ($('tapCustomMs') && Number($('tapCustomMs').value)) || 200;
+  const gateTSec = gateTapMs / 1000;
+  let gateCloseX;
+  if(e.aT > 0 && gateTSec <= e.aT){
+    gateCloseX = pts.p0.x + (pts.p1.x - pts.p0.x) * (gateTSec / e.aT);
+  } else {
+    const gfd = e.dT > 0 ? Math.min(1, (gateTSec - e.aT) / e.dT) : 1;
+    gateCloseX = pts.p1.x + (pts.pEnd.x - pts.p1.x) * gfd;
+  }
+  if(gateCloseX > pts.pS.x) gateCloseX = pts.pS.x;
+  // Update the gate envelope clip rect
+  const gateEnvClipRect = $('gateEnvClipRect');
+  if(gateEnvClipRect){
+    gateEnvClipRect.setAttribute('x', graph.x0);
+    gateEnvClipRect.setAttribute('y', graph.y0 - graph.h - 200);
+    gateEnvClipRect.setAttribute('width', gateCloseX - graph.x0);
+    gateEnvClipRect.setAttribute('height', graph.h + 400);
+  }
+
   const drawP1 = showClipped
     ? pts.p1
     : { x: pts.p1.x, y: Math.max(pts.p1.y, ceilY) };
@@ -238,8 +261,7 @@ function render(){
       el.setAttribute('d', rPath);
       el.style.stroke = relColor;
       el.style.display = legR ? '' : 'none';
-      if(greenAnalogueRelease) el.setAttribute('clip-path', 'url(#sustainReleaseClip)');
-      else el.removeAttribute('clip-path');
+      // clip-path is set later by the Clip at Gate block (handles both gateEnvClip and sustainReleaseClip)
     } }
     // #fullReferenceRelease: full peak→floor reference curve (cyan, unclipped). Only shown
     // when Show Peak Discharge is checked.
@@ -256,19 +278,7 @@ function render(){
         fullReferenceReleaseEl.style.display = 'none';
       }
     }
-    // Shared gate-close geometry — used by the orange tap-release curve and Show Gate Time.
-    // gateCloseX = where the blob sits when the gate closes (attack → decay time mapping,
-    // parked at the sustain x since gate-high never descends below sustain).
-    const gateTapMs = ($('tapCustomMs') && Number($('tapCustomMs').value)) || 200;
-    const gateTSec = gateTapMs / 1000;
-    let gateCloseX;
-    if(e.aT > 0 && gateTSec <= e.aT){
-      gateCloseX = pts.p0.x + (pts.p1.x - pts.p0.x) * (gateTSec / e.aT);
-    } else {
-      const gfd = e.dT > 0 ? Math.min(1, (gateTSec - e.aT) / e.dT) : 1;
-      gateCloseX = pts.p1.x + (pts.pEnd.x - pts.p1.x) * gfd;
-    }
-    if(gateCloseX > pts.pS.x) gateCloseX = pts.pS.x;
+    // gateCloseX is hoisted above the Model D block; sample the effective curve y here.
     // y at gateCloseX, sampled from the drawn attack or decay curve (top of the orange release curve)
     const gcPathEl = document.getElementById(gateCloseX < pts.p1.x ? 'attackInner' : 'decayInner');
     let gateCloseY = gcPathEl ? getYFromPath(gcPathEl, gateCloseX) : null;
@@ -278,29 +288,102 @@ function render(){
     // like the green release (releaseInner): the full peak→floor RC curve shifted so its
     // crossing at the gate-close level lands at gateCloseX, then clipped below that level.
     // When the gate closes at the sustain level this coincides with the green curve.
-    const tapReleaseOrangeEl = $('tapReleaseOrange');
-    if(tapReleaseOrangeEl){
-      if(drawReleasePath && curveAmt){
-        const magentaXAtGate = rcPolylineXAtY(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, gateCloseY, false, 200, 3);
-        const orangeOffset = gateCloseX - magentaXAtGate;
-        const gateReleaseClipRect = $('gateReleaseClipRect');
-        if(gateReleaseClipRect){
-          gateReleaseClipRect.setAttribute('x', graph.x0);
-          gateReleaseClipRect.setAttribute('y', gateCloseY);
-          gateReleaseClipRect.setAttribute('width', graph.w);
-          gateReleaseClipRect.setAttribute('height', graph.y0 - gateCloseY);
-        }
+    // Gate RC discharge geometry — computed once, used by tapReleaseOrange and the effective GR descender.
+    const gateRCActive = !!(drawReleasePath && curveAmt);
+    let orangeDischargeEndX = 0;
+    if(gateRCActive){
+      const magentaXAtGate = rcPolylineXAtY(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, gateCloseY, false, 200, 3);
+      const orangeOffset = gateCloseX - magentaXAtGate;
+      orangeDischargeEndX = rEnd.x + orangeOffset;
+      const gateReleaseClipRect = $('gateReleaseClipRect');
+      if(gateReleaseClipRect){
+        gateReleaseClipRect.setAttribute('x', graph.x0);
+        gateReleaseClipRect.setAttribute('y', gateCloseY);
+        gateReleaseClipRect.setAttribute('width', graph.w);
+        gateReleaseClipRect.setAttribute('height', graph.y0 - gateCloseY);
+      }
+      const tapReleaseOrangeEl = $('tapReleaseOrange');
+      if(tapReleaseOrangeEl){
         tapReleaseOrangeEl.setAttribute('d', rcPolyline(pts.p1.x + orangeOffset, pts.p1.y, rEnd.x + orangeOffset, rEnd.y, false, 50, 3));
         tapReleaseOrangeEl.setAttribute('clip-path', 'url(#gateReleaseClip)');
-        tapReleaseOrangeEl.style.stroke = '#ff8800'; // forced debug colour
+        tapReleaseOrangeEl.style.stroke = relColor;
         tapReleaseOrangeEl.style.display = '';
-      } else {
-        tapReleaseOrangeEl.style.display = 'none';
       }
+    } else {
+      const tapReleaseOrangeEl = $('tapReleaseOrange');
+      if(tapReleaseOrangeEl) tapReleaseOrangeEl.style.display = 'none';
+    }
+    // Effective GR descender: vertical at the RC discharge floor-crossing, from floor to graph.y0
+    const gateEffReleaseDropEl = $('gateEffectiveReleaseDrop');
+    const gateEffReleaseTimeEl = $('gateEffectiveReleaseTime');
+    if(gateRCActive && legR){
+      const timeLabelGutter = Math.max(0, Number(($('timeLabelGutter') && $('timeLabelGutter').value) || 0));
+      if(gateEffReleaseDropEl){
+        gateEffReleaseDropEl.setAttribute('x1', orangeDischargeEndX); gateEffReleaseDropEl.setAttribute('y1', rEnd.y);
+        gateEffReleaseDropEl.setAttribute('x2', orangeDischargeEndX); gateEffReleaseDropEl.setAttribute('y2', graph.y0);
+        gateEffReleaseDropEl.setAttribute('stroke', relColor);
+        gateEffReleaseDropEl.style.display = '';
+      }
+      if(gateEffReleaseTimeEl){
+        gateEffReleaseTimeEl.setAttribute('x', orangeDischargeEndX);
+        gateEffReleaseTimeEl.setAttribute('y', graph.y0 + TIME_LABEL_EFFECTIVE_Y_OFFSET + timeLabelGutter);
+        gateEffReleaseTimeEl.setAttribute('text-anchor', 'middle');
+        gateEffReleaseTimeEl.setAttribute('fill', relColor);
+        gateEffReleaseTimeEl.textContent = 'GR = ' + Math.round(pixelsToTimeSec(orangeDischargeEndX - gateCloseX, linearTimeOn) * 1000) + 'ms';
+        gateEffReleaseTimeEl.style.display = '';
+      }
+    } else {
+      if(gateEffReleaseDropEl) gateEffReleaseDropEl.style.display = 'none';
+      if(gateEffReleaseTimeEl) gateEffReleaseTimeEl.style.display = 'none';
+    }
+    // Textbook (stated) gate-release line + ascender drop line and GR label.
+    const showStatedGateRelease = drawReleasePath && $('underlayR') && $('underlayR').checked;
+    const gateRelEndX = gateCloseX + timeToPixels(mapTime(state.r), linearTimeOn);
+    const gateRelEndY = yFor(pts.e.floor);
+    const ulCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
+    const gateStatedReleaseEl = $('gateStatedRelease');
+    if(gateStatedReleaseEl){
+      // Sample the stated (underlay) curve y at gateCloseX
+      const gsRelPathEl = showStatedGateRelease ? document.getElementById(gateCloseX < pts.p1.x ? 'underlayAttack' : 'underlayDecay') : null;
+      const gateStatedStartY = gsRelPathEl ? getYFromPath(gsRelPathEl, gateCloseX) : null;
+      if(showStatedGateRelease && gateStatedStartY !== null){
+        gateStatedReleaseEl.setAttribute('x1', gateCloseX);
+        gateStatedReleaseEl.setAttribute('y1', gateStatedStartY);
+        gateStatedReleaseEl.setAttribute('x2', gateRelEndX);
+        gateStatedReleaseEl.setAttribute('y2', gateRelEndY);
+        gateStatedReleaseEl.style.stroke = ulCol;
+        gateStatedReleaseEl.style.display = '';
+      } else {
+        gateStatedReleaseEl.style.display = 'none';
+      }
+    }
+    // Stated GR ascender: vertical at gateRelEndX from floor to graph top
+    const gateStatedReleaseDropEl = $('gateStatedReleaseDrop');
+    const gateStatedReleaseTimeEl = $('gateStatedReleaseTime');
+    if(showStatedGateRelease){
+      const gateTopY = graph.y0 - graph.h;
+      const timeLabelGutter = Math.max(0, Number(($('timeLabelGutter') && $('timeLabelGutter').value) || 0));
+      if(gateStatedReleaseDropEl){
+        gateStatedReleaseDropEl.setAttribute('x1', gateRelEndX); gateStatedReleaseDropEl.setAttribute('y1', gateRelEndY);
+        gateStatedReleaseDropEl.setAttribute('x2', gateRelEndX); gateStatedReleaseDropEl.setAttribute('y2', gateTopY);
+        gateStatedReleaseDropEl.setAttribute('stroke', ulCol);
+        gateStatedReleaseDropEl.style.display = '';
+      }
+      if(gateStatedReleaseTimeEl){
+        gateStatedReleaseTimeEl.setAttribute('x', gateRelEndX);
+        gateStatedReleaseTimeEl.setAttribute('y', gateTopY + TIME_LABEL_STATED_Y_OFFSET - timeLabelGutter);
+        gateStatedReleaseTimeEl.setAttribute('text-anchor', 'middle');
+        gateStatedReleaseTimeEl.setAttribute('fill', ulCol);
+        gateStatedReleaseTimeEl.textContent = 'GR = ' + Math.round(mapTime(state.r) * 1000) + 'ms';
+        gateStatedReleaseTimeEl.style.display = '';
+      }
+    } else {
+      if(gateStatedReleaseDropEl) gateStatedReleaseDropEl.style.display = 'none';
+      if(gateStatedReleaseTimeEl) gateStatedReleaseTimeEl.style.display = 'none';
     }
     // Show Gate Time: vertical dotted line + label at the gate-close x,
     // with crossings on both effective and stated curves and horizontals to the meter.
-    const showGateTime = $('showGateTime') && $('showGateTime').checked;
+    // (showGateTime and gateCloseX are hoisted above the Model D block.)
     const gateTimeLineEl = $('gateTimeLine');
     const gateTimeLabelEl = $('gateTimeLabel');
     const gateEffHorizEl = $('gateEffectiveHoriz');
@@ -365,6 +448,20 @@ function render(){
       if(gateEffHorizEl) gateEffHorizEl.style.display = 'none';
       if(gateStatedHorizEl) gateStatedHorizEl.style.display = 'none';
     }
+    // Clip at Gate: apply/remove gateEnvClip on individual curve elements (not the group).
+    // tapReleaseOrange is intentionally excluded — it renders the release from the gate point.
+    // releaseInner is handled separately since it may already carry sustainReleaseClip.
+    ['attackInner','decayInner','ceilLeftInner','ceilRightInner','sustainSegInner',
+     'underlayAttack','underlayDecay','underlaySustain','underlayRelease','fullReferenceRelease'].forEach(id => {
+      const el=$(id); if(!el) return;
+      if(clipAtGateOn) el.setAttribute('clip-path','url(#gateEnvClip)');
+      else el.removeAttribute('clip-path');
+    });
+    { const el=$('releaseInner'); if(el){
+      if(clipAtGateOn) el.setAttribute('clip-path','url(#gateEnvClip)');
+      else if(greenAnalogueRelease) el.setAttribute('clip-path','url(#sustainReleaseClip)');
+      else el.removeAttribute('clip-path');
+    } }
     {
       const susSegPath = drawReleasePath ? `M ${drawPS.x} ${drawPS.y} L ${releaseStartX} ${drawPS.y}` : '';
       { const el=$('sustainSegInner'); if(el){ el.setAttribute('d', susSegPath); el.style.display = (drawReleasePath && legS) ? '' : 'none'; } }
@@ -437,6 +534,20 @@ function render(){
   { const el=$('sLabel'), bg=$('sLabelBg');
     el.setAttribute('x', METER_X - 30); el.setAttribute('y', drawPS.y); el.setAttribute('dominant-baseline', 'middle'); el.removeAttribute('stroke'); el.removeAttribute('stroke-width'); el.removeAttribute('paint-order'); el.style.fill = '#000000'; el.style.display = (textbookAdsr || !legS) ? 'none' : ''; el.textContent = ($('keyboardControl') && $('keyboardControl').checked) ? 'MODEL D SUSTAIN' : 'SUSTAIN';
     if(bg){ const bbox=el.getBBox(); bg.setAttribute('x',bbox.x-4); bg.setAttribute('y',bbox.y-2); bg.setAttribute('width',bbox.width+8); bg.setAttribute('height',bbox.height+4); const decayCol = ($('frequencyMode') && $('frequencyMode').checked) ? (($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00') : (($('loudnessDecayColor') && $('loudnessDecayColor').value) || '#ff0000'); bg.setAttribute('fill', decayCol); bg.style.display=el.style.display; }
+  }
+
+  // Clip at Gate: hide loose elements whose anchor x >= gateCloseX.
+  // Applied as a post-pass so normal visibility logic runs first; this only adds display:none.
+  if(clipAtGateOn){
+    // Elements with a single x anchor — hide if that x >= gateCloseX
+    [['sustainMarker','x1'],['sustainPoint','cx']].forEach(([id,attr]) => {
+      const el=$(id); if(!el) return;
+      const x = parseFloat(el.getAttribute(attr));
+      if(x >= gateCloseX) el.style.display='none';
+    });
+    // sLabel/sLabelBg — anchor x is METER_X-30, always right of gate
+    { const el=$('sLabel'); if(el && parseFloat(el.getAttribute('x')) >= gateCloseX) el.style.display='none'; }
+    { const el=$('sLabelBg'); if(el && el.style.display !== 'none'){ const lbl=$('sLabel'); if(lbl && lbl.style.display==='none') el.style.display='none'; } }
   }
 
   // Meter box — fixed full graph height
@@ -524,7 +635,7 @@ function render(){
   if(svgTimecodesEl){ svgTimecodesEl.setAttribute('x',METER_X-10); svgTimecodesEl.setAttribute('y',GRAPH_TOP_BASE-90); svgTimecodesEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
   const toolTitleEl=$('toolTitle');
   if(toolTitleEl){ toolTitleEl.setAttribute('x',VB_WIDTH/2); toolTitleEl.setAttribute('y',GRAPH_TOP_BASE-173); toolTitleEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
-  updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, linearTimeOn, drawPS, statedSustainX, {legA, legD, legR});
+  updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, linearTimeOn, drawPS, statedSustainX, {legA, legD, legR}, clipAtGateOn ? gateCloseX : null);
 
   const segY = GRAPH_TOP_BASE - 45;
   const segStart = 10;
