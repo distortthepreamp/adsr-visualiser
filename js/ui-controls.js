@@ -414,7 +414,9 @@ function initUIControls(){
   $('tapCustomMs') && $('tapCustomMs').addEventListener('input', render); // keep the orange tap-release curve / gate-time line live
   $('showGateTime') && $('showGateTime').addEventListener('change', render);
   $('showPeakDischarge') && $('showPeakDischarge').addEventListener('change', render);
-  $('showTextbookUnderlay') && $('showTextbookUnderlay').addEventListener('change', render);
+  ['underlayA','underlayD','underlayS','underlayR'].forEach(id => { $(id) && $(id).addEventListener('change', render); });
+  $('underlayShowAll') && $('underlayShowAll').addEventListener('click', () => { ['underlayA','underlayD','underlayS','underlayR'].forEach(id => { if($(id)) $(id).checked = true; }); render(); });
+  $('underlayHideAll') && $('underlayHideAll').addEventListener('click', () => { ['underlayA','underlayD','underlayS','underlayR'].forEach(id => { if($(id)) $(id).checked = false; }); render(); });
   $('underlayColor') && $('underlayColor').addEventListener('change', render);
   $('showNewEffectiveLines') && $('showNewEffectiveLines').addEventListener('change', render);
   $('showNewStatedLines') && $('showNewStatedLines').addEventListener('change', render);

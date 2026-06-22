@@ -162,30 +162,27 @@ function render(){
     : Math.min(1, e.rT * 1000 / 500);
 
   // Textbook ADSR underlay — faint straight-line A/D/S/R behind the main curves.
-  // Shown only in non-textbook mode when the toggle is on.
+  // Each leg is independently gated by its own checkbox (underlayA/D/S/R).
   {
-    const showUnderlay = !textbookAdsr && $('showTextbookUnderlay') && $('showTextbookUnderlay').checked;
+    const showA = !textbookAdsr && $('underlayA') && $('underlayA').checked;
+    const showD = !textbookAdsr && $('underlayD') && $('underlayD').checked;
+    const showS = !textbookAdsr && $('underlayS') && $('underlayS').checked;
+    const showR = !textbookAdsr && $('underlayR') && $('underlayR').checked;
     const ua=$('underlayAttack'), ud=$('underlayDecay'), us=$('underlaySustain'), ur=$('underlayRelease');
-    if(showUnderlay){
-      // Mirror renderTextbookPaths() geometry exactly (straight A/D/S/R) so the underlay
-      // matches the textbook ADSR: decay ends at pEnd.x, sustain is a fixed-width gap, and
-      // release spans rwFull from there down to the floor.
+    const anyLeg = showA || showD || showS || showR;
+    if(anyLeg){
       const tbSusGapPx = graph.w * state.tbSustainGap;
       const tbDecayEndX = pts.pEnd.x;
       const tbSusEndX   = pts.pEnd.x + tbSusGapPx;
       const tbRelEndX   = tbSusEndX + timeToPixels(mapTime(state.r), linearTimeOn);
       const tbFloorY    = yFor(e.floor);
-      // Textbook never trapezoid-clips, so use ceiling-clamped peak/sustain y (ignoring showClipped).
       const ulP1Y = Math.max(pts.p1.y, ceilY);
-      const ulPSY = overrange ? Math.max(yFor(e.floor + state.s * e.scale), ceilY) : yFor(e.floor + state.s * e.scale); // stated (uncapped) sustain, ignoring Mimic 80% cap
+      const ulPSY = overrange ? Math.max(yFor(e.floor + state.s * e.scale), ceilY) : yFor(e.floor + state.s * e.scale);
       const ulColor = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
-      if(ua){ ua.setAttribute('d', `M ${pts.p0.x} ${pts.p0.y} L ${pts.p1.x} ${ulP1Y}`); ua.style.display=''; }
-      if(ud){ ud.setAttribute('d', `M ${pts.p1.x} ${ulP1Y} L ${tbDecayEndX} ${ulPSY}`); ud.style.display=''; }
-      if(us){ us.setAttribute('d', `M ${tbDecayEndX} ${ulPSY} L ${tbSusEndX} ${ulPSY}`); us.style.display=''; }
-      if(ur){
-        if(drawReleasePath){ ur.setAttribute('d', `M ${tbSusEndX} ${ulPSY} L ${tbRelEndX} ${tbFloorY}`); ur.style.display=''; }
-        else { ur.setAttribute('d',''); ur.style.display='none'; }
-      }
+      if(ua){ if(showA){ ua.setAttribute('d', `M ${pts.p0.x} ${pts.p0.y} L ${pts.p1.x} ${ulP1Y}`); ua.style.display=''; } else { ua.setAttribute('d',''); ua.style.display='none'; } }
+      if(ud){ if(showD){ ud.setAttribute('d', `M ${pts.p1.x} ${ulP1Y} L ${tbDecayEndX} ${ulPSY}`); ud.style.display=''; } else { ud.setAttribute('d',''); ud.style.display='none'; } }
+      if(us){ if(showS){ us.setAttribute('d', `M ${tbDecayEndX} ${ulPSY} L ${tbSusEndX} ${ulPSY}`); us.style.display=''; } else { us.setAttribute('d',''); us.style.display='none'; } }
+      if(ur){ if(showR && drawReleasePath){ ur.setAttribute('d', `M ${tbSusEndX} ${ulPSY} L ${tbRelEndX} ${tbFloorY}`); ur.style.display=''; } else { ur.setAttribute('d',''); ur.style.display='none'; } }
       [ua,ud,us,ur].forEach(el=>{ if(el) el.style.stroke=ulColor; });
     } else {
       [ua,ud,us,ur].forEach(el => { if(el){ el.setAttribute('d',''); el.style.display='none'; } });

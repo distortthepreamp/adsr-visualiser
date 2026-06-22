@@ -19,7 +19,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   const newStatedDecayDropEl=$('newStatedDecayDrop');
   const newStatedDecayTimeLabelEl=$('newStatedDecayTime');
   if(newStatedDecayDropEl){
-    const showStatedDecayDrop = showNewStated && ($('showTextbookUnderlay').checked || $('textbookAdsr').checked);
+    const showStatedDecayDrop = showNewStated && (($('underlayD') && $('underlayD').checked) || $('textbookAdsr').checked);
     if(showStatedDecayDrop){
       const ulPSY = overrange ? Math.max(yFor(pts.e.floor + state.s * pts.e.scale), yFor(1)) : yFor(pts.e.floor + state.s * pts.e.scale); // textbook (uncapped) sustain y
       newStatedDecayDropEl.setAttribute('x1',pts.pEnd.x); newStatedDecayDropEl.setAttribute('y1',graph.y0-graph.h);
@@ -42,7 +42,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   const newStatedAttackDropEl=$('newStatedAttackDrop');
   const newStatedAttackTimeLabelEl=$('newStatedAttackTime');
   if(newStatedAttackDropEl){
-    const showStatedAttackDrop = showNewStated && ($('showTextbookUnderlay').checked || $('textbookAdsr').checked);
+    const showStatedAttackDrop = showNewStated && (($('underlayA') && $('underlayA').checked) || $('textbookAdsr').checked);
     if(showStatedAttackDrop){
       const tbPeakY = Math.max(pts.p1.y, yFor(1)); // attack peak y (= drawP1.y in non-clipped mode)
       newStatedAttackDropEl.setAttribute('x1',pts.p1.x); newStatedAttackDropEl.setAttribute('y1',graph.y0-graph.h);
@@ -152,7 +152,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   const newStatedReleaseDropEl=$('newStatedReleaseDrop');
   const newStatedReleaseTimeLabelEl=$('newStatedReleaseTime');
   if(newStatedReleaseDropEl){
-    const showStatedRelease = pts.e.releaseOn && showNewStated && ($('showTextbookUnderlay').checked || $('textbookAdsr').checked);
+    const showStatedRelease = pts.e.releaseOn && showNewStated && (($('underlayR') && $('underlayR').checked) || $('textbookAdsr').checked);
     if(showStatedRelease){
       const stRelX = pts.pEnd.x + graph.w * state.tbSustainGap + timeToPixels(mapTime(state.r), linearTimeOn);
       const stRelY = yFor(pts.e.floor);

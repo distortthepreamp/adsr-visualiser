@@ -242,7 +242,7 @@
           <div id="tbShowModelDSustainRow" class="row"><label><input id="tbShowModelDSustain" type="checkbox"> Show Model D Sustain (textbook) (\)</label></div>
           <div class="row"><label><input type="checkbox" id="showGateTime"> Show Gate Time</label></div>
           <div class="row"><label><input type="checkbox" id="showPeakDischarge"> Show Peak Discharge</label></div>
-          <div class="row"><label><input type="checkbox" id="showTextbookUnderlay"> Show Textbook Underlay (T)</label></div>
+          <div class="row" style="gap:6px;align-items:center"><label><input type="checkbox" id="underlayA" checked> Underlay A</label><label><input type="checkbox" id="underlayD" checked> D</label><label><input type="checkbox" id="underlayS" checked> S</label><label><input type="checkbox" id="underlayR" checked> R</label><button id="underlayShowAll" style="padding:2px 6px;min-height:unset;line-height:1.1;border-radius:4px;font-size:11px">Show All</button><button id="underlayHideAll" style="padding:2px 6px;min-height:unset;line-height:1.1;border-radius:4px;font-size:11px">Hide All</button></div>
           <div class="row"><label><input type="checkbox" id="showNewEffectiveLines"> Show New Effective Drop Lines</label></div>
           <div class="row"><label><input type="checkbox" id="showNewStatedLines"> Show New Stated Drop Lines</label></div>
           <div class="row"><label><input type="checkbox" id="showModelD" checked> Show Model D Overlay</label></div>
@@ -386,7 +386,6 @@
         </table>
         <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-top:14px;margin-bottom:10px">Textbook ADSR</div>
         <table style="border-collapse:collapse;width:100%">
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">T</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Textbook Underlay</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">[</td><td style="padding:3px 0;font-size:13px;font-weight:700">Dotted Textbook ADSR Sustain</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">]</td><td style="padding:3px 0;font-size:13px;font-weight:700">Collapse Textbook ADSR Sustain</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">\</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Model D Sustain (textbook)</td></tr>

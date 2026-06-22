@@ -66,7 +66,6 @@ const tag = document.activeElement ? document.activeElement.tagName : '';
     } else if(e.key === 'm' || e.key === 'M'){ toggleCheckbox('hpMode');
     } else if(e.key === 's' || e.key === 'S'){ toggleCheckbox('keyboardControl');
     } else if(e.key === 'x' || e.key === 'X'){ toggleCheckbox('linearTime');
-    } else if(e.key === 't' || e.key === 'T'){ toggleCheckbox('showTextbookUnderlay');
     } else if(e.key === '['){ toggleCheckbox('tbSustainDotted');
     } else if(e.key === ']'){ toggleCheckbox('tbSustainCollapse');
     } else if(e.key === '\\'){ toggleCheckbox('tbShowModelDSustain');
