@@ -126,8 +126,8 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   if(newEffReleaseDropEl){
     const showEffRelease = pts.e.releaseOn && ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && effectiveOn;
     if(showEffRelease){
-      // green curve floor = last point of the drawn releaseOuter path (= rEnd.x + greenOffset, rEnd.y)
-      const relEl=document.getElementById('releaseOuter');
+      // green curve floor = last point of the drawn releaseInner path (= rEnd.x + greenOffset, rEnd.y)
+      const relEl=document.getElementById('releaseInner');
       let fx=pts.pEnd.x, fy=yFor(pts.e.floor);
       if(relEl && relEl.getTotalLength() > 0){ const p=relEl.getPointAtLength(relEl.getTotalLength()); fx=p.x; fy=p.y; }
       newEffReleaseDropEl.setAttribute('x1',fx); newEffReleaseDropEl.setAttribute('y1',fy);

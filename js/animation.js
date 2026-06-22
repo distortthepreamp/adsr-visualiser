@@ -39,7 +39,7 @@ function pointWhileGateHigh(ms){
 // doesn't jump in analogue curve mode where pts.pS.y is geometrically computed.
 function sampledSustainPoint(pt){
   if(pt.phase !== 'sustain') return pt;
-  const decayPathEl = document.getElementById('decayOuter');
+  const decayPathEl = document.getElementById('decayInner');
   const sampledY = decayPathEl ? getYFromPath(decayPathEl, pt.x) : pt.y;
   return { x: pt.x, y: sampledY, level: pt.level, phase: 'sustain' };
 }
@@ -133,7 +133,7 @@ function setDot(pt, visible=true){
   dot.setAttribute('cx',pt.x);
   let dotY = pt.y;
   if(pt.phase === 'attack' || pt.phase === 'decay' || pt.phase === 'release'){
-    const pathId = pt.phase === 'attack' ? 'attackOuter' : pt.phase === 'decay' ? 'decayOuter' : 'releaseOuter';
+    const pathId = pt.phase === 'attack' ? 'attackInner' : pt.phase === 'decay' ? 'decayInner' : 'releaseInner';
     const pathEl = document.getElementById(pathId);
     if(pathEl){
       const sampled = getYFromPath(pathEl, pt.x);
@@ -233,12 +233,12 @@ function releaseFromCurrent(){
   const floorY = yFor(pts.e.floor);
   const remainingY = floorY - pts.pS.y;
   const tSlope = (slopeY !== 0) ? remainingY / slopeY : 1;
-  // Land where the drawn release path (releaseOuter) actually ends. With the analogue RC
+  // Land where the drawn release path (releaseInner) actually ends. With the analogue RC
   // release that is the horizontally-offset curve's floor point (right of the chord floor),
   // so the blob follows the curve all the way down and lands on it instead of snapping.
   // For non-analogue / overrange the path end equals the chord floor, so this is a no-op.
   let endX = pts.pS.x + slopeX * tSlope;
-  const releaseEndEl = document.getElementById('releaseOuter');
+  const releaseEndEl = document.getElementById('releaseInner');
   if(releaseEndEl && releaseEndEl.getTotalLength() > 0){
     endX = releaseEndEl.getPointAtLength(releaseEndEl.getTotalLength()).x;
   }
@@ -261,13 +261,13 @@ function releaseFromCurrent(){
     const linearY = startY + (end.y - startY) * f;
     let sampledY = null;
     if(dotX < pts.p1.x){
-      const attackPathEl = document.getElementById('attackOuter');
+      const attackPathEl = document.getElementById('attackInner');
       sampledY = attackPathEl ? getYFromPath(attackPathEl, dotX) : null;
     } else if(dotX < pts.pS.x){
-      const decayPathEl = document.getElementById('decayOuter');
+      const decayPathEl = document.getElementById('decayInner');
       sampledY = decayPathEl ? getYFromPath(decayPathEl, dotX) : null;
     } else {
-      const releasePathEl = document.getElementById('releaseOuter');
+      const releasePathEl = document.getElementById('releaseInner');
       sampledY = releasePathEl ? getYFromPath(releasePathEl, dotX) : null;
     }
     const dotY = (sampledY !== null) ? sampledY : linearY;
@@ -378,7 +378,7 @@ function hold(){
       if(elapsed < tbDur){ state.dotAnim=requestAnimationFrame(tbHoldStep); }
       else {
         const tb=tbComputeAnimPoints();
-        const decayPathEl=document.getElementById('decayOuter');
+        const decayPathEl=document.getElementById('decayInner');
         const sampledY=decayPathEl?getYFromPath(decayPathEl,tb.tbDecayEnd.x):tb.tbDecayEnd.y;
         setDot({x:tb.tbDecayEnd.x,y:sampledY,level:tb.e.s,phase:'decay'},true);
         $('dot').style.animation='none';
@@ -392,7 +392,7 @@ function hold(){
   function step(now){
     if (myAnimationToken !== animationToken) return;
     const elapsed=now-t0; setDot(sampledSustainPoint(pointWhileGateHigh(elapsed)), true);
-    if(elapsed < dur) state.dotAnim=requestAnimationFrame(step); else { const decayPathEl=document.getElementById('decayOuter'); const sampledY=decayPathEl?getYFromPath(decayPathEl,pts.pS.x):pts.pS.y; const parkPoint={x:pts.pS.x,y:sampledY,level:pts.pS.level,phase:'decay'}; setDot(parkPoint,true); $('dot').style.animation='none'; startGlowPulse(); state.currentPhase='sustain'; updateButtonStates(); }
+    if(elapsed < dur) state.dotAnim=requestAnimationFrame(step); else { const decayPathEl=document.getElementById('decayInner'); const sampledY=decayPathEl?getYFromPath(decayPathEl,pts.pS.x):pts.pS.y; const parkPoint={x:pts.pS.x,y:sampledY,level:pts.pS.level,phase:'decay'}; setDot(parkPoint,true); $('dot').style.animation='none'; startGlowPulse(); state.currentPhase='sustain'; updateButtonStates(); }
   }
   requestAnimationFrame(step);
 }

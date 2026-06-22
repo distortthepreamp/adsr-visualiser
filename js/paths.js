@@ -29,7 +29,7 @@ function buildPath(x0, y0, x1, y1, curve, scaleFactor, hStartOverride, hEndOverr
   }
 }
 function syncRadii(){
-  const lw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--lineWidth')) || 14;
+  const lw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--innerLineWidth')) || 6;
   document.getElementById('dot').setAttribute('r', Math.round(lw * 1.0));
   document.getElementById('tapMarker').setAttribute('r', Math.round(lw * 0.8));
   document.getElementById('sustainPoint').setAttribute('r', Math.round(lw * 0.57));
@@ -117,18 +117,13 @@ function render(){
   }
 
   const show = showClipped ? '' : 'none';
-  ['attackOuter','attackInner'].forEach(id => { $(id).setAttribute('d', aPath); $(id).style.display = overlayOff ? 'none' : ''; });
-  ['ceilLeftOuter','ceilRightOuter'].forEach((id,i) => {
-    const el=$(id); if(!el) return;
-    el.setAttribute('d', i===0 ? ceilLeftPath : ceilRightPath);
-    el.style.display = show;
-  });
+  { const el=$('attackInner'); if(el){ el.setAttribute('d', aPath); el.style.display = overlayOff ? 'none' : ''; } }
   ['ceilLeftInner','ceilRightInner'].forEach((id,i) => {
     const el=$(id); if(!el) return;
     el.setAttribute('d', i===0 ? ceilLeftPath : ceilRightPath);
     el.style.display = show;
   });
-  ['decayOuter','decayInner'].forEach(id => { $(id).setAttribute('d', dPath); $(id).style.display = overlayOff ? 'none' : ''; });
+  { const el=$('decayInner'); if(el){ el.setAttribute('d', dPath); el.style.display = overlayOff ? 'none' : ''; } }
 
   const drawReleasePath = pts.e.releaseOn;
   let rEnd;
@@ -212,10 +207,10 @@ function render(){
     } else {
       dPath = `M ${dStartX} ${dStartY} L ${drawPS.x} ${drawPS.y}`;
     }
-    ['decayOuter','decayInner'].forEach(id => $(id).setAttribute('d', dPath));
+    $('decayInner').setAttribute('d', dPath);
     const releaseEndHandle = { x: rEnd.x - h_release, y: rEnd.y };
     const rStart = state.releaseFromDecay ? pts.p1 : (releaseStartPoint || drawPS);
-    // releaseOuter/releaseInner: green RC discharge from drawPS — the full peak→floor curve
+    // releaseInner: green RC discharge from drawPS — the full peak→floor curve
     // shifted right so its sustain-level crossing lands at drawPS.x, clipped to below sustain.
     const greenAnalogueRelease = !!(curveAmt && drawReleasePath);
     // Release starts at the end of the textbook sustain gap (matching the underlay), not at drawPS.x.
@@ -240,14 +235,13 @@ function render(){
     }
     const _relColorEl = ($('frequencyMode') && $('frequencyMode').checked) ? $('filterReleaseColor') : $('loudnessReleaseColor');
     const relColor = _relColorEl ? _relColorEl.value : '';
-    ['releaseOuter','releaseInner'].forEach(id => {
-      const el = $(id); if(!el) return;
+    { const el = $('releaseInner'); if(el){
       el.setAttribute('d', rPath);
-      el.style.stroke = relColor; // loudness/filter release colour from the Advanced pickers
+      el.style.stroke = relColor;
       el.style.display = overlayOff ? 'none' : '';
       if(greenAnalogueRelease) el.setAttribute('clip-path', 'url(#sustainReleaseClip)');
       else el.removeAttribute('clip-path');
-    });
+    } }
     // #fullReferenceRelease: full peak→floor reference curve (cyan, unclipped). Only shown
     // when Show Peak Discharge is checked.
     const showPeakDischarge = $('showPeakDischarge') && $('showPeakDischarge').checked;
@@ -277,12 +271,12 @@ function render(){
     }
     if(gateCloseX > pts.pS.x) gateCloseX = pts.pS.x;
     // y at gateCloseX, sampled from the drawn attack or decay curve (top of the orange release curve)
-    const gcPathEl = document.getElementById(gateCloseX < pts.p1.x ? 'attackOuter' : 'decayOuter');
+    const gcPathEl = document.getElementById(gateCloseX < pts.p1.x ? 'attackInner' : 'decayInner');
     let gateCloseY = gcPathEl ? getYFromPath(gcPathEl, gateCloseX) : null;
     if(gateCloseY === null) gateCloseY = drawPS.y;
 
     // #tapReleaseOrange: RC release trajectory from the tap gate-close point. Built exactly
-    // like the green release (releaseOuter): the full peak→floor RC curve shifted so its
+    // like the green release (releaseInner): the full peak→floor RC curve shifted so its
     // crossing at the gate-close level lands at gateCloseX, then clipped below that level.
     // When the gate closes at the sustain level this coincides with the green curve.
     const tapReleaseOrangeEl = $('tapReleaseOrange');
@@ -332,7 +326,7 @@ function render(){
     }
     {
       const susSegPath = drawReleasePath ? `M ${drawPS.x} ${drawPS.y} L ${releaseStartX} ${drawPS.y}` : '';
-      ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d', susSegPath); el.style.display = (drawReleasePath && !overlayOff) ? '' : 'none'; } });
+      { const el=$('sustainSegInner'); if(el){ el.setAttribute('d', susSegPath); el.style.display = (drawReleasePath && !overlayOff) ? '' : 'none'; } }
     }
     const tbSusMarkerMD=$('tbSustainMarker'); if(tbSusMarkerMD) tbSusMarkerMD.style.display='none';
     const tbMDLineMD=$('tbModelDSustainLine'); if(tbMDLineMD) tbMDLineMD.style.display='none';
@@ -342,12 +336,6 @@ function render(){
     $('tapReleaseOrange').setAttribute('d', '');
     $('fullReferenceRelease').setAttribute('d', '');
   }
-
-  // Show/hide outer lines based on showOuterLine checkbox
-  const showOuterLine = !$('showOuterLine') || $('showOuterLine').checked;
-  ['attackOuter','decayOuter','releaseOuter','sustainSegOuter','ceilLeftOuter','ceilRightOuter'].forEach(id => {
-    const el = $(id); if(el) el.style.opacity = showOuterLine ? '' : '0';
-  });
 
   // Sustain as a horizontal level guide extending to the right from
   // the decay/release intersection. This reads as an indefinite held level,
@@ -378,7 +366,7 @@ function render(){
       const floorY = yFor(pts.e.floor);
       const statedY = floorY - (floorY - drawPS.y) * KC_SUSTAIN_SCALE;
       _statedY = statedY;
-      const decayPathEl = document.getElementById('decayOuter');
+      const decayPathEl = document.getElementById('decayInner');
       statedSustainX = pts.p1.x + (drawPS.x - pts.p1.x) * KC_SUSTAIN_SCALE; // geometric fallback
       if(decayPathEl){
         let lo = pts.p1.x, hi = drawPS.x;

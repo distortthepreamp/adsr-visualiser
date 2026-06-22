@@ -63,14 +63,8 @@
         <path id="underlayDecay" fill="none" stroke="white" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:round"/>
         <path id="underlaySustain" fill="none" stroke="white" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:round" stroke-dasharray="4,4"/>
         <path id="underlayRelease" fill="none" stroke="white" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:round"/>
-        <path id="fullReferenceRelease" fill="none" stroke="#00ffff" style="stroke-width:var(--lineWidth)"/>
-        <path id="tapReleaseOrange" fill="none" stroke="#ff8800" style="stroke-width:var(--lineWidth)"/>
-        <path id="sustainSegOuter" class="env-outer" d="" style="display:none" />
-        <path id="releaseOuter" class="env-outer" d="" />
-        <path id="decayOuter" class="env-outer" d="" />
-        <path id="ceilLeftOuter" class="env-outer" d="" style="display:none" />
-        <path id="ceilRightOuter" class="env-outer" d="" style="display:none" />
-        <path id="attackOuter" class="env-outer" d="" />
+        <path id="fullReferenceRelease" fill="none" stroke="#00ffff" style="stroke-width:var(--innerLineWidth)"/>
+        <path id="tapReleaseOrange" fill="none" stroke="#ff8800" style="stroke-width:var(--innerLineWidth)"/>
         <path id="sustainSegInner" class="env-inner decay-inner" d="" style="display:none" />
         <path id="releaseInner" class="env-inner release-inner" d="" />
         <path id="decayInner" class="env-inner decay-inner" d="" />
@@ -284,9 +278,8 @@
       </div>
       <div class="row"><label><input id="keepTapMarker" type="checkbox" checked> Leave Tap Marker</label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
-      <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Outer <input id="lineWidth" type="number" min="4" max="30" step="1" value="14"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Body <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label><label>H1 <input id="h1Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></label><label>H2 <input id="h2Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></label><label>Console <input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></label><label>Meter <input id="meterWidth" type="number" min="10" max="80" step="1" value="40"></label><label>Meter Stroke <input id="meterStrokeWidth" type="number" min="1" max="20" step="1" value="7"></label><label>TB Sustain Max <input id="tbSustainGapMax" type="number" min="15" max="30" step="1" value="15">%</label><label>VB W <input id="vbWidth" type="number" min="800" max="2400" step="10" value="1200"></label><label>VB H <input id="vbHeight" type="number" min="400" max="1200" step="10" value="625"></label><label>Graph Margin L <input id="graphLeft" type="number" min="0" max="400" step="10" value="10"></label><label>Graph Margin T <input id="graphTop" type="number" min="0" max="400" step="10" value="0"></label></div>
+      <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Body <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label><label>H1 <input id="h1Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></label><label>H2 <input id="h2Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></label><label>Console <input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></label><label>Meter <input id="meterWidth" type="number" min="10" max="80" step="1" value="40"></label><label>Meter Stroke <input id="meterStrokeWidth" type="number" min="1" max="20" step="1" value="7"></label><label>TB Sustain Max <input id="tbSustainGapMax" type="number" min="15" max="30" step="1" value="15">%</label><label>VB W <input id="vbWidth" type="number" min="800" max="2400" step="10" value="1200"></label><label>VB H <input id="vbHeight" type="number" min="400" max="1200" step="10" value="625"></label><label>Graph Margin L <input id="graphLeft" type="number" min="0" max="400" step="10" value="10"></label><label>Graph Margin T <input id="graphTop" type="number" min="0" max="400" step="10" value="0"></label></div>
       <div class="row" style="position:relative;">
-        <label><input id="showOuterLine" type="checkbox" checked> Show Outer Line</label>
         <button id="advancedToggle" style="padding:4px 7px;min-height:unset;line-height:1.1;border-radius:6px;">Advanced</button>
         <div id="advancedPopup" style="display:none;position:absolute;bottom:calc(100% + 6px);left:0;background:#1c1c1c;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:8px;z-index:200;min-width:260px;">
           <div class="row"><label><input id="meterGlow" type="checkbox" checked> Meter Glow</label><label>Glow R <input id="meterGlowRadius" type="number" min="0" max="60" step="1" value="5"></label><label><input id="meterScanlinesVisible" type="checkbox" checked> Scanlines</label></div>
@@ -527,8 +520,7 @@ logEvent('INIT', {
   keyboardControl: $('keyboardControl').checked, showClipped: $('showClipped').checked,
   linearTime: $('linearTime').checked, analogueCurve: $('analogueCurve').checked,
   textbookAdsr: $('textbookAdsr').checked, tbSustainDotted: $('tbSustainDotted').checked,
-  tbSustainCollapse: $('tbSustainCollapse').checked, tbShowModelDSustain: $('tbShowModelDSustain').checked,
-  showOuterLine: $('showOuterLine').checked
+  tbSustainCollapse: $('tbSustainCollapse').checked, tbShowModelDSustain: $('tbShowModelDSustain').checked
 });
 
 </script>

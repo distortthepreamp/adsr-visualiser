@@ -44,13 +44,13 @@ function renderTextbookPaths({ pts, drawPS, drawP1, ceilY, showClipped, drawRele
   const tbDPath = showClipped
     ? buildPath(pts.p1.x + (pts.pEnd.x - pts.p1.x) * ((e.floor + e.scale - 1) / e.scale), ceilY, tbDecayEnd.x, tbDecayEnd.y, curveAmt, dSF)
     : buildPath(drawP1.x, drawP1.y, tbDecayEnd.x, tbDecayEnd.y, curveAmt, dSF);
-  ['decayOuter','decayInner'].forEach(id => $(id).setAttribute('d', tbDPath));
+  $('decayInner').setAttribute('d', tbDPath);
   // Sustain segment: fixed-width horizontal line at sustain level y
   const sustainGap = graph.w * state.tbSustainGap;
   const tbSusEnd = { x: pts.pEnd.x + sustainGap, y: tbSustainY };
   const tbSusDotted = $('tbSustainDotted') && $('tbSustainDotted').checked;
   if(tbSusDotted){
-    ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d',''); el.style.display='none'; } });
+    { const el=$('sustainSegInner'); if(el){ el.setAttribute('d',''); el.style.display='none'; } }
     const tbSusMarker=$('tbSustainMarker');
     if(tbSusMarker){
       const smSrc=$('sustainMarker');
@@ -65,7 +65,7 @@ function renderTextbookPaths({ pts, drawPS, drawP1, ceilY, showClipped, drawRele
     }
   } else {
     const tbSusPath = drawReleasePath ? `M ${pts.pEnd.x} ${tbSustainY} L ${tbSusEnd.x} ${tbSustainY}` : '';
-    ['sustainSegOuter','sustainSegInner'].forEach(id => { const el=$(id); if(el){ el.setAttribute('d', tbSusPath); el.style.display=''; } });
+    { const el=$('sustainSegInner'); if(el){ el.setAttribute('d', tbSusPath); el.style.display=''; } }
     const tbSusMarker=$('tbSustainMarker'); if(tbSusMarker) tbSusMarker.style.display='none';
   }
   // Release: starts from end of sustain segment, spans rwFull to the right
@@ -73,7 +73,7 @@ function renderTextbookPaths({ pts, drawPS, drawP1, ceilY, showClipped, drawRele
   const rwFull2 = timeToPixels(rT_r2, linearTimeOn);
   const tbREnd = { x: tbSusEnd.x + rwFull2, y: yFor(e.floor) };
   const tbRPath = drawReleasePath ? buildPath(tbSusEnd.x, tbSusEnd.y, tbREnd.x, tbREnd.y, curveAmt, rSF) : '';
-  ['releaseOuter','releaseInner'].forEach(id => $(id).setAttribute('d', tbRPath));
+  $('releaseInner').setAttribute('d', tbRPath);
   // Model D style sustain line in textbook mode
   const tbMDLine=$('tbModelDSustainLine');
   if(tbMDLine){
