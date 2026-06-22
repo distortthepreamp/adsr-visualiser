@@ -3,10 +3,12 @@
 const TIME_LABEL_STATED_Y_OFFSET    = -10; // px above the graph top (stated labels)
 const TIME_LABEL_EFFECTIVE_Y_OFFSET =  18; // px below the time axis (effective labels)
 
-function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, linearTimeOn, drawPS, statedSustainX, showModelDOverlay) {
+function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, linearTimeOn, drawPS, statedSustainX, modelLegs) {
   // Drop lines (individual elements, gated by the new drop-line checkboxes)
-  // effectiveOn: false when textbook mode is active OR when the Model D overlay is hidden.
-  const effectiveOn = !textbookAdsr && (showModelDOverlay !== false);
+  // Per-leg effective flags: false when textbook mode is active OR when the leg is hidden.
+  const effA = !textbookAdsr && (modelLegs ? modelLegs.legA !== false : true);
+  const effD = !textbookAdsr && (modelLegs ? modelLegs.legD !== false : true);
+  const effR = !textbookAdsr && (modelLegs ? modelLegs.legR !== false : true);
   const timeLabelGutter = Math.max(0, Number(($('timeLabelGutter') && $('timeLabelGutter').value) || 0));
   const statedLabelY    = graph.y0 - graph.h + TIME_LABEL_STATED_Y_OFFSET - timeLabelGutter;
   const effectiveLabelY = graph.y0 + TIME_LABEL_EFFECTIVE_Y_OFFSET + timeLabelGutter;
@@ -65,7 +67,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   const newEffectiveDecayDropEl=$('newEffectiveDecayDrop');
   const newEffectiveDecayTimeLabelEl=$('newEffectiveDecayTime');
   if(newEffectiveDecayDropEl){
-    const showEffectiveDecayDrop = ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && effectiveOn;
+    const showEffectiveDecayDrop = ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && effD;
     if(showEffectiveDecayDrop){
       newEffectiveDecayDropEl.setAttribute('x1',drawPS.x); newEffectiveDecayDropEl.setAttribute('y1',drawPS.y);
       newEffectiveDecayDropEl.setAttribute('x2',drawPS.x); newEffectiveDecayDropEl.setAttribute('y2',graph.y0); newEffectiveDecayDropEl.setAttribute('stroke',newEffDecayCol);
@@ -86,7 +88,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   // Effective attack drop line(s): descend from the attack peak (or ceiling crossings when clipped) to the time axis
   const newEffAttackDropEl=$('newEffectiveAttackDrop');
   const newEffAttackDropEndEl=$('newEffectiveAttackDropEnd');
-  const showNewEffAttack = ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && effectiveOn && freqMode && overrange && showClipped;
+  const showNewEffAttack = ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && effA && freqMode && overrange && showClipped;
   if(showNewEffAttack){
     const ceilY = yFor(1);
     if(showClipped && overrange){
@@ -124,7 +126,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   const newEffReleaseDropEl=$('newEffectiveReleaseDrop');
   const newEffectiveReleaseTimeLabelEl=$('newEffectiveReleaseTime');
   if(newEffReleaseDropEl){
-    const showEffRelease = pts.e.releaseOn && ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && effectiveOn;
+    const showEffRelease = pts.e.releaseOn && ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && effR;
     if(showEffRelease){
       // green curve floor = last point of the drawn releaseInner path (= rEnd.x + greenOffset, rEnd.y)
       const relEl=document.getElementById('releaseInner');

@@ -419,7 +419,9 @@ function initUIControls(){
   $('underlayColor') && $('underlayColor').addEventListener('change', render);
   $('showNewEffectiveLines') && $('showNewEffectiveLines').addEventListener('change', render);
   $('showNewStatedLines') && $('showNewStatedLines').addEventListener('change', render);
-  $('showModelD') && $('showModelD').addEventListener('change', render);
+  ['modelA','modelD','modelS','modelR'].forEach(id => { $(id) && $(id).addEventListener('change', render); });
+  $('modelShowAll') && $('modelShowAll').addEventListener('click', () => { ['modelA','modelD','modelS','modelR'].forEach(id => { if($(id)) $(id).checked = true; }); render(); });
+  $('modelHideAll') && $('modelHideAll').addEventListener('click', () => { ['modelA','modelD','modelS','modelR'].forEach(id => { if($(id)) $(id).checked = false; }); render(); });
   $('clearBtn').addEventListener('click', () => { logEvent('ANIMATION', { action: 'clear' }); clearBlobAndMarker(); });
   $('keepTapMarker').addEventListener('change',()=>{ if(!$('keepTapMarker').checked) hideTapMarker(); });
 

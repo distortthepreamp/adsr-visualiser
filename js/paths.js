@@ -53,8 +53,10 @@ function render(){
   const ceilY = yFor(1);
   const overrange = e.scale > 0.0001 && e.floor + e.scale > 1.0001;
   const textbookAdsr = $('textbookAdsr') && $('textbookAdsr').checked;
-  const showModelDOverlay = $('showModelD') ? $('showModelD').checked : true;
-  const overlayOff = !showModelDOverlay;
+  const legA = $('modelA') ? $('modelA').checked : true;
+  const legD = $('modelD') ? $('modelD').checked : true;
+  const legS = $('modelS') ? $('modelS').checked : true;
+  const legR = $('modelR') ? $('modelR').checked : true;
   const showClipped = !textbookAdsr && overrange && $('showClipped') && $('showClipped').checked;
 
   const drawP1 = showClipped
@@ -117,13 +119,10 @@ function render(){
   }
 
   const show = showClipped ? '' : 'none';
-  { const el=$('attackInner'); if(el){ el.setAttribute('d', aPath); el.style.display = overlayOff ? 'none' : ''; } }
-  ['ceilLeftInner','ceilRightInner'].forEach((id,i) => {
-    const el=$(id); if(!el) return;
-    el.setAttribute('d', i===0 ? ceilLeftPath : ceilRightPath);
-    el.style.display = show;
-  });
-  { const el=$('decayInner'); if(el){ el.setAttribute('d', dPath); el.style.display = overlayOff ? 'none' : ''; } }
+  { const el=$('attackInner'); if(el){ el.setAttribute('d', aPath); el.style.display = legA ? '' : 'none'; } }
+  { const el=$('ceilLeftInner'); if(el){ el.setAttribute('d', ceilLeftPath); el.style.display = (showClipped && legA) ? '' : 'none'; } }
+  { const el=$('ceilRightInner'); if(el){ el.setAttribute('d', ceilRightPath); el.style.display = (showClipped && legD) ? '' : 'none'; } }
+  { const el=$('decayInner'); if(el){ el.setAttribute('d', dPath); el.style.display = legD ? '' : 'none'; } }
 
   const drawReleasePath = pts.e.releaseOn;
   let rEnd;
@@ -238,7 +237,7 @@ function render(){
     { const el = $('releaseInner'); if(el){
       el.setAttribute('d', rPath);
       el.style.stroke = relColor;
-      el.style.display = overlayOff ? 'none' : '';
+      el.style.display = legR ? '' : 'none';
       if(greenAnalogueRelease) el.setAttribute('clip-path', 'url(#sustainReleaseClip)');
       else el.removeAttribute('clip-path');
     } }
@@ -247,7 +246,7 @@ function render(){
     const showPeakDischarge = $('showPeakDischarge') && $('showPeakDischarge').checked;
     const fullReferenceReleaseEl = $('fullReferenceRelease');
     if(fullReferenceReleaseEl){
-      if(showPeakDischarge && curveAmt && drawReleasePath && !overlayOff){
+      if(showPeakDischarge && curveAmt && drawReleasePath){
         fullReferenceReleaseEl.setAttribute('d', rcPolyline(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, false, 50, 3));
         fullReferenceReleaseEl.removeAttribute('clip-path');
         fullReferenceReleaseEl.style.stroke = '#00ffff';
@@ -326,7 +325,7 @@ function render(){
     }
     {
       const susSegPath = drawReleasePath ? `M ${drawPS.x} ${drawPS.y} L ${releaseStartX} ${drawPS.y}` : '';
-      { const el=$('sustainSegInner'); if(el){ el.setAttribute('d', susSegPath); el.style.display = (drawReleasePath && !overlayOff) ? '' : 'none'; } }
+      { const el=$('sustainSegInner'); if(el){ el.setAttribute('d', susSegPath); el.style.display = (drawReleasePath && legS) ? '' : 'none'; } }
     }
     const tbSusMarkerMD=$('tbSustainMarker'); if(tbSusMarkerMD) tbSusMarkerMD.style.display='none';
     const tbMDLineMD=$('tbModelDSustainLine'); if(tbMDLineMD) tbMDLineMD.style.display='none';
@@ -352,10 +351,10 @@ function render(){
   $('sustainMarker').setAttribute('x2', markerEndX);
   $('sustainMarker').setAttribute('y2', drawPS.y);
   $('sustainMarker').style.stroke = ($('frequencyMode') && $('frequencyMode').checked) ? (($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00') : (($('loudnessDecayColor') && $('loudnessDecayColor').value) || '#ff0000');
-  $('sustainMarker').style.display = (textbookAdsr || overlayOff) ? 'none' : '';
+  $('sustainMarker').style.display = (textbookAdsr || !legS) ? 'none' : '';
   $('sustainPoint').setAttribute('cx', drawPS.x);
   $('sustainPoint').setAttribute('cy', drawPS.y);
-  $('sustainPoint').style.display = (textbookAdsr || overlayOff) ? 'none' : '';
+  $('sustainPoint').style.display = (textbookAdsr || !legS) ? 'none' : '';
 
   const kcOn = $('keyboardControl') && $('keyboardControl').checked;
   let statedSustainX = drawPS.x; // uncapped sustain x; equals drawPS.x when kc OFF
@@ -394,7 +393,7 @@ function render(){
   }
 
   { const el=$('sLabel'), bg=$('sLabelBg');
-    el.setAttribute('x', METER_X - 30); el.setAttribute('y', drawPS.y); el.setAttribute('dominant-baseline', 'middle'); el.removeAttribute('stroke'); el.removeAttribute('stroke-width'); el.removeAttribute('paint-order'); el.style.fill = '#000000'; el.style.display = (textbookAdsr || overlayOff) ? 'none' : ''; el.textContent = ($('keyboardControl') && $('keyboardControl').checked) ? 'MODEL D SUSTAIN' : 'SUSTAIN';
+    el.setAttribute('x', METER_X - 30); el.setAttribute('y', drawPS.y); el.setAttribute('dominant-baseline', 'middle'); el.removeAttribute('stroke'); el.removeAttribute('stroke-width'); el.removeAttribute('paint-order'); el.style.fill = '#000000'; el.style.display = (textbookAdsr || !legS) ? 'none' : ''; el.textContent = ($('keyboardControl') && $('keyboardControl').checked) ? 'MODEL D SUSTAIN' : 'SUSTAIN';
     if(bg){ const bbox=el.getBBox(); bg.setAttribute('x',bbox.x-4); bg.setAttribute('y',bbox.y-2); bg.setAttribute('width',bbox.width+8); bg.setAttribute('height',bbox.height+4); const decayCol = ($('frequencyMode') && $('frequencyMode').checked) ? (($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00') : (($('loudnessDecayColor') && $('loudnessDecayColor').value) || '#ff0000'); bg.setAttribute('fill', decayCol); bg.style.display=el.style.display; }
   }
 
@@ -483,7 +482,7 @@ function render(){
   if(svgTimecodesEl){ svgTimecodesEl.setAttribute('x',METER_X-10); svgTimecodesEl.setAttribute('y',GRAPH_TOP_BASE-90); svgTimecodesEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
   const toolTitleEl=$('toolTitle');
   if(toolTitleEl){ toolTitleEl.setAttribute('x',VB_WIDTH/2); toolTitleEl.setAttribute('y',GRAPH_TOP_BASE-173); toolTitleEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
-  updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, linearTimeOn, drawPS, statedSustainX, showModelDOverlay);
+  updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, linearTimeOn, drawPS, statedSustainX, {legA, legD, legR});
 
   const segY = GRAPH_TOP_BASE - 45;
   const segStart = 10;
