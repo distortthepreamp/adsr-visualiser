@@ -167,6 +167,14 @@ function setTapMarker(pt){
 
 function releaseFromCurrent(){
   logEvent('ANIMATION', { action: 'release' });
+
+  // If the hold's unified t-clock is running, trigger release through it (not a separate animation)
+  if(window._holdReleaseTrigger){
+    window._holdReleaseTrigger();
+    return;
+  }
+
+  // Legacy release path (for tap and other non-hold contexts)
   audioGateClose();
   animationToken++;
   const myAnimationToken = animationToken;
@@ -297,6 +305,7 @@ function clearBlobAndMarker(){
   state.dotLevel=0;
   releaseStartPoint=null;
   state.releaseFromDecay=false;
+  window._holdReleaseTrigger=null;
   updateButtonStates();
 }
 
@@ -362,11 +371,35 @@ function tap(ms){
 
 // ---- t-based effective position ----
 // Given playback time t (ms since note-on), return {x, y, phase, level} on the effective curve.
+// If releaseT is provided and t >= releaseT, the blob is in release phase, sampling releaseInner.
 // x is geometric; y is sampled from the rendered path.
-function effectivePos(t){
+function effectivePos(t, releaseT){
   const pts = computePoints(), e = pts.e;
   const tSec = t / 1000;
   let x, phase, level;
+
+  // Release phase (if triggered)
+  if(releaseT !== undefined && t >= releaseT){
+    const relDurMs = Math.max(MIN_RELEASE_MS, e.rT * 1000);
+    const rf = clamp((t - releaseT) / relDurMs);
+    phase = 'release';
+    level = e.s * (1 - rf);
+    // x: interpolate from release start (end of sustain gap) to release curve endpoint
+    // The blob jumps from its sustain park to releaseStartX — the sustain plateau is not elapsed time.
+    const relEl = document.getElementById('releaseInner');
+    const startX = pts.pEnd.x + graph.w * state.tbSustainGap;
+    let endX = startX;
+    if(relEl && relEl.getTotalLength() > 0){
+      endX = relEl.getPointAtLength(relEl.getTotalLength()).x;
+    }
+    x = startX + (endX - startX) * rf;
+    // y: sample releaseInner
+    let y = null;
+    if(relEl) y = getYFromPath(relEl, x);
+    if(y === null) y = yFor(e.floor + level * e.scale);
+    return { x, y, phase, level, done: rf >= 1 };
+  }
+
   // Attack phase
   if(e.aT > INSTANT_PHASE_THRESHOLD && tSec <= e.aT){
     const f = clamp(tSec / e.aT);
@@ -406,10 +439,34 @@ function effectivePos(t){
 // ---- t-based stated (textbook) position ----
 // Same t and phase logic as effectivePos, but samples underlay paths for y and parks
 // at the UNCAPPED stated sustain level (not the mimic-80% level).
-function statedPos(t){
+// If releaseT is provided and t >= releaseT, the blob is in release phase, sampling underlayRelease.
+function statedPos(t, releaseT){
   const pts = computePoints(), e = pts.e;
   const tSec = t / 1000;
   let x, phase, level;
+
+  // Release phase (if triggered)
+  if(releaseT !== undefined && t >= releaseT){
+    const relDurMs = Math.max(MIN_RELEASE_MS, e.rT * 1000);
+    const rf = clamp((t - releaseT) / relDurMs);
+    phase = 'release';
+    level = e.s * (1 - rf);
+    // x: interpolate from release start (end of stated sustain gap) to underlay release endpoint
+    // The blob jumps from its sustain park to the release start — the sustain plateau is not elapsed time.
+    const relEl = document.getElementById('underlayRelease');
+    const startX = pts.pEnd.x + graph.w * state.tbSustainGap;
+    let endX = startX;
+    if(relEl && relEl.getTotalLength() > 0){
+      endX = relEl.getPointAtLength(relEl.getTotalLength()).x;
+    }
+    x = startX + (endX - startX) * rf;
+    // y: sample underlayRelease
+    let y = null;
+    if(relEl) y = getYFromPath(relEl, x);
+    if(y === null) y = yFor(e.floor + level * e.scale);
+    return { x, y, phase, level, done: rf >= 1 };
+  }
+
   // Attack phase
   if(e.aT > INSTANT_PHASE_THRESHOLD && tSec <= e.aT){
     const f = clamp(tSec / e.aT);
@@ -503,65 +560,72 @@ function hold(){
   state.currentPhase = 'hold';
   updateButtonStates();
 
-  // t-based clock: t = playback time in ms, advanced by (realDelta * rate) each frame
+  // Unified t-based clock: runs through attack→decay→sustain→release
   let tPlay = 0;
   let prevNow = null;
-  let effParked = false;
-  let statedParked = false;
+  let releaseT;           // undefined until release triggered; then the tPlay at which release began
+  let glowStarted = false;
+
+  // Called by releaseFromCurrent when the hold is on the unified clock
+  window._holdReleaseTrigger = function(){
+    if(releaseT !== undefined) return; // already releasing
+    releaseT = tPlay;
+    audioGateClose();
+    stopGlowPulse();
+    state.currentPhase = 'release';
+    updateButtonStates();
+  };
 
   function step(now){
-    if(myAnimationToken !== animationToken) return;
+    if(myAnimationToken !== animationToken){ window._holdReleaseTrigger = null; return; }
     if(prevNow !== null){
       const realDelta = now - prevNow;
       tPlay += realDelta * animRate();
     }
     prevNow = now;
 
-    // Effective blob — always traject, visibility follows current phase's leg
-    if(!effParked){
-      const pos = effectivePos(tPlay);
-      setDot(pos, true);
-      const effVis = effLegVisible(pos.phase);
-      $('dot').style.opacity = effVis ? '1' : '0';
-      if(!effVis) $('dot').removeAttribute('filter');
-      if(pos.phase === 'sustain'){
-        $('dot').style.animation = 'none';
-        if(effVis) startGlowPulse();
-        effParked = true;
-      }
-    } else {
-      // Parked at sustain — re-check leg visibility each frame
-      const effVis = effLegVisible('sustain');
-      $('dot').style.opacity = effVis ? '1' : '0';
-      if(!effVis) $('dot').removeAttribute('filter');
-      else applyBlobGlow();
-    }
+    // Position both blobs
+    const pos = effectivePos(tPlay, releaseT);
+    const spos = statedPos(tPlay, releaseT);
 
-    // Stated blob — always traject, visibility follows current phase's leg
-    if(!statedParked){
-      const spos = statedPos(tPlay);
-      setDotStated(spos, true);
-      const sVis = statedLegVisible(spos.phase);
-      $('dotStated').style.opacity = sVis ? '1' : '0';
-      if(!sVis) $('dotStated').removeAttribute('filter');
-      if(spos.phase === 'sustain'){
-        if(sVis) applyBlobGlow();
-        statedParked = true;
-      }
-    } else {
-      // Parked at sustain — re-check leg visibility each frame
-      const sVis = statedLegVisible('sustain');
-      $('dotStated').style.opacity = sVis ? '1' : '0';
-      if(!sVis) $('dotStated').removeAttribute('filter');
-      else applyBlobGlow();
-    }
+    // Effective blob
+    setDot(pos, true);
+    const effVis = effLegVisible(pos.phase);
+    $('dot').style.opacity = effVis ? '1' : '0';
+    if(!effVis) $('dot').removeAttribute('filter');
 
-    // Both parked → enter sustain state, stop loop
-    if(effParked && statedParked){
+    // Stated blob
+    setDotStated(spos, true);
+    const sVis = statedLegVisible(spos.phase);
+    $('dotStated').style.opacity = sVis ? '1' : '0';
+    if(!sVis) $('dotStated').removeAttribute('filter');
+
+    // Glow at sustain (both blobs parked, before release)
+    if(releaseT === undefined && pos.phase === 'sustain' && spos.phase === 'sustain'){
+      if(!glowStarted){ startGlowPulse(); glowStarted = true; }
+      if(effVis) applyBlobGlow();
+      if(!effVis) $('dot').removeAttribute('filter');
+      if(!sVis) $('dotStated').removeAttribute('filter');
       state.currentPhase = 'sustain';
+    } else if(releaseT === undefined){
+      // At least one blob still in attack/decay — glow individual sustain arrivals
+      if(pos.phase === 'sustain' && effVis) applyBlobGlow();
+      if(spos.phase === 'sustain' && sVis) applyBlobGlow();
+    }
+
+    // Release completion: both blobs done
+    if(pos.done && spos.done){
+      hideDot();
+      hideDotStated();
+      audioCut();
+      state.held = false;
+      state.currentPhase = 'idle';
+      state.dotLevel = 0;
+      window._holdReleaseTrigger = null;
       updateButtonStates();
       return;
     }
+
     state.dotAnim = requestAnimationFrame(step);
   }
   requestAnimationFrame(step);
