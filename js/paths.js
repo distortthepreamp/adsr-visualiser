@@ -685,6 +685,53 @@ function render(){
     amountRiserR.style.stroke = contourTickColRight;
     amountRiserR.style.display = showContourRight ? '' : 'none';
   }
+  // ---- CF / AOC contour labels ----
+  const capHeight = _labelSize * 0.72;
+  const contourLabelGap = sustainLabelGap;
+  const cfText = 'CF = ' + fmtScaleValue(state.floor * 10);
+  const aocText = 'AOC = ' + fmtScaleValue(state.scale * 10);
+  const leftX = markerEndX - sustainTickLen - sustainLabelGap;
+  const rightX = markerEndX + METER_W + sustainTickLen + sustainLabelGap;
+  // CF left (Model D) — below cutoff arrow's free bottom end
+  const cfLbl = $('cfLabel');
+  if(cfLbl){
+    cfLbl.setAttribute('x', leftX);
+    cfLbl.setAttribute('y', floorY + riserLen + contourLabelGap + capHeight);
+    cfLbl.setAttribute('text-anchor', 'end');
+    cfLbl.setAttribute('fill', contourTickCol);
+    cfLbl.textContent = cfText;
+    cfLbl.style.display = showContourLeft ? '' : 'none';
+  }
+  // CF right (textbook) — below cutoff arrow's free bottom end
+  const cfLblR = $('cfLabelRight');
+  if(cfLblR){
+    cfLblR.setAttribute('x', rightX);
+    cfLblR.setAttribute('y', floorY + riserLen + contourLabelGap + capHeight);
+    cfLblR.setAttribute('text-anchor', 'start');
+    cfLblR.setAttribute('fill', contourTickColRight);
+    cfLblR.textContent = cfText;
+    cfLblR.style.display = showContourRight ? '' : 'none';
+  }
+  // AOC left (Model D) — above amount arrow's free top end
+  const aocLbl = $('aocLabel');
+  if(aocLbl){
+    aocLbl.setAttribute('x', leftX);
+    aocLbl.setAttribute('y', (amountY - riserLen) - contourLabelGap);
+    aocLbl.setAttribute('text-anchor', 'end');
+    aocLbl.setAttribute('fill', contourTickCol);
+    aocLbl.textContent = aocText;
+    aocLbl.style.display = showContourLeft ? '' : 'none';
+  }
+  // AOC right (textbook) — above amount arrow's free top end
+  const aocLblR = $('aocLabelRight');
+  if(aocLblR){
+    aocLblR.setAttribute('x', rightX);
+    aocLblR.setAttribute('y', (textbookAmountY - riserLen) - contourLabelGap);
+    aocLblR.setAttribute('text-anchor', 'start');
+    aocLblR.setAttribute('fill', contourTickColRight);
+    aocLblR.textContent = aocText;
+    aocLblR.style.display = showContourRight ? '' : 'none';
+  }
   // Show Contour checkbox: only meaningful in filter mode
   const showContourLabel = $('showContour') && $('showContour').closest('label');
   if(showContourLabel){
