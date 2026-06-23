@@ -149,7 +149,7 @@ function releaseFromCurrent(){
       const pt={x:dotX, y:linearY, level:startLevel*(1-f), phase:'release'};
       setDot(pt,true);
       if(f<1) state.dotAnim=requestAnimationFrame(tbReleaseStep);
-      else { setDot(end,false); audioCut(); state.held=false; state.currentPhase='idle'; updateButtonStates(); }
+      else { setDot(end,false); audioCut(); state.held=false; state.currentPhase='idle'; updateButtonStates(); render(); }
     }
     requestAnimationFrame(tbReleaseStep);
     return;
@@ -209,7 +209,7 @@ function releaseFromCurrent(){
     const currentLevel = startLevel*(1-f);
     const dotPhase = dotX < pts.pS.x ? (dotX < pts.p1.x ? 'attack' : 'decay') : 'release';
     setDot({x:dotX, y:dotY, level:currentLevel, phase:dotPhase}, true);
-    if(f<1) state.dotAnim=requestAnimationFrame(step); else { setDot(end,false); audioCut(); state.held=false; state.currentPhase='idle'; updateButtonStates(); }
+    if(f<1) state.dotAnim=requestAnimationFrame(step); else { setDot(end,false); audioCut(); state.held=false; state.currentPhase='idle'; updateButtonStates(); render(); }
   }
   requestAnimationFrame(step);
 }
@@ -230,6 +230,7 @@ function clearBlobAndMarker(){
   state.releaseFromDecay=false;
   window._holdReleaseTrigger=null;
   updateButtonStates();
+  render();
 }
 
 // ---- Tap and Hold ----
@@ -283,6 +284,7 @@ function tap(ms){
         state.currentPhase = 'idle';
         state.dotLevel = 0;
         updateButtonStates();
+        render();
         return;
       }
       state.currentPhase = 'release';
@@ -314,6 +316,7 @@ function tap(ms){
       state.currentPhase = 'idle';
       state.dotLevel = 0;
       updateButtonStates();
+      render();
       return;
     }
     state.dotAnim = requestAnimationFrame(step);
@@ -636,6 +639,7 @@ function hold(){
       state.dotLevel = 0;
       window._holdReleaseTrigger = null;
       updateButtonStates();
+      render();
       return;
     }
 
