@@ -129,7 +129,7 @@ function parseCueList(text) {
     }
 
     // set <checkbox-param> on/off — single regex for boolean params
-    const setBoolMatch = line.match(/^set\s+(filter-decay|hp-mode|mimic-sustain|analogue|linear-time|show-clipped|show-contour|show-gate-time)\s+(on|off)$/i);
+    const setBoolMatch = line.match(/^set\s+(filter-decay|hp-mode|mimic-sustain|analogue|linear-time|show-clipped|show-contour|show-gate-time|show-effective-lines|show-stated-lines|slomo)\s+(on|off)$/i);
     if (setBoolMatch) {
       result.push({ type: 'set', param: setBoolMatch[1].toLowerCase(), value: setBoolMatch[2].toLowerCase() === 'on' });
       continue;
@@ -318,6 +318,9 @@ function executeEvent(event) {
       case 'show-clipped':   setCheckbox('showClipped'); break;
       case 'show-contour':   setCheckbox('showContour'); break;
       case 'show-gate-time': setCheckbox('showGateTime'); break;
+      case 'show-effective-lines': setCheckbox('showNewEffectiveLines'); break;
+      case 'show-stated-lines': setCheckbox('showNewStatedLines'); break;
+      case 'slomo': setCheckbox('sloMo'); break;
       // Explicit zoom levels
       case 'zoom-x3':  setCheckbox('timelineZoom3x'); break;
       case 'zoom-x6':  setCheckbox('timelineZoom6x'); break;
@@ -587,6 +590,9 @@ function generateStateSnapshot() {
   lines.push(`set show-clipped ${$('showClipped').checked ? 'on' : 'off'}`);
   lines.push(`set show-contour ${$('showContour').checked ? 'on' : 'off'}`);
   lines.push(`set show-gate-time ${$('showGateTime').checked ? 'on' : 'off'}`);
+  lines.push(`set show-effective-lines ${$('showNewEffectiveLines').checked ? 'on' : 'off'}`);
+  lines.push(`set show-stated-lines ${$('showNewStatedLines').checked ? 'on' : 'off'}`);
+  lines.push(`set slomo ${$('sloMo').checked ? 'on' : 'off'}`);
   // Zoom levels
   [['timelineZoom3x','zoom-x3'],['timelineZoom6x','zoom-x6'],['timelineZoom12x','zoom-x12'],['timelineZoom24x','zoom-x24'],['timelineZoom48x','zoom-x48']].forEach(([id,cmd]) => {
     if($(id)) lines.push(`set ${cmd} ${$(id).checked ? 'on' : 'off'}`);
