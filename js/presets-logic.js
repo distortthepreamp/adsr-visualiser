@@ -46,6 +46,22 @@ function initPresetsLogic(){
     if(preset.lpHp !== undefined) $('hpMode').checked = preset.lpHp;
     if(preset.keyboardControl !== undefined) $('keyboardControl').checked = preset.keyboardControl;
     if(preset.textbookAdsr !== undefined) $('textbookAdsr').checked = preset.textbookAdsr;
+    if(preset.modelA !== undefined) $('modelA').checked = preset.modelA;
+    if(preset.modelD !== undefined) $('modelD').checked = preset.modelD;
+    if(preset.modelS !== undefined) $('modelS').checked = preset.modelS;
+    if(preset.modelR !== undefined) $('modelR').checked = preset.modelR;
+    if(preset.underlayA !== undefined) $('underlayA').checked = preset.underlayA;
+    if(preset.underlayD !== undefined) $('underlayD').checked = preset.underlayD;
+    if(preset.underlayS !== undefined) $('underlayS').checked = preset.underlayS;
+    if(preset.underlayR !== undefined) $('underlayR').checked = preset.underlayR;
+    if(preset.showGateTime !== undefined) $('showGateTime').checked = preset.showGateTime;
+    if(preset.timelineZoom3x !== undefined) $('timelineZoom3x').checked = preset.timelineZoom3x;
+    if(preset.timelineZoom6x !== undefined) $('timelineZoom6x').checked = preset.timelineZoom6x;
+    if(preset.timelineZoom12x !== undefined) $('timelineZoom12x').checked = preset.timelineZoom12x;
+    if(preset.timelineZoom24x !== undefined) $('timelineZoom24x').checked = preset.timelineZoom24x;
+    if(preset.timelineZoom48x !== undefined) $('timelineZoom48x').checked = preset.timelineZoom48x;
+    if(preset.showNewEffectiveLines !== undefined) $('showNewEffectiveLines').checked = preset.showNewEffectiveLines;
+    if(preset.showNewStatedLines !== undefined) $('showNewStatedLines').checked = preset.showNewStatedLines;
     // Set target knob values
     state.target.a = positionFromMs(preset.a);
     state.target.d = positionFromMs(preset.d);
@@ -53,6 +69,7 @@ function initPresetsLogic(){
     state.target.r = positionFromMs(preset.r !== undefined ? preset.r : 500);
     state.target.floor = (preset.floor || 0) / 10;
     state.target.scale = (preset.scale !== undefined ? preset.scale : 10) / 10;
+    if(preset.gate !== undefined) state.target.gate = gatePositionFromMs(preset.gate);
     // Highlight active button
     if(activeBtn){ activeBtn.style.background = ''; activeBtn.style.color = ''; }
     const btns = container.querySelectorAll('button');
@@ -111,6 +128,23 @@ function initPresetsLogic(){
     preset.lpHp = $('hpMode').checked;
     preset.keyboardControl = $('keyboardControl').checked;
     preset.textbookAdsr = $('textbookAdsr').checked;
+    preset.gate = Math.round(gateMsFromPosition(state.gate));
+    preset.modelA = $('modelA').checked;
+    preset.modelD = $('modelD').checked;
+    preset.modelS = $('modelS').checked;
+    preset.modelR = $('modelR').checked;
+    preset.underlayA = $('underlayA').checked;
+    preset.underlayD = $('underlayD').checked;
+    preset.underlayS = $('underlayS').checked;
+    preset.underlayR = $('underlayR').checked;
+    preset.showGateTime = $('showGateTime').checked;
+    preset.timelineZoom3x = $('timelineZoom3x').checked;
+    preset.timelineZoom6x = $('timelineZoom6x').checked;
+    preset.timelineZoom12x = $('timelineZoom12x').checked;
+    preset.timelineZoom24x = $('timelineZoom24x').checked;
+    preset.timelineZoom48x = $('timelineZoom48x').checked;
+    preset.showNewEffectiveLines = $('showNewEffectiveLines').checked;
+    preset.showNewStatedLines = $('showNewStatedLines').checked;
     savePresetsToStorage();
     // Flash green confirmation, then restore highlight state
     const btn = container.querySelectorAll('button')[idx];
