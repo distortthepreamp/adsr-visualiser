@@ -629,8 +629,8 @@ function render(){
   const floorRiser = $('floorRiser');
   if(floorRiser){
     const rx = markerEndX - sustainTickLen + halfStroke;
-    floorRiser.setAttribute('x1', rx); floorRiser.setAttribute('y1', floorY);
-    floorRiser.setAttribute('x2', rx); floorRiser.setAttribute('y2', floorY + riserLen);
+    floorRiser.setAttribute('x1', rx); floorRiser.setAttribute('y1', floorY + riserLen);
+    floorRiser.setAttribute('x2', rx); floorRiser.setAttribute('y2', floorY);
     floorRiser.style.stroke = contourTickCol;
     floorRiser.style.display = showContourLeft ? '' : 'none';
   }
@@ -646,8 +646,8 @@ function render(){
   const floorRiserR = $('floorRiserRight');
   if(floorRiserR){
     const rx = markerEndX + METER_W + sustainTickLen - halfStroke;
-    floorRiserR.setAttribute('x1', rx); floorRiserR.setAttribute('y1', floorY);
-    floorRiserR.setAttribute('x2', rx); floorRiserR.setAttribute('y2', floorY + riserLen);
+    floorRiserR.setAttribute('x1', rx); floorRiserR.setAttribute('y1', floorY + riserLen);
+    floorRiserR.setAttribute('x2', rx); floorRiserR.setAttribute('y2', floorY);
     floorRiserR.style.stroke = contourTickColRight;
     floorRiserR.style.display = showContourRight ? '' : 'none';
   }
@@ -662,8 +662,8 @@ function render(){
   const amountRiser = $('amountRiser');
   if(amountRiser){
     const rx = markerEndX - sustainTickLen + halfStroke;
-    amountRiser.setAttribute('x1', rx); amountRiser.setAttribute('y1', amountY);
-    amountRiser.setAttribute('x2', rx); amountRiser.setAttribute('y2', amountY - riserLen);
+    amountRiser.setAttribute('x1', rx); amountRiser.setAttribute('y1', amountY - riserLen);
+    amountRiser.setAttribute('x2', rx); amountRiser.setAttribute('y2', amountY);
     amountRiser.style.stroke = contourTickCol;
     amountRiser.style.display = showContourLeft ? '' : 'none';
   }
@@ -680,8 +680,8 @@ function render(){
   const amountRiserR = $('amountRiserRight');
   if(amountRiserR){
     const rx = markerEndX + METER_W + sustainTickLen - halfStroke;
-    amountRiserR.setAttribute('x1', rx); amountRiserR.setAttribute('y1', textbookAmountY);
-    amountRiserR.setAttribute('x2', rx); amountRiserR.setAttribute('y2', textbookAmountY - riserLen);
+    amountRiserR.setAttribute('x1', rx); amountRiserR.setAttribute('y1', textbookAmountY - riserLen);
+    amountRiserR.setAttribute('x2', rx); amountRiserR.setAttribute('y2', textbookAmountY);
     amountRiserR.style.stroke = contourTickColRight;
     amountRiserR.style.display = showContourRight ? '' : 'none';
   }
