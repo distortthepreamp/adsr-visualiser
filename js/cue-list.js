@@ -70,194 +70,133 @@ function updateTimecodeDisplay() {
 }
 
 // ---- Parser ----
+
+// Parse a single command fragment (no semicolons). Returns an event object or null.
+function parseOneCommand(frag) {
+  // wait HH:MM:SS:FF
+  const waitMatch = frag.match(/^wait\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
+  if (waitMatch) return { type: 'wait', ms: tcToMs(waitMatch[1]) };
+
+  // set attack NNNms
+  const setAttackMatch = frag.match(/^set\s+attack\s+(\d+(?:\.\d+)?)ms$/i);
+  if (setAttackMatch) return { type: 'set', param: 'attack', value: parseFloat(setAttackMatch[1]) };
+
+  // set decay NNNms
+  const setDecayMatch = frag.match(/^set\s+decay\s+(\d+(?:\.\d+)?)ms$/i);
+  if (setDecayMatch) return { type: 'set', param: 'decay', value: parseFloat(setDecayMatch[1]) };
+
+  // set sustain N
+  const setSustainMatch = frag.match(/^set\s+sustain\s+(\d+(?:\.\d+)?)$/i);
+  if (setSustainMatch) return { type: 'set', param: 'sustain', value: parseFloat(setSustainMatch[1]) };
+
+  // set release NNNms
+  const setReleaseMatch = frag.match(/^set\s+release\s+(\d+(?:\.\d+)?)ms$/i);
+  if (setReleaseMatch) return { type: 'set', param: 'release', value: parseFloat(setReleaseMatch[1]) };
+
+  // set loud-decay on/off
+  const setLoudDecayMatch = frag.match(/^set\s+loud-decay\s+(on|off)$/i);
+  if (setLoudDecayMatch) return { type: 'set', param: 'loud-decay', value: setLoudDecayMatch[1].toLowerCase() === 'on' };
+
+  // set filter-mode on/off
+  const setFilterModeMatch = frag.match(/^set\s+filter-mode\s+(on|off)$/i);
+  if (setFilterModeMatch) return { type: 'set', param: 'filter-mode', value: setFilterModeMatch[1].toLowerCase() === 'on' };
+
+  // set <checkbox-param> on/off — single regex for boolean params
+  const setBoolMatch = frag.match(/^set\s+(filter-decay|hp-mode|mimic-sustain|analogue|linear-time|show-clipped|show-contour|show-gate-time|show-effective-lines|show-stated-lines|slomo)\s+(on|off)$/i);
+  if (setBoolMatch) return { type: 'set', param: setBoolMatch[1].toLowerCase(), value: setBoolMatch[2].toLowerCase() === 'on' };
+
+  // set zoom-x3|x6|x12|x24|x48 on/off — explicit zoom levels
+  const setZoomMatch = frag.match(/^set\s+(zoom-x3|zoom-x6|zoom-x12|zoom-x24|zoom-x48)\s+(on|off)$/i);
+  if (setZoomMatch) return { type: 'set', param: setZoomMatch[1].toLowerCase(), value: setZoomMatch[2].toLowerCase() === 'on' };
+
+  // set textbook attack|decay|sustain|release on/off — underlay per-leg visibility
+  const setTextbookLegMatch = frag.match(/^set\s+textbook\s+(attack|decay|sustain|release)\s+(on|off)$/i);
+  if (setTextbookLegMatch) return { type: 'set', param: 'textbook-' + setTextbookLegMatch[1].toLowerCase(), value: setTextbookLegMatch[2].toLowerCase() === 'on' };
+
+  // set textbook show-all|hide-all — underlay bulk visibility
+  const setTextbookBulkMatch = frag.match(/^set\s+textbook\s+(show-all|hide-all)$/i);
+  if (setTextbookBulkMatch) return { type: 'set', param: 'textbook-' + setTextbookBulkMatch[1].toLowerCase() };
+
+  // set actual attack|decay|sustain|release on/off — model per-leg visibility
+  const setActualLegMatch = frag.match(/^set\s+actual\s+(attack|decay|sustain|release)\s+(on|off)$/i);
+  if (setActualLegMatch) return { type: 'set', param: 'actual-' + setActualLegMatch[1].toLowerCase(), value: setActualLegMatch[2].toLowerCase() === 'on' };
+
+  // set actual show-all|hide-all — model bulk visibility
+  const setActualBulkMatch = frag.match(/^set\s+actual\s+(show-all|hide-all)$/i);
+  if (setActualBulkMatch) return { type: 'set', param: 'actual-' + setActualBulkMatch[1].toLowerCase() };
+
+  // set cutoff N
+  const setCutoffMatch = frag.match(/^set\s+cutoff\s+(\d+(?:\.\d+)?)$/i);
+  if (setCutoffMatch) return { type: 'set', param: 'cutoff', value: parseFloat(setCutoffMatch[1]) };
+
+  // set amount N
+  const setAmountMatch = frag.match(/^set\s+amount\s+(\d+(?:\.\d+)?)$/i);
+  if (setAmountMatch) return { type: 'set', param: 'amount', value: parseFloat(setAmountMatch[1]) };
+
+  // set gate NNNms
+  const setGateMatch = frag.match(/^set\s+gate\s+(\d+(?:\.\d+)?)ms$/i);
+  if (setGateMatch) return { type: 'set', param: 'gate', value: parseFloat(setGateMatch[1]) };
+
+  // transition attack NNNms HH:MM:SS:FF
+  const transAttackMatch = frag.match(/^transition\s+attack\s+(\d+(?:\.\d+)?)ms\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
+  if (transAttackMatch) return { type: 'transition', param: 'attack', value: parseFloat(transAttackMatch[1]), durationMs: tcToMs(transAttackMatch[2]) };
+
+  // transition decay NNNms HH:MM:SS:FF
+  const transDecayMatch = frag.match(/^transition\s+decay\s+(\d+(?:\.\d+)?)ms\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
+  if (transDecayMatch) return { type: 'transition', param: 'decay', value: parseFloat(transDecayMatch[1]), durationMs: tcToMs(transDecayMatch[2]) };
+
+  // transition sustain N HH:MM:SS:FF
+  const transSustainMatch = frag.match(/^transition\s+sustain\s+(\d+(?:\.\d+)?)\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
+  if (transSustainMatch) return { type: 'transition', param: 'sustain', value: parseFloat(transSustainMatch[1]), durationMs: tcToMs(transSustainMatch[2]) };
+
+  // transition release NNNms HH:MM:SS:FF
+  const transReleaseMatch = frag.match(/^transition\s+release\s+(\d+(?:\.\d+)?)ms\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
+  if (transReleaseMatch) return { type: 'transition', param: 'release', value: parseFloat(transReleaseMatch[1]), durationMs: tcToMs(transReleaseMatch[2]) };
+
+  // transition cutoff N HH:MM:SS:FF
+  const transCutoffMatch = frag.match(/^transition\s+cutoff\s+(\d+(?:\.\d+)?)\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
+  if (transCutoffMatch) return { type: 'transition', param: 'cutoff', value: parseFloat(transCutoffMatch[1]), durationMs: tcToMs(transCutoffMatch[2]) };
+
+  // transition amount N HH:MM:SS:FF
+  const transAmountMatch = frag.match(/^transition\s+amount\s+(\d+(?:\.\d+)?)\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
+  if (transAmountMatch) return { type: 'transition', param: 'amount', value: parseFloat(transAmountMatch[1]), durationMs: tcToMs(transAmountMatch[2]) };
+
+  // transition gate NNNms HH:MM:SS:FF
+  const transGateMatch = frag.match(/^transition\s+gate\s+(\d+(?:\.\d+)?)ms\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
+  if (transGateMatch) return { type: 'transition', param: 'gate', value: parseFloat(transGateMatch[1]), durationMs: tcToMs(transGateMatch[2]) };
+
+  // play-tap NNNms [note]
+  const playTapMatch = frag.match(/^play-tap\s+(\d+(?:\.\d+)?)ms(?:\s+([A-Ga-g]\d))?$/i);
+  if (playTapMatch) return { type: 'play', action: 'tap', ms: parseFloat(playTapMatch[1]), note: playTapMatch[2] ? playTapMatch[2].toUpperCase() : null };
+
+  // play-hold [note]
+  const playHoldMatch = frag.match(/^play-hold(?:\s+([A-Ga-g]\d))?$/i);
+  if (playHoldMatch) return { type: 'play', action: 'hold', note: playHoldMatch[1] ? playHoldMatch[1].toUpperCase() : null };
+
+  // play-release
+  if (/^play-release$/i.test(frag)) return { type: 'play', action: 'release', note: null };
+
+  return null;
+}
+
 function parseCueList(text) {
   const result = [];
   const lines = text.split('\n');
-  const tcPat = /\d{2}:\d{2}:\d{2}:\d{2}/;
 
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line || line.startsWith('#')) continue;
+    const raw = lines[i].trim();
+    if (!raw || raw.startsWith('#')) continue;
 
-    // wait HH:MM:SS:FF
-    const waitMatch = line.match(/^wait\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
-    if (waitMatch) {
-      result.push({ type: 'wait', ms: tcToMs(waitMatch[1]) });
-      continue;
-    }
-
-    // set attack NNNms
-    const setAttackMatch = line.match(/^set\s+attack\s+(\d+(?:\.\d+)?)ms$/i);
-    if (setAttackMatch) {
-      result.push({ type: 'set', param: 'attack', value: parseFloat(setAttackMatch[1]) });
-      continue;
-    }
-
-    // set decay NNNms
-    const setDecayMatch = line.match(/^set\s+decay\s+(\d+(?:\.\d+)?)ms$/i);
-    if (setDecayMatch) {
-      result.push({ type: 'set', param: 'decay', value: parseFloat(setDecayMatch[1]) });
-      continue;
-    }
-
-    // set sustain N
-    const setSustainMatch = line.match(/^set\s+sustain\s+(\d+(?:\.\d+)?)$/i);
-    if (setSustainMatch) {
-      result.push({ type: 'set', param: 'sustain', value: parseFloat(setSustainMatch[1]) });
-      continue;
-    }
-
-    // set release NNNms
-    const setReleaseMatch = line.match(/^set\s+release\s+(\d+(?:\.\d+)?)ms$/i);
-    if (setReleaseMatch) {
-      result.push({ type: 'set', param: 'release', value: parseFloat(setReleaseMatch[1]) });
-      continue;
-    }
-
-    // set loud-decay on/off
-    const setLoudDecayMatch = line.match(/^set\s+loud-decay\s+(on|off)$/i);
-    if (setLoudDecayMatch) {
-      result.push({ type: 'set', param: 'loud-decay', value: setLoudDecayMatch[1].toLowerCase() === 'on' });
-      continue;
-    }
-
-    // set filter-mode on/off
-    const setFilterModeMatch = line.match(/^set\s+filter-mode\s+(on|off)$/i);
-    if (setFilterModeMatch) {
-      result.push({ type: 'set', param: 'filter-mode', value: setFilterModeMatch[1].toLowerCase() === 'on' });
-      continue;
-    }
-
-    // set <checkbox-param> on/off — single regex for boolean params
-    const setBoolMatch = line.match(/^set\s+(filter-decay|hp-mode|mimic-sustain|analogue|linear-time|show-clipped|show-contour|show-gate-time|show-effective-lines|show-stated-lines|slomo)\s+(on|off)$/i);
-    if (setBoolMatch) {
-      result.push({ type: 'set', param: setBoolMatch[1].toLowerCase(), value: setBoolMatch[2].toLowerCase() === 'on' });
-      continue;
-    }
-
-    // set zoom-x3|x6|x12|x24|x48 on/off — explicit zoom levels
-    const setZoomMatch = line.match(/^set\s+(zoom-x3|zoom-x6|zoom-x12|zoom-x24|zoom-x48)\s+(on|off)$/i);
-    if (setZoomMatch) {
-      result.push({ type: 'set', param: setZoomMatch[1].toLowerCase(), value: setZoomMatch[2].toLowerCase() === 'on' });
-      continue;
-    }
-
-    // set textbook attack|decay|sustain|release on/off — underlay per-leg visibility
-    const setTextbookLegMatch = line.match(/^set\s+textbook\s+(attack|decay|sustain|release)\s+(on|off)$/i);
-    if (setTextbookLegMatch) {
-      result.push({ type: 'set', param: 'textbook-' + setTextbookLegMatch[1].toLowerCase(), value: setTextbookLegMatch[2].toLowerCase() === 'on' });
-      continue;
-    }
-
-    // set textbook show-all|hide-all — underlay bulk visibility
-    const setTextbookBulkMatch = line.match(/^set\s+textbook\s+(show-all|hide-all)$/i);
-    if (setTextbookBulkMatch) {
-      result.push({ type: 'set', param: 'textbook-' + setTextbookBulkMatch[1].toLowerCase() });
-      continue;
-    }
-
-    // set actual attack|decay|sustain|release on/off — model per-leg visibility
-    const setActualLegMatch = line.match(/^set\s+actual\s+(attack|decay|sustain|release)\s+(on|off)$/i);
-    if (setActualLegMatch) {
-      result.push({ type: 'set', param: 'actual-' + setActualLegMatch[1].toLowerCase(), value: setActualLegMatch[2].toLowerCase() === 'on' });
-      continue;
-    }
-
-    // set actual show-all|hide-all — model bulk visibility
-    const setActualBulkMatch = line.match(/^set\s+actual\s+(show-all|hide-all)$/i);
-    if (setActualBulkMatch) {
-      result.push({ type: 'set', param: 'actual-' + setActualBulkMatch[1].toLowerCase() });
-      continue;
-    }
-
-    // set cutoff N
-    const setCutoffMatch = line.match(/^set\s+cutoff\s+(\d+(?:\.\d+)?)$/i);
-    if (setCutoffMatch) {
-      result.push({ type: 'set', param: 'cutoff', value: parseFloat(setCutoffMatch[1]) });
-      continue;
-    }
-
-    // set amount N
-    const setAmountMatch = line.match(/^set\s+amount\s+(\d+(?:\.\d+)?)$/i);
-    if (setAmountMatch) {
-      result.push({ type: 'set', param: 'amount', value: parseFloat(setAmountMatch[1]) });
-      continue;
-    }
-
-    // set gate NNNms
-    const setGateMatch = line.match(/^set\s+gate\s+(\d+(?:\.\d+)?)ms$/i);
-    if (setGateMatch) {
-      result.push({ type: 'set', param: 'gate', value: parseFloat(setGateMatch[1]) });
-      continue;
-    }
-
-    // transition attack NNNms HH:MM:SS:FF
-    const transAttackMatch = line.match(/^transition\s+attack\s+(\d+(?:\.\d+)?)ms\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
-    if (transAttackMatch) {
-      result.push({ type: 'transition', param: 'attack', value: parseFloat(transAttackMatch[1]), durationMs: tcToMs(transAttackMatch[2]) });
-      continue;
-    }
-
-    // transition decay NNNms HH:MM:SS:FF
-    const transDecayMatch = line.match(/^transition\s+decay\s+(\d+(?:\.\d+)?)ms\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
-    if (transDecayMatch) {
-      result.push({ type: 'transition', param: 'decay', value: parseFloat(transDecayMatch[1]), durationMs: tcToMs(transDecayMatch[2]) });
-      continue;
-    }
-
-    // transition sustain N HH:MM:SS:FF
-    const transSustainMatch = line.match(/^transition\s+sustain\s+(\d+(?:\.\d+)?)\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
-    if (transSustainMatch) {
-      result.push({ type: 'transition', param: 'sustain', value: parseFloat(transSustainMatch[1]), durationMs: tcToMs(transSustainMatch[2]) });
-      continue;
-    }
-
-    // transition release NNNms HH:MM:SS:FF
-    const transReleaseMatch = line.match(/^transition\s+release\s+(\d+(?:\.\d+)?)ms\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
-    if (transReleaseMatch) {
-      result.push({ type: 'transition', param: 'release', value: parseFloat(transReleaseMatch[1]), durationMs: tcToMs(transReleaseMatch[2]) });
-      continue;
-    }
-
-    // transition cutoff N HH:MM:SS:FF
-    const transCutoffMatch = line.match(/^transition\s+cutoff\s+(\d+(?:\.\d+)?)\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
-    if (transCutoffMatch) {
-      result.push({ type: 'transition', param: 'cutoff', value: parseFloat(transCutoffMatch[1]), durationMs: tcToMs(transCutoffMatch[2]) });
-      continue;
-    }
-
-    // transition amount N HH:MM:SS:FF
-    const transAmountMatch = line.match(/^transition\s+amount\s+(\d+(?:\.\d+)?)\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
-    if (transAmountMatch) {
-      result.push({ type: 'transition', param: 'amount', value: parseFloat(transAmountMatch[1]), durationMs: tcToMs(transAmountMatch[2]) });
-      continue;
-    }
-
-    // transition gate NNNms HH:MM:SS:FF
-    const transGateMatch = line.match(/^transition\s+gate\s+(\d+(?:\.\d+)?)ms\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
-    if (transGateMatch) {
-      result.push({ type: 'transition', param: 'gate', value: parseFloat(transGateMatch[1]), durationMs: tcToMs(transGateMatch[2]) });
-      continue;
-    }
-
-    // play-tap NNNms [note]
-    const playTapMatch = line.match(/^play-tap\s+(\d+(?:\.\d+)?)ms(?:\s+([A-Ga-g]\d))?$/i);
-    if (playTapMatch) {
-      result.push({ type: 'play', action: 'tap', ms: parseFloat(playTapMatch[1]), note: playTapMatch[2] ? playTapMatch[2].toUpperCase() : null });
-      continue;
-    }
-
-    // play-hold [note]
-    const playHoldMatch = line.match(/^play-hold(?:\s+([A-Ga-g]\d))?$/i);
-    if (playHoldMatch) {
-      result.push({ type: 'play', action: 'hold', note: playHoldMatch[1] ? playHoldMatch[1].toUpperCase() : null });
-      continue;
-    }
-
-    // play-release
-    if (/^play-release$/i.test(line)) {
-      result.push({ type: 'play', action: 'release', note: null });
-      continue;
+    // Split on semicolons — each fragment is a separate command, all tagged with the same rawLine
+    const fragments = raw.split(';');
+    for (let f = 0; f < fragments.length; f++) {
+      const frag = fragments[f].trim();
+      if (!frag) continue;
+      const event = parseOneCommand(frag);
+      if (event) {
+        event.rawLine = i;
+        result.push(event);
+      }
     }
   }
 
@@ -417,7 +356,8 @@ function updateCueScriptView() {
   const lines = cueListText ? cueListText.split('\n') : [];
   // Anchor: raw line of the most-recently executed event (cueIndex - 1)
   const currentCueIdx = cueIndex - 1;
-  let anchorRaw = currentCueIdx >= 0 ? getRawLineIndex(currentCueIdx) : -1;
+  let anchorRaw = (currentCueIdx >= 0 && currentCueIdx < cueList.length && cueList[currentCueIdx].rawLine !== undefined)
+    ? cueList[currentCueIdx].rawLine : -1;
   if (anchorRaw < 0) anchorRaw = 0;
 
   const TOTAL = 30;
@@ -523,18 +463,29 @@ function cueTimecodeAtIndex(idx) {
 
 function cueStepFwd() {
   if (cueIsPlaying) return;
+  // Find the first non-wait event at cueIndex or later
+  let firstIdx = -1;
   for (let i = cueIndex; i < cueList.length; i++) {
-    const event = cueList[i];
-    if (event.type === 'wait') continue;
-    cueIndex = i + 1;
+    if (cueList[i].type !== 'wait') { firstIdx = i; break; }
+  }
+  if (firstIdx === -1) {
+    // Only waits remain (or list exhausted) — advance to end
+    cueIndex = cueList.length;
     cueTimecodeMs = cueTimecodeAtIndex(cueIndex);
-    executeEvent(event);
     updateTimecodeDisplay();
     updateCueScriptView();
     return;
   }
-  // Only waits remain (or list exhausted) — advance to end
-  cueIndex = cueList.length;
+  // Execute all consecutive events sharing the same rawLine (skipping waits)
+  const targetLine = cueList[firstIdx].rawLine;
+  let lastIdx = firstIdx;
+  for (let i = firstIdx; i < cueList.length; i++) {
+    if (cueList[i].rawLine !== targetLine) break;
+    lastIdx = i;
+    if (cueList[i].type === 'wait') continue;
+    executeEvent(cueList[i]);
+  }
+  cueIndex = lastIdx + 1;
   cueTimecodeMs = cueTimecodeAtIndex(cueIndex);
   updateTimecodeDisplay();
   updateCueScriptView();
@@ -562,7 +513,15 @@ function cueStepBack() {
     return;
   }
 
-  cueIndex = prevEventIdx;
+  // Rewind to the FIRST event with the same rawLine (whole line group)
+  const targetLine = cueList[prevEventIdx].rawLine;
+  let firstOfLine = prevEventIdx;
+  for (let i = prevEventIdx - 1; i >= 0; i--) {
+    if (cueList[i].rawLine === targetLine) firstOfLine = i;
+    else break;
+  }
+
+  cueIndex = firstOfLine;
   cueTimecodeMs = cueTimecodeAtIndex(cueIndex);
   updateTimecodeDisplay();
   updateCueScriptView();
@@ -607,7 +566,7 @@ function generateStateSnapshot() {
   lines.push(`set actual decay ${$('modelD').checked ? 'on' : 'off'}`);
   lines.push(`set actual sustain ${$('modelS').checked ? 'on' : 'off'}`);
   lines.push(`set actual release ${$('modelR').checked ? 'on' : 'off'}`);
-  return lines.join('\n');
+  return lines.join('; ');
 }
 
 // ---- initCueList ----
