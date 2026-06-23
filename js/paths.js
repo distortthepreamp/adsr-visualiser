@@ -198,8 +198,10 @@ function render(){
     const tbSusEndX   = pts.pEnd.x + tbSusGapPx;
     const tbRelEndX   = tbSusEndX + timeToPixels(mapTime(state.r), linearTimeOn);
     const tbFloorY    = yFor(e.floor);
-    const ulP1Y = Math.max(pts.p1.y, ceilY);
-    const ulPSY = overrange ? Math.max(yFor(e.floor + state.s * e.scale), ceilY) : yFor(e.floor + state.s * e.scale);
+    // Textbook proportional ceiling: amount scales the headroom above the floor (never exceeds 1)
+    const textbookCeiling = e.floor + (1 - e.floor) * e.scale;
+    const ulP1Y = yFor(textbookCeiling);
+    const ulPSY = yFor(e.floor + state.s * (1 - e.floor) * e.scale);
     const ulColor = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
     if(ua){ ua.setAttribute('d', `M ${pts.p0.x} ${pts.p0.y} L ${pts.p1.x} ${ulP1Y}`); ua.style.opacity = showA ? '' : '0'; }
     if(ud){ ud.setAttribute('d', `M ${pts.p1.x} ${ulP1Y} L ${tbDecayEndX} ${ulPSY}`); ud.style.opacity = showD ? '' : '0'; }
@@ -605,41 +607,43 @@ function render(){
   const floorY = yFor(pts.e.floor);
   const amountY = Math.max(yFor(pts.e.floor + pts.e.scale), yFor(1));
   const showContour = freqMode && $('showContour') && $('showContour').checked;
+  const contourTickCol = ($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00';
+  const contourTickColRight = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
+  // Contour ticks — left stubs (meter left edge) and right stubs (meter right edge)
   if(floorLine){
-    floorLine.setAttribute('x1', graph.x0);
+    floorLine.setAttribute('x1', markerEndX - sustainTickLen);
     floorLine.setAttribute('y1', floorY);
-    floorLine.setAttribute('x2', meterLeftX);
+    floorLine.setAttribute('x2', markerEndX);
     floorLine.setAttribute('y2', floorY);
+    floorLine.style.stroke = contourTickCol;
     floorLine.style.display = showContour ? '' : 'none';
   }
+  const floorLineR = $('floorLineRight');
+  if(floorLineR){
+    floorLineR.setAttribute('x1', markerEndX + METER_W);
+    floorLineR.setAttribute('y1', floorY);
+    floorLineR.setAttribute('x2', markerEndX + METER_W + sustainTickLen);
+    floorLineR.setAttribute('y2', floorY);
+    floorLineR.style.stroke = contourTickColRight;
+    floorLineR.style.display = showContour ? '' : 'none';
+  }
   if(amountLine){
-    amountLine.setAttribute('x1', (showGateTime && gateCloseX < pts.p1.x) ? gateCloseX : pts.p1.x);
+    amountLine.setAttribute('x1', markerEndX - sustainTickLen);
     amountLine.setAttribute('y1', amountY);
-    amountLine.setAttribute('x2', meterLeftX);
+    amountLine.setAttribute('x2', markerEndX);
     amountLine.setAttribute('y2', amountY);
+    amountLine.style.stroke = contourTickCol;
     amountLine.style.display = showContour ? '' : 'none';
   }
-  // Contour line labels
-  const contourLabelX = METER_X - 30;
-  const contourAmountLabelEl = $('contourAmountLabel');
-  if(contourAmountLabelEl){
-    contourAmountLabelEl.setAttribute('x', contourLabelX);
-    contourAmountLabelEl.setAttribute('y', amountY);
-    contourAmountLabelEl.setAttribute('dominant-baseline', 'middle');
-    contourAmountLabelEl.removeAttribute('stroke'); contourAmountLabelEl.removeAttribute('stroke-width'); contourAmountLabelEl.removeAttribute('paint-order');
-    contourAmountLabelEl.style.fill = '#000000';
-    contourAmountLabelEl.style.display = showContour ? '' : 'none';
-    const caBg=$('contourAmountLabelBg'); if(caBg){ const bbox=contourAmountLabelEl.getBBox(); caBg.setAttribute('x',bbox.x-4); caBg.setAttribute('y',bbox.y-2); caBg.setAttribute('width',bbox.width+8); caBg.setAttribute('height',bbox.height+4); caBg.setAttribute('fill','#ffffff'); caBg.style.display=contourAmountLabelEl.style.display; }
-  }
-  const cutoffFreqLabelEl = $('cutoffFreqLabel');
-  if(cutoffFreqLabelEl){
-    cutoffFreqLabelEl.setAttribute('x', contourLabelX);
-    cutoffFreqLabelEl.setAttribute('y', floorY);
-    cutoffFreqLabelEl.setAttribute('dominant-baseline', 'middle');
-    cutoffFreqLabelEl.removeAttribute('stroke'); cutoffFreqLabelEl.removeAttribute('stroke-width'); cutoffFreqLabelEl.removeAttribute('paint-order');
-    cutoffFreqLabelEl.style.fill = '#000000';
-    cutoffFreqLabelEl.style.display = showContour ? '' : 'none';
-    const cfBg=$('cutoffFreqLabelBg'); if(cfBg){ const bbox=cutoffFreqLabelEl.getBBox(); cfBg.setAttribute('x',bbox.x-4); cfBg.setAttribute('y',bbox.y-2); cfBg.setAttribute('width',bbox.width+8); cfBg.setAttribute('height',bbox.height+4); cfBg.setAttribute('fill','#ffffff'); cfBg.style.display=cutoffFreqLabelEl.style.display; }
+  const amountLineR = $('amountLineRight');
+  const textbookAmountY = yFor(e.floor + (1 - e.floor) * e.scale);
+  if(amountLineR){
+    amountLineR.setAttribute('x1', markerEndX + METER_W);
+    amountLineR.setAttribute('y1', textbookAmountY);
+    amountLineR.setAttribute('x2', markerEndX + METER_W + sustainTickLen);
+    amountLineR.setAttribute('y2', textbookAmountY);
+    amountLineR.style.stroke = contourTickColRight;
+    amountLineR.style.display = showContour ? '' : 'none';
   }
   // Show Contour checkbox: only meaningful in filter mode
   const showContourLabel = $('showContour') && $('showContour').closest('label');

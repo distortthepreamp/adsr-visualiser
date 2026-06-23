@@ -52,8 +52,10 @@
           <path d="M10,0 L0,5 L10,10 Z" fill="context-stroke"/>
         </marker>
       </defs>
-      <line id="amountLine" x1="80" y1="30" x2="1145" y2="30" style="stroke:var(--contourLineColor);stroke-width:1;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
-      <line id="floorLine" x1="80" y1="445" x2="1145" y2="445" style="stroke:var(--contourLineColor);stroke-width:1;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
+      <line id="amountLine" x1="80" y1="30" x2="80" y2="30" style="stroke-width:var(--markerLineWidth);stroke-dasharray:none;vector-effect:non-scaling-stroke;display:none;" />
+      <line id="amountLineRight" x1="80" y1="30" x2="80" y2="30" style="stroke-width:var(--markerLineWidth);stroke-dasharray:none;vector-effect:non-scaling-stroke;display:none;" />
+      <line id="floorLine" x1="80" y1="445" x2="80" y2="445" style="stroke-width:var(--markerLineWidth);stroke-dasharray:none;vector-effect:non-scaling-stroke;display:none;" />
+      <line id="floorLineRight" x1="80" y1="445" x2="80" y2="445" style="stroke-width:var(--markerLineWidth);stroke-dasharray:none;vector-effect:non-scaling-stroke;display:none;" />
       <line id="sustainMarker" class="marker-line" x1="80" y1="445" x2="80" y2="445" style="stroke-dasharray:none" marker-end="url(#sustainArrowRight)" />
       <line id="statedSustainLine" class="marker-line" x1="80" y1="445" x2="80" y2="445" style="stroke:#00ffff;stroke-opacity:1;stroke-dasharray:none;display:none;" marker-start="url(#sustainArrowLeft)" />
       <text id="sustainMarkerLabel" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
@@ -113,10 +115,6 @@
       <text id="modeLabel" class="mode-label" x="80" y="0" text-anchor="start">LOUDNESS CONTOUR</text>
       <text id="svgTimecodes" x="0" y="0" text-anchor="end" font-family="'UniversCondensed',Arial,Helvetica,sans-serif" style="display:none"><tspan id="svgElapsed" fill="#00ffff">ELAPSED: 00:00:00</tspan><tspan id="svgCue" fill="#00ff00" dx="30">CUE: 00:00:00:00</tspan></text>
       <text id="tbSustainLabel" class="small-label" x="0" y="0" style="display:none;">SUSTAIN</text>
-      <rect id="contourAmountLabelBg" x="0" y="0" width="0" height="0" fill="#ffffff" style="display:none;" />
-      <text id="contourAmountLabel" class="small-label" x="0" y="0" text-anchor="end" style="display:none;">CONTOUR AMOUNT</text>
-      <rect id="cutoffFreqLabelBg" x="0" y="0" width="0" height="0" fill="#ffffff" style="display:none;" />
-      <text id="cutoffFreqLabel"    class="small-label" x="0" y="0" text-anchor="end" style="display:none;">CUTOFF FREQUENCY</text>
 
     </svg>
   </div>
@@ -552,8 +550,8 @@ let METER_X = graph.x0 + graph.w + METER_GAP;  // 1145
   const gx0 = graph.x0, gy0 = graph.y0, gw = graph.w, gh = graph.h;
   const top = gy0 - gh;  // = 30
   function set(id, attrs){ const el = document.getElementById(id); if(el) Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k,v)); }
-  set('amountLine',        { x1:gx0,    y1:top,  x2:METER_X, y2:top  });
-  set('floorLine',         { x1:gx0,    y1:gy0,  x2:METER_X, y2:gy0  });
+  set('amountLine',        { x1:METER_X, y1:top,  x2:METER_X, y2:top  });
+  set('floorLine',         { x1:METER_X, y1:gy0,  x2:METER_X, y2:gy0  });
   set('floorBound',        { x2:VB_WIDTH                               });
   set('ceilingBound',      { x2:VB_WIDTH                               });
   set('meterFill',         { x:METER_X, y:gy0,   width:METER_W        });
