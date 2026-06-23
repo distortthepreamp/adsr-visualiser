@@ -507,7 +507,9 @@ function render(){
   $('sustainMarker').setAttribute('x2', markerEndX);
   $('sustainMarker').setAttribute('y2', drawPS.y);
   $('sustainMarker').style.stroke = ($('frequencyMode') && $('frequencyMode').checked) ? (($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00') : (($('loudnessDecayColor') && $('loudnessDecayColor').value) || '#ff0000');
-  $('sustainMarker').style.display = legS ? '' : 'none';
+  const showEffLines = !!($('showNewEffectiveLines') && $('showNewEffectiveLines').checked);
+  const showModelDSusTick = legS && showEffLines;
+  $('sustainMarker').style.display = showModelDSusTick ? '' : 'none';
   { const lbl=$('sustainMarkerLabel'); if(lbl){
     lbl.setAttribute('x', markerEndX - sustainTickLen - sustainLabelGap);
     lbl.setAttribute('y', drawPS.y);
@@ -515,7 +517,7 @@ function render(){
     lbl.setAttribute('dominant-baseline', 'middle');
     lbl.setAttribute('fill', $('sustainMarker').style.stroke);
     lbl.textContent = 'S = ' + ((e.floor + drawPS.level * e.scale) * 10).toFixed(1);
-    lbl.style.display = legS ? '' : 'none';
+    lbl.style.display = showModelDSusTick ? '' : 'none';
   } }
   $('sustainPoint').setAttribute('cx', drawPS.x);
   $('sustainPoint').setAttribute('cy', drawPS.y);
@@ -526,7 +528,8 @@ function render(){
   let _statedY = null; // elevated for geometry logging
   const statedSustainLineEl = $('statedSustainLine');
   if(statedSustainLineEl){
-    const tbSusVis = !!($('underlayS') && $('underlayS').checked);
+    const showStatedLines = !!($('showNewStatedLines') && $('showNewStatedLines').checked);
+    const tbSusVis = !!($('underlayS') && $('underlayS').checked) && showStatedLines;
     const statedY = yFor(e.floor + state.s * (1 - e.floor) * e.scale);
     _statedY = statedY;
     statedSustainX = pts.pEnd.x + graph.w * state.tbSustainGap;
