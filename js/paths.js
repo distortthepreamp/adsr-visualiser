@@ -692,7 +692,8 @@ function render(){
   const capHeight = _labelSize * 0.72;
   const contourLabelGap = sustainLabelGap;
   const cfText = 'CF = ' + fmtScaleValue(state.floor * 10);
-  const aocText = 'AOC = ' + fmtScaleValue(state.scale * 10);
+  const aocTextLeft = 'AOC = ' + fmtScaleValue(Math.min(e.floor + e.scale, 1) * 10);
+  const aocTextRight = 'AOC = ' + fmtScaleValue((e.floor + (1 - e.floor) * e.scale) * 10);
   const leftX = markerEndX - sustainTickLen - sustainLabelGap;
   const rightX = markerEndX + METER_W + sustainTickLen + sustainLabelGap;
   // CF left (Model D) — below cutoff arrow's free bottom end
@@ -722,7 +723,7 @@ function render(){
     aocLbl.setAttribute('y', (amountY - riserLen) - contourLabelGap);
     aocLbl.setAttribute('text-anchor', 'end');
     aocLbl.setAttribute('fill', contourTickCol);
-    aocLbl.textContent = aocText;
+    aocLbl.textContent = aocTextLeft;
     aocLbl.style.display = showContourLeft ? '' : 'none';
   }
   // AOC right (textbook) — above amount arrow's free top end
@@ -732,7 +733,7 @@ function render(){
     aocLblR.setAttribute('y', (textbookAmountY - riserLen) - contourLabelGap);
     aocLblR.setAttribute('text-anchor', 'start');
     aocLblR.setAttribute('fill', contourTickColRight);
-    aocLblR.textContent = aocText;
+    aocLblR.textContent = aocTextRight;
     aocLblR.style.display = showContourRight ? '' : 'none';
   }
   // Show Contour checkbox: only meaningful in filter mode
