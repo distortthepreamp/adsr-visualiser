@@ -514,7 +514,7 @@ function render(){
     lbl.setAttribute('text-anchor', 'end');
     lbl.setAttribute('dominant-baseline', 'middle');
     lbl.setAttribute('fill', $('sustainMarker').style.stroke);
-    lbl.textContent = 'S = ' + (e.s * 10).toFixed(1);
+    lbl.textContent = 'S = ' + ((e.floor + drawPS.level * e.scale) * 10).toFixed(1);
     lbl.style.display = (textbookAdsr || !legS) ? 'none' : '';
   } }
   $('sustainPoint').setAttribute('cx', drawPS.x);
@@ -527,8 +527,7 @@ function render(){
   const statedSustainLineEl = $('statedSustainLine');
   if(statedSustainLineEl){
     if(kcOn && !textbookAdsr && !clipAtGateOn){
-      const floorY = yFor(pts.e.floor);
-      const statedY = floorY - (floorY - drawPS.y) * KC_SUSTAIN_SCALE;
+      const statedY = yFor(e.floor + state.s * (1 - e.floor) * e.scale);
       _statedY = statedY;
       statedSustainX = pts.pEnd.x + graph.w * state.tbSustainGap;
       const underlayCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
@@ -544,7 +543,7 @@ function render(){
         ssl.setAttribute('text-anchor', 'start');
         ssl.setAttribute('dominant-baseline', 'middle');
         ssl.setAttribute('fill', underlayCol);
-        ssl.textContent = 'S = ' + (e.rawS * 10).toFixed(1);
+        ssl.textContent = 'S = ' + ((e.floor + state.s * (1 - e.floor) * e.scale) * 10).toFixed(1);
         ssl.style.display = '';
       }
     } else {
@@ -610,6 +609,12 @@ function render(){
   const contourTickCol = ($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00';
   const contourTickColRight = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
   // Contour ticks — left stubs (meter left edge) and right stubs (meter right edge)
+  const riserLen = Math.round(sustainTickLen * 0.65);
+  // Half stroke width in user units (non-scaling-stroke is in CSS px; convert via viewBox/screen ratio)
+  const markerLW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--markerLineWidth')) || 1;
+  const svgEl2 = document.getElementById('svg');
+  const pxToUser = svgEl2 ? (VB_WIDTH / svgEl2.getBoundingClientRect().width) : 1;
+  const halfStroke = (markerLW / 2) * pxToUser;
   if(floorLine){
     floorLine.setAttribute('x1', markerEndX - sustainTickLen);
     floorLine.setAttribute('y1', floorY);
@@ -617,6 +622,14 @@ function render(){
     floorLine.setAttribute('y2', floorY);
     floorLine.style.stroke = contourTickCol;
     floorLine.style.display = showContour ? '' : 'none';
+  }
+  const floorRiser = $('floorRiser');
+  if(floorRiser){
+    const rx = markerEndX - sustainTickLen + halfStroke;
+    floorRiser.setAttribute('x1', rx); floorRiser.setAttribute('y1', floorY);
+    floorRiser.setAttribute('x2', rx); floorRiser.setAttribute('y2', floorY + riserLen);
+    floorRiser.style.stroke = contourTickCol;
+    floorRiser.style.display = showContour ? '' : 'none';
   }
   const floorLineR = $('floorLineRight');
   if(floorLineR){
@@ -627,6 +640,14 @@ function render(){
     floorLineR.style.stroke = contourTickColRight;
     floorLineR.style.display = showContour ? '' : 'none';
   }
+  const floorRiserR = $('floorRiserRight');
+  if(floorRiserR){
+    const rx = markerEndX + METER_W + sustainTickLen - halfStroke;
+    floorRiserR.setAttribute('x1', rx); floorRiserR.setAttribute('y1', floorY);
+    floorRiserR.setAttribute('x2', rx); floorRiserR.setAttribute('y2', floorY + riserLen);
+    floorRiserR.style.stroke = contourTickColRight;
+    floorRiserR.style.display = showContour ? '' : 'none';
+  }
   if(amountLine){
     amountLine.setAttribute('x1', markerEndX - sustainTickLen);
     amountLine.setAttribute('y1', amountY);
@@ -634,6 +655,14 @@ function render(){
     amountLine.setAttribute('y2', amountY);
     amountLine.style.stroke = contourTickCol;
     amountLine.style.display = showContour ? '' : 'none';
+  }
+  const amountRiser = $('amountRiser');
+  if(amountRiser){
+    const rx = markerEndX - sustainTickLen + halfStroke;
+    amountRiser.setAttribute('x1', rx); amountRiser.setAttribute('y1', amountY);
+    amountRiser.setAttribute('x2', rx); amountRiser.setAttribute('y2', amountY - riserLen);
+    amountRiser.style.stroke = contourTickCol;
+    amountRiser.style.display = showContour ? '' : 'none';
   }
   const amountLineR = $('amountLineRight');
   const textbookAmountY = yFor(e.floor + (1 - e.floor) * e.scale);
@@ -644,6 +673,14 @@ function render(){
     amountLineR.setAttribute('y2', textbookAmountY);
     amountLineR.style.stroke = contourTickColRight;
     amountLineR.style.display = showContour ? '' : 'none';
+  }
+  const amountRiserR = $('amountRiserRight');
+  if(amountRiserR){
+    const rx = markerEndX + METER_W + sustainTickLen - halfStroke;
+    amountRiserR.setAttribute('x1', rx); amountRiserR.setAttribute('y1', textbookAmountY);
+    amountRiserR.setAttribute('x2', rx); amountRiserR.setAttribute('y2', textbookAmountY - riserLen);
+    amountRiserR.style.stroke = contourTickColRight;
+    amountRiserR.style.display = showContour ? '' : 'none';
   }
   // Show Contour checkbox: only meaningful in filter mode
   const showContourLabel = $('showContour') && $('showContour').closest('label');
