@@ -29,6 +29,7 @@
   --markerLineWidth:1;
   --markerDash:4 4;
   --sustainTickLength:30;
+  --sustainLabelGap:6;
   --loudnessAttackColor:#ff0000;
   --loudnessDecayColor:#ff0000;
   --loudnessReleaseColor:#ff0000;

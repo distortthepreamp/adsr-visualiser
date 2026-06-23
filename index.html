@@ -45,11 +45,19 @@
             <feMergeNode in="SourceGraphic"/>
           </feMerge>
         </filter>
+        <marker id="sustainArrowRight" markerWidth="10" markerHeight="10" viewBox="0 0 10 10" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+          <path d="M0,0 L10,5 L0,10 Z" fill="context-stroke"/>
+        </marker>
+        <marker id="sustainArrowLeft" markerWidth="10" markerHeight="10" viewBox="0 0 10 10" refX="0" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+          <path d="M10,0 L0,5 L10,10 Z" fill="context-stroke"/>
+        </marker>
       </defs>
       <line id="amountLine" x1="80" y1="30" x2="1145" y2="30" style="stroke:var(--contourLineColor);stroke-width:1;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
       <line id="floorLine" x1="80" y1="445" x2="1145" y2="445" style="stroke:var(--contourLineColor);stroke-width:1;stroke-linecap:round;stroke-opacity:1;vector-effect:non-scaling-stroke;display:none;" />
-      <line id="sustainMarker" class="marker-line" x1="80" y1="445" x2="80" y2="445" />
-      <line id="statedSustainLine" class="marker-line" x1="80" y1="445" x2="80" y2="445" style="stroke:#00ffff;stroke-opacity:1;display:none;" />
+      <line id="sustainMarker" class="marker-line" x1="80" y1="445" x2="80" y2="445" style="stroke-dasharray:none" marker-end="url(#sustainArrowRight)" />
+      <line id="statedSustainLine" class="marker-line" x1="80" y1="445" x2="80" y2="445" style="stroke:#00ffff;stroke-opacity:1;stroke-dasharray:none;display:none;" marker-start="url(#sustainArrowLeft)" />
+      <text id="sustainMarkerLabel" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
+      <text id="statedSustainLabel" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
 <line id="tbSustainMarker" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
       <line id="tbModelDSustainLine" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
       <circle id="sustainPoint" class="tap-marker" cx="80" cy="445" style="opacity:.85" />
@@ -556,7 +564,7 @@ let METER_X = graph.x0 + graph.w + METER_GAP;  // 1145
 // Right padding  = VB_WIDTH  - graph.x0 - graph.w - METER_GAP - METER_W = 1200-220-905-20-40 = 15
 // Bottom padding = VB_HEIGHT - graph.y0                                  = 595-445           = 150
 // Graph top      = graph.y0  - graph.h                                   = 445-415           = 30 + GRAPH_TOP_EXTRA
-const GRAPH_RIGHT_PAD  = 15;
+const GRAPH_RIGHT_PAD  = 265;  // 15 base + 250 test shift to make room right of meter
 const GRAPH_BOTTOM_PAD = 180;  // clearance = VB_Y_ORIGIN + GRAPH_BOTTOM_PAD = -110+180 = 70px below graph floor
 const GRAPH_TOP_BASE   = 30;
 let   GRAPH_TOP_EXTRA  = 0;

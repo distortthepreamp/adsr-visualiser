@@ -491,13 +491,30 @@ function render(){
   const meterAbsBottom = graph.y0;          // yFor(0) = 445
 
   const markerEndX = meterX;
-  const sustainTickLen = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sustainTickLength')) || 30;
+  const _labelSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--labelSize')) || 17;
+  const arrowSize = Math.round(_labelSize * 0.72);
+  const sustainTickLen = Math.round(_labelSize * 1.5);
+  const sustainLabelGap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sustainLabelGap')) || 6;
+  // Size arrowhead markers to match label cap height
+  const arrowR = document.getElementById('sustainArrowRight');
+  const arrowL = document.getElementById('sustainArrowLeft');
+  if(arrowR){ arrowR.setAttribute('markerWidth', arrowSize); arrowR.setAttribute('markerHeight', arrowSize); }
+  if(arrowL){ arrowL.setAttribute('markerWidth', arrowSize); arrowL.setAttribute('markerHeight', arrowSize); }
   $('sustainMarker').setAttribute('x1', markerEndX - sustainTickLen);
   $('sustainMarker').setAttribute('y1', drawPS.y);
   $('sustainMarker').setAttribute('x2', markerEndX);
   $('sustainMarker').setAttribute('y2', drawPS.y);
   $('sustainMarker').style.stroke = ($('frequencyMode') && $('frequencyMode').checked) ? (($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00') : (($('loudnessDecayColor') && $('loudnessDecayColor').value) || '#ff0000');
   $('sustainMarker').style.display = (textbookAdsr || !legS) ? 'none' : '';
+  { const lbl=$('sustainMarkerLabel'); if(lbl){
+    lbl.setAttribute('x', markerEndX - sustainTickLen - sustainLabelGap);
+    lbl.setAttribute('y', drawPS.y);
+    lbl.setAttribute('text-anchor', 'end');
+    lbl.setAttribute('dominant-baseline', 'middle');
+    lbl.setAttribute('fill', $('sustainMarker').style.stroke);
+    lbl.textContent = 'S = ' + (e.s * 10).toFixed(1);
+    lbl.style.display = (textbookAdsr || !legS) ? 'none' : '';
+  } }
   $('sustainPoint').setAttribute('cx', drawPS.x);
   $('sustainPoint').setAttribute('cy', drawPS.y);
   $('sustainPoint').style.display = (textbookAdsr || !legS) ? 'none' : '';
@@ -513,14 +530,24 @@ function render(){
       _statedY = statedY;
       statedSustainX = pts.pEnd.x + graph.w * state.tbSustainGap;
       const underlayCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
-      statedSustainLineEl.setAttribute('x1', markerEndX - sustainTickLen);
+      statedSustainLineEl.setAttribute('x1', markerEndX + METER_W);
       statedSustainLineEl.setAttribute('y1', statedY);
-      statedSustainLineEl.setAttribute('x2', markerEndX);
+      statedSustainLineEl.setAttribute('x2', markerEndX + METER_W + sustainTickLen);
       statedSustainLineEl.setAttribute('y2', statedY);
       statedSustainLineEl.style.stroke = underlayCol;
       statedSustainLineEl.style.display = '';
+      const ssl=$('statedSustainLabel'); if(ssl){
+        ssl.setAttribute('x', markerEndX + METER_W + sustainTickLen + sustainLabelGap);
+        ssl.setAttribute('y', statedY);
+        ssl.setAttribute('text-anchor', 'start');
+        ssl.setAttribute('dominant-baseline', 'middle');
+        ssl.setAttribute('fill', underlayCol);
+        ssl.textContent = 'S = ' + (e.rawS * 10).toFixed(1);
+        ssl.style.display = '';
+      }
     } else {
       statedSustainLineEl.style.display = 'none';
+      const ssl=$('statedSustainLabel'); if(ssl) ssl.style.display = 'none';
     }
   }
 
@@ -559,10 +586,10 @@ function render(){
     meterClipRightRect.setAttribute('x',meterX+halfW); meterClipRightRect.setAttribute('y',meterAbsTop);
     meterClipRightRect.setAttribute('width',halfW); meterClipRightRect.setAttribute('height',graph.h);
   }
-  const meterFillStatedEl=$('meterFillStated');
-  if(meterFillStatedEl){ meterFillStatedEl.setAttribute('x',meterX); meterFillStatedEl.setAttribute('width',halfW); meterFillStatedEl.setAttribute('clip-path','url(#meterClipLeft)'); }
   const meterFillEl=$('meterFill');
-  if(meterFillEl){ meterFillEl.setAttribute('x',meterX+halfW); meterFillEl.setAttribute('width',halfW); meterFillEl.setAttribute('clip-path','url(#meterClipRight)'); }
+  if(meterFillEl){ meterFillEl.setAttribute('x',meterX); meterFillEl.setAttribute('width',halfW); meterFillEl.setAttribute('clip-path','url(#meterClipLeft)'); }
+  const meterFillStatedEl=$('meterFillStated');
+  if(meterFillStatedEl){ meterFillStatedEl.setAttribute('x',meterX+halfW); meterFillStatedEl.setAttribute('width',halfW); meterFillStatedEl.setAttribute('clip-path','url(#meterClipRight)'); }
   const meterScanlinesEl=$('meterScanlinesRect');
   if(meterScanlinesEl){
     meterScanlinesEl.setAttribute('x',meterX); meterScanlinesEl.setAttribute('y',meterAbsTop);
