@@ -1,7 +1,7 @@
 // ---- paths.js — SVG path building, knob sync, and the render() coordinator ----
 // Depends on geometry.js (clamp, yFor, computePoints, etc.) being loaded first.
 
-const KC_SUSTAIN_SCALE = 1.25; // inverse of the 0.8 keyboard-control sustain cap (1/0.8)
+const KC_SUSTAIN_SCALE = MIMIC_SUSTAIN_INV; // inverse of the mimic-sustain cap
 
 function syncKnobColours(freqMode){
   const KNOB_RED    = 'radial-gradient(circle at 36% 30%, #aa1111, #660808 68%, #220000 100%)';

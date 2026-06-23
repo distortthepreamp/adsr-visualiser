@@ -124,7 +124,7 @@ function refreshNumericInputs(){
 function patchSustainReadouts(){
   const sustainTarget = document.getElementById('sustainTarget');
   if (sustainTarget && currentMode() === 'animate') {
-    const targetS = document.getElementById('keyboardControl').checked ? state.target.s * 0.8 : state.target.s;
+    const targetS = document.getElementById('keyboardControl').checked ? state.target.s * MIMIC_SUSTAIN_CAP : state.target.s;
     sustainTarget.textContent = 'Target: ' + formatSustainScale(targetS);
   }
 }

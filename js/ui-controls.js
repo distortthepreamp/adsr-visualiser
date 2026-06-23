@@ -27,7 +27,7 @@ function syncControls(){
   if($('gateKnob')) $('gateKnob').style.setProperty('--deg', (-135 + vals.gate*270)+'deg');
   $('attackTarget').textContent=mode==='animate' ? 'Target: '+fmtTime(mapTime(state.target.a)) : '';
   $('decayTarget').textContent=mode==='animate' ? 'Target: '+fmtTime(mapTime(state.target.d)) : '';
-  $('sustainTarget').textContent=mode==='animate' ? 'Target: '+Math.round(($('keyboardControl').checked?state.target.s*.8:state.target.s)*100)+'%' : '';
+  $('sustainTarget').textContent=mode==='animate' ? 'Target: '+Math.round(($('keyboardControl').checked?state.target.s*MIMIC_SUSTAIN_CAP:state.target.s)*100)+'%' : '';
   $('releaseTarget').textContent=mode==='animate' ? 'Target: '+fmtTime(mapTime(state.target.r)) : '';
   $('floorTarget').textContent=mode==='animate' ? 'Target: '+formatSustainScale(state.target.floor) : '';
   $('scaleTarget').textContent=mode==='animate' ? 'Target: '+formatSustainScale(state.target.scale) : '';

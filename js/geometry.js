@@ -1,6 +1,10 @@
 // ---- geometry.js — pure mathematical functions for the ADSR envelope ----
 // No DOM access. All functions are top-level globals, called by paths.js and others.
 
+// ---- Mimic Model D sustain cap ----
+const MIMIC_SUSTAIN_CAP = 0.8;
+const MIMIC_SUSTAIN_INV = 1 / MIMIC_SUSTAIN_CAP;  // = 1.25, for the stated-sustain expansion
+
 // ---- displayTimeWidth curve coefficients ----
 const DISPLAY_SHORTBOOST_AMP = 38;    // amplitude of the exponential short-value boost
 const DISPLAY_SHORTBOOST_TC  = 0.012; // time constant of the short-value boost (seconds)
@@ -51,7 +55,7 @@ function displayTimeWidth(t){
 function getEffective(){
   const aT=mapTime(state.a), dT=mapTime(state.d);
   const rawS=state.s;
-  const s=($('keyboardControl') && $('keyboardControl').checked) ? rawS*.8 : rawS;
+  const s=($('keyboardControl') && $('keyboardControl').checked) ? rawS*MIMIC_SUSTAIN_CAP : rawS;
   const textbookOn = $('textbookAdsr') && $('textbookAdsr').checked;
   const releaseOn = textbookOn ? true : $('loudDecay').checked;
   const freqMode = $('frequencyMode') && $('frequencyMode').checked;
@@ -99,8 +103,8 @@ function computePoints(){
   const pEnd={x:p1.x+dwFull,y:yFor(e.floor),level:0};
   const mimicOn = $('keyboardControl') && $('keyboardControl').checked;
   const sAbsolute = e.floor + e.s * e.scale;
-  const sSafe = (mimicOn && sAbsolute > 0.8 && e.scale > 0)
-    ? Math.max(0, (0.8 - e.floor) / e.scale)
+  const sSafe = (mimicOn && sAbsolute > MIMIC_SUSTAIN_CAP && e.scale > 0)
+    ? Math.max(0, (MIMIC_SUSTAIN_CAP - e.floor) / e.scale)
     : e.s;
   const pS={x:p1.x+dwFull*(1-sSafe),y:yFor(e.floor+sSafe*e.scale),level:sSafe};
   return {p0,p1,pS,pEnd,e,aw,dwFull};
