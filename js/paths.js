@@ -507,7 +507,7 @@ function render(){
   $('sustainMarker').setAttribute('x2', markerEndX);
   $('sustainMarker').setAttribute('y2', drawPS.y);
   $('sustainMarker').style.stroke = ($('frequencyMode') && $('frequencyMode').checked) ? (($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00') : (($('loudnessDecayColor') && $('loudnessDecayColor').value) || '#ff0000');
-  $('sustainMarker').style.display = (textbookAdsr || !legS) ? 'none' : '';
+  $('sustainMarker').style.display = legS ? '' : 'none';
   { const lbl=$('sustainMarkerLabel'); if(lbl){
     lbl.setAttribute('x', markerEndX - sustainTickLen - sustainLabelGap);
     lbl.setAttribute('y', drawPS.y);
@@ -515,40 +515,36 @@ function render(){
     lbl.setAttribute('dominant-baseline', 'middle');
     lbl.setAttribute('fill', $('sustainMarker').style.stroke);
     lbl.textContent = 'S = ' + ((e.floor + drawPS.level * e.scale) * 10).toFixed(1);
-    lbl.style.display = (textbookAdsr || !legS) ? 'none' : '';
+    lbl.style.display = legS ? '' : 'none';
   } }
   $('sustainPoint').setAttribute('cx', drawPS.x);
   $('sustainPoint').setAttribute('cy', drawPS.y);
-  $('sustainPoint').style.display = (textbookAdsr || !legS) ? 'none' : '';
+  $('sustainPoint').style.display = legS ? '' : 'none';
 
   const kcOn = $('keyboardControl') && $('keyboardControl').checked;
   let statedSustainX = drawPS.x; // uncapped sustain x; equals drawPS.x when kc OFF
   let _statedY = null; // elevated for geometry logging
   const statedSustainLineEl = $('statedSustainLine');
   if(statedSustainLineEl){
-    if(kcOn && !textbookAdsr && !clipAtGateOn){
-      const statedY = yFor(e.floor + state.s * (1 - e.floor) * e.scale);
-      _statedY = statedY;
-      statedSustainX = pts.pEnd.x + graph.w * state.tbSustainGap;
-      const underlayCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
-      statedSustainLineEl.setAttribute('x1', markerEndX + METER_W);
-      statedSustainLineEl.setAttribute('y1', statedY);
-      statedSustainLineEl.setAttribute('x2', markerEndX + METER_W + sustainTickLen);
-      statedSustainLineEl.setAttribute('y2', statedY);
-      statedSustainLineEl.style.stroke = underlayCol;
-      statedSustainLineEl.style.display = '';
-      const ssl=$('statedSustainLabel'); if(ssl){
-        ssl.setAttribute('x', markerEndX + METER_W + sustainTickLen + sustainLabelGap);
-        ssl.setAttribute('y', statedY);
-        ssl.setAttribute('text-anchor', 'start');
-        ssl.setAttribute('dominant-baseline', 'middle');
-        ssl.setAttribute('fill', underlayCol);
-        ssl.textContent = 'S = ' + ((e.floor + state.s * (1 - e.floor) * e.scale) * 10).toFixed(1);
-        ssl.style.display = '';
-      }
-    } else {
-      statedSustainLineEl.style.display = 'none';
-      const ssl=$('statedSustainLabel'); if(ssl) ssl.style.display = 'none';
+    const tbSusVis = !!($('underlayS') && $('underlayS').checked);
+    const statedY = yFor(e.floor + state.s * (1 - e.floor) * e.scale);
+    _statedY = statedY;
+    statedSustainX = pts.pEnd.x + graph.w * state.tbSustainGap;
+    const underlayCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
+    statedSustainLineEl.setAttribute('x1', markerEndX + METER_W);
+    statedSustainLineEl.setAttribute('y1', statedY);
+    statedSustainLineEl.setAttribute('x2', markerEndX + METER_W + sustainTickLen);
+    statedSustainLineEl.setAttribute('y2', statedY);
+    statedSustainLineEl.style.stroke = underlayCol;
+    statedSustainLineEl.style.display = tbSusVis ? '' : 'none';
+    const ssl=$('statedSustainLabel'); if(ssl){
+      ssl.setAttribute('x', markerEndX + METER_W + sustainTickLen + sustainLabelGap);
+      ssl.setAttribute('y', statedY);
+      ssl.setAttribute('text-anchor', 'start');
+      ssl.setAttribute('dominant-baseline', 'middle');
+      ssl.setAttribute('fill', underlayCol);
+      ssl.textContent = 'S = ' + ((e.floor + state.s * (1 - e.floor) * e.scale) * 10).toFixed(1);
+      ssl.style.display = tbSusVis ? '' : 'none';
     }
   }
 
@@ -606,6 +602,10 @@ function render(){
   const floorY = yFor(pts.e.floor);
   const amountY = Math.max(yFor(pts.e.floor + pts.e.scale), yFor(1));
   const showContour = freqMode && $('showContour') && $('showContour').checked;
+  const anyModelLeg = legA || legD || legS || legR;
+  const anyUnderlayLeg = !!( ($('underlayA')&&$('underlayA').checked) || ($('underlayD')&&$('underlayD').checked) || ($('underlayS')&&$('underlayS').checked) || ($('underlayR')&&$('underlayR').checked) );
+  const showContourLeft = showContour && anyModelLeg;
+  const showContourRight = showContour && anyUnderlayLeg;
   const contourTickCol = ($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00';
   const contourTickColRight = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
   // Contour ticks — left stubs (meter left edge) and right stubs (meter right edge)
@@ -621,7 +621,7 @@ function render(){
     floorLine.setAttribute('x2', markerEndX);
     floorLine.setAttribute('y2', floorY);
     floorLine.style.stroke = contourTickCol;
-    floorLine.style.display = showContour ? '' : 'none';
+    floorLine.style.display = showContourLeft ? '' : 'none';
   }
   const floorRiser = $('floorRiser');
   if(floorRiser){
@@ -629,7 +629,7 @@ function render(){
     floorRiser.setAttribute('x1', rx); floorRiser.setAttribute('y1', floorY);
     floorRiser.setAttribute('x2', rx); floorRiser.setAttribute('y2', floorY + riserLen);
     floorRiser.style.stroke = contourTickCol;
-    floorRiser.style.display = showContour ? '' : 'none';
+    floorRiser.style.display = showContourLeft ? '' : 'none';
   }
   const floorLineR = $('floorLineRight');
   if(floorLineR){
@@ -638,7 +638,7 @@ function render(){
     floorLineR.setAttribute('x2', markerEndX + METER_W + sustainTickLen);
     floorLineR.setAttribute('y2', floorY);
     floorLineR.style.stroke = contourTickColRight;
-    floorLineR.style.display = showContour ? '' : 'none';
+    floorLineR.style.display = showContourRight ? '' : 'none';
   }
   const floorRiserR = $('floorRiserRight');
   if(floorRiserR){
@@ -646,7 +646,7 @@ function render(){
     floorRiserR.setAttribute('x1', rx); floorRiserR.setAttribute('y1', floorY);
     floorRiserR.setAttribute('x2', rx); floorRiserR.setAttribute('y2', floorY + riserLen);
     floorRiserR.style.stroke = contourTickColRight;
-    floorRiserR.style.display = showContour ? '' : 'none';
+    floorRiserR.style.display = showContourRight ? '' : 'none';
   }
   if(amountLine){
     amountLine.setAttribute('x1', markerEndX - sustainTickLen);
@@ -654,7 +654,7 @@ function render(){
     amountLine.setAttribute('x2', markerEndX);
     amountLine.setAttribute('y2', amountY);
     amountLine.style.stroke = contourTickCol;
-    amountLine.style.display = showContour ? '' : 'none';
+    amountLine.style.display = showContourLeft ? '' : 'none';
   }
   const amountRiser = $('amountRiser');
   if(amountRiser){
@@ -662,7 +662,7 @@ function render(){
     amountRiser.setAttribute('x1', rx); amountRiser.setAttribute('y1', amountY);
     amountRiser.setAttribute('x2', rx); amountRiser.setAttribute('y2', amountY - riserLen);
     amountRiser.style.stroke = contourTickCol;
-    amountRiser.style.display = showContour ? '' : 'none';
+    amountRiser.style.display = showContourLeft ? '' : 'none';
   }
   const amountLineR = $('amountLineRight');
   const textbookAmountY = yFor(e.floor + (1 - e.floor) * e.scale);
@@ -672,7 +672,7 @@ function render(){
     amountLineR.setAttribute('x2', markerEndX + METER_W + sustainTickLen);
     amountLineR.setAttribute('y2', textbookAmountY);
     amountLineR.style.stroke = contourTickColRight;
-    amountLineR.style.display = showContour ? '' : 'none';
+    amountLineR.style.display = showContourRight ? '' : 'none';
   }
   const amountRiserR = $('amountRiserRight');
   if(amountRiserR){
@@ -680,7 +680,7 @@ function render(){
     amountRiserR.setAttribute('x1', rx); amountRiserR.setAttribute('y1', textbookAmountY);
     amountRiserR.setAttribute('x2', rx); amountRiserR.setAttribute('y2', textbookAmountY - riserLen);
     amountRiserR.style.stroke = contourTickColRight;
-    amountRiserR.style.display = showContour ? '' : 'none';
+    amountRiserR.style.display = showContourRight ? '' : 'none';
   }
   // Show Contour checkbox: only meaningful in filter mode
   const showContourLabel = $('showContour') && $('showContour').closest('label');
