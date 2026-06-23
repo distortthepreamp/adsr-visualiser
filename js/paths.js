@@ -508,7 +508,7 @@ function render(){
   $('sustainMarker').setAttribute('y2', drawPS.y);
   $('sustainMarker').style.stroke = ($('frequencyMode') && $('frequencyMode').checked) ? (($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00') : (($('loudnessDecayColor') && $('loudnessDecayColor').value) || '#ff0000');
   const showEffLines = !!($('showNewEffectiveLines') && $('showNewEffectiveLines').checked);
-  const showModelDSusTick = legS && showEffLines;
+  const showModelDSusTick = (legD || legR || legS) && !showGateTime && showEffLines;
   $('sustainMarker').style.display = showModelDSusTick ? '' : 'none';
   { const lbl=$('sustainMarkerLabel'); if(lbl){
     lbl.setAttribute('x', markerEndX - sustainTickLen - sustainLabelGap);
@@ -529,7 +529,10 @@ function render(){
   const statedSustainLineEl = $('statedSustainLine');
   if(statedSustainLineEl){
     const showStatedLines = !!($('showNewStatedLines') && $('showNewStatedLines').checked);
-    const tbSusVis = !!($('underlayS') && $('underlayS').checked) && showStatedLines;
+    const ulD = !!($('underlayD') && $('underlayD').checked);
+    const ulR = !!($('underlayR') && $('underlayR').checked);
+    const ulS = !!($('underlayS') && $('underlayS').checked);
+    const tbSusVis = (ulD || ulR || ulS) && !showGateTime && showStatedLines;
     const statedY = yFor(e.floor + state.s * (1 - e.floor) * e.scale);
     _statedY = statedY;
     statedSustainX = pts.pEnd.x + graph.w * state.tbSustainGap;
