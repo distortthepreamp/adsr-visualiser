@@ -2,7 +2,8 @@
 // No DOM access. All functions are top-level globals, called by paths.js and others.
 
 // ---- Mimic Model D sustain cap ----
-const MIMIC_SUSTAIN_CAP = 0.8;
+const MIMIC_SUSTAIN_CAP = 0.83;  // measured on Phil's Behringer Model D, sustain at max (both contours,
+                                  // 3sf → 83%): loudness 4.52/5.48V = 0.825; filter 3.83/4.62V = 0.829.
 const MIMIC_SUSTAIN_INV = 1 / MIMIC_SUSTAIN_CAP;  // = 1.25, for the stated-sustain expansion
 
 // ---- displayTimeWidth curve coefficients ----
