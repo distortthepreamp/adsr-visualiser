@@ -312,7 +312,7 @@ function render(){
         tapReleaseOrangeEl.setAttribute('d', rcPolyline(pts.p1.x + orangeOffset, pts.p1.y, rEnd.x + orangeOffset, rEnd.y, false, 50, 3));
         tapReleaseOrangeEl.setAttribute('clip-path', 'url(#gateReleaseClip)');
         tapReleaseOrangeEl.style.stroke = relColor;
-        tapReleaseOrangeEl.style.opacity = gateRCVisible ? '' : '0';
+        tapReleaseOrangeEl.style.opacity = (gateRCVisible && legR) ? '' : '0';
       }
     } else {
       const tapReleaseOrangeEl = $('tapReleaseOrange');
