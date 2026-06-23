@@ -297,12 +297,14 @@ function tap(ms){
     const effVis = effLegVisible(pos.phase);
     $('dot').style.opacity = effVis ? '1' : '0';
     if(!effVis) $('dot').removeAttribute('filter');
+    $('meterFill').style.opacity = effVis ? '' : '0';
 
     // Stated blob
     setDotStated(spos, true);
     const sVis = statedLegVisible(spos.phase);
     $('dotStated').style.opacity = sVis ? '1' : '0';
     if(!sVis) $('dotStated').removeAttribute('filter');
+    $('meterFillStated').style.opacity = sVis ? '' : '0';
 
     // Release completion
     if(pos.done && spos.done){
@@ -602,12 +604,14 @@ function hold(){
     const effVis = effLegVisible(pos.phase);
     $('dot').style.opacity = effVis ? '1' : '0';
     if(!effVis) $('dot').removeAttribute('filter');
+    $('meterFill').style.opacity = effVis ? '' : '0';
 
     // Stated blob
     setDotStated(spos, true);
     const sVis = statedLegVisible(spos.phase);
     $('dotStated').style.opacity = sVis ? '1' : '0';
     if(!sVis) $('dotStated').removeAttribute('filter');
+    $('meterFillStated').style.opacity = sVis ? '' : '0';
 
     // Glow at sustain (both blobs parked, before release)
     if(releaseT === undefined && pos.phase === 'sustain' && spos.phase === 'sustain'){

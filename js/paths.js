@@ -693,6 +693,9 @@ function render(){
     const restingY = freqMode ? yFor(e.floor) : graph.y0;
     setMeterLevel(restingY);
     setMeterLevelStated(restingY);
+    // Reset fill opacity so resting fills are visible (may have been hidden by leg-off during play)
+    if($('meterFill')) $('meterFill').style.opacity = '';
+    if($('meterFillStated')) $('meterFillStated').style.opacity = '';
   }
 
   syncControls();
