@@ -86,8 +86,10 @@
       <line id="newStatedReleaseDrop" class="marker-line" stroke="cyan" style="display:none"/>
       <text id="newStatedReleaseTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <line id="gateTimeLine" class="marker-line" style="display:none;stroke:var(--gateColor)"/>
-      <line id="gateEffectiveHoriz" class="marker-line" style="display:none;stroke:var(--gateColor)"/>
-      <line id="gateStatedHoriz" class="marker-line" style="display:none;stroke:var(--gateColor)"/>
+      <line id="gateEffectiveHoriz" class="marker-line" style="display:none;stroke:var(--gateColor);stroke-dasharray:none" marker-end="url(#sustainArrowRight)"/>
+      <line id="gateStatedHoriz" class="marker-line" style="display:none;stroke:var(--gateColor);stroke-dasharray:none" marker-start="url(#sustainArrowLeft)"/>
+      <text id="gateEffLabel" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
+      <text id="gateStatedLabel" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <line id="gateStatedRelease" stroke="white" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;display:none"/>
       <line id="gateStatedReleaseDrop" class="marker-line" stroke="cyan" style="display:none"/>
       <text id="gateStatedReleaseTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>

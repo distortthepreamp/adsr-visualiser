@@ -430,24 +430,62 @@ function render(){
         gateTimeLabelEl.textContent = 'Gate = ' + gateTapMs + 'ms';
         gateTimeLabelEl.style.display = '';
       }
-      // Horizontal from effective crossing to the meter
+      // Gate meter ticks — short horizontal arrows beside the meter at the gate-close level.
+      // markerEndX / sustainTickLen are defined later, so compute locally from globals.
+      const _gateLabelSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--labelSize')) || 17;
+      const gateTickLen = Math.round(_gateLabelSize * 1.5);
+      const _gateLabelGap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sustainLabelGap')) || 6;
+      const _freqMode = !!($('frequencyMode') && $('frequencyMode').checked);
+      const gateEffCol = _freqMode ? (($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00') : (($('loudnessDecayColor') && $('loudnessDecayColor').value) || '#ff0000');
+      const gateStatedCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
+      const gateEffLblEl = $('gateEffLabel');
+      const gateStatedLblEl = $('gateStatedLabel');
       if(gateEffHorizEl){
         if(effVisible){
-          gateEffHorizEl.setAttribute('x1', gateCloseX); gateEffHorizEl.setAttribute('y1', gateCloseY);
-          gateEffHorizEl.setAttribute('x2', METER_X);    gateEffHorizEl.setAttribute('y2', gateCloseY);
+          gateEffHorizEl.setAttribute('x1', METER_X - gateTickLen); gateEffHorizEl.setAttribute('y1', gateCloseY);
+          gateEffHorizEl.setAttribute('x2', METER_X);               gateEffHorizEl.setAttribute('y2', gateCloseY);
+          gateEffHorizEl.style.stroke = gateEffCol;
           gateEffHorizEl.style.display = '';
         } else {
           gateEffHorizEl.style.display = 'none';
         }
       }
-      // Horizontal from stated crossing to the meter
+      if(gateEffLblEl){
+        if(effVisible){
+          const pct = Math.round(((graph.y0 - gateCloseY) / graph.h) * 100);
+          gateEffLblEl.setAttribute('x', METER_X - gateTickLen - _gateLabelGap);
+          gateEffLblEl.setAttribute('y', gateCloseY);
+          gateEffLblEl.setAttribute('text-anchor', 'end');
+          gateEffLblEl.setAttribute('dominant-baseline', 'middle');
+          gateEffLblEl.setAttribute('fill', gateEffCol);
+          gateEffLblEl.textContent = pct + '%';
+          gateEffLblEl.style.display = '';
+        } else {
+          gateEffLblEl.style.display = 'none';
+        }
+      }
       if(gateStatedHorizEl){
         if(statedVisible){
-          gateStatedHorizEl.setAttribute('x1', gateCloseX);     gateStatedHorizEl.setAttribute('y1', gateStatedYRaw);
-          gateStatedHorizEl.setAttribute('x2', METER_X);        gateStatedHorizEl.setAttribute('y2', gateStatedYRaw);
+          gateStatedHorizEl.setAttribute('x1', METER_X + METER_W);                gateStatedHorizEl.setAttribute('y1', gateStatedYRaw);
+          gateStatedHorizEl.setAttribute('x2', METER_X + METER_W + gateTickLen);  gateStatedHorizEl.setAttribute('y2', gateStatedYRaw);
+          gateStatedHorizEl.style.stroke = gateStatedCol;
           gateStatedHorizEl.style.display = '';
         } else {
           gateStatedHorizEl.style.display = 'none';
+        }
+      }
+      if(gateStatedLblEl){
+        if(statedVisible){
+          const pct = Math.round(((graph.y0 - gateStatedYRaw) / graph.h) * 100);
+          gateStatedLblEl.setAttribute('x', METER_X + METER_W + gateTickLen + _gateLabelGap);
+          gateStatedLblEl.setAttribute('y', gateStatedYRaw);
+          gateStatedLblEl.setAttribute('text-anchor', 'start');
+          gateStatedLblEl.setAttribute('dominant-baseline', 'middle');
+          gateStatedLblEl.setAttribute('fill', gateStatedCol);
+          gateStatedLblEl.textContent = pct + '%';
+          gateStatedLblEl.style.display = '';
+        } else {
+          gateStatedLblEl.style.display = 'none';
         }
       }
     } else {
@@ -455,6 +493,8 @@ function render(){
       if(gateTimeLabelEl) gateTimeLabelEl.style.display = 'none';
       if(gateEffHorizEl) gateEffHorizEl.style.display = 'none';
       if(gateStatedHorizEl) gateStatedHorizEl.style.display = 'none';
+      const _gEL = $('gateEffLabel'); if(_gEL) _gEL.style.display = 'none';
+      const _gSL = $('gateStatedLabel'); if(_gSL) _gSL.style.display = 'none';
     }
     // Clip at Gate: apply/remove gateEnvClip on individual curve elements (not the group).
     // tapReleaseOrange is intentionally excluded — it renders the release from the gate point.
