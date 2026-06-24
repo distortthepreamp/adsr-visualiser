@@ -81,10 +81,6 @@ function computePoints(){
   let aw, dwFull;
   aw     = timeToPixels(e.aT);
   dwFull = timeToPixels(e.dT);
-  // Clip: decay end cannot exceed graph right edge
-  const maxX = graph.x0 + graph.w;
-  if(graph.x0 + aw > maxX) aw = graph.w;
-  if(graph.x0 + aw + dwFull > maxX) dwFull = maxX - (graph.x0 + aw);
   const x0=graph.x0;
 
   // Experimental sustain-marker model:
