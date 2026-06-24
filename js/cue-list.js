@@ -102,7 +102,7 @@ function parseOneCommand(frag) {
   if (setFilterModeMatch) return { type: 'set', param: 'filter-mode', value: setFilterModeMatch[1].toLowerCase() === 'on' };
 
   // set <checkbox-param> on/off — single regex for boolean params
-  const setBoolMatch = frag.match(/^set\s+(filter-decay|hp-mode|mimic-sustain|analogue|linear-time|show-clipped|show-contour|show-gate-time|show-effective-lines|show-stated-lines|slomo)\s+(on|off)$/i);
+  const setBoolMatch = frag.match(/^set\s+(filter-decay|hp-mode|mimic-sustain|analogue|linear-time|show-clipped|show-contour|show-gate-time|show-effective-lines|show-stated-lines|slomo|persist)\s+(on|off)$/i);
   if (setBoolMatch) return { type: 'set', param: setBoolMatch[1].toLowerCase(), value: setBoolMatch[2].toLowerCase() === 'on' };
 
   // set zoom-x3|x6|x12|x24|x48 on/off — explicit zoom levels
@@ -136,6 +136,10 @@ function parseOneCommand(frag) {
   // set gate NNNms
   const setGateMatch = frag.match(/^set\s+gate\s+(\d+(?:\.\d+)?)ms$/i);
   if (setGateMatch) return { type: 'set', param: 'gate', value: parseFloat(setGateMatch[1]) };
+
+  // set persist-time NNNms
+  const setPersistTimeMatch = frag.match(/^set\s+persist-time\s+(\d+(?:\.\d+)?)ms$/i);
+  if (setPersistTimeMatch) return { type: 'set', param: 'persist-time', value: parseFloat(setPersistTimeMatch[1]) };
 
   // transition attack NNNms HH:MM:SS:FF
   const transAttackMatch = frag.match(/^transition\s+attack\s+(\d+(?:\.\d+)?)ms\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
@@ -260,6 +264,10 @@ function executeEvent(event) {
       case 'show-effective-lines': setCheckbox('showNewEffectiveLines'); break;
       case 'show-stated-lines': setCheckbox('showNewStatedLines'); break;
       case 'slomo': setCheckbox('sloMo'); break;
+      case 'persist': setCheckbox('persistEnabled'); break;
+      case 'persist-time':
+        { const inp=document.getElementById('persistTime'); if(inp) inp.value=event.value; }
+        break;
       // Explicit zoom levels
       case 'zoom-x3':  setCheckbox('timelineZoom3x'); break;
       case 'zoom-x6':  setCheckbox('timelineZoom6x'); break;
@@ -552,6 +560,8 @@ function generateStateSnapshot() {
   lines.push(`set show-effective-lines ${$('showNewEffectiveLines').checked ? 'on' : 'off'}`);
   lines.push(`set show-stated-lines ${$('showNewStatedLines').checked ? 'on' : 'off'}`);
   lines.push(`set slomo ${$('sloMo').checked ? 'on' : 'off'}`);
+  lines.push(`set persist ${$('persistEnabled').checked ? 'on' : 'off'}`);
+  lines.push(`set persist-time ${Number($('persistTime') ? $('persistTime').value : 2000)}ms`);
   // Zoom levels
   [['timelineZoom3x','zoom-x3'],['timelineZoom6x','zoom-x6'],['timelineZoom12x','zoom-x12'],['timelineZoom24x','zoom-x24'],['timelineZoom48x','zoom-x48']].forEach(([id,cmd]) => {
     if($(id)) lines.push(`set ${cmd} ${$(id).checked ? 'on' : 'off'}`);
