@@ -80,7 +80,8 @@ function buildConfigSnapshot(){
     presetDirtyState: window.presetDirtyState || 'none',
     kioskOpen: kioskOpen,
     showCues: $('showCues') ? $('showCues').checked : false,
-    timeLabelGutter: Number($('timeLabelGutter') ? $('timeLabelGutter').value : 0)
+    timeLabelGutter: Number($('timeLabelGutter') ? $('timeLabelGutter').value : 0),
+    persistTime: Number($('persistTime') ? $('persistTime').value : 2000)
   };
 }
 
@@ -165,6 +166,7 @@ function loadConfigObject(cfg){
   if($('kioskKnobGlowRadius') && cfg.kioskKnobGlowRadius !== undefined){ $('kioskKnobGlowRadius').value = cfg.kioskKnobGlowRadius; }
   if($('kioskInactiveOpacity') && cfg.kioskInactiveOpacity !== undefined){ $('kioskInactiveOpacity').value = cfg.kioskInactiveOpacity; }
   if($('timeLabelGutter') && cfg.timeLabelGutter !== undefined){ $('timeLabelGutter').value = cfg.timeLabelGutter; }
+  if($('persistTime') && cfg.persistTime !== undefined){ $('persistTime').value = cfg.persistTime; }
 
   // Preset highlight
   if(window.restorePresetHighlight){

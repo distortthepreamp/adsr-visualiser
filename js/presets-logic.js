@@ -62,6 +62,7 @@ function initPresetsLogic(){
     if(preset.timelineZoom48x !== undefined) $('timelineZoom48x').checked = preset.timelineZoom48x;
     if(preset.showNewEffectiveLines !== undefined) $('showNewEffectiveLines').checked = preset.showNewEffectiveLines;
     if(preset.showNewStatedLines !== undefined) $('showNewStatedLines').checked = preset.showNewStatedLines;
+    if(preset.persistEnabled !== undefined) $('persistEnabled').checked = preset.persistEnabled;
     // Set target knob values
     state.target.a = positionFromMs(preset.a);
     state.target.d = positionFromMs(preset.d);
@@ -145,6 +146,7 @@ function initPresetsLogic(){
     preset.timelineZoom48x = $('timelineZoom48x').checked;
     preset.showNewEffectiveLines = $('showNewEffectiveLines').checked;
     preset.showNewStatedLines = $('showNewStatedLines').checked;
+    preset.persistEnabled = $('persistEnabled').checked;
     savePresetsToStorage();
     // Flash green confirmation, then restore highlight state
     const btn = container.querySelectorAll('button')[idx];
