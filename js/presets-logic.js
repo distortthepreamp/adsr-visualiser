@@ -54,11 +54,7 @@ function initPresetsLogic(){
     if(preset.underlayS !== undefined) $('underlayS').checked = preset.underlayS;
     if(preset.underlayR !== undefined) $('underlayR').checked = preset.underlayR;
     if(preset.showGateTime !== undefined) $('showGateTime').checked = preset.showGateTime;
-    if(preset.timelineZoom3x !== undefined) $('timelineZoom3x').checked = preset.timelineZoom3x;
-    if(preset.timelineZoom6x !== undefined) $('timelineZoom6x').checked = preset.timelineZoom6x;
-    if(preset.timelineZoom12x !== undefined) $('timelineZoom12x').checked = preset.timelineZoom12x;
-    if(preset.timelineZoom24x !== undefined) $('timelineZoom24x').checked = preset.timelineZoom24x;
-    if(preset.timelineZoom48x !== undefined) $('timelineZoom48x').checked = preset.timelineZoom48x;
+    if(preset.zoomFactor !== undefined){ state.zoomFactor = preset.zoomFactor; state.target.zoomFactor = preset.zoomFactor; syncZoomReadout(); }
     if(preset.showNewEffectiveLines !== undefined) $('showNewEffectiveLines').checked = preset.showNewEffectiveLines;
     if(preset.showNewStatedLines !== undefined) $('showNewStatedLines').checked = preset.showNewStatedLines;
     if(preset.persistEnabled !== undefined) $('persistEnabled').checked = preset.persistEnabled;
@@ -137,11 +133,7 @@ function initPresetsLogic(){
     preset.underlayS = $('underlayS').checked;
     preset.underlayR = $('underlayR').checked;
     preset.showGateTime = $('showGateTime').checked;
-    preset.timelineZoom3x = $('timelineZoom3x').checked;
-    preset.timelineZoom6x = $('timelineZoom6x').checked;
-    preset.timelineZoom12x = $('timelineZoom12x').checked;
-    preset.timelineZoom24x = $('timelineZoom24x').checked;
-    preset.timelineZoom48x = $('timelineZoom48x').checked;
+    preset.zoomFactor = state.zoomFactor;
     preset.showNewEffectiveLines = $('showNewEffectiveLines').checked;
     preset.showNewStatedLines = $('showNewStatedLines').checked;
     preset.persistEnabled = $('persistEnabled').checked;

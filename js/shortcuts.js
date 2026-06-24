@@ -65,7 +65,6 @@ const tag = document.activeElement ? document.activeElement.tagName : '';
     } else if(e.key === 'l' || e.key === 'L'){ toggleMode();
     } else if(e.key === 'a' || e.key === 'A'){ toggleCheckbox('audioEnabled');
     } else if(e.key === 'd' || e.key === 'D'){ toggleCheckbox('loudDecay');
-    } else if(e.key === 'z' || e.key === 'Z'){ cycleZoom();
     } else if(e.key === '.'){ toggleCheckbox('showContour');
     } else if(e.key === 'f' || e.key === 'F'){ toggleCheckbox('frequencyMode');
     } else if(e.key === 'm' || e.key === 'M'){ toggleCheckbox('hpMode');

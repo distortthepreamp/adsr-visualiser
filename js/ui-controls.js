@@ -34,6 +34,7 @@ function syncControls(){
   if($('gateTarget')) $('gateTarget').textContent=mode==='animate' ? 'Target: '+Math.round(gateMsFromPosition(state.target.gate))+'ms' : '';
   $('modeHint').textContent = mode==='live' ? 'Live Mode: Knobs Update The Graph Immediately.' : 'Animate Mode: Knobs Set Targets. Press Transition To Morph The Graph.';
   patchSustainReadouts();
+  syncZoomReadout();
 
   // Quick-set button highlight: exact match = solid white; closest = dim; others = default
   (function(){
@@ -187,26 +188,20 @@ function syncHpModeEnabled(){
   const hpLabel = $('hpMode') && $('hpMode').closest('label');
   if(hpLabel){ hpLabel.style.opacity = freqOn ? '' : UI_DISABLED_OPACITY; hpLabel.style.pointerEvents = freqOn ? '' : 'none'; }
 }
-// ---- Zoom levels — mutually-exclusive checkboxes drive state.zoomFactor ----
-const ZOOM_FACTORS = [3, 6, 12, 24, 48];
-const ZOOM_CHECKBOX_IDS = ZOOM_FACTORS.map(f => `timelineZoom${f}x`);
-const ZOOM_LABEL_IDS = ZOOM_FACTORS.map(f => `timelineZoom${f}xLabel`);
-function currentZoomFactor(){
-  for(let i = ZOOM_FACTORS.length - 1; i >= 0; i--){
-    if($(ZOOM_CHECKBOX_IDS[i]) && $(ZOOM_CHECKBOX_IDS[i]).checked) return ZOOM_FACTORS[i];
-  }
-  return 1;
+// ---- Zoom — single numeric input drives state.zoomFactor ----
+function syncZoomReadout(){
+  const inp = $('zoomFactorInput');
+  const rd = $('zoomSecondsReadout');
+  if(inp && document.activeElement !== inp) inp.value = parseFloat(state.zoomFactor.toPrecision(3));
+  if(rd) rd.textContent = parseFloat((8 / Math.max(0.1, state.zoomFactor)).toPrecision(2)) + 's';
 }
-function setZoomLevel(factor){
-  ZOOM_FACTORS.forEach((f, i) => { if($(ZOOM_CHECKBOX_IDS[i])) $(ZOOM_CHECKBOX_IDS[i]).checked = factor === f; });
-  state.target.zoomFactor = factor;
+function commitZoom(){
+  const inp = $('zoomFactorInput'); if(!inp) return;
+  const v = Math.max(0.1, Math.min(48, parseFloat(inp.value) || 3));
+  inp.value = v;
+  state.target.zoomFactor = v;
   transition(currentTransitionSec);
-}
-// Z shortcut cycles none -> x3 -> x6 -> x12 -> x24 -> x48 -> none
-function cycleZoom(){
-  const f = currentZoomFactor();
-  const idx = ZOOM_FACTORS.indexOf(f); // -1 when no zoom
-  setZoomLevel(idx === ZOOM_FACTORS.length - 1 ? 1 : ZOOM_FACTORS[idx + 1]);
+  syncZoomReadout();
 }
 function syncAnalogueCurve(){
   const on = $('analogueCurve') && $('analogueCurve').checked;
@@ -338,11 +333,11 @@ function initUIControls(){
   $('loudDecay').addEventListener('change', () => { if(window.kioskNotifySwitch) kioskNotifySwitch($('frequencyMode').checked ? 'filter-decay' : 'loud-decay'); });
   $('hpMode').addEventListener('change', () => { if(window.kioskNotifySwitch) kioskNotifySwitch('hp-mode'); });
 
-  // Linear time / zoom
-  ZOOM_FACTORS.forEach((f, i) => {
-    const id = ZOOM_CHECKBOX_IDS[i];
-    $(id) && $(id).addEventListener('change', () => { setZoomLevel($(id).checked ? f : 1); });
-  });
+  // Zoom input
+  if($('zoomFactorInput')){
+    $('zoomFactorInput').addEventListener('change', commitZoom);
+    $('zoomFactorInput').addEventListener('keydown', e => { if(e.key === 'Enter') commitZoom(); });
+  }
 
   // Analogue curve
   $('analogueCurve').addEventListener('change', () => { syncAnalogueCurve(); render(); if(state.currentPhase === 'idle') clearBlobAndMarker(); });

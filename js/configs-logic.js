@@ -28,11 +28,7 @@ function buildConfigSnapshot(){
     kioskInactiveOpacity: Number($('kioskInactiveOpacity') ? $('kioskInactiveOpacity').value : 70),
     meterScanlinesVisible: $('meterScanlinesVisible') ? $('meterScanlinesVisible').checked : true,
     blobGlowEnabled: $('blobGlowEnabled') ? $('blobGlowEnabled').checked : true,
-    timelineZoom3x: $('timelineZoom3x') ? $('timelineZoom3x').checked : false,
-    timelineZoom6x: $('timelineZoom6x') ? $('timelineZoom6x').checked : false,
-    timelineZoom12x: $('timelineZoom12x') ? $('timelineZoom12x').checked : false,
-    timelineZoom24x: $('timelineZoom24x') ? $('timelineZoom24x').checked : false,
-    timelineZoom48x: $('timelineZoom48x') ? $('timelineZoom48x').checked : false,
+    zoomFactor: state.zoomFactor,
     blobGlowRadius: Number($('blobGlowRadius') ? $('blobGlowRadius').value : 8),
     curveAmount: Number($('curveAmount').value),
     audioEnabled: $('audioEnabled').checked,
@@ -91,15 +87,12 @@ function loadConfigObject(cfg){
   state.target.tbSustainGap = SUSTAIN_GAP_MAX;
 
   // Checkboxes
-  ['loudDecay','showContour','showNewEffectiveLines','showNewStatedLines','modelA','modelD','modelS','modelR','showGateTime','clipAtGate','showPeakDischarge','frequencyMode','hpMode','keyboardControl','showClipped','analogueCurve','linkRToD','dottedMarkers','meterGlow','meterScanlinesVisible','blobGlowEnabled','timelineZoom3x','timelineZoom6x','timelineZoom12x','timelineZoom24x','timelineZoom48x','kioskKnobGlow'].forEach(id => {
+  ['loudDecay','showContour','showNewEffectiveLines','showNewStatedLines','modelA','modelD','modelS','modelR','showGateTime','clipAtGate','showPeakDischarge','frequencyMode','hpMode','keyboardControl','showClipped','analogueCurve','linkRToD','dottedMarkers','meterGlow','meterScanlinesVisible','blobGlowEnabled','kioskKnobGlow'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
-  const restoredZoom = ($('timelineZoom48x') && $('timelineZoom48x').checked) ? 48
-    : ($('timelineZoom24x') && $('timelineZoom24x').checked) ? 24
-    : ($('timelineZoom12x') && $('timelineZoom12x').checked) ? 12
-    : ($('timelineZoom6x') && $('timelineZoom6x').checked) ? 6
-    : ($('timelineZoom3x') && $('timelineZoom3x').checked) ? 3 : 1;
+  const restoredZoom = cfg.zoomFactor !== undefined ? cfg.zoomFactor : 3;
   state.zoomFactor = restoredZoom; state.target.zoomFactor = restoredZoom;
+  syncZoomReadout();
   syncHpModeEnabled();
   syncAnalogueCurve();
 

@@ -261,11 +261,7 @@
           <div class="row"><label><input id="showContour" type="checkbox" checked> Show Contour Top And Bottom (.)</label></div>
           <div class="row"><label><input id="frequencyMode" type="checkbox"> Filter Mode (F)</label></div>
           <div class="row"><label><input id="hpMode" type="checkbox"> LP/HP Mode (M)</label></div>
-          <div class="row"><label id="timelineZoom3xLabel"><input id="timelineZoom3x" type="checkbox"> Zoom x3 (2s)</label></div>
-          <div class="row"><label id="timelineZoom6xLabel"><input type="checkbox" id="timelineZoom6x"> Zoom x6 (1s)</label></div>
-          <div class="row"><label id="timelineZoom12xLabel"><input type="checkbox" id="timelineZoom12x"> Zoom x12 (500ms)</label></div>
-          <div class="row"><label id="timelineZoom24xLabel"><input type="checkbox" id="timelineZoom24x"> Zoom x24 (250ms)</label></div>
-          <div class="row"><label id="timelineZoom48xLabel"><input type="checkbox" id="timelineZoom48x"> Zoom x48 (125ms)</label></div>
+          <div class="row" style="gap:6px;align-items:center"><label>Zoom <input id="zoomFactorInput" type="number" min="0.1" max="48" step="0.1" value="3" style="width:60px"></label><span id="zoomSecondsReadout" style="opacity:.7;font-size:12px">2.7s</span></div>
           <div class="row" style="position:relative;">
             <button id="expertToggle" style="padding:4px 7px;min-height:unset;line-height:1.1;border-radius:6px;">Expert</button>
             <div id="expertPopup" style="display:none;position:absolute;bottom:calc(100% + 6px);left:0;background:#1c1c1c;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:8px;z-index:200;min-width:260px;">
@@ -390,7 +386,6 @@
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">L</td><td style="padding:3px 0;font-size:13px;font-weight:700">Live/Animate</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">A</td><td style="padding:3px 0;font-size:13px;font-weight:700">Audio</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">D</td><td style="padding:3px 0;font-size:13px;font-weight:700">Loud/Filter Decay</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">Z</td><td style="padding:3px 0;font-size:13px;font-weight:700">Timeline Zoom x3</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">.</td><td style="padding:3px 0;font-size:13px;font-weight:700">Show Contour Top And Bottom</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">F</td><td style="padding:3px 0;font-size:13px;font-weight:700">Filter Mode</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">M</td><td style="padding:3px 0;font-size:13px;font-weight:700">LP/HP Mode</td></tr>
@@ -486,12 +481,9 @@ set actual release on|off
 set textbook show-all | hide-all
 set actual   show-all | hide-all</pre>
 
-        <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:6px">Zoom (on|off — mutually exclusive)</div>
-        <pre style="margin:0 0 14px;font-size:12px;line-height:1.5;color:#ccc">set zoom-x3 on|off
-set zoom-x6 on|off
-set zoom-x12 on|off
-set zoom-x24 on|off
-set zoom-x48 on|off</pre>
+        <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:6px">Zoom</div>
+        <pre style="margin:0 0 14px;font-size:12px;line-height:1.5;color:#ccc">set zoom N
+transition zoom N HH:MM:SS:FF</pre>
 
         <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:6px">Playback</div>
         <pre style="margin:0 0 14px;font-size:12px;line-height:1.5;color:#ccc">play-tap NNNms [Note]
@@ -543,7 +535,7 @@ const curve = [
   {p:0.00,t:0}, {p:0.08,t:0.010}, {p:0.25,t:0.200}, {p:0.42,t:0.600},
   {p:0.58,t:1.000}, {p:0.75,t:5.000}, {p:0.90,t:10.000}, {p:1.00,t:12.000}
 ];
-const state = { a:.08, d:.25, s:.5, r:.5, floor:0, scale:1, gate:gatePositionFromMs(200), tbSustainGap:SUSTAIN_GAP_MAX, zoomFactor:1, target:{a:.08,d:.25,s:.5,r:.5,floor:0,scale:1,gate:gatePositionFromMs(200),tbSustainGap:SUSTAIN_GAP_MAX,zoomFactor:1}, anim:null, dotAnim:null, held:false, dotLevel:0, dotY:0, currentPhase:'idle', releaseFromDecay:false };
+const state = { a:.08, d:.25, s:.5, r:.5, floor:0, scale:1, gate:gatePositionFromMs(200), tbSustainGap:SUSTAIN_GAP_MAX, zoomFactor:3, target:{a:.08,d:.25,s:.5,r:.5,floor:0,scale:1,gate:gatePositionFromMs(200),tbSustainGap:SUSTAIN_GAP_MAX,zoomFactor:3}, anim:null, dotAnim:null, held:false, dotLevel:0, dotY:0, currentPhase:'idle', releaseFromDecay:false };
 let GRAPH_LEFT = 10;
 const graph = { x0:GRAPH_LEFT, y0:445, w:905, h:415 };
 let METER_X = graph.x0 + graph.w + METER_GAP;  // 1145

@@ -105,9 +105,9 @@ function parseOneCommand(frag) {
   const setBoolMatch = frag.match(/^set\s+(filter-decay|hp-mode|mimic-sustain|analogue|show-clipped|show-contour|show-gate-time|show-effective-lines|show-stated-lines|slomo|persist)\s+(on|off)$/i);
   if (setBoolMatch) return { type: 'set', param: setBoolMatch[1].toLowerCase(), value: setBoolMatch[2].toLowerCase() === 'on' };
 
-  // set zoom-x3|x6|x12|x24|x48 on/off — explicit zoom levels
-  const setZoomMatch = frag.match(/^set\s+(zoom-x3|zoom-x6|zoom-x12|zoom-x24|zoom-x48)\s+(on|off)$/i);
-  if (setZoomMatch) return { type: 'set', param: setZoomMatch[1].toLowerCase(), value: setZoomMatch[2].toLowerCase() === 'on' };
+  // set zoom N — numeric zoom factor
+  const setZoomMatch = frag.match(/^set\s+zoom\s+(\d+(?:\.\d+)?)$/i);
+  if (setZoomMatch) return { type: 'set', param: 'zoom', value: parseFloat(setZoomMatch[1]) };
 
   // set textbook attack|decay|sustain|release on/off — underlay per-leg visibility
   const setTextbookLegMatch = frag.match(/^set\s+textbook\s+(attack|decay|sustain|release)\s+(on|off)$/i);
@@ -168,6 +168,10 @@ function parseOneCommand(frag) {
   // transition gate NNNms HH:MM:SS:FF
   const transGateMatch = frag.match(/^transition\s+gate\s+(\d+(?:\.\d+)?)ms\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
   if (transGateMatch) return { type: 'transition', param: 'gate', value: parseFloat(transGateMatch[1]), durationMs: tcToMs(transGateMatch[2]) };
+
+  // transition zoom N HH:MM:SS:FF
+  const transZoomMatch = frag.match(/^transition\s+zoom\s+(\d+(?:\.\d+)?)\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
+  if (transZoomMatch) return { type: 'transition', param: 'zoom', value: parseFloat(transZoomMatch[1]), durationMs: tcToMs(transZoomMatch[2]) };
 
   // play-tap NNNms [note]
   const playTapMatch = frag.match(/^play-tap\s+(\d+(?:\.\d+)?)ms(?:\s+([A-Ga-g]\d))?$/i);
@@ -267,12 +271,9 @@ function executeEvent(event) {
       case 'persist-time':
         { const inp=document.getElementById('persistTime'); if(inp) inp.value=event.value; }
         break;
-      // Explicit zoom levels
-      case 'zoom-x3':  setCheckbox('timelineZoom3x'); break;
-      case 'zoom-x6':  setCheckbox('timelineZoom6x'); break;
-      case 'zoom-x12': setCheckbox('timelineZoom12x'); break;
-      case 'zoom-x24': setCheckbox('timelineZoom24x'); break;
-      case 'zoom-x48': setCheckbox('timelineZoom48x'); break;
+      case 'zoom':
+        { const z = Math.max(0.1, Math.min(48, event.value)); state.target.zoomFactor = z; transition(currentTransitionSec); syncZoomReadout(); }
+        break;
       // Textbook (underlay) per-leg visibility
       case 'textbook-attack':  setCheckbox('underlayA'); break;
       case 'textbook-decay':   setCheckbox('underlayD'); break;
@@ -317,6 +318,11 @@ function executeEvent(event) {
       case 'amount':
         state.target.scale = event.value / 10;
         transition(event.durationMs / 1000);
+        break;
+      case 'zoom':
+        state.target.zoomFactor = Math.max(0.1, Math.min(48, event.value));
+        transition(event.durationMs / 1000);
+        syncZoomReadout();
         break;
     }
   } else if (event.type === 'play') {
@@ -560,10 +566,7 @@ function generateStateSnapshot() {
   lines.push(`set slomo ${$('sloMo').checked ? 'on' : 'off'}`);
   lines.push(`set persist ${$('persistEnabled').checked ? 'on' : 'off'}`);
   lines.push(`set persist-time ${Number($('persistTime') ? $('persistTime').value : 2000)}ms`);
-  // Zoom levels
-  [['timelineZoom3x','zoom-x3'],['timelineZoom6x','zoom-x6'],['timelineZoom12x','zoom-x12'],['timelineZoom24x','zoom-x24'],['timelineZoom48x','zoom-x48']].forEach(([id,cmd]) => {
-    if($(id)) lines.push(`set ${cmd} ${$(id).checked ? 'on' : 'off'}`);
-  });
+  lines.push(`set zoom ${state.zoomFactor}`);
   // Textbook (underlay) leg visibility
   lines.push(`set textbook attack ${$('underlayA').checked ? 'on' : 'off'}`);
   lines.push(`set textbook decay ${$('underlayD').checked ? 'on' : 'off'}`);
