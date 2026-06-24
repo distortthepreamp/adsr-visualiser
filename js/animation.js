@@ -218,6 +218,7 @@ function releaseFromCurrent(){
 
 function clearBlobAndMarker(){
   cancelAnimationFrame(state.dotAnim);
+  if(state.persistTimer){ clearTimeout(state.persistTimer); state.persistTimer = null; }
   stopGlowPulse();
   audioCut();
   $('dot').style.animation='none';
@@ -238,6 +239,7 @@ function clearBlobAndMarker(){
 function tap(ms){
   logEvent('ANIMATION', { action: 'tap', ms: Number(ms) || 200 });
   if(state.currentPhase === 'hold' || state.currentPhase === 'sustain' || state.currentPhase === 'release') clearBlobAndMarker();
+  if(state.persistTimer){ clearTimeout(state.persistTimer); state.persistTimer = null; }
   releaseStartPoint=null;
   if(audioEnabled()){ initAudio(); audioGateOpen(); }
   animationToken++;
@@ -298,18 +300,34 @@ function tap(ms){
     setDot(pos, true);
     const effVis = effLegVisible(pos.phase);
     $('dot').style.opacity = effVis ? '1' : '0';
-    if(!effVis) $('dot').removeAttribute('filter');
+    if(!effVis || pos.done) $('dot').removeAttribute('filter');
     $('meterFill').style.opacity = effVis ? '' : '0';
 
     // Stated blob
     setDotStated(spos, true);
     const sVis = statedLegVisible(spos.phase);
     $('dotStated').style.opacity = sVis ? '1' : '0';
-    if(!sVis) $('dotStated').removeAttribute('filter');
+    if(!sVis || spos.done) $('dotStated').removeAttribute('filter');
     $('meterFillStated').style.opacity = sVis ? '' : '0';
 
     // Release completion
     if(pos.done && spos.done){
+      stopGlowPulse();
+      if($('persistEnabled') && $('persistEnabled').checked){
+        // Persist: leave blobs drawn static (glowless), start dwell timer
+        audioCut();
+        const persistMs = Number(($('persistTime') && $('persistTime').value) || 2000);
+        state.persistTimer = setTimeout(() => {
+          state.persistTimer = null;
+          hideDot();
+          hideDotStated();
+          state.currentPhase = 'idle';
+          state.dotLevel = 0;
+          updateButtonStates();
+          render();
+        }, persistMs);
+        return;
+      }
       hideDot();
       hideDotStated();
       audioCut();
@@ -563,6 +581,7 @@ function animRate(){ return ($('sloMo') && $('sloMo').checked) ? 0.1 : 1; }
 
 function hold(){
   logEvent('ANIMATION', { action: 'hold' });
+  if(state.persistTimer){ clearTimeout(state.persistTimer); state.persistTimer = null; }
   releaseStartPoint = null;
   animationToken++;
   const myAnimationToken = animationToken;
@@ -606,31 +625,49 @@ function hold(){
     setDot(pos, true);
     const effVis = effLegVisible(pos.phase);
     $('dot').style.opacity = effVis ? '1' : '0';
-    if(!effVis) $('dot').removeAttribute('filter');
+    if(!effVis || pos.done) $('dot').removeAttribute('filter');
     $('meterFill').style.opacity = effVis ? '' : '0';
 
     // Stated blob
     setDotStated(spos, true);
     const sVis = statedLegVisible(spos.phase);
     $('dotStated').style.opacity = sVis ? '1' : '0';
-    if(!sVis) $('dotStated').removeAttribute('filter');
+    if(!sVis || spos.done) $('dotStated').removeAttribute('filter');
     $('meterFillStated').style.opacity = sVis ? '' : '0';
 
     // Glow at sustain (both blobs parked, before release)
     if(releaseT === undefined && pos.phase === 'sustain' && spos.phase === 'sustain'){
       if(!glowStarted){ startGlowPulse(); glowStarted = true; }
-      if(effVis) applyBlobGlow();
-      if(!effVis) $('dot').removeAttribute('filter');
-      if(!sVis) $('dotStated').removeAttribute('filter');
+      if(effVis && !pos.done) applyBlobGlow();
+      if(!effVis || pos.done) $('dot').removeAttribute('filter');
+      if(!sVis || spos.done) $('dotStated').removeAttribute('filter');
       state.currentPhase = 'sustain';
     } else if(releaseT === undefined){
       // At least one blob still in attack/decay — glow individual sustain arrivals
-      if(pos.phase === 'sustain' && effVis) applyBlobGlow();
-      if(spos.phase === 'sustain' && sVis) applyBlobGlow();
+      if(pos.phase === 'sustain' && effVis && !pos.done) applyBlobGlow();
+      if(spos.phase === 'sustain' && sVis && !spos.done) applyBlobGlow();
     }
 
     // Release completion: both blobs done
     if(pos.done && spos.done){
+      stopGlowPulse();
+      if($('persistEnabled') && $('persistEnabled').checked){
+        // Persist: leave blobs drawn static (glowless), start dwell timer
+        audioCut();
+        state.held = false;
+        window._holdReleaseTrigger = null;
+        const persistMs = Number(($('persistTime') && $('persistTime').value) || 2000);
+        state.persistTimer = setTimeout(() => {
+          state.persistTimer = null;
+          hideDot();
+          hideDotStated();
+          state.currentPhase = 'idle';
+          state.dotLevel = 0;
+          updateButtonStates();
+          render();
+        }, persistMs);
+        return;
+      }
       hideDot();
       hideDotStated();
       audioCut();
