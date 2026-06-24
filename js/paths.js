@@ -158,6 +158,10 @@ function render(){
   }
   const rSF = Math.min(1, (rEnd.x - drawPS.x) / (graph.w * 0.3));
 
+  // Rightmost visible curve x — accumulated across blocks for Fit
+  let rightmostX = pts.p0.x;
+  if(showGateTime) rightmostX = Math.max(rightmostX, gateCloseX);
+
   // Textbook ADSR underlay — faint straight-line A/D/S/R behind the main curves.
   // Each leg is independently gated by its own checkbox (underlayA/D/S/R).
   {
@@ -182,6 +186,10 @@ function render(){
     if(us){ us.setAttribute('d', `M ${tbDecayEndX} ${ulPSY} L ${tbSusEndX} ${ulPSY}`); us.style.opacity = showS ? '' : '0'; }
     if(ur){ ur.setAttribute('d', drawReleasePath ? `M ${tbSusEndX} ${ulPSY} L ${tbRelEndX} ${tbFloorY}` : `M ${tbSusEndX} ${ulPSY} L ${tbSusEndX} ${ulPSY}`); ur.style.opacity = (showR && drawReleasePath) ? '' : '0'; }
     [ua,ud,us,ur].forEach(el=>{ if(el) el.style.stroke=ulColor; });
+    // Accumulate rightmost visible textbook x for Fit
+    if(showR && drawReleasePath) rightmostX = Math.max(rightmostX, tbRelEndX);
+    else if(showS) rightmostX = Math.max(rightmostX, tbSusEndX);
+    else if(showD) rightmostX = Math.max(rightmostX, tbDecayEndX);
   }
 
   {
@@ -217,11 +225,13 @@ function render(){
     const releaseStartX = pts.pEnd.x + graph.w * state.tbSustainGap;
     const releaseStartY = drawPS.y;
     let rPath = '';
+    let effReleaseEndX = rEnd.x;
     if(drawReleasePath){
       if(curveAmt){
         const magentaXAtSustain = rcPolylineXAtY(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, releaseStartY, false, 200, 3);
         const greenOffset = releaseStartX - magentaXAtSustain;
         rPath = rcPolyline(pts.p1.x + greenOffset, pts.p1.y, rEnd.x + greenOffset, rEnd.y, false, 50, 3);
+        effReleaseEndX = rEnd.x + greenOffset;
       } else {
         rPath = `M ${rStart.x} ${rStart.y} L ${rEnd.x} ${rEnd.y}`;
       }
@@ -491,7 +501,19 @@ function render(){
     const tbSusMarkerMD=$('tbSustainMarker'); if(tbSusMarkerMD) tbSusMarkerMD.style.display='none';
     const tbMDLineMD=$('tbModelDSustainLine'); if(tbMDLineMD) tbMDLineMD.style.display='none';
     const tbSusLblMD=$('tbSustainLabel'); if(tbSusLblMD) tbSusLblMD.style.display='none';
+    // Accumulate rightmost visible effective x for Fit
+    if(legR && drawReleasePath) rightmostX = Math.max(rightmostX, effReleaseEndX);
+    if(gateRCVisible && legR) rightmostX = Math.max(rightmostX, orangeDischargeEndX);
+    if(showStatedGateRelease) rightmostX = Math.max(rightmostX, gateRelEndX);
+    if(!drawReleasePath) rightmostX = Math.max(rightmostX, drawPS.x);
+    if(clipAtGateOn){
+      let gateReleaseMax = gateCloseX;
+      if(gateRCVisible && legR) gateReleaseMax = Math.max(gateReleaseMax, orangeDischargeEndX);
+      if(showStatedGateRelease) gateReleaseMax = Math.max(gateReleaseMax, gateRelEndX);
+      rightmostX = gateReleaseMax;
+    }
   }
+  state._fitRightmostX = rightmostX;
 
   // Sustain as a horizontal level guide extending to the right from
   // the decay/release intersection. This reads as an indefinite held level,

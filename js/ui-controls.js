@@ -195,6 +195,16 @@ function syncZoomReadout(){
   if(inp && document.activeElement !== inp) inp.value = parseFloat(state.zoomFactor.toPrecision(3));
   if(rd) rd.textContent = parseFloat((8 / Math.max(0.1, state.zoomFactor)).toPrecision(2)) + 's';
 }
+function computeFitZoom(){
+  const rx = state._fitRightmostX;
+  if(!rx || rx <= graph.x0 + 1) return;
+  const margin = Number(($('fitMargin') && $('fitMargin').value) || 90) / 100;
+  let z = state.zoomFactor * (graph.w * margin) / (rx - graph.x0);
+  z = Math.max(0.1, Math.min(48, Math.round(z * 10) / 10));
+  const inp = $('zoomFactorInput'); if(!inp) return;
+  inp.value = z;
+  inp.dispatchEvent(new Event('change', {bubbles:true}));
+}
 function commitZoom(){
   const inp = $('zoomFactorInput'); if(!inp) return;
   const v = Math.max(0.1, Math.min(48, parseFloat(inp.value) || 3));
@@ -338,6 +348,7 @@ function initUIControls(){
     $('zoomFactorInput').addEventListener('change', commitZoom);
     $('zoomFactorInput').addEventListener('keydown', e => { if(e.key === 'Enter') commitZoom(); });
   }
+  if($('fitBtn')) $('fitBtn').addEventListener('click', computeFitZoom);
 
   // Analogue curve
   $('analogueCurve').addEventListener('change', () => { syncAnalogueCurve(); render(); if(state.currentPhase === 'idle') clearBlobAndMarker(); });

@@ -109,6 +109,9 @@ function parseOneCommand(frag) {
   const setZoomMatch = frag.match(/^set\s+zoom\s+(\d+(?:\.\d+)?)$/i);
   if (setZoomMatch) return { type: 'set', param: 'zoom', value: parseFloat(setZoomMatch[1]) };
 
+  // zoom-fit — compute fit zoom from current geometry
+  if (/^zoom-fit$/i.test(frag)) return { type: 'set', param: 'zoom-fit' };
+
   // set textbook attack|decay|sustain|release on/off — underlay per-leg visibility
   const setTextbookLegMatch = frag.match(/^set\s+textbook\s+(attack|decay|sustain|release)\s+(on|off)$/i);
   if (setTextbookLegMatch) return { type: 'set', param: 'textbook-' + setTextbookLegMatch[1].toLowerCase(), value: setTextbookLegMatch[2].toLowerCase() === 'on' };
@@ -172,6 +175,10 @@ function parseOneCommand(frag) {
   // transition zoom N HH:MM:SS:FF
   const transZoomMatch = frag.match(/^transition\s+zoom\s+(\d+(?:\.\d+)?)\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
   if (transZoomMatch) return { type: 'transition', param: 'zoom', value: parseFloat(transZoomMatch[1]), durationMs: tcToMs(transZoomMatch[2]) };
+
+  // transition zoom-fit HH:MM:SS:FF
+  const transZoomFitMatch = frag.match(/^transition\s+zoom-fit\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
+  if (transZoomFitMatch) return { type: 'transition', param: 'zoom-fit', durationMs: tcToMs(transZoomFitMatch[1]) };
 
   // play-tap NNNms [note]
   const playTapMatch = frag.match(/^play-tap\s+(\d+(?:\.\d+)?)ms(?:\s+([A-Ga-g]\d))?$/i);
@@ -274,6 +281,9 @@ function executeEvent(event) {
       case 'zoom':
         { const z = Math.max(0.1, Math.min(48, event.value)); state.target.zoomFactor = z; transition(currentTransitionSec); syncZoomReadout(); }
         break;
+      case 'zoom-fit':
+        computeFitZoom();
+        break;
       // Textbook (underlay) per-leg visibility
       case 'textbook-attack':  setCheckbox('underlayA'); break;
       case 'textbook-decay':   setCheckbox('underlayD'); break;
@@ -323,6 +333,18 @@ function executeEvent(event) {
         state.target.zoomFactor = Math.max(0.1, Math.min(48, event.value));
         transition(event.durationMs / 1000);
         syncZoomReadout();
+        break;
+      case 'zoom-fit':
+        { const rx = state._fitRightmostX;
+          if(rx && rx > graph.x0 + 1){
+            const margin = Number(($('fitMargin') && $('fitMargin').value) || 90) / 100;
+            let z = state.zoomFactor * (graph.w * margin) / (rx - graph.x0);
+            z = Math.max(0.1, Math.min(48, Math.round(z * 10) / 10));
+            state.target.zoomFactor = z;
+            transition(event.durationMs / 1000);
+            syncZoomReadout();
+          }
+        }
         break;
     }
   } else if (event.type === 'play') {
