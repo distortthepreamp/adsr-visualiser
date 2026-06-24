@@ -57,12 +57,11 @@ function render(){
   const e = pts.e;
   const ceilY = yFor(1);
   const overrange = e.scale > 0.0001 && e.floor + e.scale > 1.0001;
-  const textbookAdsr = $('textbookAdsr') && $('textbookAdsr').checked;
   const legA = $('modelA') ? $('modelA').checked : true;
   const legD = $('modelD') ? $('modelD').checked : true;
   const legS = $('modelS') ? $('modelS').checked : true;
   const legR = $('modelR') ? $('modelR').checked : true;
-  const showClipped = !textbookAdsr && overrange && $('showClipped') && $('showClipped').checked;
+  const showClipped = overrange && $('showClipped') && $('showClipped').checked;
 
   // Gate-close x and clip-at-gate flag — hoisted so both the Model D block and the
   // post-block loose elements can use them.
@@ -103,19 +102,7 @@ function render(){
   const releaseBox = $('releaseKnobBox');
   if(releaseBox){ releaseBox.style.opacity = linkRToD ? UI_DISABLED_OPACITY : '1'; releaseBox.style.pointerEvents = linkRToD ? 'none' : 'auto'; }
   const releaseLegendEl=$('releaseLegend'); if(releaseLegendEl) releaseLegendEl.style.opacity=linkRToD?UI_DISABLED_OPACITY:'1';
-  const loudDecayRow = $('loudDecayRow');
-  if(loudDecayRow){ loudDecayRow.style.opacity = textbookAdsr ? UI_DISABLED_OPACITY : '1'; loudDecayRow.style.pointerEvents = textbookAdsr ? 'none' : 'auto'; }
-  const showClippedRow = $('showClippedRow');
-  if(showClippedRow){ showClippedRow.style.opacity = textbookAdsr ? UI_DISABLED_OPACITY : '1'; showClippedRow.style.pointerEvents = textbookAdsr ? 'none' : 'auto'; }
-  const analogueCurveRow = $('analogueCurveRow');
-  if(analogueCurveRow){ analogueCurveRow.style.opacity = textbookAdsr ? UI_DISABLED_OPACITY : '1'; analogueCurveRow.style.pointerEvents = textbookAdsr ? 'none' : 'auto'; }
-  const tbSustainDottedRow = $('tbSustainDottedRow');
-  if(tbSustainDottedRow){ tbSustainDottedRow.style.opacity = textbookAdsr ? '1' : UI_DISABLED_OPACITY; tbSustainDottedRow.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
-  const tbSustainCollapseRow = $('tbSustainCollapseRow');
-  if(tbSustainCollapseRow){ tbSustainCollapseRow.style.opacity = textbookAdsr ? '1' : UI_DISABLED_OPACITY; tbSustainCollapseRow.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
-  const tbShowModelDSustainRow = $('tbShowModelDSustainRow');
-  if(tbShowModelDSustainRow){ tbShowModelDSustainRow.style.opacity = textbookAdsr ? '1' : UI_DISABLED_OPACITY; tbShowModelDSustainRow.style.pointerEvents = textbookAdsr ? 'auto' : 'none'; }
-  const analogueOn = !textbookAdsr && $('analogueCurve') && $('analogueCurve').checked;
+  const analogueOn = $('analogueCurve') && $('analogueCurve').checked;
   const curveAmt = analogueOn ? (Number($('curveAmount').value) / 100) : 0;
 
   const linearTimeOn = $('linearTime') && $('linearTime').checked;
@@ -172,13 +159,7 @@ function render(){
     const t = (slopeY !== 0) ? remainingY / slopeY : 1;
     rEnd = { x: pts.pS.x + slopeX * t, y: yFor(e.floor) };
   } else {
-    let pEndForRelease = pts.pEnd;
-    if(textbookAdsr && e.releaseOn){
-      const rT_r = mapTime(state.r);
-      const rwFull = timeToPixels(rT_r, linearTimeOn);
-      pEndForRelease = { x: pts.pEnd.x + rwFull, y: yFor(e.floor) };
-    }
-    rEnd = e.releaseOn ? pEndForRelease : { x: drawPS.x, y: pts.p0.y };
+    rEnd = e.releaseOn ? pts.pEnd : { x: drawPS.x, y: pts.p0.y };
   }
   const rSF = linearTimeOn
     ? Math.min(1, (rEnd.x - drawPS.x) / (graph.w * 0.3))
@@ -187,10 +168,10 @@ function render(){
   // Textbook ADSR underlay — faint straight-line A/D/S/R behind the main curves.
   // Each leg is independently gated by its own checkbox (underlayA/D/S/R).
   {
-    const showA = !textbookAdsr && $('underlayA') && $('underlayA').checked;
-    const showD = !textbookAdsr && $('underlayD') && $('underlayD').checked;
-    const showS = !textbookAdsr && $('underlayS') && $('underlayS').checked;
-    const showR = !textbookAdsr && $('underlayR') && $('underlayR').checked;
+    const showA = $('underlayA') && $('underlayA').checked;
+    const showD = $('underlayD') && $('underlayD').checked;
+    const showS = $('underlayS') && $('underlayS').checked;
+    const showR = $('underlayR') && $('underlayR').checked;
     const ua=$('underlayAttack'), ud=$('underlayDecay'), us=$('underlaySustain'), ur=$('underlayRelease');
     // Always compute and set real d; toggle opacity for visibility
     const tbSusGapPx = graph.w * state.tbSustainGap;
@@ -210,7 +191,7 @@ function render(){
     [ua,ud,us,ur].forEach(el=>{ if(el) el.style.stroke=ulColor; });
   }
 
-  if(!textbookAdsr){
+  {
     // Model D: C1 continuity at pS using natural decay slope
     const dPeakY = showClipped ? ceilY : drawP1.y;
     const h_decay   = curveAmt * Math.abs(drawPS.y - dPeakY)   * 0.5 * dSF;
@@ -405,8 +386,8 @@ function render(){
       // Per-leg visibility for each crossing
       const effLegOn = isAttackPhase ? legA : legD;
       const statedLegOn = isAttackPhase
-        ? (!textbookAdsr && $('underlayA') && $('underlayA').checked)
-        : (!textbookAdsr && $('underlayD') && $('underlayD').checked);
+        ? ($('underlayA') && $('underlayA').checked)
+        : ($('underlayD') && $('underlayD').checked);
       const effVisible = effLegOn && (gateCloseY !== null);
       const statedVisible = statedLegOn && (gateStatedYRaw !== null);
       // Vertical bottom extent
@@ -517,10 +498,6 @@ function render(){
     const tbSusMarkerMD=$('tbSustainMarker'); if(tbSusMarkerMD) tbSusMarkerMD.style.display='none';
     const tbMDLineMD=$('tbModelDSustainLine'); if(tbMDLineMD) tbMDLineMD.style.display='none';
     const tbSusLblMD=$('tbSustainLabel'); if(tbSusLblMD) tbSusLblMD.style.display='none';
-  } else {
-    renderTextbookPaths({ pts, drawPS, drawP1, ceilY, showClipped, drawReleasePath, curveAmt, dSF, rSF, linearTimeOn });
-    $('tapReleaseOrange').style.opacity = '0';
-    $('fullReferenceRelease').style.opacity = '0';
   }
 
   // Sustain as a horizontal level guide extending to the right from
@@ -800,7 +777,7 @@ function render(){
   if(svgTimecodesEl){ svgTimecodesEl.setAttribute('x',METER_X-10); svgTimecodesEl.setAttribute('y',GRAPH_TOP_BASE-90); svgTimecodesEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
   const toolTitleEl=$('toolTitle');
   if(toolTitleEl){ toolTitleEl.setAttribute('x',VB_WIDTH/2); toolTitleEl.setAttribute('y',GRAPH_TOP_BASE-173); toolTitleEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
-  updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, linearTimeOn, drawPS, statedSustainX, {legA, legD, legR}, clipAtGateOn ? gateCloseX : null);
+  updateTimeAxis(pts, overrange, showClipped, freqMode, linearTimeOn, drawPS, statedSustainX, {legA, legD, legR}, clipAtGateOn ? gateCloseX : null);
 
   // Cutoff/Amount knobs: active only in Filter Mode
   const floorBox=$('floorKnobBox'), scaleBox=$('scaleKnobBox');

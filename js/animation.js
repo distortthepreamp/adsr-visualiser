@@ -152,37 +152,6 @@ function releaseFromCurrent(){
     state.releaseFromDecay = (startLevel > pts.e.s);
   }
   releaseStartPoint = { x: startX, y: startY, level: startLevel };
-  if($('textbookAdsr') && $('textbookAdsr').checked){
-    const tb=tbComputeAnimPoints();
-    const sY=tb.tbSustainEnd.y, fY=tb.tbReleaseEnd.y;
-    // If blob is at or below sustain level (attack hasn't reached sustain yet, or below),
-    // interpolate the x start position on the release slope at startY.
-    // If blob is above sustain level (decay/sustain phase), snap to top of slope as before.
-    let tbStart;
-    if(startY >= sY && (fY - sY) > 0){
-      const f0=clamp((startY - sY) / (fY - sY));
-      tbStart={x: tb.tbSustainEnd.x + f0*(tb.tbReleaseEnd.x - tb.tbSustainEnd.x), y: startY};
-    } else {
-      tbStart={x: tb.tbSustainEnd.x, y: sY};
-    }
-    const end={x:tb.tbReleaseEnd.x, y:fY, level:0};
-    const dur=Math.max(MIN_RELEASE_MS,e.rT*1000);
-    const t0=performance.now();
-    state.currentPhase='release';
-    setDot({x:tbStart.x, y:tbStart.y, level:startLevel, phase:'sustain'}, true);
-    function tbReleaseStep(now){
-      if(myAnimationToken !== animationToken) return;
-      const f=clamp((now-t0)/dur);
-      const dotX=tbStart.x+(end.x-tbStart.x)*f;
-      const linearY=tbStart.y+(end.y-tbStart.y)*f;
-      const pt={x:dotX, y:linearY, level:startLevel*(1-f), phase:'release'};
-      setDot(pt,true);
-      if(f<1) state.dotAnim=requestAnimationFrame(tbReleaseStep);
-      else { setDot(end,false); audioCut(); state.held=false; state.currentPhase='idle'; updateButtonStates(); render(); }
-    }
-    requestAnimationFrame(tbReleaseStep);
-    return;
-  }
   const overrange = e.floor + e.scale > 1;
   const showClipped = $('showClipped') && $('showClipped').checked;
   const f_decay = overrange ? (pts.e.floor + pts.e.scale - 1) / pts.e.scale : 0;

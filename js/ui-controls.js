@@ -309,7 +309,7 @@ function initUIControls(){
   });
 
   // Checkbox render and debug log listeners
-  ['loudDecay','keyboardControl','showContour','frequencyMode','hpMode','showClipped','linearTime','textbookAdsr','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','linkRToD'].forEach(id => {
+  ['loudDecay','keyboardControl','showContour','frequencyMode','hpMode','showClipped','linearTime','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','linkRToD'].forEach(id => {
     const el = $(id); if(!el) return;
     el.addEventListener('change', render);
     el.addEventListener('change', () => {
@@ -321,7 +321,7 @@ function initUIControls(){
           loudDecay: chk('loudDecay'), keyboardControl: chk('keyboardControl'),
           frequencyMode: chk('frequencyMode'), hpMode: chk('hpMode'),
           showClipped: chk('showClipped'), analogueCurve: chk('analogueCurve'),
-          textbookAdsr: chk('textbookAdsr'), linearTime: chk('linearTime'),
+          linearTime: chk('linearTime'),
           tbSustainCollapse: chk('tbSustainCollapse')
         },
         geometry: window._lastRenderGeometry || null

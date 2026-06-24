@@ -45,7 +45,6 @@ function initPresetsLogic(){
     if(preset.filterMode !== undefined) $('frequencyMode').checked = preset.filterMode;
     if(preset.lpHp !== undefined) $('hpMode').checked = preset.lpHp;
     if(preset.keyboardControl !== undefined) $('keyboardControl').checked = preset.keyboardControl;
-    if(preset.textbookAdsr !== undefined) $('textbookAdsr').checked = preset.textbookAdsr;
     if(preset.modelA !== undefined) $('modelA').checked = preset.modelA;
     if(preset.modelD !== undefined) $('modelD').checked = preset.modelD;
     if(preset.modelS !== undefined) $('modelS').checked = preset.modelS;
@@ -128,7 +127,6 @@ function initPresetsLogic(){
     preset.filterMode = $('frequencyMode').checked;
     preset.lpHp = $('hpMode').checked;
     preset.keyboardControl = $('keyboardControl').checked;
-    preset.textbookAdsr = $('textbookAdsr').checked;
     preset.gate = Math.round(gateMsFromPosition(state.gate));
     preset.modelA = $('modelA').checked;
     preset.modelD = $('modelD').checked;

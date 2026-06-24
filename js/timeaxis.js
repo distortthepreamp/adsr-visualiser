@@ -3,12 +3,11 @@
 const TIME_LABEL_STATED_Y_OFFSET    = -10; // px above the graph top (stated labels)
 const TIME_LABEL_EFFECTIVE_Y_OFFSET =  18; // px below the time axis (effective labels)
 
-function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, linearTimeOn, drawPS, statedSustainX, modelLegs, clipGateX) {
+function updateTimeAxis(pts, overrange, showClipped, freqMode, linearTimeOn, drawPS, statedSustainX, modelLegs, clipGateX) {
   // Drop lines (individual elements, gated by the new drop-line checkboxes)
-  // Per-leg effective flags: false when textbook mode is active OR when the leg is hidden.
-  const effA = !textbookAdsr && (modelLegs ? modelLegs.legA !== false : true);
-  const effD = !textbookAdsr && (modelLegs ? modelLegs.legD !== false : true);
-  const effR = !textbookAdsr && (modelLegs ? modelLegs.legR !== false : true);
+  const effA = modelLegs ? modelLegs.legA !== false : true;
+  const effD = modelLegs ? modelLegs.legD !== false : true;
+  const effR = modelLegs ? modelLegs.legR !== false : true;
   const timeLabelGutter = Math.max(0, Number(($('timeLabelGutter') && $('timeLabelGutter').value) || 0));
   const statedLabelY    = graph.y0 - graph.h + TIME_LABEL_STATED_Y_OFFSET - timeLabelGutter;
   const effectiveLabelY = graph.y0 + TIME_LABEL_EFFECTIVE_Y_OFFSET + timeLabelGutter;
@@ -21,7 +20,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   const newStatedDecayDropEl=$('newStatedDecayDrop');
   const newStatedDecayTimeLabelEl=$('newStatedDecayTime');
   if(newStatedDecayDropEl){
-    const showStatedDecayDrop = showNewStated && (($('underlayD') && $('underlayD').checked) || $('textbookAdsr').checked);
+    const showStatedDecayDrop = showNewStated && ($('underlayD') && $('underlayD').checked);
     if(showStatedDecayDrop){
       const ulPSY = overrange ? Math.max(yFor(pts.e.floor + state.s * pts.e.scale), yFor(1)) : yFor(pts.e.floor + state.s * pts.e.scale); // textbook (uncapped) sustain y
       newStatedDecayDropEl.setAttribute('x1',pts.pEnd.x); newStatedDecayDropEl.setAttribute('y1',graph.y0-graph.h);
@@ -44,7 +43,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   const newStatedAttackDropEl=$('newStatedAttackDrop');
   const newStatedAttackTimeLabelEl=$('newStatedAttackTime');
   if(newStatedAttackDropEl){
-    const showStatedAttackDrop = showNewStated && (($('underlayA') && $('underlayA').checked) || $('textbookAdsr').checked);
+    const showStatedAttackDrop = showNewStated && ($('underlayA') && $('underlayA').checked);
     if(showStatedAttackDrop){
       const tbPeakY = Math.max(pts.p1.y, yFor(1)); // attack peak y (= drawP1.y in non-clipped mode)
       newStatedAttackDropEl.setAttribute('x1',pts.p1.x); newStatedAttackDropEl.setAttribute('y1',graph.y0-graph.h);
@@ -186,7 +185,7 @@ function updateTimeAxis(pts, overrange, showClipped, textbookAdsr, freqMode, lin
   const newStatedReleaseDropEl=$('newStatedReleaseDrop');
   const newStatedReleaseTimeLabelEl=$('newStatedReleaseTime');
   if(newStatedReleaseDropEl){
-    const showStatedRelease = pts.e.releaseOn && showNewStated && (($('underlayR') && $('underlayR').checked) || $('textbookAdsr').checked);
+    const showStatedRelease = pts.e.releaseOn && showNewStated && ($('underlayR') && $('underlayR').checked);
     if(showStatedRelease){
       const stRelX = pts.pEnd.x + graph.w * state.tbSustainGap + timeToPixels(mapTime(state.r), linearTimeOn);
       const stRelY = yFor(pts.e.floor);

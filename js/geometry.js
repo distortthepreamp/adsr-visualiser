@@ -57,12 +57,11 @@ function getEffective(){
   const aT=mapTime(state.a), dT=mapTime(state.d);
   const rawS=state.s;
   const s=($('keyboardControl') && $('keyboardControl').checked) ? rawS*MIMIC_SUSTAIN_CAP : rawS;
-  const textbookOn = $('textbookAdsr') && $('textbookAdsr').checked;
-  const releaseOn = textbookOn ? true : $('loudDecay').checked;
+  const releaseOn = $('loudDecay').checked;
   const freqMode = $('frequencyMode') && $('frequencyMode').checked;
   const floor = freqMode ? clamp(state.floor,0,1) : 0;
   const scale = freqMode ? clamp(state.scale,0,1) : 1;
-  return {aT,dT,s,rawS,releaseOn,rT:releaseOn?(textbookOn?mapTime(state.r):dT):0,floor,scale};
+  return {aT,dT,s,rawS,releaseOn,rT:releaseOn?dT:0,floor,scale};
 }
 function yFor(level){ return graph.y0 - level*graph.h; }
 function getLinearTotalMs(){

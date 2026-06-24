@@ -278,7 +278,6 @@
           </div>
         </div>
         <div>
-          <div class="row"><label><input id="textbookAdsr" type="checkbox"> Textbook ADSR</label></div>
           <div id="tbSustainDottedRow" class="row"><label><input id="tbSustainDotted" type="checkbox" checked> Dotted Textbook ADSR Sustain ([)</label></div>
           <div id="tbSustainCollapseRow" class="row"><label><input id="tbSustainCollapse" type="checkbox"> Collapse Textbook ADSR Sustain (])</label></div>
           <div id="tbShowModelDSustainRow" class="row"><label><input id="tbShowModelDSustain" type="checkbox"> Show Model D Sustain (textbook) (\)</label></div>
@@ -629,7 +628,7 @@ logEvent('INIT', {
   frequencyMode: $('frequencyMode').checked, hpMode: $('hpMode').checked,
   keyboardControl: $('keyboardControl').checked, showClipped: $('showClipped').checked,
   linearTime: $('linearTime').checked, analogueCurve: $('analogueCurve').checked,
-  textbookAdsr: $('textbookAdsr').checked, tbSustainDotted: $('tbSustainDotted').checked,
+  tbSustainDotted: $('tbSustainDotted').checked,
   tbSustainCollapse: $('tbSustainCollapse').checked, tbShowModelDSustain: $('tbShowModelDSustain').checked
 });
 
