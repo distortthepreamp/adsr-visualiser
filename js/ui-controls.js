@@ -34,7 +34,6 @@ function syncControls(){
   if($('gateTarget')) $('gateTarget').textContent=mode==='animate' ? 'Target: '+Math.round(gateMsFromPosition(state.target.gate))+'ms' : '';
   $('modeHint').textContent = mode==='live' ? 'Live Mode: Knobs Update The Graph Immediately.' : 'Animate Mode: Knobs Set Targets. Press Transition To Morph The Graph.';
   patchSustainReadouts();
-  { const linearOn = $('linearTime') && $('linearTime').checked; ZOOM_LABEL_IDS.forEach(id => { const zl = $(id); if(zl){ zl.style.opacity = linearOn ? '' : UI_DISABLED_OPACITY; zl.style.pointerEvents = linearOn ? '' : 'none'; } }); }
 
   // Quick-set button highlight: exact match = solid white; closest = dim; others = default
   (function(){
@@ -192,13 +191,6 @@ function syncHpModeEnabled(){
 const ZOOM_FACTORS = [3, 6, 12, 24, 48];
 const ZOOM_CHECKBOX_IDS = ZOOM_FACTORS.map(f => `timelineZoom${f}x`);
 const ZOOM_LABEL_IDS = ZOOM_FACTORS.map(f => `timelineZoom${f}xLabel`);
-function syncLinearTimeScale(){
-  const on = $('linearTime') && $('linearTime').checked;
-  ZOOM_LABEL_IDS.forEach(id => {
-    const zoomLbl = $(id);
-    if(zoomLbl){ zoomLbl.style.opacity = on ? '' : UI_DISABLED_OPACITY; zoomLbl.style.pointerEvents = on ? '' : 'none'; }
-  });
-}
 function currentZoomFactor(){
   for(let i = ZOOM_FACTORS.length - 1; i >= 0; i--){
     if($(ZOOM_CHECKBOX_IDS[i]) && $(ZOOM_CHECKBOX_IDS[i]).checked) return ZOOM_FACTORS[i];
@@ -309,7 +301,7 @@ function initUIControls(){
   });
 
   // Checkbox render and debug log listeners
-  ['loudDecay','keyboardControl','showContour','frequencyMode','hpMode','showClipped','linearTime','linkRToD'].forEach(id => {
+  ['loudDecay','keyboardControl','showContour','frequencyMode','hpMode','showClipped','linkRToD'].forEach(id => {
     const el = $(id); if(!el) return;
     el.addEventListener('change', render);
     el.addEventListener('change', () => {
@@ -320,8 +312,7 @@ function initUIControls(){
         flags: {
           loudDecay: chk('loudDecay'), keyboardControl: chk('keyboardControl'),
           frequencyMode: chk('frequencyMode'), hpMode: chk('hpMode'),
-          showClipped: chk('showClipped'), analogueCurve: chk('analogueCurve'),
-          linearTime: chk('linearTime')
+          showClipped: chk('showClipped'), analogueCurve: chk('analogueCurve')
         },
         geometry: window._lastRenderGeometry || null
       });
@@ -348,7 +339,6 @@ function initUIControls(){
   $('hpMode').addEventListener('change', () => { if(window.kioskNotifySwitch) kioskNotifySwitch('hp-mode'); });
 
   // Linear time / zoom
-  $('linearTime').addEventListener('change', syncLinearTimeScale);
   ZOOM_FACTORS.forEach((f, i) => {
     const id = ZOOM_CHECKBOX_IDS[i];
     $(id) && $(id).addEventListener('change', () => { setZoomLevel($(id).checked ? f : 1); });
@@ -469,7 +459,6 @@ function initUIControls(){
 
   // Run initial sync passes
   syncHpModeEnabled();
-  syncLinearTimeScale();
   syncAnalogueCurve();
   syncConsoleScale();
 }

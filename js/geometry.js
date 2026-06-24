@@ -67,31 +67,24 @@ function yFor(level){ return graph.y0 - level*graph.h; }
 function getLinearTotalMs(){
   return 8000 / Math.max(1, state.zoomFactor);
 }
-function timeToPixels(t, linearOn){
-  return linearOn ? t * 1000 * (graph.w / getLinearTotalMs()) : displayTimeWidth(t);
+function timeToPixels(t){
+  return t * 1000 * (graph.w / getLinearTotalMs());
 }
 
-function pixelsToTimeSec(px, linearOn){
+function pixelsToTimeSec(px){
   if(px <= 0) return 0;
-  if(linearOn) return px * getLinearTotalMs() / (1000 * graph.w);
-  let lo = 0, hi = 12;
-  for(let i = 0; i < 52; i++){ const mid=(lo+hi)/2; if(displayTimeWidth(mid)<px) lo=mid; else hi=mid; }
-  return (lo+hi)/2;
+  return px * getLinearTotalMs() / (1000 * graph.w);
 }
 
 function computePoints(){
   const e=getEffective();
-  const linearTimeEl = document.getElementById('linearTime');
-  const linearTime = linearTimeEl && linearTimeEl.checked;
   let aw, dwFull;
-  aw     = timeToPixels(e.aT, linearTime);
-  dwFull = timeToPixels(e.dT, linearTime);
-  if(linearTime){
-    // Clip: decay end cannot exceed graph right edge
-    const maxX = graph.x0 + graph.w;
-    if(graph.x0 + aw > maxX) aw = graph.w;
-    if(graph.x0 + aw + dwFull > maxX) dwFull = maxX - (graph.x0 + aw);
-  }
+  aw     = timeToPixels(e.aT);
+  dwFull = timeToPixels(e.dT);
+  // Clip: decay end cannot exceed graph right edge
+  const maxX = graph.x0 + graph.w;
+  if(graph.x0 + aw > maxX) aw = graph.w;
+  if(graph.x0 + aw + dwFull > maxX) dwFull = maxX - (graph.x0 + aw);
   const x0=graph.x0;
 
   // Experimental sustain-marker model:

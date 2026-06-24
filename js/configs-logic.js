@@ -10,7 +10,6 @@ function buildConfigSnapshot(){
     hpMode: $('hpMode').checked,
     keyboardControl: $('keyboardControl').checked,
     showClipped: $('showClipped').checked,
-    linearTime: $('linearTime').checked,
     analogueCurve: $('analogueCurve').checked,
     linkRToD: $('linkRToD') ? $('linkRToD').checked : false,
     showNewEffectiveLines: $('showNewEffectiveLines') ? $('showNewEffectiveLines').checked : true,
@@ -92,7 +91,7 @@ function loadConfigObject(cfg){
   state.target.tbSustainGap = SUSTAIN_GAP_MAX;
 
   // Checkboxes
-  ['loudDecay','showContour','showNewEffectiveLines','showNewStatedLines','modelA','modelD','modelS','modelR','showGateTime','clipAtGate','showPeakDischarge','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','linkRToD','dottedMarkers','meterGlow','meterScanlinesVisible','blobGlowEnabled','timelineZoom3x','timelineZoom6x','timelineZoom12x','timelineZoom24x','timelineZoom48x','kioskKnobGlow'].forEach(id => {
+  ['loudDecay','showContour','showNewEffectiveLines','showNewStatedLines','modelA','modelD','modelS','modelR','showGateTime','clipAtGate','showPeakDischarge','frequencyMode','hpMode','keyboardControl','showClipped','analogueCurve','linkRToD','dottedMarkers','meterGlow','meterScanlinesVisible','blobGlowEnabled','timelineZoom3x','timelineZoom6x','timelineZoom12x','timelineZoom24x','timelineZoom48x','kioskKnobGlow'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
   const restoredZoom = ($('timelineZoom48x') && $('timelineZoom48x').checked) ? 48

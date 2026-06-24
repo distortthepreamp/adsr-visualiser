@@ -105,13 +105,8 @@ function render(){
   const analogueOn = $('analogueCurve') && $('analogueCurve').checked;
   const curveAmt = analogueOn ? (Number($('curveAmount').value) / 100) : 0;
 
-  const linearTimeOn = $('linearTime') && $('linearTime').checked;
-  const aSF = linearTimeOn
-    ? Math.min(1, pts.aw / (graph.w * 0.3))
-    : Math.min(1, e.aT * 1000 / 500);
-  const dSF = linearTimeOn
-    ? Math.min(1, pts.dwFull / (graph.w * 0.3))
-    : Math.min(1, e.dT * 1000 / 500);
+  const aSF = Math.min(1, pts.aw / (graph.w * 0.3));
+  const dSF = Math.min(1, pts.dwFull / (graph.w * 0.3));
 
   let aPath, dPath, ceilLeftPath, ceilRightPath;
   if(showClipped){
@@ -161,9 +156,7 @@ function render(){
   } else {
     rEnd = e.releaseOn ? pts.pEnd : { x: drawPS.x, y: pts.p0.y };
   }
-  const rSF = linearTimeOn
-    ? Math.min(1, (rEnd.x - drawPS.x) / (graph.w * 0.3))
-    : Math.min(1, e.rT * 1000 / 500);
+  const rSF = Math.min(1, (rEnd.x - drawPS.x) / (graph.w * 0.3));
 
   // Textbook ADSR underlay — faint straight-line A/D/S/R behind the main curves.
   // Each leg is independently gated by its own checkbox (underlayA/D/S/R).
@@ -177,7 +170,7 @@ function render(){
     const tbSusGapPx = graph.w * state.tbSustainGap;
     const tbDecayEndX = pts.pEnd.x;
     const tbSusEndX   = pts.pEnd.x + tbSusGapPx;
-    const tbRelEndX   = tbSusEndX + timeToPixels(mapTime(state.r), linearTimeOn);
+    const tbRelEndX   = tbSusEndX + timeToPixels(mapTime(state.r));
     const tbFloorY    = yFor(e.floor);
     // Textbook proportional ceiling: amount scales the headroom above the floor (never exceeds 1)
     const textbookCeiling = e.floor + (1 - e.floor) * e.scale;
@@ -315,7 +308,7 @@ function render(){
         gateEffReleaseTimeEl.setAttribute('y', graph.y0 + TIME_LABEL_EFFECTIVE_Y_OFFSET + timeLabelGutter);
         gateEffReleaseTimeEl.setAttribute('text-anchor', 'middle');
         gateEffReleaseTimeEl.setAttribute('fill', relColor);
-        gateEffReleaseTimeEl.textContent = 'GR = ' + Math.round(pixelsToTimeSec(orangeDischargeEndX - gateCloseX, linearTimeOn) * 1000) + 'ms';
+        gateEffReleaseTimeEl.textContent = 'GR = ' + Math.round(pixelsToTimeSec(orangeDischargeEndX - gateCloseX) * 1000) + 'ms';
         gateEffReleaseTimeEl.style.display = '';
       }
     } else {
@@ -327,7 +320,7 @@ function render(){
     // Visibility gated additionally by showGateTime.
     const statedGatePopulated = !!(drawReleasePath && $('underlayR') && $('underlayR').checked);
     const showStatedGateRelease = !!(statedGatePopulated && showGateTime);
-    const gateRelEndX = gateCloseX + timeToPixels(mapTime(state.r), linearTimeOn);
+    const gateRelEndX = gateCloseX + timeToPixels(mapTime(state.r));
     const gateRelEndY = yFor(pts.e.floor);
     const ulCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
     const gateStatedReleaseEl = $('gateStatedRelease');
@@ -777,7 +770,7 @@ function render(){
   if(svgTimecodesEl){ svgTimecodesEl.setAttribute('x',METER_X-10); svgTimecodesEl.setAttribute('y',GRAPH_TOP_BASE-90); svgTimecodesEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
   const toolTitleEl=$('toolTitle');
   if(toolTitleEl){ toolTitleEl.setAttribute('x',VB_WIDTH/2); toolTitleEl.setAttribute('y',GRAPH_TOP_BASE-173); toolTitleEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
-  updateTimeAxis(pts, overrange, showClipped, freqMode, linearTimeOn, drawPS, statedSustainX, {legA, legD, legR}, clipAtGateOn ? gateCloseX : null);
+  updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSustainX, {legA, legD, legR}, clipAtGateOn ? gateCloseX : null);
 
   // Cutoff/Amount knobs: active only in Filter Mode
   const floorBox=$('floorKnobBox'), scaleBox=$('scaleKnobBox');

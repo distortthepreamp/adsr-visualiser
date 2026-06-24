@@ -327,7 +327,6 @@ function effectivePos(t, releaseT, releaseMode){
     const rf = clamp((t - releaseT) / relDurMs);
     phase = 'release';
     // Shared x from elapsed release time — both blobs advance at the same pixel rate.
-    const linearTimeOn = $('linearTime') && $('linearTime').checked;
     const elapsedRelSec = (t - releaseT) / 1000;
     if(releaseMode === 'gate'){
       // Gate-origin release: shared x from gateCloseX + time-mapped pixels
@@ -340,7 +339,7 @@ function effectivePos(t, releaseT, releaseMode){
         gcX = pts.p1.x + (pts.pEnd.x - pts.p1.x) * gfd;
       }
       if(gcX > pts.pS.x) gcX = pts.pS.x;
-      x = gcX + timeToPixels(elapsedRelSec, linearTimeOn);
+      x = gcX + timeToPixels(elapsedRelSec);
       const relEl = document.getElementById('tapReleaseOrange');
       let endX = gcX;
       if(relEl && relEl.getTotalLength() > 0){
@@ -358,7 +357,7 @@ function effectivePos(t, releaseT, releaseMode){
     level = e.s * (1 - rf);
     const relEl = document.getElementById('releaseInner');
     const startX = pts.pEnd.x + graph.w * state.tbSustainGap;
-    x = startX + timeToPixels(elapsedRelSec, linearTimeOn);
+    x = startX + timeToPixels(elapsedRelSec);
     let endX = startX;
     if(relEl && relEl.getTotalLength() > 0){
       endX = relEl.getPointAtLength(relEl.getTotalLength()).x;
@@ -422,7 +421,6 @@ function statedPos(t, releaseT, releaseMode){
     const rf = clamp((t - releaseT) / relDurMs);
     phase = 'release';
     // Shared x from elapsed release time — same pixel rate as effectivePos for vertical alignment.
-    const linearTimeOn = $('linearTime') && $('linearTime').checked;
     const elapsedRelSec = (t - releaseT) / 1000;
     if(releaseMode === 'gate'){
       // Gate-origin release: shared x from gateCloseX + time-mapped pixels
@@ -435,7 +433,7 @@ function statedPos(t, releaseT, releaseMode){
         gcX = pts.p1.x + (pts.pEnd.x - pts.p1.x) * gfd;
       }
       if(gcX > pts.pS.x) gcX = pts.pS.x;
-      x = gcX + timeToPixels(elapsedRelSec, linearTimeOn);
+      x = gcX + timeToPixels(elapsedRelSec);
       const relEl = document.getElementById('gateStatedRelease');
       let endX = gcX;
       if(relEl && relEl.getTotalLength && relEl.getTotalLength() > 0){
@@ -453,7 +451,7 @@ function statedPos(t, releaseT, releaseMode){
     level = e.s * (1 - rf);
     const relEl = document.getElementById('underlayRelease');
     const startX = pts.pEnd.x + graph.w * state.tbSustainGap;
-    x = startX + timeToPixels(elapsedRelSec, linearTimeOn);
+    x = startX + timeToPixels(elapsedRelSec);
     let endX = startX;
     if(relEl && relEl.getTotalLength() > 0){
       endX = relEl.getPointAtLength(relEl.getTotalLength()).x;

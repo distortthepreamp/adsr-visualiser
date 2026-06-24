@@ -3,7 +3,7 @@
 const TIME_LABEL_STATED_Y_OFFSET    = -10; // px above the graph top (stated labels)
 const TIME_LABEL_EFFECTIVE_Y_OFFSET =  18; // px below the time axis (effective labels)
 
-function updateTimeAxis(pts, overrange, showClipped, freqMode, linearTimeOn, drawPS, statedSustainX, modelLegs, clipGateX) {
+function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSustainX, modelLegs, clipGateX) {
   // Drop lines (individual elements, gated by the new drop-line checkboxes)
   const effA = modelLegs ? modelLegs.legA !== false : true;
   const effD = modelLegs ? modelLegs.legD !== false : true;
@@ -87,7 +87,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, linearTimeOn, dra
         newEffectiveDecayTimeLabelEl.setAttribute('y', effectiveLabelY);
         newEffectiveDecayTimeLabelEl.setAttribute('text-anchor', 'middle');
         newEffectiveDecayTimeLabelEl.setAttribute('fill', newEffDecayCol);
-        newEffectiveDecayTimeLabelEl.textContent = 'D = ' + Math.round(pixelsToTimeSec(drawPS.x - decayStartX, linearTimeOn) * 1000) + 'ms';
+        newEffectiveDecayTimeLabelEl.textContent = 'D = ' + Math.round(pixelsToTimeSec(drawPS.x - decayStartX) * 1000) + 'ms';
         newEffectiveDecayTimeLabelEl.style.display='';
       }
     } else {
@@ -117,7 +117,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, linearTimeOn, dra
       newEffAttackTimeLabelEl.setAttribute('y', effectiveLabelY);
       newEffAttackTimeLabelEl.setAttribute('text-anchor', 'middle');
       newEffAttackTimeLabelEl.setAttribute('fill', newEffAttackCol);
-      newEffAttackTimeLabelEl.textContent = 'A = ' + Math.round(pixelsToTimeSec(ceilAttackX - pts.p0.x, linearTimeOn) * 1000) + 'ms';
+      newEffAttackTimeLabelEl.textContent = 'A = ' + Math.round(pixelsToTimeSec(ceilAttackX - pts.p0.x) * 1000) + 'ms';
       newEffAttackTimeLabelEl.style.display='';
     }
   } else {
@@ -137,7 +137,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, linearTimeOn, dra
       newEffClipTimeLabelEl.setAttribute('y', effectiveLabelY);
       newEffClipTimeLabelEl.setAttribute('text-anchor', 'middle');
       newEffClipTimeLabelEl.setAttribute('fill', newEffAttackCol);
-      newEffClipTimeLabelEl.textContent = 'C = ' + Math.round(pixelsToTimeSec(ceilDecayX - ceilAttackX, linearTimeOn) * 1000) + 'ms';
+      newEffClipTimeLabelEl.textContent = 'C = ' + Math.round(pixelsToTimeSec(ceilDecayX - ceilAttackX) * 1000) + 'ms';
       newEffClipTimeLabelEl.style.display='';
     }
   } else {
@@ -173,7 +173,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, linearTimeOn, dra
         newEffectiveReleaseTimeLabelEl.setAttribute('y', effectiveLabelY);
         newEffectiveReleaseTimeLabelEl.setAttribute('text-anchor', 'middle');
         newEffectiveReleaseTimeLabelEl.setAttribute('fill', newEffReleaseCol);
-        newEffectiveReleaseTimeLabelEl.textContent = 'R = ' + Math.round(pixelsToTimeSec(effRelPx, linearTimeOn) * 1000) + 'ms';
+        newEffectiveReleaseTimeLabelEl.textContent = 'R = ' + Math.round(pixelsToTimeSec(effRelPx) * 1000) + 'ms';
         newEffectiveReleaseTimeLabelEl.style.display='';
       }
     } else {
@@ -187,7 +187,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, linearTimeOn, dra
   if(newStatedReleaseDropEl){
     const showStatedRelease = pts.e.releaseOn && showNewStated && ($('underlayR') && $('underlayR').checked);
     if(showStatedRelease){
-      const stRelX = pts.pEnd.x + graph.w * state.tbSustainGap + timeToPixels(mapTime(state.r), linearTimeOn);
+      const stRelX = pts.pEnd.x + graph.w * state.tbSustainGap + timeToPixels(mapTime(state.r));
       const stRelY = yFor(pts.e.floor);
       newStatedReleaseDropEl.setAttribute('x1',stRelX); newStatedReleaseDropEl.setAttribute('y1',stRelY);
       newStatedReleaseDropEl.setAttribute('x2',stRelX); newStatedReleaseDropEl.setAttribute('y2',graph.y0-graph.h); newStatedReleaseDropEl.setAttribute('stroke',newStatedCol);

@@ -102,7 +102,7 @@ function parseOneCommand(frag) {
   if (setFilterModeMatch) return { type: 'set', param: 'filter-mode', value: setFilterModeMatch[1].toLowerCase() === 'on' };
 
   // set <checkbox-param> on/off — single regex for boolean params
-  const setBoolMatch = frag.match(/^set\s+(filter-decay|hp-mode|mimic-sustain|analogue|linear-time|show-clipped|show-contour|show-gate-time|show-effective-lines|show-stated-lines|slomo|persist)\s+(on|off)$/i);
+  const setBoolMatch = frag.match(/^set\s+(filter-decay|hp-mode|mimic-sustain|analogue|show-clipped|show-contour|show-gate-time|show-effective-lines|show-stated-lines|slomo|persist)\s+(on|off)$/i);
   if (setBoolMatch) return { type: 'set', param: setBoolMatch[1].toLowerCase(), value: setBoolMatch[2].toLowerCase() === 'on' };
 
   // set zoom-x3|x6|x12|x24|x48 on/off — explicit zoom levels
@@ -257,7 +257,6 @@ function executeEvent(event) {
       case 'hp-mode':        setCheckbox('hpMode'); break;
       case 'mimic-sustain':  setCheckbox('keyboardControl'); break;
       case 'analogue':       setCheckbox('analogueCurve'); break;
-      case 'linear-time':    setCheckbox('linearTime'); break;
       case 'show-clipped':   setCheckbox('showClipped'); break;
       case 'show-contour':   setCheckbox('showContour'); break;
       case 'show-gate-time': setCheckbox('showGateTime'); break;
@@ -553,7 +552,6 @@ function generateStateSnapshot() {
   lines.push(`set hp-mode ${$('hpMode').checked ? 'on' : 'off'}`);
   lines.push(`set mimic-sustain ${$('keyboardControl').checked ? 'on' : 'off'}`);
   lines.push(`set analogue ${$('analogueCurve').checked ? 'on' : 'off'}`);
-  lines.push(`set linear-time ${$('linearTime').checked ? 'on' : 'off'}`);
   lines.push(`set show-clipped ${$('showClipped').checked ? 'on' : 'off'}`);
   lines.push(`set show-contour ${$('showContour').checked ? 'on' : 'off'}`);
   lines.push(`set show-gate-time ${$('showGateTime').checked ? 'on' : 'off'}`);

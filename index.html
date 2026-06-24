@@ -261,12 +261,11 @@
           <div class="row"><label><input id="showContour" type="checkbox" checked> Show Contour Top And Bottom (.)</label></div>
           <div class="row"><label><input id="frequencyMode" type="checkbox"> Filter Mode (F)</label></div>
           <div class="row"><label><input id="hpMode" type="checkbox"> LP/HP Mode (M)</label></div>
-          <div class="row"><label><input id="linearTime" type="checkbox"> Linear Time (X)</label></div>
-          <div class="row"><label id="timelineZoom3xLabel" style="opacity:0.35;pointer-events:none"><input id="timelineZoom3x" type="checkbox"> Zoom x3 (2s)</label></div>
-          <div class="row"><label id="timelineZoom6xLabel" style="opacity:0.35;pointer-events:none"><input type="checkbox" id="timelineZoom6x"> Zoom x6 (1s)</label></div>
-          <div class="row"><label id="timelineZoom12xLabel" style="opacity:0.35;pointer-events:none"><input type="checkbox" id="timelineZoom12x"> Zoom x12 (500ms)</label></div>
-          <div class="row"><label id="timelineZoom24xLabel" style="opacity:0.35;pointer-events:none"><input type="checkbox" id="timelineZoom24x"> Zoom x24 (250ms)</label></div>
-          <div class="row"><label id="timelineZoom48xLabel" style="opacity:0.35;pointer-events:none"><input type="checkbox" id="timelineZoom48x"> Zoom x48 (125ms)</label></div>
+          <div class="row"><label id="timelineZoom3xLabel"><input id="timelineZoom3x" type="checkbox"> Zoom x3 (2s)</label></div>
+          <div class="row"><label id="timelineZoom6xLabel"><input type="checkbox" id="timelineZoom6x"> Zoom x6 (1s)</label></div>
+          <div class="row"><label id="timelineZoom12xLabel"><input type="checkbox" id="timelineZoom12x"> Zoom x12 (500ms)</label></div>
+          <div class="row"><label id="timelineZoom24xLabel"><input type="checkbox" id="timelineZoom24x"> Zoom x24 (250ms)</label></div>
+          <div class="row"><label id="timelineZoom48xLabel"><input type="checkbox" id="timelineZoom48x"> Zoom x48 (125ms)</label></div>
           <div class="row" style="position:relative;">
             <button id="expertToggle" style="padding:4px 7px;min-height:unset;line-height:1.1;border-radius:6px;">Expert</button>
             <div id="expertPopup" style="display:none;position:absolute;bottom:calc(100% + 6px);left:0;background:#1c1c1c;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:8px;z-index:200;min-width:260px;">
@@ -467,7 +466,6 @@ set filter-mode on|off
 set hp-mode on|off
 set mimic-sustain on|off
 set analogue on|off
-set linear-time on|off
 set show-clipped on|off
 set show-contour on|off
 set show-gate-time on|off</pre>
@@ -594,9 +592,6 @@ initCueList();
 // Default mode: Animate
 document.querySelector('input[name="mode"][value="animate"]').checked = true;
 
-// Default: Linear Time enabled
-$('linearTime').checked = true;
-
 // Default: Preset A — set state and target directly so no animation occurs
 (function(){
   const pa = PRESETS[0];
@@ -623,7 +618,7 @@ logEvent('INIT', {
   showContour: $('showContour').checked,
   frequencyMode: $('frequencyMode').checked, hpMode: $('hpMode').checked,
   keyboardControl: $('keyboardControl').checked, showClipped: $('showClipped').checked,
-  linearTime: $('linearTime').checked, analogueCurve: $('analogueCurve').checked
+  analogueCurve: $('analogueCurve').checked
 });
 
 </script>

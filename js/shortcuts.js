@@ -70,7 +70,6 @@ const tag = document.activeElement ? document.activeElement.tagName : '';
     } else if(e.key === 'f' || e.key === 'F'){ toggleCheckbox('frequencyMode');
     } else if(e.key === 'm' || e.key === 'M'){ toggleCheckbox('hpMode');
     } else if(e.key === 's' || e.key === 'S'){ toggleCheckbox('keyboardControl');
-    } else if(e.key === 'x' || e.key === 'X'){ toggleCheckbox('linearTime');
     } else if(e.key === 'b' || e.key === 'B'){ toggleCheckbox('analogueCurve');
     } else if(e.key === 'g' || e.key === 'G'){ toggleCheckbox('showCues');
     } else if(e.key === 'k' || e.key === 'K'){ toggleKiosk();
