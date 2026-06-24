@@ -87,6 +87,35 @@ function setDot(pt, visible=true){
 
 
 
+// ---- Shared excursion finish (persist or immediate reset) ----
+function finishExcursion(){
+  stopGlowPulse();
+  $('dot').removeAttribute('filter');
+  $('dotStated').removeAttribute('filter');
+  audioCut();
+  state.held = false;
+  window._holdReleaseTrigger = null;
+  if($('persistEnabled') && $('persistEnabled').checked){
+    const persistMs = Number(($('persistTime') && $('persistTime').value) || 2000);
+    state.persistTimer = setTimeout(() => {
+      state.persistTimer = null;
+      hideDot();
+      hideDotStated();
+      state.currentPhase = 'idle';
+      state.dotLevel = 0;
+      updateButtonStates();
+      render();
+    }, persistMs);
+  } else {
+    hideDot();
+    hideDotStated();
+    state.currentPhase = 'idle';
+    state.dotLevel = 0;
+    updateButtonStates();
+    render();
+  }
+}
+
 // ---- Release ----
 
 function releaseFromCurrent(){
@@ -105,11 +134,11 @@ function releaseFromCurrent(){
   const dot=$('dot'); dot.style.animation='none'; dot.style.opacity='1';
   cancelAnimationFrame(state.dotAnim);
   stopGlowPulse();
-  hideDotStated();
   const e=getEffective();
 
-  // Loud Decay OFF: no release phase — blob vanishes instantly.
-  if(!e.releaseOn){ clearBlobAndMarker(); return; }
+  // Loud Decay OFF: no release phase — blobs stay at current position for persist.
+  if(!e.releaseOn){ finishExcursion(); return; }
+  hideDotStated();
 
   const pts=computePoints();
   let startX = Number($('dot').getAttribute('cx'));
@@ -279,14 +308,7 @@ function tap(ms){
         const stEnd = statedPos(tapMs);
         setDot(effEnd, true);
         setDotStated(stEnd, true);
-        // Brief flash then vanish
-        audioCut();
-        hideDot();
-        hideDotStated();
-        state.currentPhase = 'idle';
-        state.dotLevel = 0;
-        updateButtonStates();
-        render();
+        finishExcursion();
         return;
       }
       state.currentPhase = 'release';
@@ -312,29 +334,7 @@ function tap(ms){
 
     // Release completion
     if(pos.done && spos.done){
-      stopGlowPulse();
-      if($('persistEnabled') && $('persistEnabled').checked){
-        // Persist: leave blobs drawn static (glowless), start dwell timer
-        audioCut();
-        const persistMs = Number(($('persistTime') && $('persistTime').value) || 2000);
-        state.persistTimer = setTimeout(() => {
-          state.persistTimer = null;
-          hideDot();
-          hideDotStated();
-          state.currentPhase = 'idle';
-          state.dotLevel = 0;
-          updateButtonStates();
-          render();
-        }, persistMs);
-        return;
-      }
-      hideDot();
-      hideDotStated();
-      audioCut();
-      state.currentPhase = 'idle';
-      state.dotLevel = 0;
-      updateButtonStates();
-      render();
+      finishExcursion();
       return;
     }
     state.dotAnim = requestAnimationFrame(step);
@@ -650,33 +650,7 @@ function hold(){
 
     // Release completion: both blobs done
     if(pos.done && spos.done){
-      stopGlowPulse();
-      if($('persistEnabled') && $('persistEnabled').checked){
-        // Persist: leave blobs drawn static (glowless), start dwell timer
-        audioCut();
-        state.held = false;
-        window._holdReleaseTrigger = null;
-        const persistMs = Number(($('persistTime') && $('persistTime').value) || 2000);
-        state.persistTimer = setTimeout(() => {
-          state.persistTimer = null;
-          hideDot();
-          hideDotStated();
-          state.currentPhase = 'idle';
-          state.dotLevel = 0;
-          updateButtonStates();
-          render();
-        }, persistMs);
-        return;
-      }
-      hideDot();
-      hideDotStated();
-      audioCut();
-      state.held = false;
-      state.currentPhase = 'idle';
-      state.dotLevel = 0;
-      window._holdReleaseTrigger = null;
-      updateButtonStates();
-      render();
+      finishExcursion();
       return;
     }
 
