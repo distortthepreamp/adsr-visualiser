@@ -12,9 +12,6 @@ function buildConfigSnapshot(){
     showClipped: $('showClipped').checked,
     linearTime: $('linearTime').checked,
     analogueCurve: $('analogueCurve').checked,
-    tbSustainDotted: $('tbSustainDotted') ? $('tbSustainDotted').checked : true,
-    tbSustainCollapse: $('tbSustainCollapse') ? $('tbSustainCollapse').checked : false,
-    tbShowModelDSustain: $('tbShowModelDSustain') ? $('tbShowModelDSustain').checked : false,
     linkRToD: $('linkRToD') ? $('linkRToD').checked : false,
     showNewEffectiveLines: $('showNewEffectiveLines') ? $('showNewEffectiveLines').checked : true,
     showNewStatedLines: $('showNewStatedLines') ? $('showNewStatedLines').checked : true,
@@ -91,12 +88,11 @@ function loadConfigObject(cfg){
   state.a = cfg.a; state.d = cfg.d; state.s = cfg.s; state.r = cfg.r !== undefined ? cfg.r : 0.5; state.floor = cfg.floor; state.scale = cfg.scale;
   if(cfg.gate !== undefined){ state.gate = cfg.gate; state.target.gate = cfg.gate; }
   state.target.a = cfg.a; state.target.d = cfg.d; state.target.s = cfg.s; state.target.r = state.r; state.target.floor = cfg.floor; state.target.scale = cfg.scale;
-  const _tbCollapse = cfg.tbSustainCollapse ? true : false;
-  state.tbSustainGap = _tbCollapse ? 0 : SUSTAIN_GAP_MAX;
-  state.target.tbSustainGap = state.tbSustainGap;
+  state.tbSustainGap = SUSTAIN_GAP_MAX;
+  state.target.tbSustainGap = SUSTAIN_GAP_MAX;
 
   // Checkboxes
-  ['loudDecay','showContour','showNewEffectiveLines','showNewStatedLines','modelA','modelD','modelS','modelR','showGateTime','clipAtGate','showPeakDischarge','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','linkRToD','dottedMarkers','meterGlow','meterScanlinesVisible','blobGlowEnabled','timelineZoom3x','timelineZoom6x','timelineZoom12x','timelineZoom24x','timelineZoom48x','kioskKnobGlow'].forEach(id => {
+  ['loudDecay','showContour','showNewEffectiveLines','showNewStatedLines','modelA','modelD','modelS','modelR','showGateTime','clipAtGate','showPeakDischarge','frequencyMode','hpMode','keyboardControl','showClipped','linearTime','analogueCurve','linkRToD','dottedMarkers','meterGlow','meterScanlinesVisible','blobGlowEnabled','timelineZoom3x','timelineZoom6x','timelineZoom12x','timelineZoom24x','timelineZoom48x','kioskKnobGlow'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
   const restoredZoom = ($('timelineZoom48x') && $('timelineZoom48x').checked) ? 48

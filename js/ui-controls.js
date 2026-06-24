@@ -309,7 +309,7 @@ function initUIControls(){
   });
 
   // Checkbox render and debug log listeners
-  ['loudDecay','keyboardControl','showContour','frequencyMode','hpMode','showClipped','linearTime','tbSustainDotted','tbSustainCollapse','tbShowModelDSustain','linkRToD'].forEach(id => {
+  ['loudDecay','keyboardControl','showContour','frequencyMode','hpMode','showClipped','linearTime','linkRToD'].forEach(id => {
     const el = $(id); if(!el) return;
     el.addEventListener('change', render);
     el.addEventListener('change', () => {
@@ -321,19 +321,13 @@ function initUIControls(){
           loudDecay: chk('loudDecay'), keyboardControl: chk('keyboardControl'),
           frequencyMode: chk('frequencyMode'), hpMode: chk('hpMode'),
           showClipped: chk('showClipped'), analogueCurve: chk('analogueCurve'),
-          linearTime: chk('linearTime'),
-          tbSustainCollapse: chk('tbSustainCollapse')
+          linearTime: chk('linearTime')
         },
         geometry: window._lastRenderGeometry || null
       });
     });
   });
 
-  // tbSustainCollapse — also triggers a transition
-  $('tbSustainCollapse').addEventListener('change', () => {
-    state.target.tbSustainGap = $('tbSustainCollapse').checked ? 0 : SUSTAIN_GAP_MAX;
-    transition(currentTransitionSec);
-  });
 
   // Meter / blob glow
   $('meterGlow').addEventListener('change', () => setMeterLevel(state.dotY || graph.y0));

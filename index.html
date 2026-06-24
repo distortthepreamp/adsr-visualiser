@@ -278,9 +278,6 @@
           </div>
         </div>
         <div>
-          <div id="tbSustainDottedRow" class="row"><label><input id="tbSustainDotted" type="checkbox" checked> Dotted Textbook ADSR Sustain ([)</label></div>
-          <div id="tbSustainCollapseRow" class="row"><label><input id="tbSustainCollapse" type="checkbox"> Collapse Textbook ADSR Sustain (])</label></div>
-          <div id="tbShowModelDSustainRow" class="row"><label><input id="tbShowModelDSustain" type="checkbox"> Show Model D Sustain (textbook) (\)</label></div>
           <div class="row"><label><input type="checkbox" id="linkRToD"> Link Textbook R to D</label></div>
           <div class="row"><label><input type="checkbox" id="showGateTime"> Show Gate Time</label></div>
           <div class="row"><label><input type="checkbox" id="showPeakDischarge"> Show Peak Discharge</label></div>
@@ -517,7 +514,6 @@ notes: E1 E2 C4 A4</pre>
 <script src="data/configs.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/timeaxis.js"></script>
-<script src="js/textbook.js"></script>
 <script src="js/animation.js"></script>
 <script src="js/geometry.js"></script>
 <script src="js/rc-physics.js"></script>
@@ -627,9 +623,7 @@ logEvent('INIT', {
   showContour: $('showContour').checked,
   frequencyMode: $('frequencyMode').checked, hpMode: $('hpMode').checked,
   keyboardControl: $('keyboardControl').checked, showClipped: $('showClipped').checked,
-  linearTime: $('linearTime').checked, analogueCurve: $('analogueCurve').checked,
-  tbSustainDotted: $('tbSustainDotted').checked,
-  tbSustainCollapse: $('tbSustainCollapse').checked, tbShowModelDSustain: $('tbShowModelDSustain').checked
+  linearTime: $('linearTime').checked, analogueCurve: $('analogueCurve').checked
 });
 
 </script>
