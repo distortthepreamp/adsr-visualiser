@@ -191,6 +191,9 @@ function parseOneCommand(frag) {
   // play-release
   if (/^play-release$/i.test(frag)) return { type: 'play', action: 'release', note: null };
 
+  // play-clear
+  if (/^play-clear$/i.test(frag)) return { type: 'play-clear' };
+
   // set subtitle "..."
   const setSubtitleMatch = frag.match(/^set\s+subtitle\s+"([^"]*)"$/i);
   if (setSubtitleMatch) return { type: 'set', param: 'subtitle', value: setSubtitleMatch[1] };
@@ -375,6 +378,8 @@ function executeEvent(event) {
         if (window.releaseFromCurrent) releaseFromCurrent();
         break;
     }
+  } else if (event.type === 'play-clear') {
+    if (window.clearBlobAndMarker) clearBlobAndMarker();
   }
 }
 

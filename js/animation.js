@@ -1,4 +1,9 @@
 // ---- Blob animation state ----
+function cueNoteStr(){
+  if(!window.noteMode) return '';
+  const m = noteMode.match(/^note([A-Ga-g]\d)Btn$/);
+  return m ? ' ' + m[1] : '';
+}
 let animationToken = 0;
 let releaseStartPoint = null;
 // glowPulseRaf is scoped inside the glow closure below
@@ -237,7 +242,7 @@ function clearBlobAndMarker(){
 
 function tap(ms){
   logEvent('ANIMATION', { action: 'tap', ms: Number(ms) || 200 });
-  if(window.cueRecordRaw) cueRecordRaw(`play-tap ${Number(ms)||200}ms`);
+  if(window.cueRecordRaw) cueRecordRaw(`play-tap ${Number(ms)||200}ms${cueNoteStr()}`);
   if(state.currentPhase === 'hold' || state.currentPhase === 'sustain' || state.currentPhase === 'release') clearBlobAndMarker();
   if(state.persistTimer){ clearTimeout(state.persistTimer); state.persistTimer = null; }
   releaseStartPoint=null;
@@ -550,7 +555,7 @@ function animRate(){ return ($('sloMo') && $('sloMo').checked) ? 0.1 : 1; }
 
 function hold(){
   logEvent('ANIMATION', { action: 'hold' });
-  if(window.cueRecordRaw) cueRecordRaw('play-hold');
+  if(window.cueRecordRaw) cueRecordRaw(`play-hold${cueNoteStr()}`);
   if(state.persistTimer){ clearTimeout(state.persistTimer); state.persistTimer = null; }
   releaseStartPoint = null;
   animationToken++;
