@@ -102,7 +102,7 @@ function parseOneCommand(frag) {
   if (setFilterModeMatch) return { type: 'set', param: 'filter-mode', value: setFilterModeMatch[1].toLowerCase() === 'on' };
 
   // set <checkbox-param> on/off — single regex for boolean params
-  const setBoolMatch = frag.match(/^set\s+(filter-decay|hp-mode|mimic-sustain|analogue|show-clipped|show-contour|show-gate-time|show-effective-lines|show-stated-lines|slomo|persist)\s+(on|off)$/i);
+  const setBoolMatch = frag.match(/^set\s+(filter-decay|hp-mode|mimic-sustain|analogue|show-clipped|show-contour|show-gate-time|clip-at-gate|show-peak-discharge|link-r-to-d|show-effective-lines|show-stated-lines|slomo|persist)\s+(on|off)$/i);
   if (setBoolMatch) return { type: 'set', param: setBoolMatch[1].toLowerCase(), value: setBoolMatch[2].toLowerCase() === 'on' };
 
   // set zoom N — numeric zoom factor
@@ -275,6 +275,9 @@ function executeEvent(event) {
       case 'show-clipped':   setCheckbox('showClipped'); break;
       case 'show-contour':   setCheckbox('showContour'); break;
       case 'show-gate-time': setCheckbox('showGateTime'); break;
+      case 'clip-at-gate':        setCheckbox('clipAtGate'); break;
+      case 'show-peak-discharge': setCheckbox('showPeakDischarge'); break;
+      case 'link-r-to-d':         setCheckbox('linkRToD'); break;
       case 'show-effective-lines': setCheckbox('showNewEffectiveLines'); break;
       case 'show-stated-lines': setCheckbox('showNewStatedLines'); break;
       case 'slomo': setCheckbox('sloMo'); break;
@@ -590,6 +593,9 @@ const CUE_PARAMS = [
   { key:'show-clipped',        fmt:()=>`set show-clipped ${$('showClipped').checked?'on':'off'}` },
   { key:'show-contour',        fmt:()=>`set show-contour ${$('showContour').checked?'on':'off'}` },
   { key:'show-gate-time',      fmt:()=>`set show-gate-time ${$('showGateTime').checked?'on':'off'}` },
+  { key:'clip-at-gate',        fmt:()=>`set clip-at-gate ${$('clipAtGate').checked?'on':'off'}` },
+  { key:'show-peak-discharge', fmt:()=>`set show-peak-discharge ${$('showPeakDischarge').checked?'on':'off'}` },
+  { key:'link-r-to-d',         fmt:()=>`set link-r-to-d ${$('linkRToD').checked?'on':'off'}` },
   { key:'show-effective-lines',fmt:()=>`set show-effective-lines ${$('showNewEffectiveLines').checked?'on':'off'}` },
   { key:'show-stated-lines',   fmt:()=>`set show-stated-lines ${$('showNewStatedLines').checked?'on':'off'}` },
   { key:'slomo',               fmt:()=>`set slomo ${$('sloMo').checked?'on':'off'}` },
