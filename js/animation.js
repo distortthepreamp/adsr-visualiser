@@ -120,6 +120,7 @@ function finishExcursion(){
 
 function releaseFromCurrent(){
   logEvent('ANIMATION', { action: 'release' });
+  if(window.cueRecordRaw) cueRecordRaw('play-release');
 
   // If the hold's unified t-clock is running, trigger release through it (not a separate animation)
   if(window._holdReleaseTrigger){
@@ -236,6 +237,7 @@ function clearBlobAndMarker(){
 
 function tap(ms){
   logEvent('ANIMATION', { action: 'tap', ms: Number(ms) || 200 });
+  if(window.cueRecordRaw) cueRecordRaw(`play-tap ${Number(ms)||200}ms`);
   if(state.currentPhase === 'hold' || state.currentPhase === 'sustain' || state.currentPhase === 'release') clearBlobAndMarker();
   if(state.persistTimer){ clearTimeout(state.persistTimer); state.persistTimer = null; }
   releaseStartPoint=null;
@@ -548,6 +550,7 @@ function animRate(){ return ($('sloMo') && $('sloMo').checked) ? 0.1 : 1; }
 
 function hold(){
   logEvent('ANIMATION', { action: 'hold' });
+  if(window.cueRecordRaw) cueRecordRaw('play-hold');
   if(state.persistTimer){ clearTimeout(state.persistTimer); state.persistTimer = null; }
   releaseStartPoint = null;
   animationToken++;

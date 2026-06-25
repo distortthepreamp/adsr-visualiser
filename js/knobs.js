@@ -7,6 +7,8 @@ const MAX_TIME_MS = 12000;       // maximum ms value for attack/decay/release in
 const KNOB_DRAG_PX_RANGE = 200;          // px of vertical drag that spans the full 0–1 knob range
 const BTN_PRESS_RELEASE_DELAY_MS = 120;  // ms before removing the pressed visual state from a button
 
+const KNOB_CUE_KEY = { a:'attack', d:'decay', s:'sustain', r:'release', floor:'cutoff', scale:'amount', gate:'gate' };
+
 (function(){
 
 // ---- Numeric input typed-display state ----
@@ -61,6 +63,7 @@ function commitTime(which, input){
   const ms = Math.max(0, Math.min(MAX_TIME_MS, Math.round(Number(input.value) || 0)));
   input.value = ms;
   logEvent('COMMIT', { knob: which, value: ms });
+  if(window.cueRecord) cueRecord(KNOB_CUE_KEY[which]);
   const m = currentMode();
   typedDisplay[m][which] = ms;
   const obj = activeObject();
@@ -80,6 +83,7 @@ function commitSustain(){
   const scale = Math.max(0, Math.min(10, Number(sustainInput.value) || 0));
   sustainInput.value = fmtScaleValue(scale);
   logEvent('COMMIT', { knob: 's', value: scale });
+  if(window.cueRecord) cueRecord('sustain');
   const obj = activeObject();
   obj.s = scale / 10;
   if (currentMode() === 'live') {
@@ -135,6 +139,7 @@ function commitFloor(){
   const v = Math.max(0, Math.min(10, Number(floorInput.value) || 0));
   floorInput.value = fmtScaleValue(v);
   logEvent('COMMIT', { knob: 'floor', value: v });
+  if(window.cueRecord) cueRecord('cutoff');
   const obj = activeObject();
   obj.floor = v / 10;
   if (currentMode() === 'live') {
@@ -151,6 +156,7 @@ function commitScale(){
   const v = Math.max(0, Math.min(10, Number(scaleInput.value) || 0));
   scaleInput.value = fmtScaleValue(v);
   logEvent('COMMIT', { knob: 'scale', value: v });
+  if(window.cueRecord) cueRecord('amount');
   const obj = activeObject();
   obj.scale = v / 10;
   if (currentMode() === 'live') {
@@ -166,6 +172,7 @@ function commitGate(){
   const ms = Math.max(20, Math.min(5000, Math.round(Number(gateInput.value) || 200)));
   gateInput.value = ms;
   logEvent('COMMIT', { knob: 'gate', value: ms });
+  if(window.cueRecord) cueRecord('gate');
   const obj = activeObject();
   obj.gate = gatePositionFromMs(ms);
   if (currentMode() === 'live') {
@@ -286,6 +293,7 @@ function initKnobs(){
     knob.addEventListener('pointerup', e => {
       knob.releasePointerCapture(e.pointerId);
       logEvent('COMMIT', { knob: field, value: activeObject()[field] });
+      if(window.cueRecord) cueRecord(KNOB_CUE_KEY[field]);
     });
   });
 }

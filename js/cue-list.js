@@ -615,6 +615,14 @@ const CUE_PARAMS = [
 
 function formatCueCommand(key){ const p = CUE_PARAMS.find(p=>p.key===key); return p ? p.fmt() : null; }
 
+// ---- Cue recorder ----
+let cueLog = [];
+const _cueT0 = Date.now();
+window.cueRecord = function(key){ const c = formatCueCommand(key); if(c) cueLog.push({ t: Date.now()-_cueT0, command: c }); };
+window.cueRecordRaw = function(cmd){ cueLog.push({ t: Date.now()-_cueT0, command: cmd }); };
+window.getCueLog = function(){ return cueLog; };
+window.clearCueLog = function(){ cueLog = []; };
+
 // ---- generateStateSnapshot — returns set commands for all cueable params ----
 function generateStateSnapshot() {
   return CUE_PARAMS.map(p=>p.fmt()).join('; ');

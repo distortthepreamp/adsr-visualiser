@@ -212,6 +212,7 @@ function commitZoom(){
   state.target.zoomFactor = v;
   transition(currentTransitionSec);
   syncZoomReadout();
+  if(window.cueRecord) cueRecord('zoom');
 }
 function syncAnalogueCurve(){
   const on = $('analogueCurve') && $('analogueCurve').checked;
@@ -305,7 +306,8 @@ function initUIControls(){
     document.body.classList.toggle('decluttered', e.target.checked);
   });
 
-  // Checkbox render and debug log listeners
+  // Checkbox render, debug log, and cue recorder listeners
+  const TOGGLE_CUE_KEY = { loudDecay:'loud-decay', keyboardControl:'mimic-sustain', showContour:'show-contour', frequencyMode:'filter-mode', hpMode:'hp-mode', showClipped:'show-clipped', linkRToD:'link-r-to-d' };
   ['loudDecay','keyboardControl','showContour','frequencyMode','hpMode','showClipped','linkRToD'].forEach(id => {
     const el = $(id); if(!el) return;
     el.addEventListener('change', render);
@@ -321,6 +323,7 @@ function initUIControls(){
         },
         geometry: window._lastRenderGeometry || null
       });
+      if(window.cueRecord) cueRecord(TOGGLE_CUE_KEY[id]);
     });
   });
 
@@ -351,7 +354,7 @@ function initUIControls(){
   if($('fitBtn')) $('fitBtn').addEventListener('click', computeFitZoom);
 
   // Analogue curve
-  $('analogueCurve').addEventListener('change', () => { syncAnalogueCurve(); render(); if(state.currentPhase === 'idle') clearBlobAndMarker(); });
+  $('analogueCurve').addEventListener('change', () => { syncAnalogueCurve(); render(); if(state.currentPhase === 'idle') clearBlobAndMarker(); if(window.cueRecord) cueRecord('analogue'); });
   $('curveAmount').addEventListener('input', () => { syncAnalogueCurve(); render(); });
 
   // Colour inputs
@@ -404,20 +407,23 @@ function initUIControls(){
       if(window.markPresetDirty) markPresetDirty();
     });
   });
-  $('showGateTime') && $('showGateTime').addEventListener('change', render);
-  $('clipAtGate') && $('clipAtGate').addEventListener('change', render);
-  $('showPeakDischarge') && $('showPeakDischarge').addEventListener('change', render);
-  ['underlayA','underlayD','underlayS','underlayR'].forEach(id => { $(id) && $(id).addEventListener('change', render); });
-  $('underlayShowAll') && $('underlayShowAll').addEventListener('click', () => { ['underlayA','underlayD','underlayS','underlayR'].forEach(id => { if($(id)) $(id).checked = true; }); render(); });
-  $('underlayHideAll') && $('underlayHideAll').addEventListener('click', () => { ['underlayA','underlayD','underlayS','underlayR'].forEach(id => { if($(id)) $(id).checked = false; }); render(); });
+  $('showGateTime') && $('showGateTime').addEventListener('change', () => { render(); if(window.cueRecord) cueRecord('show-gate-time'); });
+  $('clipAtGate') && $('clipAtGate').addEventListener('change', () => { render(); if(window.cueRecord) cueRecord('clip-at-gate'); });
+  $('showPeakDischarge') && $('showPeakDischarge').addEventListener('change', () => { render(); if(window.cueRecord) cueRecord('show-peak-discharge'); });
+  const LEG_CUE_KEY = { underlayA:'textbook-attack', underlayD:'textbook-decay', underlayS:'textbook-sustain', underlayR:'textbook-release', modelA:'actual-attack', modelD:'actual-decay', modelS:'actual-sustain', modelR:'actual-release' };
+  ['underlayA','underlayD','underlayS','underlayR'].forEach(id => { $(id) && $(id).addEventListener('change', () => { render(); if(window.cueRecord) cueRecord(LEG_CUE_KEY[id]); }); });
+  $('underlayShowAll') && $('underlayShowAll').addEventListener('click', () => { ['underlayA','underlayD','underlayS','underlayR'].forEach(id => { if($(id)) $(id).checked = true; }); render(); if(window.cueRecordRaw) cueRecordRaw('set textbook show-all'); });
+  $('underlayHideAll') && $('underlayHideAll').addEventListener('click', () => { ['underlayA','underlayD','underlayS','underlayR'].forEach(id => { if($(id)) $(id).checked = false; }); render(); if(window.cueRecordRaw) cueRecordRaw('set textbook hide-all'); });
   $('underlayColor') && $('underlayColor').addEventListener('change', render);
-  $('showNewEffectiveLines') && $('showNewEffectiveLines').addEventListener('change', render);
-  $('showNewStatedLines') && $('showNewStatedLines').addEventListener('change', render);
-  ['modelA','modelD','modelS','modelR'].forEach(id => { $(id) && $(id).addEventListener('change', render); });
-  $('modelShowAll') && $('modelShowAll').addEventListener('click', () => { ['modelA','modelD','modelS','modelR'].forEach(id => { if($(id)) $(id).checked = true; }); render(); });
-  $('modelHideAll') && $('modelHideAll').addEventListener('click', () => { ['modelA','modelD','modelS','modelR'].forEach(id => { if($(id)) $(id).checked = false; }); render(); });
+  $('showNewEffectiveLines') && $('showNewEffectiveLines').addEventListener('change', () => { render(); if(window.cueRecord) cueRecord('show-effective-lines'); });
+  $('showNewStatedLines') && $('showNewStatedLines').addEventListener('change', () => { render(); if(window.cueRecord) cueRecord('show-stated-lines'); });
+  ['modelA','modelD','modelS','modelR'].forEach(id => { $(id) && $(id).addEventListener('change', () => { render(); if(window.cueRecord) cueRecord(LEG_CUE_KEY[id]); }); });
+  $('modelShowAll') && $('modelShowAll').addEventListener('click', () => { ['modelA','modelD','modelS','modelR'].forEach(id => { if($(id)) $(id).checked = true; }); render(); if(window.cueRecordRaw) cueRecordRaw('set actual show-all'); });
+  $('modelHideAll') && $('modelHideAll').addEventListener('click', () => { ['modelA','modelD','modelS','modelR'].forEach(id => { if($(id)) $(id).checked = false; }); render(); if(window.cueRecordRaw) cueRecordRaw('set actual hide-all'); });
   $('clearBtn').addEventListener('click', () => { logEvent('ANIMATION', { action: 'clear' }); clearBlobAndMarker(); });
-  $('sloMo') && $('sloMo').addEventListener('change', () => { if($('sloMo').checked) audioCut(); });
+  $('sloMo') && $('sloMo').addEventListener('change', () => { if($('sloMo').checked) audioCut(); if(window.cueRecord) cueRecord('slomo'); });
+  $('persistEnabled') && $('persistEnabled').addEventListener('change', () => { if(window.cueRecord) cueRecord('persist'); });
+  $('persistTime') && $('persistTime').addEventListener('change', () => { if(window.cueRecord) cueRecord('persist-time'); });
 
   // Quick-set buttons
   document.querySelectorAll('.quickset-btn').forEach(btn => {
