@@ -617,7 +617,8 @@ function formatCueCommand(key){ const p = CUE_PARAMS.find(p=>p.key===key); retur
 
 // ---- Cue recorder ----
 let cueLog = [];
-const _cueT0 = Date.now();
+let _cueT0 = Date.now();
+const CUE_RECORD_MERGE_MS = 200;
 window.cueRecord = function(key){ const c = formatCueCommand(key); if(c) cueLog.push({ t: Date.now()-_cueT0, command: c }); };
 window.cueRecordRaw = function(cmd){ cueLog.push({ t: Date.now()-_cueT0, command: cmd }); };
 window.getCueLog = function(){ return cueLog; };
@@ -627,6 +628,69 @@ window.clearCueLog = function(){ cueLog = []; };
 function generateStateSnapshot() {
   return CUE_PARAMS.map(p=>p.fmt()).join('; ');
 }
+
+window.resetCueRec = function(){
+  cueLog = [];
+  _cueT0 = Date.now();
+  cueLog.push({ t: 0, command: generateStateSnapshot() });
+};
+
+function buildCueScript(){
+  const lines = [];
+  for(let i = 0; i < cueLog.length; i++){
+    const entry = cueLog[i];
+    if(i === 0){
+      lines.push(entry.command);
+      continue;
+    }
+    if(i > 1){
+      const gap = entry.t - cueLog[i-1].t;
+      lines.push('wait ' + msToTc(gap));
+    }
+    lines.push(entry.command);
+  }
+  return lines.join('\n');
+}
+
+// ---- Cue Log viewer modal ----
+(function(){
+  const overlay = document.createElement('div');
+  overlay.id = 'cueLogOverlay';
+  overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;align-items:center;justify-content:center;';
+  overlay.innerHTML =
+    '<div style="background:rgba(18,18,18,.97);border:1px solid rgba(255,255,255,.3);border-radius:14px;padding:22px 28px 24px;width:600px;max-width:95vw;display:flex;flex-direction:column;color:#fff;font-family:Arial,Helvetica,sans-serif;position:relative;">' +
+      '<button id="cueLogClose" style="position:absolute;top:10px;right:14px;background:none;border:none;color:rgba(255,255,255,.7);font-size:20px;font-weight:800;cursor:pointer;line-height:1;padding:0">\xd7</button>' +
+      '<div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:12px">Cue Log</div>' +
+      '<textarea id="cueLogText" readonly style="width:100%;box-sizing:border-box;height:360px;background:#0a0a0a;color:#ccc;border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:10px;font-family:monospace;font-size:12px;resize:vertical;"></textarea>' +
+      '<div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;">' +
+        '<button id="cueLogCopy" style="padding:5px 14px;">Copy</button>' +
+        '<button id="cueLogClose2" style="padding:5px 14px;">Close</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+
+  function closeModal(){ overlay.style.display = 'none'; }
+  document.getElementById('cueLogClose').addEventListener('click', closeModal);
+  document.getElementById('cueLogClose2').addEventListener('click', closeModal);
+  overlay.addEventListener('click', e => { if(e.target === overlay) closeModal(); });
+  document.getElementById('cueLogCopy').addEventListener('click', () => {
+    const ta = document.getElementById('cueLogText');
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(ta.value).catch(() => { ta.select(); document.execCommand('copy'); });
+    } else {
+      ta.select(); document.execCommand('copy');
+    }
+  });
+
+  const openBtn = document.getElementById('cueLogBtn');
+  if(openBtn) openBtn.addEventListener('click', () => {
+    document.getElementById('cueLogText').value = buildCueScript();
+    overlay.style.display = 'flex';
+  });
+
+  const recResetBtn = document.getElementById('cueRecResetBtn');
+  if(recResetBtn) recResetBtn.addEventListener('click', () => { resetCueRec(); });
+})();
 
 // ---- initCueList ----
 function initCueList() {
@@ -717,6 +781,7 @@ function initCueList() {
   const copyStateBtn = document.getElementById('cueCopyStateBtn');
   if (copyStateBtn) copyStateBtn.addEventListener('click', () => {
     navigator.clipboard.writeText(generateStateSnapshot());
+    cueLog.push({ t: Date.now()-_cueT0, command: generateStateSnapshot() });
   });
 
   // Load button — file picker

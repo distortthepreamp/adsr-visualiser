@@ -405,6 +405,11 @@ function initUIControls(){
       state.target.gate = gatePositionFromMs(ms);
       transition(currentTransitionSec);
       if(window.markPresetDirty) markPresetDirty();
+      if(currentTransitionSec <= 0.01){
+        if(window.cueRecord) cueRecord('gate');
+      } else if(window.cueRecordRaw && window.msToTc){
+        cueRecordRaw(`transition gate ${ms}ms ${window.msToTc(currentTransitionSec*1000)}`);
+      }
     });
   });
   $('showGateTime') && $('showGateTime').addEventListener('change', () => { render(); if(window.cueRecord) cueRecord('show-gate-time'); });
@@ -438,6 +443,13 @@ function initUIControls(){
       else if(knob === 'cutoff') state.target.floor = ms / 10;
       else if(knob === 'amount') state.target.scale = ms / 10;
       transition(currentTransitionSec);
+      if(currentTransitionSec <= 0.01){
+        if(window.cueRecord) cueRecord(knob);
+      } else if(window.cueRecordRaw && window.msToTc){
+        const isTimeKnob = ['attack','decay','release','gate'].includes(knob);
+        const valStr = isTimeKnob ? ms + 'ms' : String(ms);
+        cueRecordRaw(`transition ${knob} ${valStr} ${window.msToTc(currentTransitionSec*1000)}`);
+      }
     });
   });
 
