@@ -643,9 +643,10 @@ function buildCueScript(){
       lines.push(entry.command);
       continue;
     }
-    if(i > 1){
+    if(i > 0){
       const gap = entry.t - cueLog[i-1].t;
-      lines.push('wait ' + msToTc(gap));
+      const MIN_WAIT_MS = Math.ceil(1000/24); // 1 frame @ 24fps = 42ms
+      lines.push('wait ' + msToTc(Math.max(gap, MIN_WAIT_MS)));
     }
     lines.push(entry.command);
   }
@@ -690,6 +691,19 @@ function buildCueScript(){
 
   const recResetBtn = document.getElementById('cueRecResetBtn');
   if(recResetBtn) recResetBtn.addEventListener('click', () => { resetCueRec(); });
+
+  const loadLogBtn = document.getElementById('cueLogLoadBtn');
+  if(loadLogBtn) loadLogBtn.addEventListener('click', () => {
+    const script = buildCueScript();
+    if(!script || !script.trim()){ alert('Cue log is empty \u2014 nothing to load.'); return; }
+    if(cueListText.trim() && !confirm('Replace the current cue script?')) return;
+    cueListText = script;
+    cueList = parseCueList(cueListText);
+    cueIndex = 0;
+    cueTimecodeMs = 0;
+    updateTimecodeDisplay();
+    updateCueScriptView();
+  });
 })();
 
 // ---- initCueList ----

@@ -351,6 +351,7 @@
           <button id="debugLogBtn" style="padding:3px 6px">Debug Log</button>
           <button id="cueLogBtn" style="padding:3px 6px">Cue Log</button>
           <button id="cueRecResetBtn" style="padding:3px 6px">Clear Cues</button>
+          <button id="cueLogLoadBtn" style="padding:3px 6px">Load Cue Log</button>
         </div>
         <span id="configName" style="font-size:13px;font-weight:700;opacity:.85"></span>
       </div>
@@ -615,6 +616,7 @@ logEvent('INIT', {
   keyboardControl: $('keyboardControl').checked, showClipped: $('showClipped').checked,
   analogueCurve: $('analogueCurve').checked
 });
+if(window.resetCueRec) resetCueRec();
 
 </script>
 </body>
