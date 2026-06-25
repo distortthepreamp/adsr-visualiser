@@ -573,42 +573,45 @@ function cueStepBack() {
 window.cueStepFwd  = cueStepFwd;
 window.cueStepBack = cueStepBack;
 
+// ---- Shared per-control cue formatter (used by Copy State and recorder) ----
+const CUE_PARAMS = [
+  { key:'attack',              fmt:()=>`set attack ${Math.round(msFromPosition(state.a))}ms` },
+  { key:'decay',               fmt:()=>`set decay ${Math.round(msFromPosition(state.d))}ms` },
+  { key:'sustain',             fmt:()=>`set sustain ${Math.round(state.s*10)}` },
+  { key:'release',             fmt:()=>`set release ${Math.round(msFromPosition(state.r))}ms` },
+  { key:'cutoff',              fmt:()=>`set cutoff ${Math.round(state.floor*10)}` },
+  { key:'amount',              fmt:()=>`set amount ${Math.round(state.scale*10)}` },
+  { key:'gate',                fmt:()=>`set gate ${Math.round(gateMsFromPosition(state.gate))}ms` },
+  { key:'loud-decay',          fmt:()=>`set loud-decay ${$('loudDecay').checked?'on':'off'}` },
+  { key:'filter-mode',         fmt:()=>`set filter-mode ${$('frequencyMode').checked?'on':'off'}` },
+  { key:'hp-mode',             fmt:()=>`set hp-mode ${$('hpMode').checked?'on':'off'}` },
+  { key:'mimic-sustain',       fmt:()=>`set mimic-sustain ${$('keyboardControl').checked?'on':'off'}` },
+  { key:'analogue',            fmt:()=>`set analogue ${$('analogueCurve').checked?'on':'off'}` },
+  { key:'show-clipped',        fmt:()=>`set show-clipped ${$('showClipped').checked?'on':'off'}` },
+  { key:'show-contour',        fmt:()=>`set show-contour ${$('showContour').checked?'on':'off'}` },
+  { key:'show-gate-time',      fmt:()=>`set show-gate-time ${$('showGateTime').checked?'on':'off'}` },
+  { key:'show-effective-lines',fmt:()=>`set show-effective-lines ${$('showNewEffectiveLines').checked?'on':'off'}` },
+  { key:'show-stated-lines',   fmt:()=>`set show-stated-lines ${$('showNewStatedLines').checked?'on':'off'}` },
+  { key:'slomo',               fmt:()=>`set slomo ${$('sloMo').checked?'on':'off'}` },
+  { key:'persist',             fmt:()=>`set persist ${$('persistEnabled').checked?'on':'off'}` },
+  { key:'persist-time',        fmt:()=>`set persist-time ${Number($('persistTime')?$('persistTime').value:2000)}ms` },
+  { key:'zoom',                fmt:()=>`set zoom ${state.zoomFactor}` },
+  { key:'textbook-attack',     fmt:()=>`set textbook attack ${$('underlayA').checked?'on':'off'}` },
+  { key:'textbook-decay',      fmt:()=>`set textbook decay ${$('underlayD').checked?'on':'off'}` },
+  { key:'textbook-sustain',    fmt:()=>`set textbook sustain ${$('underlayS').checked?'on':'off'}` },
+  { key:'textbook-release',    fmt:()=>`set textbook release ${$('underlayR').checked?'on':'off'}` },
+  { key:'actual-attack',       fmt:()=>`set actual attack ${$('modelA').checked?'on':'off'}` },
+  { key:'actual-decay',        fmt:()=>`set actual decay ${$('modelD').checked?'on':'off'}` },
+  { key:'actual-sustain',      fmt:()=>`set actual sustain ${$('modelS').checked?'on':'off'}` },
+  { key:'actual-release',      fmt:()=>`set actual release ${$('modelR').checked?'on':'off'}` },
+  { key:'subtitle',            fmt:()=>`set subtitle "${state.subtitle||''}"` },
+];
+
+function formatCueCommand(key){ const p = CUE_PARAMS.find(p=>p.key===key); return p ? p.fmt() : null; }
+
 // ---- generateStateSnapshot — returns set commands for all cueable params ----
 function generateStateSnapshot() {
-  const lines = [];
-  lines.push(`set attack ${Math.round(msFromPosition(state.a))}ms`);
-  lines.push(`set decay ${Math.round(msFromPosition(state.d))}ms`);
-  lines.push(`set sustain ${Math.round(state.s * 10)}`);
-  lines.push(`set release ${Math.round(msFromPosition(state.r))}ms`);
-  lines.push(`set cutoff ${Math.round(state.floor * 10)}`);
-  lines.push(`set amount ${Math.round(state.scale * 10)}`);
-  lines.push(`set gate ${Math.round(gateMsFromPosition(state.gate))}ms`);
-  lines.push(`set loud-decay ${$('loudDecay').checked ? 'on' : 'off'}`);
-  lines.push(`set filter-mode ${$('frequencyMode').checked ? 'on' : 'off'}`);
-  lines.push(`set hp-mode ${$('hpMode').checked ? 'on' : 'off'}`);
-  lines.push(`set mimic-sustain ${$('keyboardControl').checked ? 'on' : 'off'}`);
-  lines.push(`set analogue ${$('analogueCurve').checked ? 'on' : 'off'}`);
-  lines.push(`set show-clipped ${$('showClipped').checked ? 'on' : 'off'}`);
-  lines.push(`set show-contour ${$('showContour').checked ? 'on' : 'off'}`);
-  lines.push(`set show-gate-time ${$('showGateTime').checked ? 'on' : 'off'}`);
-  lines.push(`set show-effective-lines ${$('showNewEffectiveLines').checked ? 'on' : 'off'}`);
-  lines.push(`set show-stated-lines ${$('showNewStatedLines').checked ? 'on' : 'off'}`);
-  lines.push(`set slomo ${$('sloMo').checked ? 'on' : 'off'}`);
-  lines.push(`set persist ${$('persistEnabled').checked ? 'on' : 'off'}`);
-  lines.push(`set persist-time ${Number($('persistTime') ? $('persistTime').value : 2000)}ms`);
-  lines.push(`set zoom ${state.zoomFactor}`);
-  // Textbook (underlay) leg visibility
-  lines.push(`set textbook attack ${$('underlayA').checked ? 'on' : 'off'}`);
-  lines.push(`set textbook decay ${$('underlayD').checked ? 'on' : 'off'}`);
-  lines.push(`set textbook sustain ${$('underlayS').checked ? 'on' : 'off'}`);
-  lines.push(`set textbook release ${$('underlayR').checked ? 'on' : 'off'}`);
-  // Actual (model) leg visibility
-  lines.push(`set actual attack ${$('modelA').checked ? 'on' : 'off'}`);
-  lines.push(`set actual decay ${$('modelD').checked ? 'on' : 'off'}`);
-  lines.push(`set actual sustain ${$('modelS').checked ? 'on' : 'off'}`);
-  lines.push(`set actual release ${$('modelR').checked ? 'on' : 'off'}`);
-  lines.push(`set subtitle "${state.subtitle || ''}"`);
-  return lines.join('; ');
+  return CUE_PARAMS.map(p=>p.fmt()).join('; ');
 }
 
 // ---- initCueList ----
