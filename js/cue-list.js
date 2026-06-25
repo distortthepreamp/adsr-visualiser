@@ -191,6 +191,10 @@ function parseOneCommand(frag) {
   // play-release
   if (/^play-release$/i.test(frag)) return { type: 'play', action: 'release', note: null };
 
+  // set subtitle "..."
+  const setSubtitleMatch = frag.match(/^set\s+subtitle\s+"([^"]*)"$/i);
+  if (setSubtitleMatch) return { type: 'set', param: 'subtitle', value: setSubtitleMatch[1] };
+
   return null;
 }
 
@@ -283,6 +287,10 @@ function executeEvent(event) {
         break;
       case 'zoom-fit':
         computeFitZoom();
+        break;
+      case 'subtitle':
+        state.subtitle = event.value;
+        { const subEl=$('subtitleBox'); if(subEl) subEl.textContent = event.value || 'EMPTY'; }
         break;
       // Textbook (underlay) per-leg visibility
       case 'textbook-attack':  setCheckbox('underlayA'); break;
@@ -599,6 +607,7 @@ function generateStateSnapshot() {
   lines.push(`set actual decay ${$('modelD').checked ? 'on' : 'off'}`);
   lines.push(`set actual sustain ${$('modelS').checked ? 'on' : 'off'}`);
   lines.push(`set actual release ${$('modelR').checked ? 'on' : 'off'}`);
+  lines.push(`set subtitle "${state.subtitle || ''}"`);
   return lines.join('; ');
 }
 
