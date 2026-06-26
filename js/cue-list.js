@@ -762,7 +762,7 @@ function initCueList() {
       '<div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:10px">Cue List</div>' +
       '<div style="display:flex;position:relative;border:1px solid rgba(255,255,255,.2);border-radius:6px;overflow:hidden">' +
         '<div id="cueEditGutter" style="flex:0 0 auto;height:380px;overflow:hidden;text-align:right;padding:8px 6px;font-family:monospace;font-size:13px;line-height:1.4;color:#666;background:rgba(255,255,255,.04);user-select:none"></div>' +
-        '<textarea id="cueEditTextarea" style="flex:1;box-sizing:border-box;height:380px;background:#0a0a0a;color:#ccc;border:none;padding:8px;font-family:monospace;font-size:13px;line-height:1.4;resize:vertical;"></textarea>' +
+        '<textarea id="cueEditTextarea" style="flex:1;box-sizing:border-box;height:380px;background:#0a0a0a;color:#ccc;border:none;padding:8px;font-family:monospace;font-size:13px;line-height:1.4;white-space:pre-wrap;overflow-wrap:break-word;overflow-y:auto;resize:vertical;"></textarea>' +
       '</div>' +
       '<div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;">' +
         '<button id="cueEditCopy" style="padding:5px 16px;">Copy</button>' +
@@ -773,19 +773,34 @@ function initCueList() {
   document.body.appendChild(editOverlay);
 
   let _editAnchorRaw = -1;
-  const LINE_HEIGHT_PX = 13 * 1.4; // must match gutter + textarea line-height
+  let _measuredHeights = [];
+
+  // Hidden div for measuring wrapped line heights — matches textarea's wrapping
+  const _measureDiv = document.createElement('div');
+  _measureDiv.style.cssText = 'position:absolute;visibility:hidden;left:-9999px;top:0;font-family:monospace;font-size:13px;line-height:1.4;white-space:pre-wrap;overflow-wrap:break-word;box-sizing:border-box;padding:0 8px;';
+  document.body.appendChild(_measureDiv);
+
+  function measureLineHeight(text, wrapWidth){
+    _measureDiv.style.width = wrapWidth + 'px';
+    _measureDiv.textContent = text === '' ? ' ' : text;
+    return _measureDiv.offsetHeight;
+  }
 
   function populateGutter(){
     const gutter = document.getElementById('cueEditGutter');
     const ta = document.getElementById('cueEditTextarea');
     if(!gutter || !ta) return;
-    const count = ta.value.split('\n').length;
+    const wrapWidth = ta.clientWidth - 16; // minus horizontal padding (8px each side)
+    const lines = ta.value.split('\n');
+    _measuredHeights = [];
     const divs = [];
-    for(let i = 1; i <= count; i++){
-      const isCurrent = (i - 1) === _editAnchorRaw;
+    for(let i = 0; i < lines.length; i++){
+      const h = measureLineHeight(lines[i], wrapWidth);
+      _measuredHeights.push(h);
+      const isCurrent = i === _editAnchorRaw;
       divs.push(isCurrent
-        ? '<div style="font-weight:700;color:#fff">' + i + '</div>'
-        : '<div>' + i + '</div>');
+        ? '<div style="height:' + h + 'px;font-weight:700;color:#fff">' + (i+1) + '</div>'
+        : '<div style="height:' + h + 'px">' + (i+1) + '</div>');
     }
     gutter.innerHTML = divs.join('');
     gutter.scrollTop = ta.scrollTop;
@@ -817,7 +832,9 @@ function initCueList() {
       const charEnd = charStart + (lines[_editAnchorRaw] || '').length;
       ta.setSelectionRange(charStart, charEnd);
       ta.focus();
-      ta.scrollTop = Math.max(0, _editAnchorRaw * LINE_HEIGHT_PX - ta.clientHeight / 2);
+      let scrollY = 0;
+      for(let i = 0; i < _editAnchorRaw && i < _measuredHeights.length; i++) scrollY += _measuredHeights[i];
+      ta.scrollTop = Math.max(0, scrollY - ta.clientHeight / 2);
       const gutter = document.getElementById('cueEditGutter');
       if(gutter) gutter.scrollTop = ta.scrollTop;
     } else {
