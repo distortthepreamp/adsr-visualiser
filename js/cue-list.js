@@ -418,8 +418,9 @@ function updateCueScriptView() {
   for (let pos = 0; pos < TOTAL; pos++) {
     const rawIdx = anchorRaw - BEFORE + pos;
     const text = (rawIdx >= 0 && rawIdx < lines.length) ? lines[rawIdx] : '';
+    const lineNum = (rawIdx >= 0 && rawIdx < lines.length) ? String(rawIdx + 1).padStart(3) + '  ' : '     ';
     const div = document.createElement('div');
-    div.textContent = text;
+    div.textContent = lineNum + text;
     div.style.whiteSpace = 'pre';
     div.style.overflow = 'hidden';
     div.style.textOverflow = 'ellipsis';
@@ -756,10 +757,13 @@ function initCueList() {
   editOverlay.id = 'cueEditOverlay';
   editOverlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;align-items:center;justify-content:center;';
   editOverlay.innerHTML =
-    '<div style="background:rgba(18,18,18,.97);border:1px solid rgba(255,255,255,.3);border-radius:14px;padding:22px 28px 24px;width:680px;max-width:92vw;color:#fff;font-family:Arial,Helvetica,sans-serif;position:relative;">' +
+    '<div style="background:rgba(18,18,18,.97);border:1px solid rgba(255,255,255,.3);border-radius:14px;padding:22px 28px 24px;width:680px;max-width:92vw;max-height:90vh;overflow:auto;color:#fff;font-family:Arial,Helvetica,sans-serif;position:relative;">' +
       '<button id="cueEditClose" style="position:absolute;top:10px;right:14px;background:none;border:none;color:rgba(255,255,255,.7);font-size:20px;font-weight:800;cursor:pointer;line-height:1;padding:0">\xd7</button>' +
       '<div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:10px">Cue List</div>' +
-      '<textarea id="cueEditTextarea" style="width:100%;box-sizing:border-box;height:380px;background:#0a0a0a;color:#ccc;border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:10px;font-family:monospace;font-size:13px;resize:vertical;"></textarea>' +
+      '<div style="display:flex;position:relative;border:1px solid rgba(255,255,255,.2);border-radius:6px;overflow:hidden">' +
+        '<div id="cueEditGutter" style="flex:0 0 auto;height:380px;overflow:hidden;text-align:right;padding:8px 6px;font-family:monospace;font-size:13px;line-height:1.4;color:#666;background:rgba(255,255,255,.04);user-select:none"></div>' +
+        '<textarea id="cueEditTextarea" style="flex:1;box-sizing:border-box;height:380px;background:#0a0a0a;color:#ccc;border:none;padding:8px;font-family:monospace;font-size:13px;line-height:1.4;resize:vertical;"></textarea>' +
+      '</div>' +
       '<div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;">' +
         '<button id="cueEditCopy" style="padding:5px 16px;">Copy</button>' +
         '<button id="cueEditSave" style="padding:5px 16px;">Save</button>' +
@@ -768,17 +772,78 @@ function initCueList() {
     '</div>';
   document.body.appendChild(editOverlay);
 
+  let _editAnchorRaw = -1;
+  const LINE_HEIGHT_PX = 13 * 1.4; // must match gutter + textarea line-height
+
+  function populateGutter(){
+    const gutter = document.getElementById('cueEditGutter');
+    const ta = document.getElementById('cueEditTextarea');
+    if(!gutter || !ta) return;
+    const count = ta.value.split('\n').length;
+    const divs = [];
+    for(let i = 1; i <= count; i++){
+      const isCurrent = (i - 1) === _editAnchorRaw;
+      divs.push(isCurrent
+        ? '<div style="font-weight:700;color:#fff">' + i + '</div>'
+        : '<div>' + i + '</div>');
+    }
+    gutter.innerHTML = divs.join('');
+    gutter.scrollTop = ta.scrollTop;
+  }
+
   function cueEditEscHandler(e) {
     if (e.key === 'Escape') { closeEditModal(); }
   }
   function openEditModal()  {
-    document.getElementById('cueEditTextarea').value = cueListText;
+    const ta = document.getElementById('cueEditTextarea');
+    ta.value = cueListText;
     editOverlay.style.display = 'flex';
     document.addEventListener('keydown', cueEditEscHandler);
+
+    // Compute current line
+    const ci = cueIndex - 1;
+    _editAnchorRaw = (ci >= 0 && ci < cueList.length && cueList[ci].rawLine !== undefined)
+      ? cueList[ci].rawLine : -1;
+
+    populateGutter();
+
+    // Jump to current line
+    if(_editAnchorRaw >= 0){
+      const lines = cueListText.split('\n');
+      let charStart = 0;
+      for(let i = 0; i < _editAnchorRaw && i < lines.length; i++){
+        charStart += lines[i].length + 1;
+      }
+      const charEnd = charStart + (lines[_editAnchorRaw] || '').length;
+      ta.setSelectionRange(charStart, charEnd);
+      ta.focus();
+      ta.scrollTop = Math.max(0, _editAnchorRaw * LINE_HEIGHT_PX - ta.clientHeight / 2);
+      const gutter = document.getElementById('cueEditGutter');
+      if(gutter) gutter.scrollTop = ta.scrollTop;
+    } else {
+      ta.scrollTop = 0;
+      ta.focus();
+    }
   }
   function closeEditModal() {
     editOverlay.style.display = 'none';
     document.removeEventListener('keydown', cueEditEscHandler);
+  }
+
+  // Scroll sync + gutter repopulate on edit
+  const _ta = document.getElementById('cueEditTextarea');
+  if(_ta){
+    _ta.addEventListener('scroll', () => {
+      const gutter = document.getElementById('cueEditGutter');
+      if(gutter) gutter.scrollTop = _ta.scrollTop;
+    });
+    _ta.addEventListener('input', populateGutter);
+    if(typeof ResizeObserver !== 'undefined'){
+      new ResizeObserver(() => {
+        const gutter = document.getElementById('cueEditGutter');
+        if(gutter) gutter.style.height = _ta.clientHeight + 'px';
+      }).observe(_ta);
+    }
   }
 
   document.getElementById('cueEditClose').addEventListener('click',  closeEditModal);
