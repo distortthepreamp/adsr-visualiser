@@ -55,7 +55,6 @@ const tag = document.activeElement ? document.activeElement.tagName : '';
     } else if((e.key === 'c' || e.key === 'C') && e.altKey){ logEvent('ANIMATION', { action: 'clear' }); clearBlobAndMarker(); if(window.cueRecordRaw) cueRecordRaw('play-clear');
     } else if(e.key === 'c' || e.key === 'C'){ toggleCheckbox('showClipped');
     } else if(e.key === 'l' || e.key === 'L'){ toggleMode();
-    } else if(e.key === 'a' || e.key === 'A'){ toggleCheckbox('audioEnabled');
     } else if(e.key === 'd' || e.key === 'D'){ toggleCheckbox('loudDecay');
     } else if(e.key === '.'){ toggleCheckbox('showContour');
     } else if(e.key === 'f' || e.key === 'F'){ toggleCheckbox('frequencyMode');

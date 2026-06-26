@@ -25,9 +25,6 @@ const MASTER_GAIN = 0.7;             // default master output gain
     return cutoffCurve[cutoffCurve.length-1].f;
   }
 
-  // ---- Stubs for per-voice enables (replaced by real checkboxes in stage 2) ----
-  let STUB_AUDIO_MODEL_D = true;
-  let STUB_AUDIO_TEXTBOOK = true;
 
   // ---- RC curve sampling for setValueCurveAtTime ----
   const RC_SAMPLES = 256;
@@ -72,7 +69,7 @@ const MASTER_GAIN = 0.7;             // default master output gain
 
   const noteBtnIds = ['noteE1Btn','noteE2Btn','noteC4Btn','noteA4Btn','noteCustomToggle'];
 
-  function audioEnabled(){ return !!($('audioEnabled')&&$('audioEnabled').checked); }
+  function audioEnabled(){ return !!(($('audioModelD')&&$('audioModelD').checked)||($('audioTextbook')&&$('audioTextbook').checked)); }
   function audioStretch(){ return ($('sloMo')&&$('sloMo').checked) ? 10 : 1; }
 
   function setNoteMode(btnId, freq){
@@ -143,10 +140,10 @@ const MASTER_GAIN = 0.7;             // default master output gain
 
   // ---- Audibility helpers ----
   function isModelDAudible(){
-    return STUB_AUDIO_MODEL_D && !!($('modelA')&&$('modelA').checked || $('modelD')&&$('modelD').checked || $('modelS')&&$('modelS').checked || $('modelR')&&$('modelR').checked);
+    return ($('audioModelD')&&$('audioModelD').checked) && !!($('modelA')&&$('modelA').checked || $('modelD')&&$('modelD').checked || $('modelS')&&$('modelS').checked || $('modelR')&&$('modelR').checked);
   }
   function isTextbookAudible(){
-    return STUB_AUDIO_TEXTBOOK && !!($('underlayA')&&$('underlayA').checked || $('underlayD')&&$('underlayD').checked || $('underlayS')&&$('underlayS').checked || $('underlayR')&&$('underlayR').checked);
+    return ($('audioTextbook')&&$('audioTextbook').checked) && !!($('underlayA')&&$('underlayA').checked || $('underlayD')&&$('underlayD').checked || $('underlayS')&&$('underlayS').checked || $('underlayR')&&$('underlayR').checked);
   }
 
   // ---- Schedule helpers ----

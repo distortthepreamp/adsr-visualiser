@@ -31,7 +31,8 @@ function buildConfigSnapshot(){
     zoomFactor: state.zoomFactor,
     blobGlowRadius: Number($('blobGlowRadius') ? $('blobGlowRadius').value : 8),
     curveAmount: Number($('curveAmount').value),
-    audioEnabled: $('audioEnabled').checked,
+    audioModelD: $('audioModelD') ? $('audioModelD').checked : false,
+    audioTextbook: $('audioTextbook') ? $('audioTextbook').checked : false,
     noteMode: noteMode,
     noteCustomHz: Number($('noteCustomHz').value),
     transitionSec: currentTransitionSec,
@@ -106,7 +107,8 @@ function loadConfigObject(cfg){
   if($('customTransitionTime') && cfg.transitionSec !== undefined) $('customTransitionTime').value = cfg.transitionSec;
 
   // Audio enabled
-  if($('audioEnabled') && cfg.audioEnabled !== undefined) $('audioEnabled').checked = cfg.audioEnabled;
+  if($('audioModelD') && cfg.audioModelD !== undefined) $('audioModelD').checked = cfg.audioModelD;
+  if($('audioTextbook') && cfg.audioTextbook !== undefined) $('audioTextbook').checked = cfg.audioTextbook;
 
   // Note mode
   if(cfg.noteMode){
