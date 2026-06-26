@@ -63,6 +63,7 @@ function buildConfigSnapshot(){
     consoleScale: Number($('consoleScale').value),
     meterWidth: Number($('meterWidth').value),
     meterStrokeWidth: Number($('meterStrokeWidth').value),
+    dbLabelSize: Number($('dbLabelSize').value),
     tbSustainGapMax: Number($('tbSustainGapMax').value),
     vbWidth: Number($('vbWidth').value),
     vbHeight: Number($('vbHeight').value),
@@ -141,6 +142,7 @@ function loadConfigObject(cfg){
   if($('consoleScale') && cfg.consoleScale !== undefined){ $('consoleScale').value = cfg.consoleScale; syncConsoleScale(); }
   if($('meterWidth') && cfg.meterWidth !== undefined){ $('meterWidth').value = cfg.meterWidth; METER_W = Math.max(10, Math.min(80, Number(cfg.meterWidth) || 40)); }
   if($('meterStrokeWidth') && cfg.meterStrokeWidth !== undefined){ $('meterStrokeWidth').value = cfg.meterStrokeWidth; METER_STROKE_W = Math.max(0, Math.min(20, Number(cfg.meterStrokeWidth) || 7)); }
+  if($('dbLabelSize') && cfg.dbLabelSize !== undefined){ $('dbLabelSize').value = cfg.dbLabelSize; DB_LABEL_SIZE = Math.max(6, Math.min(24, Number(cfg.dbLabelSize) || 11)); }
   if($('tbSustainGapMax') && cfg.tbSustainGapMax !== undefined){ $('tbSustainGapMax').value = cfg.tbSustainGapMax; SUSTAIN_GAP_MAX = Math.max(0.15, Math.min(0.30, (Number(cfg.tbSustainGapMax) || 15) / 100)); }
   if($('vbWidth')  && cfg.vbWidth  !== undefined){ $('vbWidth').value  = Math.round(Math.min(VB_WIDTH_MAX, Math.max(VB_WIDTH_MIN,  Number(cfg.vbWidth)  || 1200)) / 10) * 10; }
   if($('vbHeight') && cfg.vbHeight !== undefined){ $('vbHeight').value = Math.round(Math.min(VB_HEIGHT_MAX, Math.max(VB_HEIGHT_MIN,  Number(cfg.vbHeight) || 595))  / 10) * 10; }

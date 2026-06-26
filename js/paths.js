@@ -606,17 +606,32 @@ function render(){
     meterBox.setAttribute('width',meterW); meterBox.setAttribute('height',graph.h);
     meterBox.style.strokeWidth = METER_STROKE_W;
   }
-  // dB scale gutter — image butting against the meter's left edge, inset to the fill range
+  // dB scale labels — computed reference numbers in the gutter column, inset to the fill range
   const gutterX = meterX - DB_GUTTER_W;
-  const dbGutter = $('dbScaleGutter');
-  if(dbGutter){
+  const dbLabels = $('dbScaleLabels');
+  if(dbLabels){
+    // dB labels are a loudness scale — only show in loudness mode (hidden in frequency/filter mode)
+    const _dbFreqMode = $('frequencyMode') && $('frequencyMode').checked;
+    while(dbLabels.firstChild) dbLabels.removeChild(dbLabels.firstChild);
+    dbLabels.style.display = _dbFreqMode ? 'none' : '';
+    if(!_dbFreqMode){
     const _svgForPx = document.getElementById('svg');
     const _pxToUser = _svgForPx ? (VB_WIDTH / _svgForPx.getBoundingClientRect().width) : 1;
     const strokeInset = (METER_STROKE_W / 2) * _pxToUser;
     const innerTop = meterAbsTop + strokeInset;
     const innerH = graph.h - 2 * strokeInset;
-    dbGutter.setAttribute('x', gutterX); dbGutter.setAttribute('y', innerTop);
-    dbGutter.setAttribute('width', DB_GUTTER_W); dbGutter.setAttribute('height', Math.max(0, innerH));
+    const DB_MARKS = [0, -3, -6, -9, -12, -18];
+    const labelX = gutterX + DB_GUTTER_W / 2;
+    for(const D of DB_MARKS){
+      const y = innerTop + innerH * (1 - Math.pow(10, D / 20));
+      const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      t.setAttribute('x', labelX); t.setAttribute('y', y);
+      t.setAttribute('text-anchor', 'middle');
+      t.setAttribute('style', 'dominant-baseline:middle;font-size:'+DB_LABEL_SIZE+'px;fill:#fff;font-family:\'UniversCondensed\',Arial,Helvetica,sans-serif;');
+      t.textContent = String(D);
+      dbLabels.appendChild(t);
+    }
+    }
   }
   const meterClipRect=$('meterClipRect');
   if(meterClipRect){
