@@ -39,6 +39,7 @@ function syncRadii(){
 
 function render(){
   try {
+  const DB_GUTTER_W = 60;  // dB-scale gutter width (user units); mirror-ready for right side
   // Keep viewBox and VB_WIDTH-dependent elements in sync
   const svgEl = document.getElementById('svg');
   if(svgEl) svgEl.setAttribute('viewBox', `0 ${VB_Y_ORIGIN} ${VB_WIDTH} ${VB_HEIGHT}`);
@@ -426,8 +427,8 @@ function render(){
       const gateStatedLblEl = $('gateStatedLabel');
       if(gateEffHorizEl){
         if(effVisible){
-          gateEffHorizEl.setAttribute('x1', METER_X - gateTickLen); gateEffHorizEl.setAttribute('y1', gateCloseY);
-          gateEffHorizEl.setAttribute('x2', METER_X);               gateEffHorizEl.setAttribute('y2', gateCloseY);
+          gateEffHorizEl.setAttribute('x1', METER_X - DB_GUTTER_W - gateTickLen); gateEffHorizEl.setAttribute('y1', gateCloseY);
+          gateEffHorizEl.setAttribute('x2', METER_X - DB_GUTTER_W);               gateEffHorizEl.setAttribute('y2', gateCloseY);
           gateEffHorizEl.style.stroke = gateEffCol;
           gateEffHorizEl.style.display = '';
         } else {
@@ -437,7 +438,7 @@ function render(){
       if(gateEffLblEl){
         if(effVisible){
           const pct = Math.round(((graph.y0 - gateCloseY) / graph.h) * 100);
-          gateEffLblEl.setAttribute('x', METER_X - gateTickLen - _gateLabelGap);
+          gateEffLblEl.setAttribute('x', METER_X - DB_GUTTER_W - gateTickLen - _gateLabelGap);
           gateEffLblEl.setAttribute('y', gateCloseY);
           gateEffLblEl.setAttribute('text-anchor', 'end');
           gateEffLblEl.setAttribute('dominant-baseline', 'middle');
@@ -524,7 +525,8 @@ function render(){
   const meterAbsTop = graph.y0 - graph.h;  // yFor(1) = 85
   const meterAbsBottom = graph.y0;          // yFor(0) = 445
 
-  const markerEndX = meterX;
+  const markerEndX = meterX - DB_GUTTER_W;  // left-side ticks end at the gutter's left edge
+  const markerRightX = meterX + meterW;      // right-side ticks start at the meter's right edge
   const _labelSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--labelSize')) || 17;
   const arrowSize = Math.round(_labelSize * 0.72);
   const sustainTickLen = Math.round(_labelSize * 1.5);
@@ -569,14 +571,14 @@ function render(){
     _statedY = statedY;
     statedSustainX = pts.pEnd.x + graph.w * state.tbSustainGap;
     const underlayCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
-    statedSustainLineEl.setAttribute('x1', markerEndX + METER_W);
+    statedSustainLineEl.setAttribute('x1', markerRightX);
     statedSustainLineEl.setAttribute('y1', statedY);
-    statedSustainLineEl.setAttribute('x2', markerEndX + METER_W + sustainTickLen);
+    statedSustainLineEl.setAttribute('x2', markerRightX + sustainTickLen);
     statedSustainLineEl.setAttribute('y2', statedY);
     statedSustainLineEl.style.stroke = underlayCol;
     statedSustainLineEl.style.display = tbSusVis ? '' : 'none';
     const ssl=$('statedSustainLabel'); if(ssl){
-      ssl.setAttribute('x', markerEndX + METER_W + sustainTickLen + sustainLabelGap);
+      ssl.setAttribute('x', markerRightX + sustainTickLen + sustainLabelGap);
       ssl.setAttribute('y', statedY);
       ssl.setAttribute('text-anchor', 'start');
       ssl.setAttribute('dominant-baseline', 'middle');
@@ -603,6 +605,18 @@ function render(){
     meterBox.setAttribute('x',meterX); meterBox.setAttribute('y',meterAbsTop);
     meterBox.setAttribute('width',meterW); meterBox.setAttribute('height',graph.h);
     meterBox.style.strokeWidth = METER_STROKE_W;
+  }
+  // dB scale gutter — image butting against the meter's left edge, inset to the fill range
+  const gutterX = meterX - DB_GUTTER_W;
+  const dbGutter = $('dbScaleGutter');
+  if(dbGutter){
+    const _svgForPx = document.getElementById('svg');
+    const _pxToUser = _svgForPx ? (VB_WIDTH / _svgForPx.getBoundingClientRect().width) : 1;
+    const strokeInset = (METER_STROKE_W / 2) * _pxToUser;
+    const innerTop = meterAbsTop + strokeInset;
+    const innerH = graph.h - 2 * strokeInset;
+    dbGutter.setAttribute('x', gutterX); dbGutter.setAttribute('y', innerTop);
+    dbGutter.setAttribute('width', DB_GUTTER_W); dbGutter.setAttribute('height', Math.max(0, innerH));
   }
   const meterClipRect=$('meterClipRect');
   if(meterClipRect){
@@ -671,16 +685,16 @@ function render(){
   }
   const floorLineR = $('floorLineRight');
   if(floorLineR){
-    floorLineR.setAttribute('x1', markerEndX + METER_W);
+    floorLineR.setAttribute('x1', markerRightX);
     floorLineR.setAttribute('y1', floorY);
-    floorLineR.setAttribute('x2', markerEndX + METER_W + sustainTickLen);
+    floorLineR.setAttribute('x2', markerRightX + sustainTickLen);
     floorLineR.setAttribute('y2', floorY);
     floorLineR.style.stroke = contourTickColRight;
     floorLineR.style.display = showContourRight ? '' : 'none';
   }
   const floorRiserR = $('floorRiserRight');
   if(floorRiserR){
-    const rx = markerEndX + METER_W + sustainTickLen - halfStroke;
+    const rx = markerRightX + sustainTickLen - halfStroke;
     floorRiserR.setAttribute('x1', rx); floorRiserR.setAttribute('y1', floorY + riserLen);
     floorRiserR.setAttribute('x2', rx); floorRiserR.setAttribute('y2', floorY);
     floorRiserR.style.stroke = contourTickColRight;
@@ -705,16 +719,16 @@ function render(){
   const amountLineR = $('amountLineRight');
   const textbookAmountY = yFor(e.floor + (1 - e.floor) * e.scale);
   if(amountLineR){
-    amountLineR.setAttribute('x1', markerEndX + METER_W);
+    amountLineR.setAttribute('x1', markerRightX);
     amountLineR.setAttribute('y1', textbookAmountY);
-    amountLineR.setAttribute('x2', markerEndX + METER_W + sustainTickLen);
+    amountLineR.setAttribute('x2', markerRightX + sustainTickLen);
     amountLineR.setAttribute('y2', textbookAmountY);
     amountLineR.style.stroke = contourTickColRight;
     amountLineR.style.display = showContourRight ? '' : 'none';
   }
   const amountRiserR = $('amountRiserRight');
   if(amountRiserR){
-    const rx = markerEndX + METER_W + sustainTickLen - halfStroke;
+    const rx = markerRightX + sustainTickLen - halfStroke;
     amountRiserR.setAttribute('x1', rx); amountRiserR.setAttribute('y1', textbookAmountY - riserLen);
     amountRiserR.setAttribute('x2', rx); amountRiserR.setAttribute('y2', textbookAmountY);
     amountRiserR.style.stroke = contourTickColRight;
@@ -731,7 +745,7 @@ function render(){
   const aocPctR = Math.round((e.floor + (1 - e.floor) * e.scale) * 100);
   const aocTextRight = (_hp ? '' : 'Max ') + aocPctR + '%';
   const leftX = markerEndX - sustainTickLen - sustainLabelGap;
-  const rightX = markerEndX + METER_W + sustainTickLen + sustainLabelGap;
+  const rightX = markerRightX + sustainTickLen + sustainLabelGap;
   // CF left (Model D) — below cutoff arrow's free bottom end
   const cfLbl = $('cfLabel');
   if(cfLbl){

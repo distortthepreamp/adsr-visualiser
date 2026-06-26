@@ -376,7 +376,7 @@ function initUIControls(){
   $('blobScale').addEventListener('input',e=>{ const inp=e.target,c=Math.min(8,Math.max(1,isNaN(parseFloat(inp.value))?3:Math.round(parseFloat(inp.value)*2)/2)); inp.value=c; syncRadii(); });
   $('consoleScale').addEventListener('input', e => { const inp=e.target,raw=parseFloat(inp.value),c=Math.min(1.0,Math.max(0.5,isNaN(raw)?0.7:raw)); inp.value=c; syncConsoleScale(); });
   $('meterWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(80,Math.max(10,isNaN(parseInt(inp.value))?40:parseInt(inp.value))); inp.value=c; METER_W=c; recalcGeometry(); render(); });
-  $('meterStrokeWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(20,Math.max(1,isNaN(parseInt(inp.value))?7:parseInt(inp.value))); inp.value=c; METER_STROKE_W=c; render(); });
+  $('meterStrokeWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(20,Math.max(0,isNaN(parseInt(inp.value))?7:parseInt(inp.value))); inp.value=c; METER_STROKE_W=c; render(); });
   $('timeLabelGutter').addEventListener('input', e => { const inp=e.target,c=Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value)); inp.value=c; render(); });
   $('markerLineWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(8,Math.max(1,isNaN(parseFloat(inp.value))?1:Math.round(parseFloat(inp.value)*2)/2)); inp.value=c; document.documentElement.style.setProperty('--markerLineWidth',c); });
   $('dottedMarkers').addEventListener('change', () => { document.documentElement.style.setProperty('--markerDash', $('dottedMarkers').checked ? '4 4' : 'none'); });
