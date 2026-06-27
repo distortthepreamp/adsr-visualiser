@@ -187,6 +187,10 @@ function syncHpModeEnabled(){
   const freqOn = $('frequencyMode') && $('frequencyMode').checked;
   const hpLabel = $('hpMode') && $('hpMode').closest('label');
   if(hpLabel){ hpLabel.style.opacity = freqOn ? '' : UI_DISABLED_OPACITY; hpLabel.style.pointerEvents = freqOn ? '' : 'none'; }
+  const kb1 = $('keyboardTrack1') && $('keyboardTrack1').closest('label');
+  if(kb1){ kb1.style.opacity = freqOn ? '' : UI_DISABLED_OPACITY; kb1.style.pointerEvents = freqOn ? '' : 'none'; }
+  const kb2 = $('keyboardTrack2') && $('keyboardTrack2').closest('label');
+  if(kb2){ kb2.style.opacity = freqOn ? '' : UI_DISABLED_OPACITY; kb2.style.pointerEvents = freqOn ? '' : 'none'; }
 }
 // ---- Zoom — single numeric input drives state.zoomFactor ----
 function syncZoomReadout(){
@@ -345,6 +349,8 @@ function initUIControls(){
   // Kiosk switch glow — notify on manual checkbox changes
   $('loudDecay').addEventListener('change', () => { if(window.kioskNotifySwitch) kioskNotifySwitch($('frequencyMode').checked ? 'filter-decay' : 'loud-decay'); });
   $('hpMode').addEventListener('change', () => { if(window.kioskNotifySwitch) kioskNotifySwitch('hp-mode'); });
+  $('keyboardTrack1').addEventListener('change', () => { if(window.kioskNotifySwitch) kioskNotifySwitch('keyboard1'); });
+  $('keyboardTrack2').addEventListener('change', () => { if(window.kioskNotifySwitch) kioskNotifySwitch('keyboard2'); });
 
   // Zoom input
   if($('zoomFactorInput')){

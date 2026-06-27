@@ -47,6 +47,7 @@ const SWITCH_LEFT_X   = 53;
 const SWITCH_CENTRE_X = 114;
 const SWITCH_RIGHT_X  = 175;
 const SWITCH_ARROW_H  = 45;
+const SWITCH_BLUE     = 'rgb(10, 57, 247)';  // shared blue for LP/HP + the two keyboard switches
 
 function drawSwitch(ctx, y, on, color) {
   ctx.beginPath();
@@ -159,10 +160,14 @@ function drawKiosk(){
   // Switch background rectangles — drawn before darts so darts appear on top
   const loudDecayOn = !!($('loudDecay') && $('loudDecay').checked);
   const hpModeOn    = !!($('hpMode')    && $('hpMode').checked);
+  const kb1On       = !!($('keyboardTrack1') && $('keyboardTrack1').checked);
+  const kb2On       = !!($('keyboardTrack2') && $('keyboardTrack2').checked);
   const switchRects = [];
   if (!filterOn) switchRects.push({ y: 864, color: '#ffffff', param: 'loud-decay'   });
   if (filterOn)  switchRects.push({ y: 744, color: '#ffffff', param: 'filter-decay' });
-  if (filterOn)  switchRects.push({ y: 248, color: '#0DCAF2', param: 'hp-mode'      });
+  if (filterOn)  switchRects.push({ y: 248, color: SWITCH_BLUE, param: 'hp-mode'      });
+  if (filterOn)  switchRects.push({ y: 494, color: SWITCH_BLUE, param: 'keyboard1'    });
+  if (filterOn)  switchRects.push({ y: 618, color: SWITCH_BLUE, param: 'keyboard2'    });
   const switchNowGlowing = activeKioskSwitch !== null && performance.now() < activeKioskSwitchUntil;
   if (!switchNowGlowing) activeKioskSwitch = null;
   switchRects.forEach(({ y, color, param }) => {
@@ -198,6 +203,8 @@ function drawKiosk(){
   // Switch indicators (dart arrows)
   if (filterOn)  drawSwitch(ctx, 248, hpModeOn,    'white');  // Filter Mode Lo/Hi
   if (filterOn)  drawSwitch(ctx, 744, loudDecayOn, 'black');  // Filter Decay
+  if (filterOn)  drawSwitch(ctx, 494, kb1On,       'white');  // Keyboard 1
+  if (filterOn)  drawSwitch(ctx, 618, kb2On,       'white');  // Keyboard 2
   if (!filterOn) drawSwitch(ctx, 864, loudDecayOn, 'black');  // Loud Decay
 }
 
