@@ -633,9 +633,17 @@ function render(){
       const DB_MARKS = [0, -3, -6, -9, -12, -18];
       for(const D of DB_MARKS) _addLabel(String(D), Math.pow(10, D / 20));
     } else {
-      // Hz labels at fixed calibration fractions (independent of the audio cutoff curve)
+      // Hz labels at fixed calibration fractions (independent of the audio cutoff curve).
+      // Keyboard tracking shifts the scale up by a measured octave amount (0.1 frac/octave).
+      const kb1 = $('keyboardTrack1') && $('keyboardTrack1').checked;
+      const kb2 = $('keyboardTrack2') && $('keyboardTrack2').checked;
+      const octShift = (kb1 && kb2) ? 3.12 : kb2 ? 2.29 : kb1 ? 1.41 : 0;  // measured
+      const fracShift = octShift * 0.1;
       const HZ_MARKS = [['10k', 0.832], ['1k', 0.5], ['100', 0.168]];
-      for(const [txt, frac] of HZ_MARKS) _addLabel(txt, frac);
+      for(const [txt, baseFrac] of HZ_MARKS){
+        const newFrac = baseFrac + fracShift;
+        if(newFrac >= 0 && newFrac <= 1) _addLabel(txt, newFrac);
+      }
     }
   }
   const meterClipRect=$('meterClipRect');

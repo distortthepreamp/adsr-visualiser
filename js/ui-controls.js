@@ -349,8 +349,8 @@ function initUIControls(){
   // Kiosk switch glow — notify on manual checkbox changes
   $('loudDecay').addEventListener('change', () => { if(window.kioskNotifySwitch) kioskNotifySwitch($('frequencyMode').checked ? 'filter-decay' : 'loud-decay'); });
   $('hpMode').addEventListener('change', () => { if(window.kioskNotifySwitch) kioskNotifySwitch('hp-mode'); });
-  $('keyboardTrack1').addEventListener('change', () => { if(window.kioskNotifySwitch) kioskNotifySwitch('keyboard1'); });
-  $('keyboardTrack2').addEventListener('change', () => { if(window.kioskNotifySwitch) kioskNotifySwitch('keyboard2'); });
+  $('keyboardTrack1').addEventListener('change', () => { if(window.kioskNotifySwitch) kioskNotifySwitch('keyboard1'); render(); });
+  $('keyboardTrack2').addEventListener('change', () => { if(window.kioskNotifySwitch) kioskNotifySwitch('keyboard2'); render(); });
 
   // Zoom input
   if($('zoomFactorInput')){
