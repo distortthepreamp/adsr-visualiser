@@ -25,6 +25,15 @@ const MASTER_GAIN = 0.7;             // default master output gain
     return cutoffCurve[cutoffCurve.length-1].f;
   }
 
+  // Keyboard tracking: multiplies the audio filter cutoff by 2^(octave shift).
+  // octave values mirror the scale-label logic (paths.js Hz labels): kb1=1.41, kb2=2.29, both=3.12, none=0.
+  function filterTrackingMult(){
+    const kb1 = $('keyboardTrack1') && $('keyboardTrack1').checked;
+    const kb2 = $('keyboardTrack2') && $('keyboardTrack2').checked;
+    const oct = (kb1 && kb2) ? 3.12 : kb2 ? 2.29 : kb1 ? 1.41 : 0;
+    return Math.pow(2, oct);
+  }
+
 
   // ---- RC curve sampling for setValueCurveAtTime ----
   const RC_SAMPLES = 256;
@@ -161,20 +170,6 @@ const MASTER_GAIN = 0.7;             // default master output gain
       param.linearRampToValueAtTime(Math.max(0.0001, sus), now + aDur + dDur);
     }
   }
-  // Schedule attack+decay on a filter frequency param (filter mode)
-  function scheduleFilterAD(param, now, aT, dT, fFloor, fCeil, fSus, useRC){
-    param.cancelScheduledValues(now);
-    param.setValueAtTime(fFloor, now);
-    const aDur = Math.max(0.001, aT);
-    const dDur = Math.max(0.001, dT);
-    if(useRC){
-      param.setValueCurveAtTime(rcCurveArray(fFloor, fCeil, true), now, aDur);
-      param.setValueCurveAtTime(rcCurveArray(fCeil, fSus, false), now + aDur, dDur);
-    } else {
-      param.linearRampToValueAtTime(fCeil, now + aDur);
-      param.linearRampToValueAtTime(fSus, now + aDur + dDur);
-    }
-  }
 
   function audioGateOpen(){
     if(!audioEnabled()||!audioReady) return;
@@ -212,20 +207,18 @@ const MASTER_GAIN = 0.7;             // default master output gain
       // ---- FILTER MODE ----
       // Audio cutoff uses the approximate transfer function (NOT mapCutoff, which drives the visual)
       const clampHz = f => Math.max(10, Math.min(f, 20000));
-      const fFloor = clampHz(filterCutoffHz(e.floor));
+      const trk = filterTrackingMult();
+      const fFloor = clampHz(filterCutoffHz(e.floor) * trk);
+      // Filter frequency is driven per-frame from the blob (audioSetFilterLevels); establish the floor at start.
       if(v1Audible){
         v1Gain.gain.cancelScheduledValues(now); v1Gain.gain.setValueAtTime(1, now);
-        const fCeil = clampHz(filterCutoffHz(e.floor + e.scale));
-        const fSus = clampHz(filterCutoffHz(e.floor + e.s * e.scale));
-        [v1Filter1,v1Filter2].forEach(f => scheduleFilterAD(f.frequency, now, aT, dT, fFloor, fCeil, fSus, analogue));
+        [v1Filter1,v1Filter2].forEach(flt => { flt.frequency.cancelScheduledValues(now); flt.frequency.setValueAtTime(fFloor, now); });
       } else {
         v1Gain.gain.cancelScheduledValues(now); v1Gain.gain.setValueAtTime(0, now);
       }
       if(v2Audible){
         v2Gain.gain.cancelScheduledValues(now); v2Gain.gain.setValueAtTime(1, now);
-        const tbCeil = clampHz(filterCutoffHz(e.floor + (1 - e.floor) * e.scale));
-        const tbSus = clampHz(filterCutoffHz(e.floor + state.s * (1 - e.floor) * e.scale));
-        [v2Filter1,v2Filter2].forEach(f => scheduleFilterAD(f.frequency, now, aT, dT, fFloor, tbCeil, tbSus, false));
+        [v2Filter1,v2Filter2].forEach(flt => { flt.frequency.cancelScheduledValues(now); flt.frequency.setValueAtTime(fFloor, now); });
       } else {
         v2Gain.gain.cancelScheduledValues(now); v2Gain.gain.setValueAtTime(0, now);
       }
@@ -268,37 +261,8 @@ const MASTER_GAIN = 0.7;             // default master output gain
         }
       }
     } else {
-      // Audio cutoff uses the approximate transfer function (NOT mapCutoff, which drives the visual)
-      const clampHz = f => Math.max(10, Math.min(f, 20000));
-      const fFloor = clampHz(filterCutoffHz(e.floor));
-      // Voice 1 filter release
-      if(v1Audible){
-        if(e.releaseOn){
-          [v1Filter1,v1Filter2].forEach(f=>{
-            f.frequency.cancelScheduledValues(now);
-            f.frequency.setValueAtTime(f.frequency.value, now);
-            if(analogue){
-              f.frequency.setValueCurveAtTime(rcCurveArray(f.frequency.value, fFloor, false), now, v1rDur);
-            } else {
-              f.frequency.linearRampToValueAtTime(fFloor, now + v1rDur);
-            }
-          });
-        } else {
-          [v1Filter1,v1Filter2].forEach(f=>{ f.frequency.cancelScheduledValues(now); f.frequency.setValueAtTime(fFloor, now); });
-        }
-      }
-      // Voice 2 filter release — always linear
-      if(v2Audible){
-        if(e.releaseOn){
-          [v2Filter1,v2Filter2].forEach(f=>{
-            f.frequency.cancelScheduledValues(now);
-            f.frequency.setValueAtTime(f.frequency.value, now);
-            f.frequency.linearRampToValueAtTime(fFloor, now + v2rDur);
-          });
-        } else {
-          [v2Filter1,v2Filter2].forEach(f=>{ f.frequency.cancelScheduledValues(now); f.frequency.setValueAtTime(fFloor, now); });
-        }
-      }
+      // FILTER MODE: the filter frequency release is now driven per-frame from the blob
+      // (audioSetFilterLevels), which follows the release curve to the floor. Nothing to schedule here.
     }
   }
 
@@ -306,7 +270,7 @@ const MASTER_GAIN = 0.7;             // default master output gain
     if(!audioReady) return;
     const now = audioCtx.currentTime;
     const clampHz = f => Math.max(10, Math.min(f, 20000));
-    const minFreq = clampHz(filterCutoffHz(0)); // ≈10 Hz
+    const minFreq = clampHz(filterCutoffHz(0) * filterTrackingMult()); // ≈10 Hz (×tracking)
     // Voice 1
     v1Gain.gain.cancelScheduledValues(now); v1Gain.gain.setTargetAtTime(0, now, 0.005);
     v1Filter1.frequency.cancelScheduledValues(now); v1Filter1.frequency.setTargetAtTime(minFreq, now, 0.005);
@@ -325,6 +289,26 @@ const MASTER_GAIN = 0.7;             // default master output gain
     if(osc1) osc1.frequency.value = freq;
     if(osc2) osc2.frequency.value = freq;
   }
+
+  // Per-frame filter drive: each voice's filter follows its blob's cutoff POSITION (0..1),
+  // derived in the animation loop from blob y (which bakes in floor/scale/clipping/ceiling/RC).
+  // NOTE: args are cutoff positions p, NOT raw ADSR levels — see animation.js step loop.
+  window.audioSetFilterLevels = function(effPos, statedPos){
+    if(!audioReady) return;
+    if(!($('frequencyMode') && $('frequencyMode').checked)) return;  // filter mode only
+    const clampHz = f => Math.max(10, Math.min(f, 20000));
+    const trk = filterTrackingMult();
+    const tc = 0.015;                       // smoothing time constant (avoids zipper noise)
+    const now = audioCtx.currentTime;
+    if(isModelDAudible()){
+      const f = clampHz(filterCutoffHz(effPos) * trk);
+      [v1Filter1, v1Filter2].forEach(flt => flt.frequency.setTargetAtTime(f, now, tc));
+    }
+    if(isTextbookAudible()){
+      const f = clampHz(filterCutoffHz(statedPos) * trk);
+      [v2Filter1, v2Filter2].forEach(flt => flt.frequency.setTargetAtTime(f, now, tc));
+    }
+  };
 
   window.initAudio          = initAudio;
   window.syncAudioFilterType= syncAudioFilterType;

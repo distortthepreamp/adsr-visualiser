@@ -641,7 +641,7 @@ function render(){
       const fracShift = octShift * 0.1;
       const HZ_MARKS = [['10k', 0.832], ['1k', 0.5], ['100', 0.168]];
       for(const [txt, baseFrac] of HZ_MARKS){
-        const newFrac = baseFrac + fracShift;
+        const newFrac = baseFrac - fracShift;
         if(newFrac >= 0 && newFrac <= 1) _addLabel(txt, newFrac);
       }
     }

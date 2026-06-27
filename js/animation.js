@@ -213,6 +213,11 @@ function releaseFromCurrent(){
     const currentLevel = startLevel*(1-f);
     const dotPhase = dotX < pts.pS.x ? (dotX < pts.p1.x ? 'attack' : 'decay') : 'release';
     setDot({x:dotX, y:dotY, level:currentLevel, phase:dotPhase}, true);
+    // Legacy release path: only the effective blob exists (stated blob hidden), so drive both voices from it.
+    if(window.audioSetFilterLevels){
+      const relP = clamp((graph.y0 - dotY) / graph.h);
+      window.audioSetFilterLevels(relP, relP);
+    }
     if(f<1) state.dotAnim=requestAnimationFrame(step); else { setDot(end,false); audioCut(); state.held=false; state.currentPhase='idle'; updateButtonStates(); render(); }
   }
   requestAnimationFrame(step);
@@ -293,6 +298,14 @@ function tap(ms){
     // Position both blobs
     const pos = effectivePos(tPlay, releaseT, releaseMode);
     const spos = statedPos(tPlay, releaseT, releaseMode);
+
+    // Drive the audio filter per-frame from each blob's cutoff position (p from blob y).
+    // p = (graph.y0 - blobY)/graph.h inherits floor/scale/clipping/ceiling/RC from the visual maths.
+    if(window.audioSetFilterLevels){
+      const effP    = clamp((graph.y0 - pos.y)  / graph.h);
+      const statedP = clamp((graph.y0 - spos.y) / graph.h);
+      window.audioSetFilterLevels(effP, statedP);
+    }
 
     // Effective blob
     setDot(pos, true);
@@ -595,6 +608,13 @@ function hold(){
     // Position both blobs
     const pos = effectivePos(tPlay, releaseT, 'sustain');
     const spos = statedPos(tPlay, releaseT, 'sustain');
+
+    // Drive the audio filter per-frame from each blob's cutoff position (p from blob y).
+    if(window.audioSetFilterLevels){
+      const effP    = clamp((graph.y0 - pos.y)  / graph.h);
+      const statedP = clamp((graph.y0 - spos.y) / graph.h);
+      window.audioSetFilterLevels(effP, statedP);
+    }
 
     // Effective blob
     setDot(pos, true);
