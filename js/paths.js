@@ -610,27 +610,32 @@ function render(){
   const gutterX = meterX - DB_GUTTER_W;
   const dbLabels = $('dbScaleLabels');
   if(dbLabels){
-    // dB labels are a loudness scale — only show in loudness mode (hidden in frequency/filter mode)
+    // Loudness mode → dB scale; filter mode → Hz scale. Same gutter, same styling.
     const _dbFreqMode = $('frequencyMode') && $('frequencyMode').checked;
     while(dbLabels.firstChild) dbLabels.removeChild(dbLabels.firstChild);
-    dbLabels.style.display = _dbFreqMode ? 'none' : '';
-    if(!_dbFreqMode){
+    dbLabels.style.display = '';
     const _svgForPx = document.getElementById('svg');
     const _pxToUser = _svgForPx ? (VB_WIDTH / _svgForPx.getBoundingClientRect().width) : 1;
     const strokeInset = (METER_STROKE_W / 2) * _pxToUser;
     const innerTop = meterAbsTop + strokeInset;
     const innerH = graph.h - 2 * strokeInset;
-    const DB_MARKS = [0, -3, -6, -9, -12, -18];
     const labelX = gutterX + DB_GUTTER_W / 2;
-    for(const D of DB_MARKS){
-      const y = innerTop + innerH * (1 - Math.pow(10, D / 20));
+    const _addLabel = (text, frac) => {
       const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      t.setAttribute('x', labelX); t.setAttribute('y', y);
+      t.setAttribute('x', labelX); t.setAttribute('y', innerTop + innerH * (1 - frac));
       t.setAttribute('text-anchor', 'middle');
       t.setAttribute('style', 'dominant-baseline:middle;font-size:'+DB_LABEL_SIZE+'px;fill:#fff;font-family:\'UniversCondensed\',Arial,Helvetica,sans-serif;');
-      t.textContent = String(D);
+      t.textContent = text;
       dbLabels.appendChild(t);
-    }
+    };
+    if(!_dbFreqMode){
+      // dB labels positioned by linear-amplitude mapping: frac = 10^(dB/20)
+      const DB_MARKS = [0, -3, -6, -9, -12, -18];
+      for(const D of DB_MARKS) _addLabel(String(D), Math.pow(10, D / 20));
+    } else {
+      // Hz labels at fixed calibration fractions (independent of the audio cutoff curve)
+      const HZ_MARKS = [['10k', 0.832], ['1k', 0.5], ['100', 0.168]];
+      for(const [txt, frac] of HZ_MARKS) _addLabel(txt, frac);
     }
   }
   const meterClipRect=$('meterClipRect');
