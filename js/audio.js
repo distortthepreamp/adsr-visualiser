@@ -210,19 +210,21 @@ const MASTER_GAIN = 0.7;             // default master output gain
       }
     } else {
       // ---- FILTER MODE ----
-      const fFloor = mapCutoff(e.floor);
+      // Audio cutoff uses the approximate transfer function (NOT mapCutoff, which drives the visual)
+      const clampHz = f => Math.max(10, Math.min(f, 20000));
+      const fFloor = clampHz(filterCutoffHz(e.floor));
       if(v1Audible){
         v1Gain.gain.cancelScheduledValues(now); v1Gain.gain.setValueAtTime(1, now);
-        const fCeil = mapCutoff(e.floor + e.scale);
-        const fSus = mapCutoff(e.floor + e.s * e.scale);
+        const fCeil = clampHz(filterCutoffHz(e.floor + e.scale));
+        const fSus = clampHz(filterCutoffHz(e.floor + e.s * e.scale));
         [v1Filter1,v1Filter2].forEach(f => scheduleFilterAD(f.frequency, now, aT, dT, fFloor, fCeil, fSus, analogue));
       } else {
         v1Gain.gain.cancelScheduledValues(now); v1Gain.gain.setValueAtTime(0, now);
       }
       if(v2Audible){
         v2Gain.gain.cancelScheduledValues(now); v2Gain.gain.setValueAtTime(1, now);
-        const tbCeil = mapCutoff(e.floor + (1 - e.floor) * e.scale);
-        const tbSus = mapCutoff(e.floor + state.s * (1 - e.floor) * e.scale);
+        const tbCeil = clampHz(filterCutoffHz(e.floor + (1 - e.floor) * e.scale));
+        const tbSus = clampHz(filterCutoffHz(e.floor + state.s * (1 - e.floor) * e.scale));
         [v2Filter1,v2Filter2].forEach(f => scheduleFilterAD(f.frequency, now, aT, dT, fFloor, tbCeil, tbSus, false));
       } else {
         v2Gain.gain.cancelScheduledValues(now); v2Gain.gain.setValueAtTime(0, now);
@@ -266,7 +268,9 @@ const MASTER_GAIN = 0.7;             // default master output gain
         }
       }
     } else {
-      const fFloor = mapCutoff(e.floor);
+      // Audio cutoff uses the approximate transfer function (NOT mapCutoff, which drives the visual)
+      const clampHz = f => Math.max(10, Math.min(f, 20000));
+      const fFloor = clampHz(filterCutoffHz(e.floor));
       // Voice 1 filter release
       if(v1Audible){
         if(e.releaseOn){
@@ -301,7 +305,8 @@ const MASTER_GAIN = 0.7;             // default master output gain
   function audioCut(){
     if(!audioReady) return;
     const now = audioCtx.currentTime;
-    const minFreq = mapCutoff(0); // 10 Hz
+    const clampHz = f => Math.max(10, Math.min(f, 20000));
+    const minFreq = clampHz(filterCutoffHz(0)); // ≈10 Hz
     // Voice 1
     v1Gain.gain.cancelScheduledValues(now); v1Gain.gain.setTargetAtTime(0, now, 0.005);
     v1Filter1.frequency.cancelScheduledValues(now); v1Filter1.frequency.setTargetAtTime(minFreq, now, 0.005);
