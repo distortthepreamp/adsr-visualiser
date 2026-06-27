@@ -856,8 +856,10 @@ function render(){
     hideDotStated();
     // Resting meter: filter mode → cutoff floor; loudness mode → empty
     const restingY = freqMode ? yFor(e.floor) : graph.y0;
-    setMeterLevel(anyModelLeg ? restingY : graph.y0);
-    setMeterLevelStated(anyUnderlayLeg ? restingY : graph.y0);
+    // "Empty" is mode-dependent: LP empties at the floor (graph.y0), HP at the ceiling (yFor(1))
+    const emptyY = ($('hpMode') && $('hpMode').checked) ? yFor(1) : graph.y0;
+    setMeterLevel(anyModelLeg ? restingY : emptyY);
+    setMeterLevelStated(anyUnderlayLeg ? restingY : emptyY);
     // Reset fill opacity so resting fills are visible (may have been hidden by leg-off during play)
     if($('meterFill')) $('meterFill').style.opacity = '';
     if($('meterFillStated')) $('meterFillStated').style.opacity = '';
