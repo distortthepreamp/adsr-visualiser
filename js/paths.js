@@ -856,8 +856,8 @@ function render(){
     hideDotStated();
     // Resting meter: filter mode → cutoff floor; loudness mode → empty
     const restingY = freqMode ? yFor(e.floor) : graph.y0;
-    setMeterLevel(restingY);
-    setMeterLevelStated(restingY);
+    setMeterLevel(anyModelLeg ? restingY : graph.y0);
+    setMeterLevelStated(anyUnderlayLeg ? restingY : graph.y0);
     // Reset fill opacity so resting fills are visible (may have been hidden by leg-off during play)
     if($('meterFill')) $('meterFill').style.opacity = '';
     if($('meterFillStated')) $('meterFillStated').style.opacity = '';
