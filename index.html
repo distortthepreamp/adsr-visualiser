@@ -15,7 +15,7 @@
   <div id="kioskLayout">
   <div id="stageColumn">
   <div class="stage">
-    <svg id="svg" viewBox="0 -110 1200 595" preserveAspectRatio="xMidYMid meet" aria-label="ADSR envelope graph">
+    <svg id="svg" viewBox="0 -110 1200 595" preserveAspectRatio="xMidYMin meet" aria-label="ADSR envelope graph">
       <defs>
         <clipPath id="meterClip">
           <rect id="meterClipRect" x="0" y="0" width="0" height="0"/>
@@ -122,8 +122,7 @@
       <g id="dbScaleLabels"></g>
       <rect id="meterBox"  x="1145" y="30" width="40" height="415" style="fill:none;stroke:var(--line);stroke-width:7;stroke-opacity:1;vector-effect:non-scaling-stroke;" />
       <text id="meterLabelTitle" x="1165" y="72" text-anchor="middle" style="fill:var(--fg);font-size:calc(var(--labelSize) * 1px);font-weight:800;font-family:'UniversCondensed',Arial,Helvetica,sans-serif;display:none;">VOL</text>
-      <text id="toolTitle" class="mode-label" x="600" y="-82" text-anchor="middle">DISTORT THE PREAMP: MODEL D CONTOUR VISUALISER</text>
-      <text id="modeLabel" class="mode-label" x="80" y="0" text-anchor="start">LOUDNESS CONTOUR</text>
+      <text id="modeLabel" class="mode-label" x="10" y="-30" text-anchor="start">LOUDNESS CONTOUR</text>
       <text id="svgTimecodes" x="0" y="0" text-anchor="end" font-family="'UniversCondensed',Arial,Helvetica,sans-serif" style="display:none"><tspan id="svgElapsed" fill="#00ffff">ELAPSED: 00:00:00</tspan><tspan id="svgCue" fill="#00ff00" dx="30">CUE: 00:00:00:00</tspan></text>
       <text id="tbSustainLabel" class="small-label" x="0" y="0" style="display:none;">SUSTAIN</text>
 
@@ -337,6 +336,7 @@
       <div id="noteCustomRow" style="display:none" class="row">
         <label>Hz <input id="noteCustomHz" type="number" min="20" max="20000" step="0.1" value="440"></label>
       </div>
+      <div class="row"><label><input id="sloMo" type="checkbox"> Slo-mo</label></div>
       <div id="audioHelpText" class="hint" style="display:none;position:absolute;bottom:calc(100% + 6px);right:0;background:#1c1c1c;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:8px;z-index:100;min-width:260px;max-width:320px;line-height:1.4;">Tap releases after the chosen gate time. Attack, Decay and Release are shown as white strokes with soft colour centres. Sustain is a chunky rightward dotted level guide.</div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div id="configBtns" style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:2px"></div>
@@ -360,6 +360,7 @@
   </div>
 </div>
   </div><!-- /#kioskLayout -->
+<div id="toolFooter" style="width:100%;text-align:center;padding:6px 0;font-size:12px;opacity:.5;letter-spacing:.08em;font-weight:600;font-family:Arial,Helvetica,sans-serif;">DISTORT THE PREAMP: MODEL D CONTOUR VISUALISER</div>
 
 <!-- Display modal -->
 <div id="displayOverlay" style="display:none;position:fixed;inset:0;z-index:500;align-items:center;justify-content:center;pointer-events:none;">
@@ -382,7 +383,6 @@
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Textbook sustain gap max</span><input id="tbSustainGapMax" type="number" min="15" max="30" step="1" value="15"></div>
         <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.55;margin:13px 0 5px;">Time</div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Persist time</span><input id="persistTime" type="number" min="0" max="10000" step="100" value="2000"></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Slo-mo</span><input id="sloMo" type="checkbox"></div>
       </div>
       <div style="flex:1;min-width:230px;">
         <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.55;margin:2px 0 5px;">Widths and strokes</div>
@@ -550,7 +550,7 @@ let SUSTAIN_GAP_MAX = 0.15;
 const METER_GAP = 20;
 let VB_WIDTH = 1200;
 let VB_HEIGHT = 625;
-const VB_Y_ORIGIN = -110;
+const VB_Y_ORIGIN = -60;
 
 let currentTransitionSec = 1;
 let activeTransBtn = 'trans1Btn';

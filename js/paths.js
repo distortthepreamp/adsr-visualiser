@@ -829,11 +829,9 @@ function render(){
   // These text anchors are intentionally fixed to GRAPH_TOP_BASE (the top of the staging area).
   // They do NOT follow GRAPH_TOP_EXTRA — only the graph and its time labels move with the gutter.
   const modeLabelEl=$('modeLabel');
-  if(modeLabelEl){ modeLabelEl.textContent=freqMode?'FILTER CONTOUR':'LOUDNESS CONTOUR'; modeLabelEl.setAttribute('x',10); modeLabelEl.setAttribute('y',GRAPH_TOP_BASE-90); modeLabelEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
+  if(modeLabelEl){ modeLabelEl.textContent=freqMode?'FILTER CONTOUR':'LOUDNESS CONTOUR'; modeLabelEl.setAttribute('x',10); modeLabelEl.setAttribute('text-anchor','start'); modeLabelEl.setAttribute('y',VB_Y_ORIGIN + 30); modeLabelEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }  // left-aligned top header (sits just below the tightened viewBox top)
   const svgTimecodesEl=$('svgTimecodes');
   if(svgTimecodesEl){ svgTimecodesEl.setAttribute('x',METER_X-10); svgTimecodesEl.setAttribute('y',GRAPH_TOP_BASE-90); svgTimecodesEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
-  const toolTitleEl=$('toolTitle');
-  if(toolTitleEl){ toolTitleEl.setAttribute('x',VB_WIDTH/2); toolTitleEl.setAttribute('y',GRAPH_TOP_BASE-173); toolTitleEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
   updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSustainX, {legA, legD, legR}, clipAtGateOn ? gateCloseX : null);
 
   // Cutoff/Amount knobs: active only in Filter Mode
