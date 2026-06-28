@@ -315,23 +315,12 @@
     <div class="panel">
       <div class="row">
         <button id="clearBtn">Clear</button>
-        <label><input id="sloMo" type="checkbox"> Slo-mo</label>
       </div>
       <hr style="border-color:rgba(255,255,255,.25)">
-      <div class="row"><label>Line <input id="lineColor" type="color" value="#ffffff"></label><label>Inner <input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></label><label>Body <input id="labelSize" type="number" min="10" max="72" step="1" value="17"></label><label>H1 <input id="h1Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></label><label>H2 <input id="h2Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></label><label>Blob <input id="blobScale" type="number" min="1" max="8" step="0.5" value="3"></label><label>Console <input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></label><label>Meter <input id="meterWidth" type="number" min="10" max="80" step="1" value="40"></label><label>Meter Stroke <input id="meterStrokeWidth" type="number" min="0" max="20" step="1" value="7"></label><label>dB Label Size <input id="dbLabelSize" type="number" min="6" max="24" step="1" value="11"></label><label>TB Sustain Max <input id="tbSustainGapMax" type="number" min="15" max="30" step="1" value="15">%</label><label>VB W <input id="vbWidth" type="number" min="800" max="2400" step="10" value="1200"></label><label>VB H <input id="vbHeight" type="number" min="400" max="1200" step="10" value="625"></label><label>Graph Margin L <input id="graphLeft" type="number" min="0" max="400" step="10" value="10"></label><label>Graph Margin T <input id="graphTop" type="number" min="0" max="400" step="10" value="0"></label><label>Persist Time <input id="persistTime" type="number" min="0" max="10000" step="100" value="2000">ms</label><label>Fit Margin <input id="fitMargin" type="number" min="50" max="100" step="1" value="90">%</label></div>
-      <div class="row" style="position:relative;">
-        <button id="advancedToggle" style="padding:4px 7px;min-height:unset;line-height:1.1;border-radius:6px;">Advanced</button>
-        <div id="advancedPopup" style="display:none;position:absolute;bottom:calc(100% + 6px);left:0;background:#1c1c1c;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:8px;z-index:200;min-width:260px;">
-          <div class="row"><label><input id="meterGlow" type="checkbox" checked> Meter Glow</label><label>Glow R <input id="meterGlowRadius" type="number" min="0" max="60" step="1" value="5"></label><label><input id="meterScanlinesVisible" type="checkbox" checked> Scanlines</label></div>
-          <div class="row"><label><input id="blobGlowEnabled" type="checkbox" checked> Blob Glow</label><label>Blob R <input id="blobGlowRadius" type="number" min="0" max="30" step="1" value="8"></label></div>
-          <div class="row"><label><input id="kioskKnobGlow" type="checkbox" checked> Knob Glow</label><label>Knob Glow R <input id="kioskKnobGlowRadius" type="number" min="0" max="100" step="1" value="40"></label><label>Inactive Knob <input id="kioskInactiveOpacity" type="number" min="0" max="100" step="5" value="70">%</label></div>
-          <div class="row"><label>Meter L <input id="meterFillColor" type="color" value="#00ff00"></label><label>Meter F <input id="meterFillColorFilter" type="color" value="#00ffff"></label><label>Stated <input id="timeAxisStatedColor" type="color" value="#aaaaaa"></label><label>Contour <input id="contourLineColor" type="color" value="#ffff00"></label></div>
-          <div class="row"><label>L.Attack <input id="loudnessAttackColor" type="color" value="#ff0000"></label><label>L.Decay <input id="loudnessDecayColor" type="color" value="#ff0000"></label><label>L.Release <input id="loudnessReleaseColor" type="color" value="#ff0000"></label><label>L.Gate <input id="loudnessGateColor" type="color" value="#ff8800"></label></div>
-          <div class="row"><label>F.Attack <input id="filterAttackColor" type="color" value="#00ffff"></label><label>F.Decay <input id="filterDecayColor" type="color" value="#ffff00"></label><label>F.Release <input id="filterReleaseColor" type="color" value="#ffff00"></label><label>F.Gate <input id="filterGateColor" type="color" value="#ff8800"></label></div>
-          <div class="row"><label>Underlay <input type="color" id="underlayColor" value="#ffffff"></label><label>Label Gutter <input id="timeLabelGutter" type="number" min="0" step="1" value="0"></label><label>Marker W <input id="markerLineWidth" type="number" min="1" max="8" step="0.5" value="1"></label><label><input id="dottedMarkers" type="checkbox" checked> Dotted Markers</label></div>
-        </div>
+      <div class="row">
+        <button id="coloursBtn" style="padding:4px 7px;min-height:unset;line-height:1.1;border-radius:6px;">Colours</button>
+        <button id="displayBtn" style="padding:4px 7px;min-height:unset;line-height:1.1;border-radius:6px;">Display</button>
       </div>
-      <div class="row"><label>BG <input id="bgColor" type="color" value="#00ff00"></label></div>
       <hr style="border-color:rgba(255,255,255,.25)">
       <div class="row" style="gap:10px;align-items:center;flex-wrap:wrap">
         <label><input id="audioModelD" type="checkbox"> Model D Audio</label>
@@ -371,6 +360,94 @@
   </div>
 </div>
   </div><!-- /#kioskLayout -->
+
+<!-- Display modal -->
+<div id="displayOverlay" style="display:none;position:fixed;inset:0;z-index:500;align-items:center;justify-content:center;pointer-events:none;">
+  <div id="displayModal" style="background:rgba(18,18,18,.97);border:1px solid rgba(255,255,255,.3);border-radius:14px;padding:22px 28px 24px;min-width:340px;max-height:85vh;overflow-y:auto;color:#fff;font-family:Arial,Helvetica,sans-serif;position:relative;pointer-events:auto;box-shadow:0 8px 40px rgba(0,0,0,.55);">
+    <button id="displayClose" style="position:absolute;top:10px;right:14px;background:none;border:none;color:rgba(255,255,255,.7);font-size:20px;font-weight:800;cursor:pointer;line-height:1;padding:0">×</button>
+    <div id="displayHeader" style="cursor:move;user-select:none;">
+      <div style="font-weight:700;font-size:14px;margin-bottom:3px;">Display settings</div>
+      <div style="opacity:.6;font-size:11px;margin-bottom:14px;">Changes apply immediately and are saved with your config. Drag this header to move.</div>
+    </div>
+    <div style="display:flex;gap:32px;font-size:12px;">
+      <div style="flex:1;min-width:230px;">
+        <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.55;margin:2px 0 5px;">Margins and geometry</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Viewbox width</span><input id="vbWidth" type="number" min="800" max="2400" step="10" value="1200"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Viewbox height</span><input id="vbHeight" type="number" min="400" max="1200" step="10" value="625"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Graph margin: left</span><input id="graphLeft" type="number" min="0" max="400" step="10" value="10"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Graph margin: top</span><input id="graphTop" type="number" min="0" max="400" step="10" value="0"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Meter right margin</span><input id="meterRightMargin" type="number" min="0" max="600" step="5" value="265"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Zoom fit right margin</span><input id="fitMargin" type="number" min="50" max="100" step="1" value="90"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Time label gutter</span><input id="timeLabelGutter" type="number" min="0" step="1" value="0"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Textbook sustain gap max</span><input id="tbSustainGapMax" type="number" min="15" max="30" step="1" value="15"></div>
+        <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.55;margin:13px 0 5px;">Time</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Persist time</span><input id="persistTime" type="number" min="0" max="10000" step="100" value="2000"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Slo-mo</span><input id="sloMo" type="checkbox"></div>
+      </div>
+      <div style="flex:1;min-width:230px;">
+        <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.55;margin:2px 0 5px;">Widths and strokes</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Envelope stroke width</span><input id="innerLineWidth" type="number" min="1" max="18" step="1" value="6"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Meter stroke width</span><input id="meterStrokeWidth" type="number" min="0" max="20" step="1" value="7"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Marker line width</span><input id="markerLineWidth" type="number" min="1" max="8" step="0.5" value="1"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Meter width</span><input id="meterWidth" type="number" min="10" max="80" step="1" value="40"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Blob diameter</span><input id="blobScale" type="number" min="1" max="8" step="0.5" value="3"></div>
+        <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.55;margin:13px 0 5px;">Text sizes</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Body text size</span><input id="labelSize" type="number" min="10" max="72" step="1" value="17"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Heading 1 size</span><input id="h1Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Heading 2 size</span><input id="h2Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>dB label size</span><input id="dbLabelSize" type="number" min="6" max="24" step="1" value="11"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Console scale</span><input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></div>
+      </div>
+      <div style="flex:1;min-width:230px;">
+        <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.55;margin:2px 0 5px;">Effects</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Meter glow</span><input id="meterGlow" type="checkbox" checked></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Meter glow radius</span><input id="meterGlowRadius" type="number" min="0" max="60" step="1" value="5"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Blob glow</span><input id="blobGlowEnabled" type="checkbox" checked></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Blob glow radius</span><input id="blobGlowRadius" type="number" min="0" max="30" step="1" value="8"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Knob glow</span><input id="kioskKnobGlow" type="checkbox" checked></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Knob glow radius</span><input id="kioskKnobGlowRadius" type="number" min="0" max="100" step="1" value="40"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Inactive knob</span><input id="kioskInactiveOpacity" type="number" min="0" max="100" step="5" value="70"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Meter fill scanlines</span><input id="meterScanlinesVisible" type="checkbox" checked></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Dotted markers</span><input id="dottedMarkers" type="checkbox" checked></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Colours modal -->
+<div id="coloursOverlay" style="display:none;position:fixed;inset:0;z-index:500;align-items:center;justify-content:center;pointer-events:none;">
+  <div id="coloursModal" style="background:rgba(18,18,18,.97);border:1px solid rgba(255,255,255,.3);border-radius:14px;padding:22px 28px 24px;min-width:340px;max-height:85vh;overflow-y:auto;color:#fff;font-family:Arial,Helvetica,sans-serif;position:relative;pointer-events:auto;box-shadow:0 8px 40px rgba(0,0,0,.55);">
+    <button id="coloursClose" style="position:absolute;top:10px;right:14px;background:none;border:none;color:rgba(255,255,255,.7);font-size:20px;font-weight:800;cursor:pointer;line-height:1;padding:0">×</button>
+    <div id="coloursHeader" style="cursor:move;user-select:none;">
+      <div style="font-weight:700;font-size:14px;margin-bottom:3px;">Display colours</div>
+      <div style="opacity:.6;font-size:11px;margin-bottom:14px;">Changes apply immediately and are saved with your config. Drag this header to move.</div>
+    </div>
+    <div style="display:flex;gap:32px;font-size:12px;">
+      <div style="flex:1;min-width:230px;">
+        <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.55;margin:2px 0 5px;">Meter</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Meter outline</span><input id="lineColor" type="color" value="#ffffff"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Meter fill: loudness</span><input id="meterFillColor" type="color" value="#00ff00"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Meter fill: filter</span><input id="meterFillColorFilter" type="color" value="#00ffff"></div>
+        <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.55;margin:13px 0 5px;">Loudness envelope</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Loudness: attack</span><input id="loudnessAttackColor" type="color" value="#ff0000"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Loudness: decay</span><input id="loudnessDecayColor" type="color" value="#ff0000"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Loudness: release</span><input id="loudnessReleaseColor" type="color" value="#ff0000"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Loudness: gate</span><input id="loudnessGateColor" type="color" value="#ff8800"></div>
+      </div>
+      <div style="flex:1;min-width:230px;">
+        <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.55;margin:2px 0 5px;">Filter envelope</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Filter: attack</span><input id="filterAttackColor" type="color" value="#00ffff"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Filter: decay</span><input id="filterDecayColor" type="color" value="#ffff00"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Filter: release</span><input id="filterReleaseColor" type="color" value="#ffff00"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Filter: gate</span><input id="filterGateColor" type="color" value="#ff8800"></div>
+        <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.55;margin:13px 0 5px;">Curves &amp; background</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Contour line</span><input id="contourLineColor" type="color" value="#ffff00"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Underlay (textbook curve)</span><input type="color" id="underlayColor" value="#ffffff"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Background</span><input id="bgColor" type="color" value="#00ff00"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Help modal -->
 <div id="helpOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;align-items:center;justify-content:center;">
@@ -466,6 +543,7 @@
 
 const STATUS_DIM_OPACITY = 0.65;
 let METER_W = 40;
+let METER_RIGHT_MARGIN = 265;  // meter's gap from the right edge (pure reposition; default keeps it where GRAPH_RIGHT_PAD put it)
 let METER_STROKE_W = 7;
 let DB_LABEL_SIZE = 11;
 let SUSTAIN_GAP_MAX = 0.15;
@@ -515,7 +593,9 @@ function recalcGeometry(){
   graph.w  = VB_WIDTH  - graph.x0 - METER_GAP - METER_W - GRAPH_RIGHT_PAD;
   graph.y0 = VB_HEIGHT - GRAPH_BOTTOM_PAD;
   graph.h  = graph.y0  - GRAPH_TOP_BASE - GRAPH_TOP_EXTRA;
-  METER_X  = graph.x0  + graph.w + METER_GAP;
+  // Meter right gap is set purely by METER_RIGHT_MARGIN; graph.w above keeps using the stable
+  // GRAPH_RIGHT_PAD base, so moving the meter no longer resizes the graph.
+  METER_X  = VB_WIDTH - METER_RIGHT_MARGIN - METER_W;
   const svgEl = document.getElementById('svg');
   if(svgEl) svgEl.style.aspectRatio = `${VB_WIDTH} / ${VB_HEIGHT + Math.abs(VB_Y_ORIGIN)}`;
 }

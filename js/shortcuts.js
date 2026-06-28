@@ -35,8 +35,15 @@ const tag = document.activeElement ? document.activeElement.tagName : '';
       if(e.key === 'Escape') hideHelp();
       return;
     }
+    if($('coloursOverlay') && $('coloursOverlay').style.display !== 'none'){
+      if(e.key === 'Escape') $('coloursOverlay').style.display='none';
+      return;
+    }
+    if($('displayOverlay') && $('displayOverlay').style.display !== 'none'){
+      if(e.key === 'Escape') $('displayOverlay').style.display='none';
+      return;
+    }
     if(isExpertOpen()){ if(e.key === 'Escape') closeExpert(); return; }
-    if(isAdvancedOpen()){ if(e.key === 'Escape') closeAdvanced(); return; }
     if(e.key === 'Escape') return;
     if(e.key === '?'){ showHelp(); return; }
     if(e.key === ' '){

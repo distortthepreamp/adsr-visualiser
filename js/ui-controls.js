@@ -172,15 +172,42 @@ function updateButtonStates(){
   // stub — reserved for future button state sync
 }
 
-// ---- Advanced popup helpers ----
-function openAdvanced(){ $('advancedPopup').style.display=''; $('advancedToggle').style.background=BTN_ACTIVE_BG; $('advancedToggle').style.color=BTN_ACTIVE_FG; }
-function closeAdvanced(){ $('advancedPopup').style.display='none'; $('advancedToggle').style.background=''; $('advancedToggle').style.color=''; }
-function isAdvancedOpen(){ return $('advancedPopup').style.display !== 'none'; }
 
 // ---- Expert popup helpers ----
 function openExpert(){ $('expertPopup').style.display=''; $('expertToggle').style.background=BTN_ACTIVE_BG; $('expertToggle').style.color=BTN_ACTIVE_FG; }
 function closeExpert(){ $('expertPopup').style.display='none'; $('expertToggle').style.background=''; $('expertToggle').style.color=''; }
 function isExpertOpen(){ return $('expertPopup').style.display !== 'none'; }
+
+// ---- Floating-panel helpers (Colours / Display) ----
+// Reset a draggable panel card back to flex-centred (cleared inline position) when reopened.
+function resetModalPos(card){ if(!card) return; card.style.position='relative'; card.style.left=''; card.style.top=''; card.style.margin=''; }
+// Make a panel card draggable by its header; switches the card to fixed positioning on first drag.
+function makeDraggable(card, handle){
+  if(!card || !handle) return;
+  let dragging=false, offX=0, offY=0;
+  handle.addEventListener('pointerdown', e => {
+    if(e.button !== 0) return;
+    const r = card.getBoundingClientRect();
+    card.style.position='fixed'; card.style.margin='0';
+    card.style.left=r.left+'px'; card.style.top=r.top+'px';
+    offX = e.clientX - r.left; offY = e.clientY - r.top;
+    dragging=true;
+    try{ handle.setPointerCapture(e.pointerId); }catch(_){}
+    e.preventDefault();
+  });
+  handle.addEventListener('pointermove', e => {
+    if(!dragging) return;
+    const r = card.getBoundingClientRect();
+    const m = 40; // keep at least this many px on-screen so it can't be lost
+    let nx = e.clientX - offX, ny = e.clientY - offY;
+    nx = Math.max(m - r.width, Math.min(nx, window.innerWidth - m));
+    ny = Math.max(0,           Math.min(ny, window.innerHeight - m));
+    card.style.left=nx+'px'; card.style.top=ny+'px';
+  });
+  const end = e => { if(dragging){ dragging=false; try{ handle.releasePointerCapture(e.pointerId); }catch(_){} } };
+  handle.addEventListener('pointerup', end);
+  handle.addEventListener('pointercancel', end);
+}
 
 // ---- Sync helpers (also called from loadConfigObject) ----
 function syncHpModeEnabled(){
@@ -368,7 +395,7 @@ function initUIControls(){
   $('bgColor').addEventListener('input',e=>document.documentElement.style.setProperty('--bg', e.target.value));
   $('meterFillColor').addEventListener('input',e=>document.documentElement.style.setProperty('--meterFill', e.target.value));
   $('meterFillColorFilter').addEventListener('input',e=>document.documentElement.style.setProperty('--meterFillFilter', e.target.value));
-  $('timeAxisStatedColor').addEventListener('input',e=>document.documentElement.style.setProperty('--timeAxisStatedColor', e.target.value));
+  $('timeAxisStatedColor') && $('timeAxisStatedColor').addEventListener('input',e=>document.documentElement.style.setProperty('--timeAxisStatedColor', e.target.value));
   $('contourLineColor').addEventListener('input',e=>{ document.documentElement.style.setProperty('--contourLineColor', e.target.value); render(); });
   ['loudnessAttackColor','loudnessDecayColor','loudnessReleaseColor','loudnessGateColor','filterAttackColor','filterDecayColor','filterReleaseColor','filterGateColor'].forEach(id => {
     const el = $(id); if(el) el.addEventListener('input', render);
@@ -382,6 +409,7 @@ function initUIControls(){
   $('blobScale').addEventListener('input',e=>{ const inp=e.target,c=Math.min(8,Math.max(1,isNaN(parseFloat(inp.value))?3:Math.round(parseFloat(inp.value)*2)/2)); inp.value=c; syncRadii(); });
   $('consoleScale').addEventListener('input', e => { const inp=e.target,raw=parseFloat(inp.value),c=Math.min(1.0,Math.max(0.5,isNaN(raw)?0.7:raw)); inp.value=c; syncConsoleScale(); });
   $('meterWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(80,Math.max(10,isNaN(parseInt(inp.value))?40:parseInt(inp.value))); inp.value=c; METER_W=c; recalcGeometry(); render(); });
+  $('meterRightMargin').addEventListener('input', e => { const inp=e.target,c=Math.min(600,Math.max(0,isNaN(parseInt(inp.value))?265:parseInt(inp.value))); inp.value=c; METER_RIGHT_MARGIN=c; recalcGeometry(); render(); });
   $('meterStrokeWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(20,Math.max(0,isNaN(parseInt(inp.value))?7:parseInt(inp.value))); inp.value=c; METER_STROKE_W=c; render(); });
   $('dbLabelSize').addEventListener('input', e => { const inp=e.target, c=Math.min(24,Math.max(6,isNaN(parseInt(inp.value))?11:parseInt(inp.value))); inp.value=c; DB_LABEL_SIZE=c; render(); });
   $('timeLabelGutter').addEventListener('input', e => { const inp=e.target,c=Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value)); inp.value=c; render(); });
@@ -463,10 +491,15 @@ function initUIControls(){
   // Expert popup
   $('expertToggle').addEventListener('click', e => { e.stopPropagation(); isExpertOpen() ? closeExpert() : openExpert(); });
   $('expertPopup').addEventListener('click', e => e.stopPropagation());
-  // Advanced popup
-  $('advancedToggle').addEventListener('click', e => { e.stopPropagation(); isAdvancedOpen() ? closeAdvanced() : openAdvanced(); });
-  $('advancedPopup').addEventListener('click', e => e.stopPropagation());
-  document.addEventListener('click', () => { if(isAdvancedOpen()) closeAdvanced(); if(isExpertOpen()) closeExpert(); });
+  document.addEventListener('click', () => { if(isExpertOpen()) closeExpert(); });
+  // Colours panel — non-blocking floating card, draggable by its header (opens centred)
+  $('coloursBtn').addEventListener('click', () => { resetModalPos($('coloursModal')); $('coloursOverlay').style.display='flex'; });
+  $('coloursClose').addEventListener('click', () => { $('coloursOverlay').style.display='none'; });
+  makeDraggable($('coloursModal'), $('coloursHeader'));
+  // Display panel — non-blocking floating card, draggable by its header (opens centred)
+  $('displayBtn').addEventListener('click', () => { resetModalPos($('displayModal')); $('displayOverlay').style.display='flex'; });
+  $('displayClose').addEventListener('click', () => { $('displayOverlay').style.display='none'; });
+  makeDraggable($('displayModal'), $('displayHeader'));
 
   // Note mode buttons
   Object.entries(noteFreqs).forEach(([btnId, freq]) => {
