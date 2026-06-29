@@ -44,6 +44,7 @@ const tag = document.activeElement ? document.activeElement.tagName : '';
       return;
     }
     if(isExpertOpen()){ if(e.key === 'Escape') closeExpert(); return; }
+    if(isPendingOpen()){ if(e.key === 'Escape') closePending(); return; }
     if(e.key === 'Escape') return;
     if(e.key === '?'){ showHelp(); return; }
     if(e.key === ' '){

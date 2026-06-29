@@ -32,7 +32,7 @@ function syncControls(){
   $('floorTarget').textContent=mode==='animate' ? 'Target: '+formatSustainScale(state.target.floor) : '';
   $('scaleTarget').textContent=mode==='animate' ? 'Target: '+formatSustainScale(state.target.scale) : '';
   if($('gateTarget')) $('gateTarget').textContent=mode==='animate' ? 'Target: '+Math.round(gateMsFromPosition(state.target.gate))+'ms' : '';
-  $('modeHint').textContent = mode==='live' ? 'Live Mode: Knobs Update The Graph Immediately.' : 'Animate Mode: Knobs Set Targets. Press Transition To Morph The Graph.';
+  const mh=$('modeHint'); if(mh) mh.textContent = mode==='live' ? 'Live Mode: Knobs Update The Graph Immediately.' : 'Animate Mode: Knobs Set Targets. Press Transition To Morph The Graph.';
   patchSustainReadouts();
   syncZoomReadout();
 
@@ -174,9 +174,13 @@ function updateButtonStates(){
 
 
 // ---- Expert popup helpers ----
-function openExpert(){ $('expertPopup').style.display=''; $('expertToggle').style.background=BTN_ACTIVE_BG; $('expertToggle').style.color=BTN_ACTIVE_FG; }
+function openExpert(){ closePending(); $('expertPopup').style.display=''; $('expertToggle').style.background=BTN_ACTIVE_BG; $('expertToggle').style.color=BTN_ACTIVE_FG; }
 function closeExpert(){ $('expertPopup').style.display='none'; $('expertToggle').style.background=''; $('expertToggle').style.color=''; }
 function isExpertOpen(){ return $('expertPopup').style.display !== 'none'; }
+// Pending Removal popup — mirrors Expert; mutually exclusive so the two upward popups never overlap.
+function openPending(){ closeExpert(); $('pendingPopup').style.display=''; $('pendingToggle').style.background=BTN_ACTIVE_BG; $('pendingToggle').style.color=BTN_ACTIVE_FG; }
+function closePending(){ $('pendingPopup').style.display='none'; $('pendingToggle').style.background=''; $('pendingToggle').style.color=''; }
+function isPendingOpen(){ return $('pendingPopup').style.display !== 'none'; }
 
 // ---- Floating-panel helpers (Colours / Display) ----
 // Reset a draggable panel card back to flex-centred (cleared inline position) when reopened.
@@ -492,7 +496,9 @@ function initUIControls(){
   // Expert popup
   $('expertToggle').addEventListener('click', e => { e.stopPropagation(); isExpertOpen() ? closeExpert() : openExpert(); });
   $('expertPopup').addEventListener('click', e => e.stopPropagation());
-  document.addEventListener('click', () => { if(isExpertOpen()) closeExpert(); });
+  $('pendingToggle').addEventListener('click', e => { e.stopPropagation(); isPendingOpen() ? closePending() : openPending(); });
+  $('pendingPopup').addEventListener('click', e => e.stopPropagation());
+  document.addEventListener('click', () => { if(isExpertOpen()) closeExpert(); if(isPendingOpen()) closePending(); });
   // Colours panel — non-blocking floating card, draggable by its header (opens centred)
   $('coloursBtn').addEventListener('click', () => { resetModalPos($('coloursModal')); $('coloursOverlay').style.display='flex'; });
   $('coloursClose').addEventListener('click', () => { $('coloursOverlay').style.display='none'; });
