@@ -42,7 +42,7 @@ function render(){
   const DB_GUTTER_W = 60;  // dB-scale gutter width (user units); mirror-ready for right side
   // Keep viewBox and VB_WIDTH-dependent elements in sync
   const svgEl = document.getElementById('svg');
-  if(svgEl) svgEl.setAttribute('viewBox', `0 ${VB_Y_ORIGIN} ${VB_WIDTH} ${VB_HEIGHT}`);
+  if(svgEl) svgEl.setAttribute('viewBox', `0 ${VB_Y_ORIGIN} ${VB_WIDTH} ${VB_HEIGHT_EFF}`);
   const floorBoundEl = document.getElementById('floorBound');
   if(floorBoundEl){ floorBoundEl.setAttribute('x2', VB_WIDTH); floorBoundEl.setAttribute('y1', graph.y0); floorBoundEl.setAttribute('y2', graph.y0); }
   const ceilingBoundEl = document.getElementById('ceilingBound');

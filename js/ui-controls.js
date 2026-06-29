@@ -410,6 +410,7 @@ function initUIControls(){
   $('consoleScale').addEventListener('input', e => { const inp=e.target,raw=parseFloat(inp.value),c=Math.min(1.0,Math.max(0.5,isNaN(raw)?0.7:raw)); inp.value=c; syncConsoleScale(); });
   $('meterWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(80,Math.max(10,isNaN(parseInt(inp.value))?40:parseInt(inp.value))); inp.value=c; METER_W=c; recalcGeometry(); render(); });
   $('meterRightMargin').addEventListener('input', e => { const inp=e.target,c=Math.min(600,Math.max(0,isNaN(parseInt(inp.value))?265:parseInt(inp.value))); inp.value=c; METER_RIGHT_MARGIN=c; recalcGeometry(); render(); });
+  $('graphBottomMargin').addEventListener('input', e => { const inp=e.target,c=Math.min(300,Math.max(20,isNaN(parseInt(inp.value))?120:parseInt(inp.value))); inp.value=c; GRAPH_BOTTOM_MARGIN=c; recalcGeometry(); render(); });
   $('meterStrokeWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(20,Math.max(0,isNaN(parseInt(inp.value))?7:parseInt(inp.value))); inp.value=c; METER_STROKE_W=c; render(); });
   $('dbLabelSize').addEventListener('input', e => { const inp=e.target, c=Math.min(24,Math.max(6,isNaN(parseInt(inp.value))?11:parseInt(inp.value))); inp.value=c; DB_LABEL_SIZE=c; render(); });
   $('timeLabelGutter').addEventListener('input', e => { const inp=e.target,c=Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value)); inp.value=c; render(); });

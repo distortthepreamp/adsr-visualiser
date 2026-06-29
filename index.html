@@ -374,7 +374,8 @@
       <div style="flex:1;min-width:230px;">
         <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.55;margin:2px 0 5px;">Margins and geometry</div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Viewbox width</span><input id="vbWidth" type="number" min="800" max="2400" step="10" value="1200"></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Viewbox height</span><input id="vbHeight" type="number" min="400" max="1200" step="10" value="625"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Graph height</span><input id="vbHeight" type="number" min="400" max="1200" step="10" value="625"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Below-graph margin</span><input id="graphBottomMargin" type="number" min="20" max="300" step="5" value="120"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Graph margin: left</span><input id="graphLeft" type="number" min="0" max="400" step="10" value="10"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Graph margin: top</span><input id="graphTop" type="number" min="0" max="400" step="10" value="0"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Meter right margin</span><input id="meterRightMargin" type="number" min="0" max="600" step="5" value="265"></div>
@@ -550,6 +551,8 @@ let SUSTAIN_GAP_MAX = 0.15;
 const METER_GAP = 20;
 let VB_WIDTH = 1200;
 let VB_HEIGHT = 625;
+let GRAPH_BOTTOM_MARGIN = 120;  // space from graph.y0 to the viewBox bottom (below-graph gap before the subtitle/console); independent of vbHeight, does not move graph.y0
+let VB_HEIGHT_EFF = 625;        // derived: graph.y0 + GRAPH_BOTTOM_MARGIN - VB_Y_ORIGIN (computed in recalcGeometry; the real viewBox height)
 const VB_Y_ORIGIN = -60;
 
 let currentTransitionSec = 1;
@@ -568,7 +571,7 @@ let METER_X = graph.x0 + graph.w + METER_GAP;  // 1145
 // Initialise static SVG geometry from named constants
 (function initSvgGeometry(){
   const svg = document.getElementById('svg');
-  if(svg) svg.setAttribute('viewBox', `0 ${VB_Y_ORIGIN} ${VB_WIDTH} ${VB_HEIGHT}`);
+  if(svg) svg.setAttribute('viewBox', `0 ${VB_Y_ORIGIN} ${VB_WIDTH} ${VB_HEIGHT_EFF}`);
   const gx0 = graph.x0, gy0 = graph.y0, gw = graph.w, gh = graph.h;
   const top = gy0 - gh;  // = 30
   function set(id, attrs){ const el = document.getElementById(id); if(el) Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k,v)); }
@@ -593,11 +596,14 @@ function recalcGeometry(){
   graph.w  = VB_WIDTH  - graph.x0 - METER_GAP - METER_W - GRAPH_RIGHT_PAD;
   graph.y0 = VB_HEIGHT - GRAPH_BOTTOM_PAD;
   graph.h  = graph.y0  - GRAPH_TOP_BASE - GRAPH_TOP_EXTRA;
+  // Below-graph margin sets the viewBox bottom independently of the graph floor:
+  // viewBox bottom = graph.y0 + GRAPH_BOTTOM_MARGIN, so VB_HEIGHT_EFF = that - VB_Y_ORIGIN.
+  VB_HEIGHT_EFF = graph.y0 + GRAPH_BOTTOM_MARGIN - VB_Y_ORIGIN;
   // Meter right gap is set purely by METER_RIGHT_MARGIN; graph.w above keeps using the stable
   // GRAPH_RIGHT_PAD base, so moving the meter no longer resizes the graph.
   METER_X  = VB_WIDTH - METER_RIGHT_MARGIN - METER_W;
   const svgEl = document.getElementById('svg');
-  if(svgEl) svgEl.style.aspectRatio = `${VB_WIDTH} / ${VB_HEIGHT + Math.abs(VB_Y_ORIGIN)}`;
+  if(svgEl) svgEl.style.aspectRatio = `${VB_WIDTH} / ${VB_HEIGHT_EFF}`;  // match viewBox; xMidYMin keeps content top-pinned (no bottom letterbox)
 }
 
 // ---- Init ----
