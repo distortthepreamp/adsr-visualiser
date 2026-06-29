@@ -237,8 +237,11 @@ function computeFitZoom(){
   let z = state.zoomFactor * (graph.w * margin) / (rx - graph.x0);
   z = Math.max(0.1, Math.min(48, Math.round(z * 10) / 10));
   const inp = $('zoomFactorInput'); if(!inp) return;
+  // Apply silently (no synthetic change event → no cueRecord('zoom')); the Fit button records 'zoom-fit'.
   inp.value = z;
-  inp.dispatchEvent(new Event('change', {bubbles:true}));
+  state.target.zoomFactor = z;
+  transition(currentTransitionSec);
+  syncZoomReadout();
 }
 function commitZoom(){
   const inp = $('zoomFactorInput'); if(!inp) return;
@@ -388,7 +391,7 @@ function initUIControls(){
     $('zoomFactorInput').addEventListener('change', commitZoom);
     $('zoomFactorInput').addEventListener('keydown', e => { if(e.key === 'Enter') commitZoom(); });
   }
-  if($('fitBtn')) $('fitBtn').addEventListener('click', computeFitZoom);
+  if($('fitBtn')) $('fitBtn').addEventListener('click', () => { computeFitZoom(); if(window.cueRecordRaw) cueRecordRaw('zoom-fit'); });
 
   // Analogue curve
   $('analogueCurve').addEventListener('change', () => { syncAnalogueCurve(); render(); if(state.currentPhase === 'idle') clearBlobAndMarker(); if(window.cueRecord) cueRecord('analogue'); });

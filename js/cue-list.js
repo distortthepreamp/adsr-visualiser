@@ -625,8 +625,8 @@ function formatCueCommand(key){ const p = CUE_PARAMS.find(p=>p.key===key); retur
 let cueLog = [];
 let _cueT0 = Date.now();
 const CUE_RECORD_MERGE_MS = 200;
-window.cueRecord = function(key){ const c = formatCueCommand(key); if(c) cueLog.push({ t: Date.now()-_cueT0, command: c }); };
-window.cueRecordRaw = function(cmd){ cueLog.push({ t: Date.now()-_cueT0, command: cmd }); };
+window.cueRecord = function(key){ const c = formatCueCommand(key); if(c){ const t = Date.now()-_cueT0; cueLog.push({ t, command: c }); const subEl=$('subtitleBox'); if(subEl) subEl.textContent = msToTc(t) + '  ' + c; /* display-only echo */ } };
+window.cueRecordRaw = function(cmd){ const t = Date.now()-_cueT0; cueLog.push({ t, command: cmd }); const subEl=$('subtitleBox'); if(subEl) subEl.textContent = msToTc(t) + '  ' + cmd; /* display-only echo */ };
 window.getCueLog = function(){ return cueLog; };
 window.clearCueLog = function(){ cueLog = []; };
 
