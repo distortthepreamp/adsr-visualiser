@@ -275,7 +275,8 @@ function initKnobs(){
     knob.addEventListener('pointermove', e => {
       if (!knob.hasPointerCapture(e.pointerId)) return;
       const delta  = startY - e.clientY;
-      const newVal = clamp(startVal + delta / KNOB_DRAG_PX_RANGE);
+      const fine   = e.metaKey ? 0.2 : 1;   // Cmd held = 5× finer (read live each move)
+      const newVal = clamp(startVal + (delta / KNOB_DRAG_PX_RANGE) * fine);
       const mode   = currentMode();
       if (mode === 'live') {
         if (isTime) clearBlobAndMarker();
