@@ -57,6 +57,18 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
         newStatedAttackTimeLabelEl.textContent = 'A = ' + Math.round(msFromPosition(state.a)) + 'ms';
         newStatedAttackTimeLabelEl.style.display='';
       }
+    } else if(($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && effA){
+      // Textbook hidden but Model D attack shown: keep the attack time label at the same
+      // (textbook) position, coloured like the Model D attack. Drop LINE stays hidden.
+      newStatedAttackDropEl.style.display='none';
+      if(newStatedAttackTimeLabelEl){
+        newStatedAttackTimeLabelEl.setAttribute('x', pts.p1.x);
+        newStatedAttackTimeLabelEl.setAttribute('y', statedLabelY);
+        newStatedAttackTimeLabelEl.setAttribute('text-anchor', 'middle');
+        newStatedAttackTimeLabelEl.setAttribute('fill', newEffAttackCol);
+        newStatedAttackTimeLabelEl.textContent = 'A = ' + Math.round(msFromPosition(state.a)) + 'ms';
+        newStatedAttackTimeLabelEl.style.display='';
+      }
     } else {
       newStatedAttackDropEl.style.display='none';
       if(newStatedAttackTimeLabelEl) newStatedAttackTimeLabelEl.style.display='none';
