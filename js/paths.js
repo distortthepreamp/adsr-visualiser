@@ -831,7 +831,7 @@ function render(){
   const modeLabelEl=$('modeLabel');
   if(modeLabelEl){ modeLabelEl.textContent=freqMode?'FILTER CONTOUR':'LOUDNESS CONTOUR'; modeLabelEl.setAttribute('x',10); modeLabelEl.setAttribute('text-anchor','start'); modeLabelEl.setAttribute('y',VB_Y_ORIGIN + 30); modeLabelEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }  // left-aligned top header (sits just below the tightened viewBox top)
   const svgTimecodesEl=$('svgTimecodes');
-  if(svgTimecodesEl){ svgTimecodesEl.setAttribute('x',METER_X-10); svgTimecodesEl.setAttribute('y',GRAPH_TOP_BASE-90); svgTimecodesEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }
+  if(svgTimecodesEl){ svgTimecodesEl.setAttribute('x',VB_WIDTH); svgTimecodesEl.setAttribute('y',VB_Y_ORIGIN + 30); svgTimecodesEl.style.fontSize='calc(var(--labelSize) * var(--h1Scale) * 1px)'; }  // right-aligned at the SVG right edge, on the modeLabel (H1) baseline
   updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSustainX, {legA, legD, legR}, clipAtGateOn ? gateCloseX : null);
 
   // Cutoff/Amount knobs: active only in Filter Mode
