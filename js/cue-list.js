@@ -192,13 +192,18 @@ function parseOneCommand(frag) {
   const playHoldMatch = frag.match(/^play-hold(?:\s+([A-Ga-g]\d))?$/i);
   if (playHoldMatch) return { type: 'play', action: 'hold', note: playHoldMatch[1] ? playHoldMatch[1].toUpperCase() : null };
 
-  // play-from-decay [note] — starts at the decay onset (skips the attack)
-  const playFromDecayMatch = frag.match(/^play-from-decay(?:\s+([A-Ga-g]\d))?$/i);
-  if (playFromDecayMatch) return { type: 'play', action: 'from-decay', note: playFromDecayMatch[1] ? playFromDecayMatch[1].toUpperCase() : null };
+  // play-decay [note] — starts at the decay onset (skips the attack)
+  const playFromDecayMatch = frag.match(/^play-decay(?:\s+([A-Ga-g]\d))?$/i);
+  if (playFromDecayMatch) return { type: 'play', action: 'decay', note: playFromDecayMatch[1] ? playFromDecayMatch[1].toUpperCase() : null };
 
-  // play-from-release [note] — starts at the sustain level and immediately releases to floor
+  // play-from-release [note] — starts at the sustain level and immediately releases to floor.
+  // (Name kept distinct from the pre-existing 'play-release' = manual release-from-current.)
   const playFromReleaseMatch = frag.match(/^play-from-release(?:\s+([A-Ga-g]\d))?$/i);
   if (playFromReleaseMatch) return { type: 'play', action: 'from-release', note: playFromReleaseMatch[1] ? playFromReleaseMatch[1].toUpperCase() : null };
+
+  // play-attack [note] — plays only the attack (start→peak) then stops at the peak
+  const playAttackMatch = frag.match(/^play-attack(?:\s+([A-Ga-g]\d))?$/i);
+  if (playAttackMatch) return { type: 'play', action: 'attack', note: playAttackMatch[1] ? playAttackMatch[1].toUpperCase() : null };
 
   // play-release
   if (/^play-release$/i.test(frag)) return { type: 'play', action: 'release', note: null };
@@ -392,11 +397,14 @@ function executeEvent(event) {
       case 'hold':
         if (window.hold) hold();
         break;
-      case 'from-decay':
+      case 'decay':
         if (window.hold) hold(getEffective().aT * 1000);
         break;
       case 'from-release':
         if (window.hold) { const e = getEffective(); hold((e.aT + e.dT) * 1000, 'from-release'); }
+        break;
+      case 'attack':
+        if (window.hold) hold(0, 'attack-only');
         break;
       case 'release':
         if (window.releaseFromCurrent) releaseFromCurrent();

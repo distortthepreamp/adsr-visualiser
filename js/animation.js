@@ -568,8 +568,11 @@ function animRate(){ return ($('sloMo') && $('sloMo').checked) ? 0.1 : 1; }
 
 function hold(startT = 0, mode){
   const fromRelease = mode === 'from-release';
+  const attackOnly = mode === 'attack-only';
   logEvent('ANIMATION', { action: 'hold' });
-  const cueCmd = fromRelease ? 'play-from-release' : (startT > 0 ? 'play-from-decay' : 'play-hold');
+  // NB: 'play-release' is already taken (manual release-from-current, releaseFromCurrent), so the
+  // from-sustain "Play Release" button keeps the distinct cue command 'play-from-release'.
+  const cueCmd = attackOnly ? 'play-attack' : fromRelease ? 'play-from-release' : (startT > 0 ? 'play-decay' : 'play-hold');
   if(window.cueRecordRaw) cueRecordRaw(`${cueCmd}${cueNoteStr()}`);
   if(state.persistTimer){ clearTimeout(state.persistTimer); state.persistTimer = null; }
   releaseStartPoint = null;
@@ -585,10 +588,11 @@ function hold(startT = 0, mode){
   updateButtonStates();
 
   // Unified t-based clock: runs through attack→decay→sustain→release.
-  // startT > 0 begins partway (Play From Decay: start at e.aT*1000; Play From Release: start at (e.aT+e.dT)*1000).
+  // startT > 0 begins partway (Play Decay: start at e.aT*1000; Play Release: start at (e.aT+e.dT)*1000).
   let tPlay = startT;
+  const attackEndMs = attackOnly ? getEffective().aT * 1000 : Infinity;  // Play Attack halts here (the peak)
   let prevNow = null;
-  // Normally undefined until release triggered; Play From Release pre-triggers it at tPlay so release fires on frame 1.
+  // Normally undefined until release triggered; Play Release pre-triggers it at tPlay so release fires on frame 1.
   let releaseT = fromRelease ? startT : undefined;
   let glowStarted = false;
 
@@ -609,6 +613,14 @@ function hold(startT = 0, mode){
       tPlay += realDelta * animRate();
     }
     prevNow = now;
+
+    // Play Attack: halt exactly at the peak (end of attack), park there, then persist-or-clear. No decay.
+    if(attackOnly && tPlay >= attackEndMs){
+      setDot(effectivePos(attackEndMs, undefined, 'sustain'), true);
+      setDotStated(statedPos(attackEndMs, undefined, 'sustain'), true);
+      finishExcursion();
+      return;
+    }
 
     // Position both blobs
     const pos = effectivePos(tPlay, releaseT, 'sustain');
