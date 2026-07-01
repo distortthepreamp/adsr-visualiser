@@ -566,26 +566,30 @@ function statedLegVisible(phase){
 // ---- Slo-mo rate ----
 function animRate(){ return ($('sloMo') && $('sloMo').checked) ? 0.1 : 1; }
 
-function hold(startT = 0){
+function hold(startT = 0, mode){
+  const fromRelease = mode === 'from-release';
   logEvent('ANIMATION', { action: 'hold' });
-  if(window.cueRecordRaw) cueRecordRaw(`${startT > 0 ? 'play-from-decay' : 'play-hold'}${cueNoteStr()}`);
+  const cueCmd = fromRelease ? 'play-from-release' : (startT > 0 ? 'play-from-decay' : 'play-hold');
+  if(window.cueRecordRaw) cueRecordRaw(`${cueCmd}${cueNoteStr()}`);
   if(state.persistTimer){ clearTimeout(state.persistTimer); state.persistTimer = null; }
   releaseStartPoint = null;
   animationToken++;
   const myAnimationToken = animationToken;
-  if(audioEnabled()){ initAudio(); audioGateOpen(startT > 0); }
+  // fromDecay skips the attack ramp; fromRelease starts at sustain then audioGateClose ramps to floor.
+  if(audioEnabled()){ initAudio(); audioGateOpen(startT > 0 && !fromRelease, fromRelease); if(fromRelease) audioGateClose(); }
   cancelAnimationFrame(state.dotAnim);
   hideDot();
   hideDotStated();
   state.held = true;
-  state.currentPhase = 'hold';
+  state.currentPhase = fromRelease ? 'release' : 'hold';
   updateButtonStates();
 
   // Unified t-based clock: runs through attack→decay→sustain→release.
-  // startT > 0 begins partway (e.g. Play From Decay skips the attack by starting at e.aT*1000).
+  // startT > 0 begins partway (Play From Decay: start at e.aT*1000; Play From Release: start at (e.aT+e.dT)*1000).
   let tPlay = startT;
   let prevNow = null;
-  let releaseT;           // undefined until release triggered; then the tPlay at which release began
+  // Normally undefined until release triggered; Play From Release pre-triggers it at tPlay so release fires on frame 1.
+  let releaseT = fromRelease ? startT : undefined;
   let glowStarted = false;
 
   // Called by releaseFromCurrent when the hold is on the unified clock

@@ -472,6 +472,7 @@ function initUIControls(){
   $('modelHideAll') && $('modelHideAll').addEventListener('click', () => { ['modelA','modelD','modelS','modelR'].forEach(id => { if($(id)) $(id).checked = false; }); render(); if(window.cueRecordRaw) cueRecordRaw('set actual hide-all'); });
   $('clearBtn').addEventListener('click', () => { logEvent('ANIMATION', { action: 'clear' }); clearBlobAndMarker(); if(window.cueRecordRaw) cueRecordRaw('play-clear'); });
   $('playFromDecayBtn') && $('playFromDecayBtn').addEventListener('click', () => { if(window.hold) hold(getEffective().aT * 1000); });
+  $('playFromReleaseBtn') && $('playFromReleaseBtn').addEventListener('click', () => { if(window.hold){ const e=getEffective(); hold((e.aT + e.dT) * 1000, 'from-release'); } });
   $('sloMo') && $('sloMo').addEventListener('change', () => { if($('sloMo').checked) audioCut(); if(window.cueRecord) cueRecord('slomo'); });
   $('persistEnabled') && $('persistEnabled').addEventListener('change', () => { if(window.cueRecord) cueRecord('persist'); });
   $('persistTime') && $('persistTime').addEventListener('change', () => { if(window.cueRecord) cueRecord('persist-time'); });

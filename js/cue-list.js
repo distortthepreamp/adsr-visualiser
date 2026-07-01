@@ -192,6 +192,10 @@ function parseOneCommand(frag) {
   const playFromDecayMatch = frag.match(/^play-from-decay(?:\s+([A-Ga-g]\d))?$/i);
   if (playFromDecayMatch) return { type: 'play', action: 'from-decay', note: playFromDecayMatch[1] ? playFromDecayMatch[1].toUpperCase() : null };
 
+  // play-from-release [note] — starts at the sustain level and immediately releases to floor
+  const playFromReleaseMatch = frag.match(/^play-from-release(?:\s+([A-Ga-g]\d))?$/i);
+  if (playFromReleaseMatch) return { type: 'play', action: 'from-release', note: playFromReleaseMatch[1] ? playFromReleaseMatch[1].toUpperCase() : null };
+
   // play-release
   if (/^play-release$/i.test(frag)) return { type: 'play', action: 'release', note: null };
 
@@ -380,6 +384,9 @@ function executeEvent(event) {
         break;
       case 'from-decay':
         if (window.hold) hold(getEffective().aT * 1000);
+        break;
+      case 'from-release':
+        if (window.hold) { const e = getEffective(); hold((e.aT + e.dT) * 1000, 'from-release'); }
         break;
       case 'release':
         if (window.releaseFromCurrent) releaseFromCurrent();
