@@ -180,6 +180,10 @@ function parseOneCommand(frag) {
   const transZoomFitMatch = frag.match(/^transition\s+zoom-fit\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
   if (transZoomFitMatch) return { type: 'transition', param: 'zoom-fit', durationMs: tcToMs(transZoomFitMatch[1]) };
 
+  // transition mimic-sustain on/off HH:MM:SS:FF
+  const transMimicMatch = frag.match(/^transition\s+mimic-sustain\s+(on|off)\s+(\d{2}:\d{2}:\d{2}:\d{2})$/i);
+  if (transMimicMatch) return { type: 'transition', param: 'mimic-sustain', value: transMimicMatch[1].toLowerCase(), durationMs: tcToMs(transMimicMatch[2]) };
+
   // play-tap NNNms [note]
   const playTapMatch = frag.match(/^play-tap\s+(\d+(?:\.\d+)?)ms(?:\s+([A-Ga-g]\d))?$/i);
   if (playTapMatch) return { type: 'play', action: 'tap', ms: parseFloat(playTapMatch[1]), note: playTapMatch[2] ? playTapMatch[2].toUpperCase() : null };
@@ -367,6 +371,12 @@ function executeEvent(event) {
             syncZoomReadout();
           }
         }
+        break;
+      case 'mimic-sustain':
+        // Ease the mimic effect over the parsed duration: set the transition time, then flip the
+        // checkbox so its change → animateMimic uses currentTransitionSec.
+        currentTransitionSec = event.durationMs / 1000;
+        { const el = $('keyboardControl'); if(el){ el.checked = (event.value === 'on'); el.dispatchEvent(new Event('change', {bubbles:true})); } }
         break;
     }
   } else if (event.type === 'play') {

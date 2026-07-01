@@ -117,6 +117,33 @@ function transition(durSec){
   state.anim=requestAnimationFrame(step);
 }
 
+// Ease the Mimic Model D Sustain effect (mimicFactor) between 1 and MIMIC_SUSTAIN_CAP over
+// currentTransitionSec when the toggle flips, rendering each frame. Instant (dur ~0) snaps.
+let mimicAnimToken = 0;
+function animateMimic(){
+  const on   = $('keyboardControl') && $('keyboardControl').checked;
+  const to   = on ? MIMIC_SUSTAIN_CAP : 1;
+  const from = on ? 1 : MIMIC_SUSTAIN_CAP;   // pre-toggle value (opposite of the new state)
+  const dur  = currentTransitionSec * 1000;
+  mimicAnimToken++;
+  const myToken = mimicAnimToken;
+  if(dur <= 0){ _mimicAnimating = false; mimicFactor = to; render(); return; }
+  _mimicAnimating = true;
+  mimicFactor = from;
+  render();
+  let t0 = null;
+  function step(now){
+    if(myToken !== mimicAnimToken) return;
+    if(t0 === null) t0 = now;
+    const f = clamp((now - t0) / dur), k = easeInOut(f);
+    mimicFactor = from + (to - from) * k;
+    render();
+    if(f < 1) requestAnimationFrame(step);
+    else { mimicFactor = to; _mimicAnimating = false; render(); }
+  }
+  requestAnimationFrame(step);
+}
+
 function setTransMode(durSec, activeBtnId){
   const transBtns = ['transInstantBtn','trans1Btn','trans2Btn','trans3Btn','trans4Btn','trans5Btn','transCustomToggle'];
   if(durSec !== null) currentTransitionSec = durSec;
@@ -348,7 +375,7 @@ function initUIControls(){
   const TOGGLE_CUE_KEY = { loudDecay:'loud-decay', keyboardControl:'mimic-sustain', showContour:'show-contour', frequencyMode:'filter-mode', hpMode:'hp-mode', showClipped:'show-clipped', linkRToD:'link-r-to-d' };
   ['loudDecay','keyboardControl','showContour','frequencyMode','hpMode','showClipped','linkRToD'].forEach(id => {
     const el = $(id); if(!el) return;
-    el.addEventListener('change', render);
+    if(id !== 'keyboardControl') el.addEventListener('change', render);  // keyboardControl renders via animateMimic (eased)
     el.addEventListener('change', () => {
       const chk = id2 => { const e2=$(id2); return e2 ? e2.checked : undefined; };
       logEvent('CHECKBOX', {
@@ -361,9 +388,16 @@ function initUIControls(){
         },
         geometry: window._lastRenderGeometry || null
       });
-      if(window.cueRecord) cueRecord(TOGGLE_CUE_KEY[id]);
+      // Mimic-sustain eases over currentTransitionSec, so record a timed transition cue when non-instant.
+      if(id === 'keyboardControl' && currentTransitionSec > 0.01 && window.cueRecordRaw && window.msToTc){
+        cueRecordRaw(`transition mimic-sustain ${el.checked ? 'on' : 'off'} ${window.msToTc(currentTransitionSec*1000)}`);
+      } else if(window.cueRecord){
+        cueRecord(TOGGLE_CUE_KEY[id]);
+      }
     });
   });
+  // Mimic Model D Sustain eases its effect over currentTransitionSec instead of snapping.
+  $('keyboardControl') && $('keyboardControl').addEventListener('change', animateMimic);
 
 
   // Meter / blob glow

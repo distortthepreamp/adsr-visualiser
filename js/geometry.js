@@ -5,6 +5,11 @@
 const MIMIC_SUSTAIN_CAP = 0.83;  // measured on Phil's Behringer Model D, sustain at max (both contours,
                                   // 3sf → 83%): loudness 4.52/5.48V = 0.825; filter 3.83/4.62V = 0.829.
 const MIMIC_SUSTAIN_INV = 1 / MIMIC_SUSTAIN_CAP;  // = 1.25, for the stated-sustain expansion
+// Animated mimic multiplier: eases 1 ↔ MIMIC_SUSTAIN_CAP over the transition time when the toggle flips.
+// Used ONLY while _mimicAnimating; otherwise getEffective reads the checkbox directly (so config/preset/cue
+// restores are correct without extra syncing).
+let mimicFactor = 1;
+let _mimicAnimating = false;
 
 // ---- displayTimeWidth curve coefficients ----
 const DISPLAY_SHORTBOOST_AMP = 38;    // amplitude of the exponential short-value boost
@@ -56,7 +61,8 @@ function displayTimeWidth(t){
 function getEffective(){
   const aT=mapTime(state.a), dT=mapTime(state.d);
   const rawS=state.s;
-  const s=($('keyboardControl') && $('keyboardControl').checked) ? rawS*MIMIC_SUSTAIN_CAP : rawS;
+  const _mf = _mimicAnimating ? mimicFactor : (($('keyboardControl') && $('keyboardControl').checked) ? MIMIC_SUSTAIN_CAP : 1);
+  const s = rawS * _mf;
   const releaseOn = $('loudDecay').checked;
   const freqMode = $('frequencyMode') && $('frequencyMode').checked;
   const floor = freqMode ? clamp(state.floor,0,1) : 0;
