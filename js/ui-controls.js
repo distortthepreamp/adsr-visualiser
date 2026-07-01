@@ -68,6 +68,16 @@ function syncControls(){
       });
     });
   })();
+  syncFilterModeButtons();
+}
+
+// ---- syncFilterModeButtons — reflect frequencyMode.checked onto the LOUD/FILTER segmented pair ----
+function syncFilterModeButtons(){
+  const cb = $('frequencyMode'); if(!cb) return;
+  const filterOn = cb.checked;
+  const loud = $('modeLoudBtn'), filt = $('modeFilterBtn');
+  if(loud){ loud.style.background = filterOn ? '' : BTN_ACTIVE_BG; loud.style.color = filterOn ? '' : BTN_ACTIVE_FG; }
+  if(filt){ filt.style.background = filterOn ? BTN_ACTIVE_BG : ''; filt.style.color = filterOn ? BTN_ACTIVE_FG : ''; }
 }
 
 // ---- transition — animates state toward state.target ----
@@ -412,6 +422,9 @@ function initUIControls(){
 
   // Filter mode
   $('frequencyMode').addEventListener('change', () => { syncHpModeEnabled(); setMeterLevel(state.dotY || graph.y0); });
+  // LOUD/FILTER segmented buttons drive the frequencyMode checkbox (all existing listeners fire off its change event)
+  $('modeLoudBtn') && $('modeLoudBtn').addEventListener('click', () => { const cb=$('frequencyMode'); if(cb.checked){ cb.checked=false; cb.dispatchEvent(new Event('change')); } syncFilterModeButtons(); });
+  $('modeFilterBtn') && $('modeFilterBtn').addEventListener('click', () => { const cb=$('frequencyMode'); if(!cb.checked){ cb.checked=true; cb.dispatchEvent(new Event('change')); } syncFilterModeButtons(); });
   $('hpMode').addEventListener('change', () => setMeterLevel(state.dotY || graph.y0));
 
   // Kiosk switch glow — notify on manual checkbox changes
