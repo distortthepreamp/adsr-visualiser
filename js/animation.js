@@ -568,7 +568,7 @@ function animRate(){ return ($('sloMo') && $('sloMo').checked) ? 0.1 : 1; }
 
 function hold(startT = 0){
   logEvent('ANIMATION', { action: 'hold' });
-  if(window.cueRecordRaw) cueRecordRaw(`play-hold${cueNoteStr()}`);
+  if(window.cueRecordRaw) cueRecordRaw(`${startT > 0 ? 'play-from-decay' : 'play-hold'}${cueNoteStr()}`);
   if(state.persistTimer){ clearTimeout(state.persistTimer); state.persistTimer = null; }
   releaseStartPoint = null;
   animationToken++;

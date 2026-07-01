@@ -188,6 +188,10 @@ function parseOneCommand(frag) {
   const playHoldMatch = frag.match(/^play-hold(?:\s+([A-Ga-g]\d))?$/i);
   if (playHoldMatch) return { type: 'play', action: 'hold', note: playHoldMatch[1] ? playHoldMatch[1].toUpperCase() : null };
 
+  // play-from-decay [note] — starts at the decay onset (skips the attack)
+  const playFromDecayMatch = frag.match(/^play-from-decay(?:\s+([A-Ga-g]\d))?$/i);
+  if (playFromDecayMatch) return { type: 'play', action: 'from-decay', note: playFromDecayMatch[1] ? playFromDecayMatch[1].toUpperCase() : null };
+
   // play-release
   if (/^play-release$/i.test(frag)) return { type: 'play', action: 'release', note: null };
 
@@ -373,6 +377,9 @@ function executeEvent(event) {
         break;
       case 'hold':
         if (window.hold) hold();
+        break;
+      case 'from-decay':
+        if (window.hold) hold(getEffective().aT * 1000);
         break;
       case 'release':
         if (window.releaseFromCurrent) releaseFromCurrent();
