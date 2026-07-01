@@ -53,6 +53,7 @@ function buildConfigSnapshot(){
     timeAxisStatedColor: $('timeAxisStatedColor') ? $('timeAxisStatedColor').value : '#aaaaaa',
     contourLineColor: $('contourLineColor') ? $('contourLineColor').value : '#ffff00',
     underlayColor: $('underlayColor') ? $('underlayColor').value : '#ffffff',
+    peakDischargeColor: $('peakDischargeColor') ? $('peakDischargeColor').value : '#00ffff',
     innerLineWidth: Number($('innerLineWidth').value),
     markerLineWidth: Number($('markerLineWidth') ? $('markerLineWidth').value : 1),
     dottedMarkers: $('dottedMarkers') ? $('dottedMarkers').checked : true,
@@ -129,7 +130,7 @@ function loadConfigObject(cfg){
   }
 
   // Colours (dispatch input to update CSS variables)
-  ['lineColor','bgColor','loudnessAttackColor','loudnessDecayColor','loudnessReleaseColor','loudnessGateColor','filterAttackColor','filterDecayColor','filterReleaseColor','filterGateColor','meterFillColor','meterFillColorFilter','timeAxisStatedColor','contourLineColor','underlayColor'].forEach(id => {
+  ['lineColor','bgColor','loudnessAttackColor','loudnessDecayColor','loudnessReleaseColor','loudnessGateColor','filterAttackColor','filterDecayColor','filterReleaseColor','filterGateColor','meterFillColor','meterFillColorFilter','timeAxisStatedColor','contourLineColor','underlayColor','peakDischargeColor'].forEach(id => {
     if($(id) && cfg[id]){ $(id).value = cfg[id]; $(id).dispatchEvent(new Event('input')); }
   });
 

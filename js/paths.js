@@ -262,7 +262,7 @@ function render(){
         fullReferenceReleaseEl.setAttribute('d', rcPolyline(pts.p1.x, pts.p1.y, rEnd.x, rEnd.y, false, 50, 3));
       }
       fullReferenceReleaseEl.removeAttribute('clip-path');
-      fullReferenceReleaseEl.style.stroke = '#00ffff';
+      fullReferenceReleaseEl.style.stroke = ($('peakDischargeColor') && $('peakDischargeColor').value) || '#00ffff';
       fullReferenceReleaseEl.style.opacity = (showPeakDischarge && curveAmt && drawReleasePath) ? '' : '0';
     }
     // gateCloseX is hoisted above the Model D block; sample the effective curve y here.

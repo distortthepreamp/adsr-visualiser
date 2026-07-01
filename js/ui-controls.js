@@ -463,6 +463,7 @@ function initUIControls(){
   $('underlayShowAll') && $('underlayShowAll').addEventListener('click', () => { ['underlayA','underlayD','underlayS','underlayR'].forEach(id => { if($(id)) $(id).checked = true; }); render(); if(window.cueRecordRaw) cueRecordRaw('set textbook show-all'); });
   $('underlayHideAll') && $('underlayHideAll').addEventListener('click', () => { ['underlayA','underlayD','underlayS','underlayR'].forEach(id => { if($(id)) $(id).checked = false; }); render(); if(window.cueRecordRaw) cueRecordRaw('set textbook hide-all'); });
   $('underlayColor') && $('underlayColor').addEventListener('change', render);
+  $('peakDischargeColor') && $('peakDischargeColor').addEventListener('input', render);
   $('showNewEffectiveLines') && $('showNewEffectiveLines').addEventListener('change', () => { render(); if(window.cueRecord) cueRecord('show-effective-lines'); });
   $('showNewStatedLines') && $('showNewStatedLines').addEventListener('change', () => { render(); if(window.cueRecord) cueRecord('show-stated-lines'); });
   ['modelA','modelD','modelS','modelR'].forEach(id => { $(id) && $(id).addEventListener('change', () => { render(); if(window.cueRecord) cueRecord(LEG_CUE_KEY[id]); }); });
