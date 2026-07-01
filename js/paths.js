@@ -378,6 +378,7 @@ function render(){
     // with crossings on both effective and stated curves and horizontals to the meter.
     // (showGateTime and gateCloseX are hoisted above the Model D block.)
     const gateTimeLineEl = $('gateTimeLine');
+    const gateTopCapEl = $('gateTopCap');
     const gateTimeLabelEl = $('gateTimeLabel');
     const gateEffHorizEl = $('gateEffectiveHoriz');
     const gateStatedHorizEl = $('gateStatedHoriz');
@@ -407,11 +408,19 @@ function render(){
         gateTimeLineEl.setAttribute('y2', gateBottomY);
         gateTimeLineEl.style.display = '';
       }
+      if(gateTopCapEl){
+        // Symmetric solid horizontal tick capping the top of the gate vertical.
+        const capHalf = 7;
+        gateTopCapEl.setAttribute('x1', gateCloseX - capHalf); gateTopCapEl.setAttribute('x2', gateCloseX + capHalf);
+        gateTopCapEl.setAttribute('y1', gateTopY); gateTopCapEl.setAttribute('y2', gateTopY);
+        gateTopCapEl.style.display = '';
+      }
       if(gateTimeLabelEl){
         const timeLabelGutter = Math.max(0, Number(($('timeLabelGutter') && $('timeLabelGutter').value) || 0));
-        gateTimeLabelEl.setAttribute('x', gateCloseX);
-        gateTimeLabelEl.setAttribute('y', gateTopY + TIME_LABEL_STATED_Y_OFFSET - timeLabelGutter);
-        gateTimeLabelEl.setAttribute('text-anchor', 'middle');
+        gateTimeLabelEl.setAttribute('x', gateCloseX + 15);
+        gateTimeLabelEl.setAttribute('y', gateTopY);
+        gateTimeLabelEl.setAttribute('text-anchor', 'start');
+        gateTimeLabelEl.setAttribute('dominant-baseline', 'middle');
         gateTimeLabelEl.textContent = 'Gate = ' + gateTapMs + 'ms';
         gateTimeLabelEl.style.display = '';
       }
@@ -475,6 +484,7 @@ function render(){
       }
     } else {
       if(gateTimeLineEl) gateTimeLineEl.style.display = 'none';
+      if(gateTopCapEl) gateTopCapEl.style.display = 'none';
       if(gateTimeLabelEl) gateTimeLabelEl.style.display = 'none';
       if(gateEffHorizEl) gateEffHorizEl.style.display = 'none';
       if(gateStatedHorizEl) gateStatedHorizEl.style.display = 'none';
