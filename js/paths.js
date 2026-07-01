@@ -317,9 +317,9 @@ function render(){
       if(gateEffReleaseTimeEl){
         gateEffReleaseTimeEl.setAttribute('x', orangeDischargeEndX);
         gateEffReleaseTimeEl.setAttribute('y', graph.y0 + TIME_LABEL_EFFECTIVE_Y_OFFSET + timeLabelGutter);
-        gateEffReleaseTimeEl.setAttribute('text-anchor', 'middle');
+        gateEffReleaseTimeEl.setAttribute('text-anchor', 'start');
         gateEffReleaseTimeEl.setAttribute('fill', relColor);
-        gateEffReleaseTimeEl.textContent = 'GR = ' + Math.round(pixelsToTimeSec(orangeDischargeEndX - gateCloseX) * 1000) + 'ms';
+        gateEffReleaseTimeEl.textContent = 'Release After Key Up = ' + Math.round(pixelsToTimeSec(orangeDischargeEndX - gateCloseX) * 1000) + 'ms';
         gateEffReleaseTimeEl.style.display = '';
       }
     } else {
@@ -352,26 +352,38 @@ function render(){
     }
     // Stated GR ascender: vertical at gateRelEndX from floor to graph top
     const gateStatedReleaseDropEl = $('gateStatedReleaseDrop');
+    const gateStatedTopCapEl = $('gateStatedTopCap');
     const gateStatedReleaseTimeEl = $('gateStatedReleaseTime');
+    const STATED_GR_TOP_DROP = 100;  // px the textbook vertical's top sits below the graph top / gate vertical
     if(showStatedGateRelease){
       const gateTopY = graph.y0 - graph.h;
-      const timeLabelGutter = Math.max(0, Number(($('timeLabelGutter') && $('timeLabelGutter').value) || 0));
+      const statedTopY = gateTopY + STATED_GR_TOP_DROP;
       if(gateStatedReleaseDropEl){
         gateStatedReleaseDropEl.setAttribute('x1', gateRelEndX); gateStatedReleaseDropEl.setAttribute('y1', gateRelEndY);
-        gateStatedReleaseDropEl.setAttribute('x2', gateRelEndX); gateStatedReleaseDropEl.setAttribute('y2', gateTopY);
+        gateStatedReleaseDropEl.setAttribute('x2', gateRelEndX); gateStatedReleaseDropEl.setAttribute('y2', statedTopY);
         gateStatedReleaseDropEl.setAttribute('stroke', ulCol);
         gateStatedReleaseDropEl.style.display = '';
       }
+      if(gateStatedTopCapEl){
+        // Symmetric solid horizontal tick capping the textbook vertical's (lowered) top, in the underlay colour.
+        const statedCapHalf = 7;
+        gateStatedTopCapEl.setAttribute('x1', gateRelEndX - statedCapHalf); gateStatedTopCapEl.setAttribute('x2', gateRelEndX + statedCapHalf);
+        gateStatedTopCapEl.setAttribute('y1', statedTopY); gateStatedTopCapEl.setAttribute('y2', statedTopY);
+        gateStatedTopCapEl.style.stroke = ulCol;
+        gateStatedTopCapEl.style.display = '';
+      }
       if(gateStatedReleaseTimeEl){
-        gateStatedReleaseTimeEl.setAttribute('x', gateRelEndX);
-        gateStatedReleaseTimeEl.setAttribute('y', gateTopY + TIME_LABEL_STATED_Y_OFFSET - timeLabelGutter);
-        gateStatedReleaseTimeEl.setAttribute('text-anchor', 'middle');
+        gateStatedReleaseTimeEl.setAttribute('x', gateRelEndX + 15);
+        gateStatedReleaseTimeEl.setAttribute('y', statedTopY);
+        gateStatedReleaseTimeEl.setAttribute('text-anchor', 'start');
+        gateStatedReleaseTimeEl.setAttribute('dominant-baseline', 'middle');
         gateStatedReleaseTimeEl.setAttribute('fill', ulCol);
-        gateStatedReleaseTimeEl.textContent = 'GR = ' + Math.round(mapTime(state.r) * 1000) + 'ms';
+        gateStatedReleaseTimeEl.textContent = 'Textbook Release From Key Up = ' + Math.round(mapTime(state.r) * 1000) + 'ms';
         gateStatedReleaseTimeEl.style.display = '';
       }
     } else {
       if(gateStatedReleaseDropEl) gateStatedReleaseDropEl.style.display = 'none';
+      if(gateStatedTopCapEl) gateStatedTopCapEl.style.display = 'none';
       if(gateStatedReleaseTimeEl) gateStatedReleaseTimeEl.style.display = 'none';
     }
     // Show Gate Time: vertical dotted line + label at the gate-close x,
@@ -421,7 +433,7 @@ function render(){
         gateTimeLabelEl.setAttribute('y', gateTopY);
         gateTimeLabelEl.setAttribute('text-anchor', 'start');
         gateTimeLabelEl.setAttribute('dominant-baseline', 'middle');
-        gateTimeLabelEl.textContent = 'Gate = ' + gateTapMs + 'ms';
+        gateTimeLabelEl.textContent = 'Key Down = ' + gateTapMs + 'ms';
         gateTimeLabelEl.style.display = '';
       }
       // Gate meter ticks — short horizontal arrows beside the meter at the gate-close level.
