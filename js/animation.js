@@ -566,14 +566,14 @@ function statedLegVisible(phase){
 // ---- Slo-mo rate ----
 function animRate(){ return ($('sloMo') && $('sloMo').checked) ? 0.1 : 1; }
 
-function hold(){
+function hold(startT = 0){
   logEvent('ANIMATION', { action: 'hold' });
   if(window.cueRecordRaw) cueRecordRaw(`play-hold${cueNoteStr()}`);
   if(state.persistTimer){ clearTimeout(state.persistTimer); state.persistTimer = null; }
   releaseStartPoint = null;
   animationToken++;
   const myAnimationToken = animationToken;
-  if(audioEnabled()){ initAudio(); audioGateOpen(); }
+  if(audioEnabled()){ initAudio(); audioGateOpen(startT > 0); }
   cancelAnimationFrame(state.dotAnim);
   hideDot();
   hideDotStated();
@@ -581,8 +581,9 @@ function hold(){
   state.currentPhase = 'hold';
   updateButtonStates();
 
-  // Unified t-based clock: runs through attack→decay→sustain→release
-  let tPlay = 0;
+  // Unified t-based clock: runs through attack→decay→sustain→release.
+  // startT > 0 begins partway (e.g. Play From Decay skips the attack by starting at e.aT*1000).
+  let tPlay = startT;
   let prevNow = null;
   let releaseT;           // undefined until release triggered; then the tPlay at which release began
   let glowStarted = false;

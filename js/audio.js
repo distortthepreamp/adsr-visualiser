@@ -157,11 +157,21 @@ const MASTER_GAIN = 0.7;             // default master output gain
 
   // ---- Schedule helpers ----
   // Schedule attack+decay on a gain param (loudness mode)
-  function scheduleGainAD(param, now, aT, dT, peak, sus, useRC){
+  function scheduleGainAD(param, now, aT, dT, peak, sus, useRC, fromDecay){
     param.cancelScheduledValues(now);
+    const dDur = Math.max(0.001, dT);
+    if(fromDecay){
+      // Play from decay: start at peak, schedule ONLY the decay→sustain ramp (skip the attack).
+      param.setValueAtTime(peak, now);
+      if(useRC){
+        param.setValueCurveAtTime(rcCurveArray(peak, Math.max(0.0001, sus), false), now, dDur);
+      } else {
+        param.linearRampToValueAtTime(Math.max(0.0001, sus), now + dDur);
+      }
+      return;
+    }
     param.setValueAtTime(0, now);
     const aDur = Math.max(0.001, aT);
-    const dDur = Math.max(0.001, dT);
     if(useRC){
       param.setValueCurveAtTime(rcCurveArray(0, peak, true), now, aDur);
       param.setValueCurveAtTime(rcCurveArray(peak, Math.max(0.0001, sus), false), now + aDur, dDur);
@@ -171,7 +181,7 @@ const MASTER_GAIN = 0.7;             // default master output gain
     }
   }
 
-  function audioGateOpen(){
+  function audioGateOpen(fromDecay){
     if(!audioEnabled()||!audioReady) return;
     if(audioCtx.state==='suspended') audioCtx.resume();
     const e = getEffective();
@@ -192,13 +202,13 @@ const MASTER_GAIN = 0.7;             // default master output gain
     if(!freqMode){
       // ---- LOUDNESS MODE ----
       if(v1Audible){
-        scheduleGainAD(v1Gain.gain, now, aT, dT, 1, e.s, analogue);
+        scheduleGainAD(v1Gain.gain, now, aT, dT, 1, e.s, analogue, fromDecay);
         [v1Filter1,v1Filter2].forEach(f=>{ f.type='lowpass'; f.frequency.cancelScheduledValues(now); f.frequency.setValueAtTime(FILTER_OPEN_FREQUENCY,now); f.Q.value=0; });
       } else {
         v1Gain.gain.cancelScheduledValues(now); v1Gain.gain.setValueAtTime(0, now);
       }
       if(v2Audible){
-        scheduleGainAD(v2Gain.gain, now, aT, dT, 1, e.s, false);
+        scheduleGainAD(v2Gain.gain, now, aT, dT, 1, e.s, false, fromDecay);
         [v2Filter1,v2Filter2].forEach(f=>{ f.type='lowpass'; f.frequency.cancelScheduledValues(now); f.frequency.setValueAtTime(FILTER_OPEN_FREQUENCY,now); f.Q.value=0; });
       } else {
         v2Gain.gain.cancelScheduledValues(now); v2Gain.gain.setValueAtTime(0, now);
