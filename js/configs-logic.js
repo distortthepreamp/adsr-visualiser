@@ -65,6 +65,7 @@ function buildConfigSnapshot(){
     meterWidth: Number($('meterWidth').value),
     meterStrokeWidth: Number($('meterStrokeWidth').value),
     meterRightMargin: Number($('meterRightMargin').value),
+    dbLabelRightMargin: Number($('dbLabelRightMargin').value),
     graphBottomMargin: Number($('graphBottomMargin').value),
     dbLabelSize: Number($('dbLabelSize').value),
     tbSustainGapMax: Number($('tbSustainGapMax').value),
@@ -146,8 +147,9 @@ function loadConfigObject(cfg){
   if($('meterWidth') && cfg.meterWidth !== undefined){ $('meterWidth').value = cfg.meterWidth; METER_W = Math.max(10, Math.min(80, Number(cfg.meterWidth) || 40)); }
   if($('meterStrokeWidth') && cfg.meterStrokeWidth !== undefined){ $('meterStrokeWidth').value = cfg.meterStrokeWidth; METER_STROKE_W = Math.max(0, Math.min(20, Number(cfg.meterStrokeWidth) || 7)); }
   if($('meterRightMargin') && cfg.meterRightMargin !== undefined){ $('meterRightMargin').value = cfg.meterRightMargin; METER_RIGHT_MARGIN = Math.max(0, Math.min(600, Number(cfg.meterRightMargin) || 265)); }
+  if($('dbLabelRightMargin') && cfg.dbLabelRightMargin !== undefined){ $('dbLabelRightMargin').value = cfg.dbLabelRightMargin; DB_LABEL_RIGHT_MARGIN = Math.max(0, Math.min(120, Number(cfg.dbLabelRightMargin) || 0)); }
   if($('graphBottomMargin') && cfg.graphBottomMargin !== undefined){ $('graphBottomMargin').value = cfg.graphBottomMargin; GRAPH_BOTTOM_MARGIN = Math.max(20, Math.min(300, Number(cfg.graphBottomMargin) || 120)); }
-  if($('dbLabelSize') && cfg.dbLabelSize !== undefined){ $('dbLabelSize').value = cfg.dbLabelSize; DB_LABEL_SIZE = Math.max(6, Math.min(24, Number(cfg.dbLabelSize) || 11)); }
+  if($('dbLabelSize') && cfg.dbLabelSize !== undefined){ $('dbLabelSize').value = cfg.dbLabelSize; DB_LABEL_SIZE = Math.max(6, Math.min(72, Number(cfg.dbLabelSize) || 11)); }
   if($('tbSustainGapMax') && cfg.tbSustainGapMax !== undefined){ $('tbSustainGapMax').value = cfg.tbSustainGapMax; SUSTAIN_GAP_MAX = Math.max(0.15, Math.min(0.30, (Number(cfg.tbSustainGapMax) || 15) / 100)); }
   if($('vbWidth')  && cfg.vbWidth  !== undefined){ $('vbWidth').value  = Math.round(Math.min(VB_WIDTH_MAX, Math.max(VB_WIDTH_MIN,  Number(cfg.vbWidth)  || 1200)) / 10) * 10; }
   if($('vbHeight') && cfg.vbHeight !== undefined){ $('vbHeight').value = Math.round(Math.min(VB_HEIGHT_MAX, Math.max(VB_HEIGHT_MIN,  Number(cfg.vbHeight) || 595))  / 10) * 10; }

@@ -375,6 +375,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Graph margin: left</span><input id="graphLeft" type="number" min="0" max="400" step="10" value="10"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Graph margin: below</span><input id="graphBottomMargin" type="number" min="20" max="300" step="5" value="120"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Meter right margin</span><input id="meterRightMargin" type="number" min="0" max="600" step="5" value="265"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>dB label right margin</span><input id="dbLabelRightMargin" type="number" min="0" max="120" step="1" value="0"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Zoom fit right margin</span><input id="fitMargin" type="number" min="50" max="100" step="1" value="90"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Time label gutter</span><input id="timeLabelGutter" type="number" min="0" step="1" value="0"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Textbook sustain gap max</span><input id="tbSustainGapMax" type="number" min="15" max="30" step="1" value="15"></div>
@@ -392,7 +393,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Body text size</span><input id="labelSize" type="number" min="10" max="72" step="1" value="17"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Heading 1 size</span><input id="h1Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Heading 2 size</span><input id="h2Scale" type="number" min="1.0" max="3.0" step="0.1" value="1.0"></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>dB label size</span><input id="dbLabelSize" type="number" min="6" max="24" step="1" value="11"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>dB label size</span><input id="dbLabelSize" type="number" min="6" max="72" step="1" value="11"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Console scale</span><input id="consoleScale" type="number" min="0.5" max="1.0" step="0.05" value="0.7"></div>
       </div>
       <div style="flex:1;min-width:230px;">
@@ -518,6 +519,7 @@
 const STATUS_DIM_OPACITY = 0.65;
 let METER_W = 40;
 let METER_RIGHT_MARGIN = 265;  // meter's gap from the right edge (pure reposition; default keeps it where GRAPH_RIGHT_PAD put it)
+let DB_LABEL_RIGHT_MARGIN = 0;  // extra gap pushing ONLY the dB scale labels left of the meter (0 = current position)
 let METER_STROKE_W = 7;
 let DB_LABEL_SIZE = 11;
 let SUSTAIN_GAP_MAX = 0.15;

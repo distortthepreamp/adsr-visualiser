@@ -619,11 +619,11 @@ function render(){
     const strokeInset = (METER_STROKE_W / 2) * _pxToUser;
     const innerTop = meterAbsTop + strokeInset;
     const innerH = graph.h - 2 * strokeInset;
-    const labelX = gutterX + DB_GUTTER_W / 2;
+    const labelX = gutterX + DB_GUTTER_W / 2 - DB_LABEL_RIGHT_MARGIN;
     const _addLabel = (text, frac) => {
       const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       t.setAttribute('x', labelX); t.setAttribute('y', innerTop + innerH * (1 - frac));
-      t.setAttribute('text-anchor', 'middle');
+      t.setAttribute('text-anchor', 'end');
       t.setAttribute('style', 'dominant-baseline:middle;font-size:'+DB_LABEL_SIZE+'px;fill:#fff;font-family:\'UniversCondensed\',Arial,Helvetica,sans-serif;');
       t.textContent = text;
       dbLabels.appendChild(t);
