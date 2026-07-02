@@ -11,12 +11,28 @@ const VB_HEIGHT_MIN = 400;
 const BTN_ACTIVE_BG  = '#ffffff';
 const BTN_ACTIVE_FG  = '#111111';
 let KIOSK_SCALE = 0.5;
+let kioskTopAlign = false;  // true = bypass the -6 auto-align, revert to original top-aligned kiosk (translateY 0)
 
-// ---- applyKioskScale — set #kioskPanel transform scale AND #kioskOverlay width together (coupled: overlay width must equal 800 × scale) ----
+// ---- applyKioskScale — set #kioskPanel transform (scale + vertical alignment translate) AND
+// #kioskOverlay width together. The translate aligns the Keyboard 2 chevron (canvas y=618, scaled
+// by KIOSK_SCALE) with the -6 dB mark (50% of the meter). Overlay-referenced dy is one-shot/idempotent.
 function applyKioskScale(){
   const kp = $('kioskPanel'); const ko = $('kioskOverlay');
-  if(kp) kp.style.transform = 'scale(' + KIOSK_SCALE + ')';
   if(ko) ko.style.width = (800 * KIOSK_SCALE) + 'px';
+  if(!kp) return;
+  let dy = 0;
+  const mBox = $('meterBox');
+  const open = document.body.classList.contains('kiosk-open');
+  if(!kioskTopAlign && open && mBox && ko){
+    const m = mBox.getBoundingClientRect();
+    const o = ko.getBoundingClientRect();
+    if(m.height > 0){
+      const targetY  = m.top + m.height * 0.5;      // -6 dB ≈ 50% of the meter
+      const chevronY = o.top + 618 * KIOSK_SCALE;   // unshifted chevron centre (overlay is not translated)
+      dy = targetY - chevronY;
+    }
+  }
+  kp.style.transform = 'translateY(' + dy + 'px) scale(' + KIOSK_SCALE + ')';  // translate leftmost = exact Δpx
 }
 const BTN_PARTIAL_BG = 'rgba(255,255,255,0.35)';
 
@@ -422,6 +438,8 @@ function initUIControls(){
   $('meterGlow').addEventListener('change', () => setMeterLevel(state.dotY || graph.y0));
   $('meterGlowRadius').addEventListener('input', e => { const inp=e.target,c=Math.min(60,Math.max(0,isNaN(parseInt(inp.value))?5:parseInt(inp.value))); inp.value=c; setMeterLevel(state.dotY || graph.y0); });
   $('meterScanlinesVisible').addEventListener('change', render);
+  $('useShortLabels').addEventListener('change', () => { useShortLabels = $('useShortLabels').checked; render(); });
+  $('kioskTopAlign').addEventListener('change', () => { kioskTopAlign = $('kioskTopAlign').checked; applyKioskScale(); });
   $('blobGlowEnabled').addEventListener('change', () => { applyBlobGlow(); if(state.currentPhase==='sustain') startGlowPulse(); else stopGlowPulse(); });
   $('blobGlowRadius').addEventListener('input', e => { const inp=e.target,c=Math.min(30,Math.max(0,isNaN(parseInt(inp.value))?8:parseInt(inp.value))); inp.value=c; applyBlobGlow(); if(state.currentPhase==='sustain') startGlowPulse(); });
   $('kioskKnobGlow').addEventListener('change', () => { render(); if(window.kioskDrawIfOpen) kioskDrawIfOpen(); });
@@ -472,12 +490,14 @@ function initUIControls(){
   $('consoleScale').addEventListener('input', e => { const inp=e.target,raw=parseFloat(inp.value),c=Math.min(1.0,Math.max(0.5,isNaN(raw)?0.7:raw)); inp.value=c; syncConsoleScale(); });
   $('meterWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(80,Math.max(10,isNaN(parseInt(inp.value))?40:parseInt(inp.value))); inp.value=c; METER_W=c; recalcGeometry(); render(); });
   $('meterRightMargin').addEventListener('input', e => { const inp=e.target,c=Math.min(600,Math.max(0,isNaN(parseInt(inp.value))?265:parseInt(inp.value))); inp.value=c; METER_RIGHT_MARGIN=c; recalcGeometry(); render(); });
-  $('dbLabelRightMargin').addEventListener('input', e => { const inp=e.target,c=Math.min(120,Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value))); inp.value=c; DB_LABEL_RIGHT_MARGIN=c; render(); });
+  $('dbLabelRightMargin').addEventListener('input', e => { const inp=e.target,c=Math.min(120,Math.max(-40,isNaN(parseInt(inp.value))?0:parseInt(inp.value))); inp.value=c; DB_LABEL_RIGHT_MARGIN=c; render(); });
   $('graphBottomMargin').addEventListener('input', e => { const inp=e.target,c=Math.min(300,Math.max(20,isNaN(parseInt(inp.value))?120:parseInt(inp.value))); inp.value=c; GRAPH_BOTTOM_MARGIN=c; recalcGeometry(); render(); });
   $('meterStrokeWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(20,Math.max(0,isNaN(parseInt(inp.value))?7:parseInt(inp.value))); inp.value=c; METER_STROKE_W=c; render(); });
   $('dbLabelSize').addEventListener('input', e => { const inp=e.target, c=Math.min(72,Math.max(6,isNaN(parseInt(inp.value))?11:parseInt(inp.value))); inp.value=c; DB_LABEL_SIZE=c; render(); });
   $('timeLabelGutter').addEventListener('input', e => { const inp=e.target,c=Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value)); inp.value=c; render(); });
   $('kioskScale').addEventListener('input', e => { const inp=e.target,c=Math.min(1.0,Math.max(0.5,isNaN(parseFloat(inp.value))?0.5:parseFloat(inp.value))); inp.value=c; KIOSK_SCALE=c; applyKioskScale(); });
+  // Re-align the kiosk vertically when the viewport changes (no existing resize listener)
+  window.addEventListener('resize', () => applyKioskScale());
   $('markerLineWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(8,Math.max(1,isNaN(parseFloat(inp.value))?1:Math.round(parseFloat(inp.value)*2)/2)); inp.value=c; document.documentElement.style.setProperty('--markerLineWidth',c); });
   $('dottedMarkers').addEventListener('change', () => { document.documentElement.style.setProperty('--markerDash', $('dottedMarkers').checked ? '4 4' : 'none'); });
   $('tbSustainGapMax').addEventListener('input', e => { const inp=e.target,c=Math.min(30,Math.max(15,isNaN(parseInt(inp.value))?15:parseInt(inp.value))); inp.value=c; SUSTAIN_GAP_MAX=c/100; render(); });

@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="css/kiosk.css">
 </head>
 <body>
-  <div style="background:rgba(0,0,0,0.7);padding:4px 36px;display:flex;justify-content:flex-end;align-items:center;flex-shrink:0">
+  <div style="background:var(--bg);padding:4px 36px;display:flex;justify-content:flex-end;align-items:center;flex-shrink:0">
     <button id="helpBtn" title="Keyboard shortcuts" style="font-size:13px;font-weight:800;width:24px;height:24px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.6);background:rgba(0,0,0,.3);color:#fff;cursor:pointer;line-height:1;flex-shrink:0">?</button>
   </div>
   <div id="kioskLayout">
@@ -385,7 +385,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Graph margin: left</span><input id="graphLeft" type="number" min="0" max="400" step="10" value="10"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Graph margin: below</span><input id="graphBottomMargin" type="number" min="20" max="300" step="5" value="120"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Meter right margin</span><input id="meterRightMargin" type="number" min="0" max="600" step="5" value="265"></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>dB label right margin</span><input id="dbLabelRightMargin" type="number" min="0" max="120" step="1" value="0"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>dB label right margin</span><input id="dbLabelRightMargin" type="number" min="-40" max="120" step="1" value="0"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Zoom fit right margin</span><input id="fitMargin" type="number" min="50" max="100" step="1" value="90"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Kiosk scale</span><input id="kioskScale" type="number" min="0.5" max="1.0" step="0.1" value="0.5"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Time label gutter</span><input id="timeLabelGutter" type="number" min="0" step="1" value="0"></div>
@@ -418,6 +418,8 @@
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Inactive knob</span><input id="kioskInactiveOpacity" type="number" min="0" max="100" step="5" value="70"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Meter fill scanlines</span><input id="meterScanlinesVisible" type="checkbox" checked></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Dotted markers</span><input id="dottedMarkers" type="checkbox" checked></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Use short labels</span><input id="useShortLabels" type="checkbox"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Kiosk Top Align</span><input id="kioskTopAlign" type="checkbox"></div>
       </div>
     </div>
   </div>
@@ -531,6 +533,7 @@ const STATUS_DIM_OPACITY = 0.65;
 let METER_W = 40;
 let METER_RIGHT_MARGIN = 265;  // meter's gap from the right edge (pure reposition; default keeps it where GRAPH_RIGHT_PAD put it)
 let DB_LABEL_RIGHT_MARGIN = 0;  // extra gap pushing ONLY the dB scale labels left of the meter (0 = current position)
+let useShortLabels = false;  // condense cramped graph labels: ' = ' → ': ' and drop 'Max '/'Min ' prefixes
 let METER_STROKE_W = 7;
 let DB_LABEL_SIZE = 11;
 let SUSTAIN_GAP_MAX = 0.15;

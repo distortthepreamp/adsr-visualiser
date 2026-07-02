@@ -572,7 +572,7 @@ function render(){
     lbl.setAttribute('text-anchor', 'end');
     lbl.setAttribute('dominant-baseline', 'middle');
     lbl.setAttribute('fill', $('sustainMarker').style.stroke);
-    lbl.textContent = 'S = ' + Math.round((e.floor + drawPS.level * e.scale) * 100) + '%';
+    lbl.textContent = 'S' + (useShortLabels ? ': ' : ' = ') + Math.round((e.floor + drawPS.level * e.scale) * 100) + '%';
     lbl.style.display = showModelDSusTick ? '' : 'none';
   } }
   $('sustainPoint').setAttribute('cx', drawPS.x);
@@ -605,7 +605,7 @@ function render(){
       ssl.setAttribute('text-anchor', 'start');
       ssl.setAttribute('dominant-baseline', 'middle');
       ssl.setAttribute('fill', underlayCol);
-      ssl.textContent = 'S = ' + Math.round((e.floor + state.s * (1 - e.floor) * e.scale) * 100) + '%';
+      ssl.textContent = 'S' + (useShortLabels ? ': ' : ' = ') + Math.round((e.floor + state.s * (1 - e.floor) * e.scale) * 100) + '%';
       ssl.style.display = tbSusVis ? '' : 'none';
     }
   }
@@ -789,11 +789,11 @@ function render(){
   const contourLabelGap = sustainLabelGap;
   const _hp = $('hpMode') && $('hpMode').checked;
   const cfPct = Math.round(e.floor * 100);
-  const cfText = (_hp ? 'Min ' : '') + cfPct + '%';
+  const cfText = (useShortLabels ? '' : (_hp ? 'Min ' : '')) + cfPct + '%';
   const aocPctL = Math.round(Math.min(e.floor + e.scale, 1) * 100);
-  const aocTextLeft = (_hp ? '' : 'Max ') + aocPctL + '%';
+  const aocTextLeft = (useShortLabels ? '' : (_hp ? '' : 'Max ')) + aocPctL + '%';
   const aocPctR = Math.round((e.floor + (1 - e.floor) * e.scale) * 100);
-  const aocTextRight = (_hp ? '' : 'Max ') + aocPctR + '%';
+  const aocTextRight = (useShortLabels ? '' : (_hp ? '' : 'Max ')) + aocPctR + '%';
   const leftX = markerEndX - sustainTickLen - sustainLabelGap;
   const rightX = markerRightX + sustainTickLen + sustainLabelGap;
   // CF left (Model D) — below cutoff arrow's free bottom end

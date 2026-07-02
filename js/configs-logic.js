@@ -57,6 +57,8 @@ function buildConfigSnapshot(){
     innerLineWidth: Number($('innerLineWidth').value),
     markerLineWidth: Number($('markerLineWidth') ? $('markerLineWidth').value : 1),
     dottedMarkers: $('dottedMarkers') ? $('dottedMarkers').checked : true,
+    useShortLabels: $('useShortLabels') ? $('useShortLabels').checked : false,
+    kioskTopAlign: $('kioskTopAlign') ? $('kioskTopAlign').checked : false,
     labelSize: Number($('labelSize').value),
     h1Scale: Number($('h1Scale') ? $('h1Scale').value : 1.0),
     blobScale: Number($('blobScale') ? $('blobScale').value : 3),
@@ -95,9 +97,11 @@ function loadConfigObject(cfg){
   state.target.tbSustainGap = SUSTAIN_GAP_MAX;
 
   // Checkboxes
-  ['loudDecay','showContour','showNewEffectiveLines','showNewStatedLines','modelA','modelD','modelS','modelR','showGateTime','clipAtGate','showPeakDischarge','frequencyMode','hpMode','keyboardControl','showClipped','analogueCurve','linkRToD','dottedMarkers','meterGlow','meterScanlinesVisible','blobGlowEnabled','kioskKnobGlow'].forEach(id => {
+  ['loudDecay','showContour','showNewEffectiveLines','showNewStatedLines','modelA','modelD','modelS','modelR','showGateTime','clipAtGate','showPeakDischarge','frequencyMode','hpMode','keyboardControl','showClipped','analogueCurve','linkRToD','dottedMarkers','meterGlow','meterScanlinesVisible','blobGlowEnabled','kioskKnobGlow','useShortLabels','kioskTopAlign'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
+  if($('useShortLabels')) useShortLabels = $('useShortLabels').checked;
+  if($('kioskTopAlign')) kioskTopAlign = $('kioskTopAlign').checked;
   const restoredZoom = cfg.zoomFactor !== undefined ? cfg.zoomFactor : 3;
   state.zoomFactor = restoredZoom; state.target.zoomFactor = restoredZoom;
   syncZoomReadout();
@@ -148,7 +152,7 @@ function loadConfigObject(cfg){
   if($('meterWidth') && cfg.meterWidth !== undefined){ $('meterWidth').value = cfg.meterWidth; METER_W = Math.max(10, Math.min(80, Number(cfg.meterWidth) || 40)); }
   if($('meterStrokeWidth') && cfg.meterStrokeWidth !== undefined){ $('meterStrokeWidth').value = cfg.meterStrokeWidth; METER_STROKE_W = Math.max(0, Math.min(20, Number(cfg.meterStrokeWidth) || 7)); }
   if($('meterRightMargin') && cfg.meterRightMargin !== undefined){ $('meterRightMargin').value = cfg.meterRightMargin; METER_RIGHT_MARGIN = Math.max(0, Math.min(600, Number(cfg.meterRightMargin) || 265)); }
-  if($('dbLabelRightMargin') && cfg.dbLabelRightMargin !== undefined){ $('dbLabelRightMargin').value = cfg.dbLabelRightMargin; DB_LABEL_RIGHT_MARGIN = Math.max(0, Math.min(120, Number(cfg.dbLabelRightMargin) || 0)); }
+  if($('dbLabelRightMargin') && cfg.dbLabelRightMargin !== undefined){ $('dbLabelRightMargin').value = cfg.dbLabelRightMargin; DB_LABEL_RIGHT_MARGIN = Math.max(-40, Math.min(120, Number(cfg.dbLabelRightMargin) || 0)); }
   if($('graphBottomMargin') && cfg.graphBottomMargin !== undefined){ $('graphBottomMargin').value = cfg.graphBottomMargin; GRAPH_BOTTOM_MARGIN = Math.max(20, Math.min(300, Number(cfg.graphBottomMargin) || 120)); }
   if($('kioskScale') && cfg.kioskScale !== undefined){ KIOSK_SCALE = Math.max(0.5, Math.min(1.0, Number(cfg.kioskScale) || 0.5)); $('kioskScale').value = KIOSK_SCALE; if(window.applyKioskScale) applyKioskScale(); }
   if($('dbLabelSize') && cfg.dbLabelSize !== undefined){ $('dbLabelSize').value = cfg.dbLabelSize; DB_LABEL_SIZE = Math.max(6, Math.min(72, Number(cfg.dbLabelSize) || 11)); }

@@ -31,7 +31,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
         newStatedDecayTimeLabelEl.setAttribute('y', statedLabelY);
         newStatedDecayTimeLabelEl.setAttribute('text-anchor', 'middle');
         newStatedDecayTimeLabelEl.setAttribute('fill', newStatedCol);
-        newStatedDecayTimeLabelEl.textContent = 'D = ' + Math.round(msFromPosition(state.d)) + 'ms';
+        newStatedDecayTimeLabelEl.textContent = 'D' + (useShortLabels ? ': ' : ' = ') + Math.round(msFromPosition(state.d)) + 'ms';
         newStatedDecayTimeLabelEl.style.display='';
       }
     } else {
@@ -54,7 +54,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
         newStatedAttackTimeLabelEl.setAttribute('y', statedLabelY);
         newStatedAttackTimeLabelEl.setAttribute('text-anchor', 'middle');
         newStatedAttackTimeLabelEl.setAttribute('fill', newStatedCol);
-        newStatedAttackTimeLabelEl.textContent = 'A = ' + Math.round(msFromPosition(state.a)) + 'ms';
+        newStatedAttackTimeLabelEl.textContent = 'A' + (useShortLabels ? ': ' : ' = ') + Math.round(msFromPosition(state.a)) + 'ms';
         newStatedAttackTimeLabelEl.style.display='';
       }
     } else if(($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && effA){
@@ -66,7 +66,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
         newStatedAttackTimeLabelEl.setAttribute('y', statedLabelY);
         newStatedAttackTimeLabelEl.setAttribute('text-anchor', 'middle');
         newStatedAttackTimeLabelEl.setAttribute('fill', newEffAttackCol);
-        newStatedAttackTimeLabelEl.textContent = 'A = ' + Math.round(msFromPosition(state.a)) + 'ms';
+        newStatedAttackTimeLabelEl.textContent = 'A' + (useShortLabels ? ': ' : ' = ') + Math.round(msFromPosition(state.a)) + 'ms';
         newStatedAttackTimeLabelEl.style.display='';
       }
     } else {
@@ -99,7 +99,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
         newEffectiveDecayTimeLabelEl.setAttribute('y', effectiveLabelY);
         newEffectiveDecayTimeLabelEl.setAttribute('text-anchor', 'middle');
         newEffectiveDecayTimeLabelEl.setAttribute('fill', newEffDecayCol);
-        newEffectiveDecayTimeLabelEl.textContent = 'D = ' + Math.round(pixelsToTimeSec(drawPS.x - decayStartX) * 1000) + 'ms';
+        newEffectiveDecayTimeLabelEl.textContent = 'D' + (useShortLabels ? ': ' : ' = ') + Math.round(pixelsToTimeSec(drawPS.x - decayStartX) * 1000) + 'ms';
         newEffectiveDecayTimeLabelEl.style.display='';
       }
     } else {
@@ -129,7 +129,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
       newEffAttackTimeLabelEl.setAttribute('y', effectiveLabelY);
       newEffAttackTimeLabelEl.setAttribute('text-anchor', 'middle');
       newEffAttackTimeLabelEl.setAttribute('fill', newEffAttackCol);
-      newEffAttackTimeLabelEl.textContent = 'A = ' + Math.round(pixelsToTimeSec(ceilAttackX - pts.p0.x) * 1000) + 'ms';
+      newEffAttackTimeLabelEl.textContent = 'A' + (useShortLabels ? ': ' : ' = ') + Math.round(pixelsToTimeSec(ceilAttackX - pts.p0.x) * 1000) + 'ms';
       newEffAttackTimeLabelEl.style.display='';
     }
   } else {
@@ -149,7 +149,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
       newEffClipTimeLabelEl.setAttribute('y', effectiveLabelY);
       newEffClipTimeLabelEl.setAttribute('text-anchor', 'middle');
       newEffClipTimeLabelEl.setAttribute('fill', newEffAttackCol);
-      newEffClipTimeLabelEl.textContent = 'C = ' + Math.round(pixelsToTimeSec(ceilDecayX - ceilAttackX) * 1000) + 'ms';
+      newEffClipTimeLabelEl.textContent = 'C' + (useShortLabels ? ': ' : ' = ') + Math.round(pixelsToTimeSec(ceilDecayX - ceilAttackX) * 1000) + 'ms';
       newEffClipTimeLabelEl.style.display='';
     }
   } else {
@@ -185,7 +185,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
         newEffectiveReleaseTimeLabelEl.setAttribute('y', effectiveLabelY);
         newEffectiveReleaseTimeLabelEl.setAttribute('text-anchor', 'middle');
         newEffectiveReleaseTimeLabelEl.setAttribute('fill', newEffReleaseCol);
-        newEffectiveReleaseTimeLabelEl.textContent = 'R = ' + Math.round(pixelsToTimeSec(effRelPx) * 1000) + 'ms';
+        newEffectiveReleaseTimeLabelEl.textContent = 'R' + (useShortLabels ? ': ' : ' = ') + Math.round(pixelsToTimeSec(effRelPx) * 1000) + 'ms';
         newEffectiveReleaseTimeLabelEl.style.display='';
       }
     } else {
@@ -209,7 +209,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
         newStatedReleaseTimeLabelEl.setAttribute('y', statedLabelY);
         newStatedReleaseTimeLabelEl.setAttribute('text-anchor', 'middle');
         newStatedReleaseTimeLabelEl.setAttribute('fill', newStatedCol);
-        newStatedReleaseTimeLabelEl.textContent = 'R = ' + Math.round(msFromPosition(state.r)) + 'ms';
+        newStatedReleaseTimeLabelEl.textContent = 'R' + (useShortLabels ? ': ' : ' = ') + Math.round(msFromPosition(state.r)) + 'ms';
         newStatedReleaseTimeLabelEl.style.display='';
       }
     } else {

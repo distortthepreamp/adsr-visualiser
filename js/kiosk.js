@@ -278,7 +278,7 @@ function openKiosk(){
   const overlay = document.getElementById('kioskOverlay');
   if(overlay) overlay.style.display = 'flex';
   document.body.classList.add('kiosk-open');
-  if(window.applyKioskScale) applyKioskScale();
+  if(window.applyKioskScale){ applyKioskScale(); requestAnimationFrame(applyKioskScale); }  // rAF: overlay just switched display, needs a layout box for the align
   const img = ($('frequencyMode') && $('frequencyMode').checked) ? panelImgFilter : panelImgLoudness;
   if(img.complete) {
     drawKiosk();
@@ -299,7 +299,7 @@ function toggleKiosk(){
 }
 
 window.kioskDrawIfOpen = function(){
-  if(kioskOpen) drawKiosk();
+  if(kioskOpen){ drawKiosk(); if(window.applyKioskScale) applyKioskScale(); }  // re-align on meter relayout (applyKioskScale never calls render → no loop)
 };
 
 // Click outside the panel to close
