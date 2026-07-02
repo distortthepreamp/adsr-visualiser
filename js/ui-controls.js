@@ -484,7 +484,7 @@ function initUIControls(){
   });
 
   // Line widths / label sizes
-  $('innerLineWidth').addEventListener('input',e=>{ const inp=e.target,c=Math.min(18,Math.max(1,isNaN(parseInt(inp.value))?6:parseInt(inp.value))); inp.value=c; document.documentElement.style.setProperty('--innerLineWidth',c); syncRadii(); });
+  $('innerLineWidth').addEventListener('input',e=>{ const inp=e.target,c=Math.min(30,Math.max(1,isNaN(parseInt(inp.value))?6:parseInt(inp.value))); inp.value=c; document.documentElement.style.setProperty('--innerLineWidth',c); syncRadii(); });
   $('labelSize').addEventListener('input',e=>{ const inp=e.target,c=Math.min(72,Math.max(10,isNaN(parseInt(inp.value))?17:parseInt(inp.value))); inp.value=c; document.documentElement.style.setProperty('--labelSize',c); });
   $('h1Scale').addEventListener('change',e=>{ const inp=e.target,c=Math.min(3.0,Math.max(1.0,isNaN(parseFloat(inp.value))?1.0:Math.round(parseFloat(inp.value)*10)/10)); inp.value=c.toFixed(1); document.documentElement.style.setProperty('--h1Scale',c); render(); });
   $('h2Scale').addEventListener('change',e=>{ const inp=e.target,c=Math.min(3.0,Math.max(1.0,isNaN(parseFloat(inp.value))?1.0:Math.round(parseFloat(inp.value)*10)/10)); inp.value=c.toFixed(1); document.documentElement.style.setProperty('--h2Scale',c); render(); });
@@ -496,7 +496,7 @@ function initUIControls(){
   $('sustainArrowXOffset').addEventListener('input', e => { const inp=e.target,c=Math.min(120,Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value))); inp.value=c; SUSTAIN_ARROW_X_OFFSET=c; render(); });
   $('textbookLabelXOffset').addEventListener('input', e => { const inp=e.target,c=Math.min(200,Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value))); inp.value=c; TEXTBOOK_LABEL_X_OFFSET=c; render(); });
   $('graphBottomMargin').addEventListener('input', e => { const inp=e.target,c=Math.min(300,Math.max(20,isNaN(parseInt(inp.value))?120:parseInt(inp.value))); inp.value=c; GRAPH_BOTTOM_MARGIN=c; recalcGeometry(); render(); });
-  $('meterStrokeWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(20,Math.max(0,isNaN(parseInt(inp.value))?7:parseInt(inp.value))); inp.value=c; METER_STROKE_W=c; render(); });
+  $('meterStrokeWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(30,Math.max(0,isNaN(parseInt(inp.value))?7:parseInt(inp.value))); inp.value=c; METER_STROKE_W=c; render(); });
   $('dbLabelSize').addEventListener('input', e => { const inp=e.target, c=Math.min(72,Math.max(6,isNaN(parseInt(inp.value))?11:parseInt(inp.value))); inp.value=c; DB_LABEL_SIZE=c; render(); });
   $('timeLabelGutterTop').addEventListener('input', e => { const inp=e.target,c=Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value)); inp.value=c; render(); });
   $('timeLabelGutterBottom').addEventListener('input', e => { const inp=e.target,c=Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value)); inp.value=c; render(); });

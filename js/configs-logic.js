@@ -156,7 +156,7 @@ function loadConfigObject(cfg){
   if($('blobScale') && cfg.blobScale !== undefined){ $('blobScale').value = Math.min(8,Math.max(1,Number(cfg.blobScale)||3)); syncRadii(); }
   if($('consoleScale') && cfg.consoleScale !== undefined){ $('consoleScale').value = cfg.consoleScale; syncConsoleScale(); }
   if($('meterWidth') && cfg.meterWidth !== undefined){ $('meterWidth').value = cfg.meterWidth; METER_W = Math.max(10, Math.min(80, Number(cfg.meterWidth) || 40)); }
-  if($('meterStrokeWidth') && cfg.meterStrokeWidth !== undefined){ $('meterStrokeWidth').value = cfg.meterStrokeWidth; METER_STROKE_W = Math.max(0, Math.min(20, Number(cfg.meterStrokeWidth) || 7)); }
+  if($('meterStrokeWidth') && cfg.meterStrokeWidth !== undefined){ $('meterStrokeWidth').value = cfg.meterStrokeWidth; METER_STROKE_W = Math.max(0, Math.min(30, Number(cfg.meterStrokeWidth) || 7)); }
   if($('meterRightMargin') && cfg.meterRightMargin !== undefined){ $('meterRightMargin').value = cfg.meterRightMargin; METER_RIGHT_MARGIN = Math.max(0, Math.min(600, Number(cfg.meterRightMargin) || 265)); }
   if($('dbLabelRightMargin') && cfg.dbLabelRightMargin !== undefined){ $('dbLabelRightMargin').value = cfg.dbLabelRightMargin; DB_LABEL_RIGHT_MARGIN = Math.max(-40, Math.min(120, Number(cfg.dbLabelRightMargin) || 0)); }
   if($('sustainArrowXOffset') && cfg.sustainArrowXOffset !== undefined){ $('sustainArrowXOffset').value = cfg.sustainArrowXOffset; SUSTAIN_ARROW_X_OFFSET = Math.max(0, Math.min(120, Number(cfg.sustainArrowXOffset) || 0)); }
