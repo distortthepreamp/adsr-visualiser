@@ -58,6 +58,7 @@ function buildConfigSnapshot(){
     markerLineWidth: Number($('markerLineWidth') ? $('markerLineWidth').value : 1),
     dottedMarkers: $('dottedMarkers') ? $('dottedMarkers').checked : true,
     useShortLabels: $('useShortLabels') ? $('useShortLabels').checked : false,
+    showValuesAsPercent: $('showValuesAsPercent') ? $('showValuesAsPercent').checked : false,
     kioskTopAlign: $('kioskTopAlign') ? $('kioskTopAlign').checked : false,
     labelSize: Number($('labelSize').value),
     h1Scale: Number($('h1Scale') ? $('h1Scale').value : 1.0),
@@ -68,6 +69,7 @@ function buildConfigSnapshot(){
     meterStrokeWidth: Number($('meterStrokeWidth').value),
     meterRightMargin: Number($('meterRightMargin').value),
     dbLabelRightMargin: Number($('dbLabelRightMargin').value),
+    sustainArrowXOffset: Number($('sustainArrowXOffset').value),
     graphBottomMargin: Number($('graphBottomMargin').value),
     kioskScale: Number($('kioskScale').value),
     dbLabelSize: Number($('dbLabelSize').value),
@@ -97,10 +99,11 @@ function loadConfigObject(cfg){
   state.target.tbSustainGap = SUSTAIN_GAP_MAX;
 
   // Checkboxes
-  ['loudDecay','showContour','showNewEffectiveLines','showNewStatedLines','modelA','modelD','modelS','modelR','showGateTime','clipAtGate','showPeakDischarge','frequencyMode','hpMode','keyboardControl','showClipped','analogueCurve','linkRToD','dottedMarkers','meterGlow','meterScanlinesVisible','blobGlowEnabled','kioskKnobGlow','useShortLabels','kioskTopAlign'].forEach(id => {
+  ['loudDecay','showContour','showNewEffectiveLines','showNewStatedLines','modelA','modelD','modelS','modelR','showGateTime','clipAtGate','showPeakDischarge','frequencyMode','hpMode','keyboardControl','showClipped','analogueCurve','linkRToD','dottedMarkers','meterGlow','meterScanlinesVisible','blobGlowEnabled','kioskKnobGlow','useShortLabels','showValuesAsPercent','kioskTopAlign'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
   if($('useShortLabels')) useShortLabels = $('useShortLabels').checked;
+  if($('showValuesAsPercent')) showValuesAsPercent = $('showValuesAsPercent').checked;
   if($('kioskTopAlign')) kioskTopAlign = $('kioskTopAlign').checked;
   const restoredZoom = cfg.zoomFactor !== undefined ? cfg.zoomFactor : 3;
   state.zoomFactor = restoredZoom; state.target.zoomFactor = restoredZoom;
@@ -153,6 +156,7 @@ function loadConfigObject(cfg){
   if($('meterStrokeWidth') && cfg.meterStrokeWidth !== undefined){ $('meterStrokeWidth').value = cfg.meterStrokeWidth; METER_STROKE_W = Math.max(0, Math.min(20, Number(cfg.meterStrokeWidth) || 7)); }
   if($('meterRightMargin') && cfg.meterRightMargin !== undefined){ $('meterRightMargin').value = cfg.meterRightMargin; METER_RIGHT_MARGIN = Math.max(0, Math.min(600, Number(cfg.meterRightMargin) || 265)); }
   if($('dbLabelRightMargin') && cfg.dbLabelRightMargin !== undefined){ $('dbLabelRightMargin').value = cfg.dbLabelRightMargin; DB_LABEL_RIGHT_MARGIN = Math.max(-40, Math.min(120, Number(cfg.dbLabelRightMargin) || 0)); }
+  if($('sustainArrowXOffset') && cfg.sustainArrowXOffset !== undefined){ $('sustainArrowXOffset').value = cfg.sustainArrowXOffset; SUSTAIN_ARROW_X_OFFSET = Math.max(0, Math.min(120, Number(cfg.sustainArrowXOffset) || 0)); }
   if($('graphBottomMargin') && cfg.graphBottomMargin !== undefined){ $('graphBottomMargin').value = cfg.graphBottomMargin; GRAPH_BOTTOM_MARGIN = Math.max(20, Math.min(300, Number(cfg.graphBottomMargin) || 120)); }
   if($('kioskScale') && cfg.kioskScale !== undefined){ KIOSK_SCALE = Math.max(0.5, Math.min(1.0, Number(cfg.kioskScale) || 0.5)); $('kioskScale').value = KIOSK_SCALE; if(window.applyKioskScale) applyKioskScale(); }
   if($('dbLabelSize') && cfg.dbLabelSize !== undefined){ $('dbLabelSize').value = cfg.dbLabelSize; DB_LABEL_SIZE = Math.max(6, Math.min(72, Number(cfg.dbLabelSize) || 11)); }
