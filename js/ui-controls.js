@@ -10,6 +10,14 @@ const VB_HEIGHT_MAX = 1200;
 const VB_HEIGHT_MIN = 400;
 const BTN_ACTIVE_BG  = '#ffffff';
 const BTN_ACTIVE_FG  = '#111111';
+let KIOSK_SCALE = 0.5;
+
+// ---- applyKioskScale — set #kioskPanel transform scale AND #kioskOverlay width together (coupled: overlay width must equal 800 × scale) ----
+function applyKioskScale(){
+  const kp = $('kioskPanel'); const ko = $('kioskOverlay');
+  if(kp) kp.style.transform = 'scale(' + KIOSK_SCALE + ')';
+  if(ko) ko.style.width = (800 * KIOSK_SCALE) + 'px';
+}
 const BTN_PARTIAL_BG = 'rgba(255,255,255,0.35)';
 
 // ---- Transport state ----
@@ -469,6 +477,7 @@ function initUIControls(){
   $('meterStrokeWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(20,Math.max(0,isNaN(parseInt(inp.value))?7:parseInt(inp.value))); inp.value=c; METER_STROKE_W=c; render(); });
   $('dbLabelSize').addEventListener('input', e => { const inp=e.target, c=Math.min(72,Math.max(6,isNaN(parseInt(inp.value))?11:parseInt(inp.value))); inp.value=c; DB_LABEL_SIZE=c; render(); });
   $('timeLabelGutter').addEventListener('input', e => { const inp=e.target,c=Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value)); inp.value=c; render(); });
+  $('kioskScale').addEventListener('input', e => { const inp=e.target,c=Math.min(1.0,Math.max(0.5,isNaN(parseFloat(inp.value))?0.5:parseFloat(inp.value))); inp.value=c; KIOSK_SCALE=c; applyKioskScale(); });
   $('markerLineWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(8,Math.max(1,isNaN(parseFloat(inp.value))?1:Math.round(parseFloat(inp.value)*2)/2)); inp.value=c; document.documentElement.style.setProperty('--markerLineWidth',c); });
   $('dottedMarkers').addEventListener('change', () => { document.documentElement.style.setProperty('--markerDash', $('dottedMarkers').checked ? '4 4' : 'none'); });
   $('tbSustainGapMax').addEventListener('input', e => { const inp=e.target,c=Math.min(30,Math.max(15,isNaN(parseInt(inp.value))?15:parseInt(inp.value))); inp.value=c; SUSTAIN_GAP_MAX=c/100; render(); });

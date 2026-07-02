@@ -278,6 +278,7 @@ function openKiosk(){
   const overlay = document.getElementById('kioskOverlay');
   if(overlay) overlay.style.display = 'flex';
   document.body.classList.add('kiosk-open');
+  if(window.applyKioskScale) applyKioskScale();
   const img = ($('frequencyMode') && $('frequencyMode').checked) ? panelImgFilter : panelImgLoudness;
   if(img.complete) {
     drawKiosk();
