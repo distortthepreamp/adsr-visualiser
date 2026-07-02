@@ -70,6 +70,7 @@ function buildConfigSnapshot(){
     meterRightMargin: Number($('meterRightMargin').value),
     dbLabelRightMargin: Number($('dbLabelRightMargin').value),
     sustainArrowXOffset: Number($('sustainArrowXOffset').value),
+    textbookLabelXOffset: Number($('textbookLabelXOffset') ? $('textbookLabelXOffset').value : 0),
     graphBottomMargin: Number($('graphBottomMargin').value),
     kioskScale: Number($('kioskScale').value),
     kioskNudge: Number($('kioskNudge') ? $('kioskNudge').value : 0),
@@ -159,6 +160,7 @@ function loadConfigObject(cfg){
   if($('meterRightMargin') && cfg.meterRightMargin !== undefined){ $('meterRightMargin').value = cfg.meterRightMargin; METER_RIGHT_MARGIN = Math.max(0, Math.min(600, Number(cfg.meterRightMargin) || 265)); }
   if($('dbLabelRightMargin') && cfg.dbLabelRightMargin !== undefined){ $('dbLabelRightMargin').value = cfg.dbLabelRightMargin; DB_LABEL_RIGHT_MARGIN = Math.max(-40, Math.min(120, Number(cfg.dbLabelRightMargin) || 0)); }
   if($('sustainArrowXOffset') && cfg.sustainArrowXOffset !== undefined){ $('sustainArrowXOffset').value = cfg.sustainArrowXOffset; SUSTAIN_ARROW_X_OFFSET = Math.max(0, Math.min(120, Number(cfg.sustainArrowXOffset) || 0)); }
+  if($('textbookLabelXOffset') && cfg.textbookLabelXOffset !== undefined){ $('textbookLabelXOffset').value = cfg.textbookLabelXOffset; TEXTBOOK_LABEL_X_OFFSET = Math.max(0, Math.min(200, Number(cfg.textbookLabelXOffset) || 0)); }
   if($('graphBottomMargin') && cfg.graphBottomMargin !== undefined){ $('graphBottomMargin').value = cfg.graphBottomMargin; GRAPH_BOTTOM_MARGIN = Math.max(20, Math.min(300, Number(cfg.graphBottomMargin) || 120)); }
   if($('kioskScale') && cfg.kioskScale !== undefined){ KIOSK_SCALE = Math.max(0.5, Math.min(1.0, Number(cfg.kioskScale) || 0.5)); $('kioskScale').value = KIOSK_SCALE.toFixed(2); if(window.applyKioskScale) applyKioskScale(); }
   if($('kioskNudge') && cfg.kioskNudge !== undefined){ KIOSK_NUDGE = Math.max(-200, Math.min(200, Number(cfg.kioskNudge) || 0)); $('kioskNudge').value = KIOSK_NUDGE; if(window.applyKioskScale) applyKioskScale(); }

@@ -595,14 +595,14 @@ function render(){
     _statedY = statedY;
     statedSustainX = pts.pEnd.x + graph.w * state.tbSustainGap;
     const underlayCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
-    statedSustainLineEl.setAttribute('x1', markerRightX);
+    statedSustainLineEl.setAttribute('x1', markerRightX + TEXTBOOK_LABEL_X_OFFSET);
     statedSustainLineEl.setAttribute('y1', statedY);
-    statedSustainLineEl.setAttribute('x2', markerRightX + 1);
+    statedSustainLineEl.setAttribute('x2', markerRightX + 1 + TEXTBOOK_LABEL_X_OFFSET);
     statedSustainLineEl.setAttribute('y2', statedY);
     statedSustainLineEl.style.stroke = underlayCol;
     statedSustainLineEl.style.display = tbSusVis ? '' : 'none';
     const ssl=$('statedSustainLabel'); if(ssl){
-      ssl.setAttribute('x', markerRightX + arrowSize + sustainLabelGap);
+      ssl.setAttribute('x', markerRightX + arrowSize + sustainLabelGap + TEXTBOOK_LABEL_X_OFFSET);
       ssl.setAttribute('y', statedY);
       ssl.setAttribute('text-anchor', 'start');
       ssl.setAttribute('dominant-baseline', 'middle');
@@ -729,7 +729,7 @@ function render(){
   }
   const floorRiser = $('floorRiser');
   if(floorRiser){
-    const rx = markerEndX - sustainTickLen + halfStroke;
+    const rx = markerEndX - SUSTAIN_ARROW_X_OFFSET - arrowSize + halfStroke;
     floorRiser.setAttribute('x1', rx); floorRiser.setAttribute('y1', floorY + 1);
     floorRiser.setAttribute('x2', rx); floorRiser.setAttribute('y2', floorY);
     floorRiser.style.stroke = contourTickCol;
@@ -746,7 +746,7 @@ function render(){
   }
   const floorRiserR = $('floorRiserRight');
   if(floorRiserR){
-    const rx = markerRightX + arrowSize - halfStroke;
+    const rx = markerRightX + arrowSize - halfStroke + TEXTBOOK_LABEL_X_OFFSET;
     floorRiserR.setAttribute('x1', rx); floorRiserR.setAttribute('y1', floorY + 1);
     floorRiserR.setAttribute('x2', rx); floorRiserR.setAttribute('y2', floorY);
     floorRiserR.style.stroke = contourTickColRight;
@@ -762,7 +762,7 @@ function render(){
   }
   const amountRiser = $('amountRiser');
   if(amountRiser){
-    const rx = markerEndX - sustainTickLen + halfStroke;
+    const rx = markerEndX - SUSTAIN_ARROW_X_OFFSET - arrowSize + halfStroke;
     amountRiser.setAttribute('x1', rx); amountRiser.setAttribute('y1', amountY - 1);
     amountRiser.setAttribute('x2', rx); amountRiser.setAttribute('y2', amountY);
     amountRiser.style.stroke = contourTickCol;
@@ -780,7 +780,7 @@ function render(){
   }
   const amountRiserR = $('amountRiserRight');
   if(amountRiserR){
-    const rx = markerRightX + arrowSize - halfStroke;
+    const rx = markerRightX + arrowSize - halfStroke + TEXTBOOK_LABEL_X_OFFSET;
     amountRiserR.setAttribute('x1', rx); amountRiserR.setAttribute('y1', textbookAmountY - 1);
     amountRiserR.setAttribute('x2', rx); amountRiserR.setAttribute('y2', textbookAmountY);
     amountRiserR.style.stroke = contourTickColRight;
@@ -801,7 +801,7 @@ function render(){
   // CF left (Model D) — below cutoff arrow's free bottom end
   const cfLbl = $('cfLabel');
   if(cfLbl){
-    cfLbl.setAttribute('x', leftX);
+    cfLbl.setAttribute('x', (markerEndX - SUSTAIN_ARROW_X_OFFSET) - arrowSize - sustainLabelGap);
     cfLbl.setAttribute('y', floorY + arrowSize + contourLabelGap + capHeight);
     cfLbl.setAttribute('text-anchor', 'end');
     cfLbl.setAttribute('fill', contourTickCol);
@@ -811,7 +811,7 @@ function render(){
   // CF right (textbook) — below cutoff arrow's free bottom end
   const cfLblR = $('cfLabelRight');
   if(cfLblR){
-    cfLblR.setAttribute('x', markerRightX + arrowSize + sustainLabelGap);
+    cfLblR.setAttribute('x', markerRightX + arrowSize + sustainLabelGap + TEXTBOOK_LABEL_X_OFFSET);
     cfLblR.setAttribute('y', floorY + arrowSize + contourLabelGap + capHeight);
     cfLblR.setAttribute('text-anchor', 'start');
     cfLblR.setAttribute('fill', contourTickColRight);
@@ -821,7 +821,7 @@ function render(){
   // AOC left (Model D) — above amount arrow's free top end
   const aocLbl = $('aocLabel');
   if(aocLbl){
-    aocLbl.setAttribute('x', leftX);
+    aocLbl.setAttribute('x', (markerEndX - SUSTAIN_ARROW_X_OFFSET) - arrowSize - sustainLabelGap);
     aocLbl.setAttribute('y', amountY - arrowSize - contourLabelGap);
     aocLbl.setAttribute('text-anchor', 'end');
     aocLbl.setAttribute('fill', contourTickCol);
@@ -831,7 +831,7 @@ function render(){
   // AOC right (textbook) — above amount arrow's free top end
   const aocLblR = $('aocLabelRight');
   if(aocLblR){
-    aocLblR.setAttribute('x', markerRightX + arrowSize + sustainLabelGap);
+    aocLblR.setAttribute('x', markerRightX + arrowSize + sustainLabelGap + TEXTBOOK_LABEL_X_OFFSET);
     aocLblR.setAttribute('y', textbookAmountY - arrowSize - contourLabelGap);
     aocLblR.setAttribute('text-anchor', 'start');
     aocLblR.setAttribute('fill', contourTickColRight);

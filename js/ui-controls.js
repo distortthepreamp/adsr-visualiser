@@ -494,6 +494,7 @@ function initUIControls(){
   $('meterRightMargin').addEventListener('input', e => { const inp=e.target,c=Math.min(600,Math.max(0,isNaN(parseInt(inp.value))?265:parseInt(inp.value))); inp.value=c; METER_RIGHT_MARGIN=c; recalcGeometry(); render(); });
   $('dbLabelRightMargin').addEventListener('input', e => { const inp=e.target,c=Math.min(120,Math.max(-40,isNaN(parseInt(inp.value))?0:parseInt(inp.value))); inp.value=c; DB_LABEL_RIGHT_MARGIN=c; render(); });
   $('sustainArrowXOffset').addEventListener('input', e => { const inp=e.target,c=Math.min(120,Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value))); inp.value=c; SUSTAIN_ARROW_X_OFFSET=c; render(); });
+  $('textbookLabelXOffset').addEventListener('input', e => { const inp=e.target,c=Math.min(200,Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value))); inp.value=c; TEXTBOOK_LABEL_X_OFFSET=c; render(); });
   $('graphBottomMargin').addEventListener('input', e => { const inp=e.target,c=Math.min(300,Math.max(20,isNaN(parseInt(inp.value))?120:parseInt(inp.value))); inp.value=c; GRAPH_BOTTOM_MARGIN=c; recalcGeometry(); render(); });
   $('meterStrokeWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(20,Math.max(0,isNaN(parseInt(inp.value))?7:parseInt(inp.value))); inp.value=c; METER_STROKE_W=c; render(); });
   $('dbLabelSize').addEventListener('input', e => { const inp=e.target, c=Math.min(72,Math.max(6,isNaN(parseInt(inp.value))?11:parseInt(inp.value))); inp.value=c; DB_LABEL_SIZE=c; render(); });
