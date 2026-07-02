@@ -144,11 +144,11 @@
           <div id="attackTarget" class="targetReadout"></div>
           <div class="quickset-col">
             <button class="quickset-btn" data-knob="attack" data-value="0">0</button>
+            <button class="quickset-btn" data-knob="attack" data-value="10">10</button>
             <button class="quickset-btn" data-knob="attack" data-value="100">100</button>
-            <button class="quickset-btn" data-knob="attack" data-value="250">250</button>
-            <button class="quickset-btn" data-knob="attack" data-value="500">500</button>
+            <button class="quickset-btn" data-knob="attack" data-value="200">200</button>
+            <button class="quickset-btn" data-knob="attack" data-value="600">600</button>
             <button class="quickset-btn" data-knob="attack" data-value="1000">1000</button>
-            <button class="quickset-btn" data-knob="attack" data-value="2000">2000</button>
             <div class="quickset-legend">⇧ 1–6</div>
           </div>
         </div>
@@ -158,11 +158,11 @@
           <div id="decayTarget" class="targetReadout"></div>
           <div class="quickset-col">
             <button class="quickset-btn" data-knob="decay" data-value="0">0</button>
+            <button class="quickset-btn" data-knob="decay" data-value="10">10</button>
             <button class="quickset-btn" data-knob="decay" data-value="100">100</button>
-            <button class="quickset-btn" data-knob="decay" data-value="250">250</button>
-            <button class="quickset-btn" data-knob="decay" data-value="500">500</button>
+            <button class="quickset-btn" data-knob="decay" data-value="200">200</button>
+            <button class="quickset-btn" data-knob="decay" data-value="600">600</button>
             <button class="quickset-btn" data-knob="decay" data-value="1000">1000</button>
-            <button class="quickset-btn" data-knob="decay" data-value="2000">2000</button>
             <div class="quickset-legend">⇧⌥ 1–6</div>
           </div>
         </div>
@@ -186,11 +186,11 @@
           <div id="releaseTarget" class="targetReadout"></div>
           <div class="quickset-col">
             <button class="quickset-btn" data-knob="release" data-value="0">0</button>
+            <button class="quickset-btn" data-knob="release" data-value="10">10</button>
             <button class="quickset-btn" data-knob="release" data-value="100">100</button>
-            <button class="quickset-btn" data-knob="release" data-value="250">250</button>
-            <button class="quickset-btn" data-knob="release" data-value="500">500</button>
+            <button class="quickset-btn" data-knob="release" data-value="200">200</button>
+            <button class="quickset-btn" data-knob="release" data-value="600">600</button>
             <button class="quickset-btn" data-knob="release" data-value="1000">1000</button>
-            <button class="quickset-btn" data-knob="release" data-value="2000">2000</button>
             <div id="releaseLegend" class="quickset-legend">⇧⌥⌘ 1–6</div>
           </div>
         </div>
@@ -278,6 +278,7 @@
           <div class="row"><label><input type="checkbox" id="linkRToD"> Link Textbook R to D</label></div>
           <div class="row"><label><input type="checkbox" id="showGateTime"> Gate Time</label></div>
           <div class="row"><label><input type="checkbox" id="showPeakDischarge"> Peak Discharge</label></div>
+          <div class="row"><label><input id="keyboardControl" type="checkbox"> Mimic Model D Sustain</label></div>
         </div>
       </div>
       <hr style="border-color:rgba(255,255,255,.25)">
@@ -295,7 +296,6 @@
         <div id="expertPopup" style="display:none;position:absolute;bottom:calc(100% + 6px);left:0;background:#1c1c1c;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:8px;z-index:200;min-width:260px;">
           <div id="showClippedRow" class="row"><label><input id="showClipped" type="checkbox"> Clipped Shape</label></div>
           <div class="row"><label><input type="checkbox" id="clipAtGate"> Clip at Gate</label></div>
-          <div class="row"><label><input id="keyboardControl" type="checkbox"> Mimic Model D Sustain (80%) (S)</label></div>
           <div id="analogueCurveRow" class="row" style="align-items:center;gap:6px"><label><input id="analogueCurve" type="checkbox"> Analogue</label><input id="curveAmount" type="range" min="0" max="100" value="40" style="width:80px;opacity:0.35"><span id="curveAmountVal" style="font-size:13px;min-width:20px;text-align:right;opacity:0.35">40</span></div>
         </div>
         <div id="pendingPopup" style="display:none;position:absolute;bottom:calc(100% + 6px);right:0;left:auto;background:#1c1c1c;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:8px;z-index:200;min-width:260px;">
@@ -484,7 +484,7 @@
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">.</td><td style="padding:3px 0;font-size:13px;font-weight:700">Meter Cutoff/Amount</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">F</td><td style="padding:3px 0;font-size:13px;font-weight:700">Filter Mode</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">M</td><td style="padding:3px 0;font-size:13px;font-weight:700">LP/HP Mode</td></tr>
-          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">S</td><td style="padding:3px 0;font-size:13px;font-weight:700">Mimic Model D Sustain (80%)</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">S</td><td style="padding:3px 0;font-size:13px;font-weight:700">Mimic Model D Sustain</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">G</td><td style="padding:3px 0;font-size:13px;font-weight:700">Cues</td></tr>
           <tr><td style="padding:3px 14px 3px 0;font-family:monospace;font-size:13px;font-weight:800">K</td><td style="padding:3px 0;font-size:13px;font-weight:700">Kiosk Mode</td></tr>
         </table>
