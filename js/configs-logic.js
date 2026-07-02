@@ -27,6 +27,7 @@ function buildConfigSnapshot(){
     kioskKnobGlowRadius: Number($('kioskKnobGlowRadius') ? $('kioskKnobGlowRadius').value : 40),
     kioskInactiveOpacity: Number($('kioskInactiveOpacity') ? $('kioskInactiveOpacity').value : 70),
     meterScanlinesVisible: $('meterScanlinesVisible') ? $('meterScanlinesVisible').checked : true,
+    showMeterScale: $('showMeterScale') ? $('showMeterScale').checked : true,
     blobGlowEnabled: $('blobGlowEnabled') ? $('blobGlowEnabled').checked : true,
     zoomFactor: state.zoomFactor,
     blobGlowRadius: Number($('blobGlowRadius') ? $('blobGlowRadius').value : 8),
@@ -102,7 +103,7 @@ function loadConfigObject(cfg){
   state.target.tbSustainGap = SUSTAIN_GAP_MAX;
 
   // Checkboxes
-  ['loudDecay','showContour','showNewEffectiveLines','showNewStatedLines','modelA','modelD','modelS','modelR','showGateTime','clipAtGate','showPeakDischarge','frequencyMode','hpMode','keyboardControl','showClipped','analogueCurve','linkRToD','dottedMarkers','meterGlow','meterScanlinesVisible','blobGlowEnabled','kioskKnobGlow','useShortLabels','showValuesAsPercent','kioskTopAlign'].forEach(id => {
+  ['loudDecay','showContour','showNewEffectiveLines','showNewStatedLines','modelA','modelD','modelS','modelR','showGateTime','clipAtGate','showPeakDischarge','frequencyMode','hpMode','keyboardControl','showClipped','analogueCurve','linkRToD','dottedMarkers','meterGlow','meterScanlinesVisible','blobGlowEnabled','kioskKnobGlow','useShortLabels','showValuesAsPercent','kioskTopAlign','showMeterScale'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
   if($('useShortLabels')) useShortLabels = $('useShortLabels').checked;

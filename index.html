@@ -118,10 +118,10 @@
       <circle id="dotStated" class="env-dot" cx="80" cy="445" />
       <circle id="dot" class="env-dot" cx="80" cy="445" />
 
+      <g id="dbScaleLabels"></g>
       <rect id="meterFillStated" x="1145" y="445" width="20" height="0" style="fill:#ffffff;stroke:none;" />
       <rect id="meterFill" x="1165" y="445" width="20" height="0" style="fill:var(--meterFill,var(--line));stroke:none;" />
       <rect id="meterScanlinesRect" x="1145" y="30" width="40" height="415" fill="url(#scanlines)" clip-path="url(#meterClip)" style="display:none;" />
-      <g id="dbScaleLabels"></g>
       <rect id="meterBox"  x="1145" y="30" width="40" height="415" style="fill:none;stroke:var(--line);stroke-width:7;stroke-opacity:1;vector-effect:non-scaling-stroke;" />
       <text id="meterLabelTitle" x="1165" y="72" text-anchor="middle" style="fill:var(--fg);font-size:calc(var(--labelSize) * 1px);font-weight:800;font-family:'UniversCondensed',Arial,Helvetica,sans-serif;display:none;">VOL</text>
       <text id="modeLabel" class="mode-label" x="10" y="-30" text-anchor="start">LOUDNESS CONTOUR</text>
@@ -273,6 +273,7 @@
           <div id="loudDecayRow" class="row"><label><input id="loudDecay" type="checkbox"> <span id="loudDecayLabel">Loud Decay</span> (D)</label></div>
           <div class="row"><label><input id="showContour" type="checkbox" checked> Meter Cutoff/Amt (.)</label></div>
           <div class="row"><label><input id="hpMode" type="checkbox"> LP/HP Mode (M)</label></div>
+          <div class="row"><label><input id="showMeterScale" type="checkbox" checked> Meter scale</label></div>
         </div>
         <div>
           <div class="row"><label><input type="checkbox" id="linkRToD"> Link Textbook R to D</label></div>

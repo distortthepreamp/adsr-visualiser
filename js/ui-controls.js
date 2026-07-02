@@ -439,6 +439,7 @@ function initUIControls(){
   $('meterGlow').addEventListener('change', () => setMeterLevel(state.dotY || graph.y0));
   $('meterGlowRadius').addEventListener('input', e => { const inp=e.target,c=Math.min(60,Math.max(0,isNaN(parseInt(inp.value))?5:parseInt(inp.value))); inp.value=c; setMeterLevel(state.dotY || graph.y0); });
   $('meterScanlinesVisible').addEventListener('change', render);
+  $('showMeterScale').addEventListener('change', render);
   $('useShortLabels').addEventListener('change', () => { useShortLabels = $('useShortLabels').checked; render(); });
   $('showValuesAsPercent').addEventListener('change', () => { showValuesAsPercent = $('showValuesAsPercent').checked; render(); });
   $('kioskTopAlign').addEventListener('change', () => { kioskTopAlign = $('kioskTopAlign').checked; applyKioskScale(); });

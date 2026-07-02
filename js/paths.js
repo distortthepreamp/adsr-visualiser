@@ -637,17 +637,17 @@ function render(){
     // Loudness mode → dB scale; filter mode → Hz scale. Same gutter, same styling.
     const _dbFreqMode = $('frequencyMode') && $('frequencyMode').checked;
     while(dbLabels.firstChild) dbLabels.removeChild(dbLabels.firstChild);
-    dbLabels.style.display = '';
+    dbLabels.style.display = ($('showMeterScale') && $('showMeterScale').checked) ? '' : 'none';
     const _svgForPx = document.getElementById('svg');
     const _pxToUser = _svgForPx ? (VB_WIDTH / _svgForPx.getBoundingClientRect().width) : 1;
     const strokeInset = (METER_STROKE_W / 2) * _pxToUser;
     const innerTop = meterAbsTop + strokeInset;
     const innerH = graph.h - 2 * strokeInset;
-    const labelX = gutterX + DB_GUTTER_W / 2 - DB_LABEL_RIGHT_MARGIN;
+    const labelX = meterX + meterW / 2;  // centred in the meter (Stage 1: parked; fills paint over it)
     const _addLabel = (text, frac) => {
       const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       t.setAttribute('x', labelX); t.setAttribute('y', innerTop + innerH * (1 - frac));
-      t.setAttribute('text-anchor', 'end');
+      t.setAttribute('text-anchor', 'middle');
       t.setAttribute('style', 'dominant-baseline:middle;font-size:'+DB_LABEL_SIZE+'px;fill:#fff;font-family:\'UniversCondensed\',Arial,Helvetica,sans-serif;');
       t.textContent = text;
       dbLabels.appendChild(t);
