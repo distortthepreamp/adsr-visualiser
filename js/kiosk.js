@@ -205,7 +205,7 @@ function drawKiosk(){
   if (filterOn)  drawSwitch(ctx, 744, loudDecayOn, 'black');  // Filter Decay
   if (filterOn)  drawSwitch(ctx, 494, kb1On,       'white');  // Keyboard 1
   if (filterOn)  drawSwitch(ctx, 618, kb2On,       'white');  // Keyboard 2
-  if (!filterOn) drawSwitch(ctx, 864, loudDecayOn, 'black');  // Loud Decay
+  if (!filterOn) drawSwitch(ctx, 864, loudDecayOn && !!($('modelR') && $('modelR').checked), 'black');  // Loud Decay — off if Model D R unchecked
 }
 
 let kioskAttackStart = 210, kioskAttackTarget = 210, kioskAttackTransStart = 0, kioskAttackTransDur = 0;
