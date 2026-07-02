@@ -8,9 +8,10 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
   const effA = modelLegs ? modelLegs.legA !== false : true;
   const effD = modelLegs ? modelLegs.legD !== false : true;
   const effR = modelLegs ? modelLegs.legR !== false : true;
-  const timeLabelGutter = Math.max(0, Number(($('timeLabelGutter') && $('timeLabelGutter').value) || 0));
-  const statedLabelY    = graph.y0 - graph.h + TIME_LABEL_STATED_Y_OFFSET - timeLabelGutter;
-  const effectiveLabelY = graph.y0 + TIME_LABEL_EFFECTIVE_Y_OFFSET + timeLabelGutter;
+  const timeLabelGutterTop    = Math.max(0, Number(($('timeLabelGutterTop') && $('timeLabelGutterTop').value) || 0));
+  const timeLabelGutterBottom = Math.max(0, Number(($('timeLabelGutterBottom') && $('timeLabelGutterBottom').value) || 0));
+  const statedLabelY    = graph.y0 - graph.h + TIME_LABEL_STATED_Y_OFFSET - timeLabelGutterTop;
+  const effectiveLabelY = graph.y0 + TIME_LABEL_EFFECTIVE_Y_OFFSET + timeLabelGutterBottom;
   const newStatedCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
   const newEffAttackCol = (freqMode ? ($('filterAttackColor') && $('filterAttackColor').value) : ($('loudnessAttackColor') && $('loudnessAttackColor').value)) || '#ffffff';
   const newEffDecayCol = (freqMode ? ($('filterDecayColor') && $('filterDecayColor').value) : ($('loudnessDecayColor') && $('loudnessDecayColor').value)) || '#ffffff';

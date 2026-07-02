@@ -496,7 +496,8 @@ function initUIControls(){
   $('graphBottomMargin').addEventListener('input', e => { const inp=e.target,c=Math.min(300,Math.max(20,isNaN(parseInt(inp.value))?120:parseInt(inp.value))); inp.value=c; GRAPH_BOTTOM_MARGIN=c; recalcGeometry(); render(); });
   $('meterStrokeWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(20,Math.max(0,isNaN(parseInt(inp.value))?7:parseInt(inp.value))); inp.value=c; METER_STROKE_W=c; render(); });
   $('dbLabelSize').addEventListener('input', e => { const inp=e.target, c=Math.min(72,Math.max(6,isNaN(parseInt(inp.value))?11:parseInt(inp.value))); inp.value=c; DB_LABEL_SIZE=c; render(); });
-  $('timeLabelGutter').addEventListener('input', e => { const inp=e.target,c=Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value)); inp.value=c; render(); });
+  $('timeLabelGutterTop').addEventListener('input', e => { const inp=e.target,c=Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value)); inp.value=c; render(); });
+  $('timeLabelGutterBottom').addEventListener('input', e => { const inp=e.target,c=Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value)); inp.value=c; render(); });
   $('kioskScale').addEventListener('input', e => { const inp=e.target,c=Math.min(1.0,Math.max(0.5,isNaN(parseFloat(inp.value))?0.5:parseFloat(inp.value))); inp.value=c; KIOSK_SCALE=c; applyKioskScale(); });
   // Re-align the kiosk vertically when the viewport changes (no existing resize listener)
   window.addEventListener('resize', () => applyKioskScale());

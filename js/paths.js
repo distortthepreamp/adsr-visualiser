@@ -310,7 +310,7 @@ function render(){
     const gateEffReleaseDropEl = $('gateEffectiveReleaseDrop');
     const gateEffReleaseTimeEl = $('gateEffectiveReleaseTime');
     if(gateRCVisible && legR){
-      const timeLabelGutter = Math.max(0, Number(($('timeLabelGutter') && $('timeLabelGutter').value) || 0));
+      const timeLabelGutterBottom = Math.max(0, Number(($('timeLabelGutterBottom') && $('timeLabelGutterBottom').value) || 0));
       if(gateEffReleaseDropEl){
         gateEffReleaseDropEl.setAttribute('x1', orangeDischargeEndX); gateEffReleaseDropEl.setAttribute('y1', rEnd.y);
         gateEffReleaseDropEl.setAttribute('x2', orangeDischargeEndX); gateEffReleaseDropEl.setAttribute('y2', graph.y0);
@@ -319,7 +319,7 @@ function render(){
       }
       if(gateEffReleaseTimeEl){
         gateEffReleaseTimeEl.setAttribute('x', orangeDischargeEndX);
-        gateEffReleaseTimeEl.setAttribute('y', graph.y0 + TIME_LABEL_EFFECTIVE_Y_OFFSET + timeLabelGutter);
+        gateEffReleaseTimeEl.setAttribute('y', graph.y0 + TIME_LABEL_EFFECTIVE_Y_OFFSET + timeLabelGutterBottom);
         gateEffReleaseTimeEl.setAttribute('text-anchor', 'start');
         gateEffReleaseTimeEl.setAttribute('fill', relColor);
         gateEffReleaseTimeEl.textContent = 'Release After Key Up = ' + Math.round(pixelsToTimeSec(orangeDischargeEndX - gateCloseX) * 1000) + 'ms';
@@ -431,7 +431,6 @@ function render(){
         gateTopCapEl.style.display = '';
       }
       if(gateTimeLabelEl){
-        const timeLabelGutter = Math.max(0, Number(($('timeLabelGutter') && $('timeLabelGutter').value) || 0));
         gateTimeLabelEl.setAttribute('x', gateCloseX + 15);
         gateTimeLabelEl.setAttribute('y', gateTopY);
         gateTimeLabelEl.setAttribute('text-anchor', 'start');
