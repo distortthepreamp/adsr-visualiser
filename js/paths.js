@@ -40,6 +40,16 @@ function syncRadii(){
 // ---- fmtMeterVal — format a sustain/amount/cutoff value: one-decimal 0-10 number (default) or the raw percentage ----
 function fmtMeterVal(pct){ return showValuesAsPercent ? (pct + '%') : ((pct / 10).toFixed(1)); }
 
+// ---- setMeterArrow — standalone inward-pointing arrowhead triangle at a meter edge (tip at the edge, body extends outward by size) ----
+function setMeterArrow(id, tipX, tipY, pointsRight, size, fill, show){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const baseX = pointsRight ? (tipX - size) : (tipX + size);
+  el.setAttribute('points', tipX+','+tipY+' '+baseX+','+(tipY - size/2)+' '+baseX+','+(tipY + size/2));
+  el.style.fill = fill;
+  el.style.display = show ? '' : 'none';
+}
+
 function render(){
   try {
   const DB_GUTTER_W = 60;  // dB-scale gutter width (user units); mirror-ready for right side
@@ -442,26 +452,18 @@ function render(){
       // markerEndX / sustainTickLen are defined later, so compute locally from globals.
       const _gateLabelSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--labelSize')) || 17;
       const gateTickLen = Math.round(_gateLabelSize * 1.5);
+      const _gateArrowSize = Math.round(_gateLabelSize * 0.72);  // matches Stage-2 arrowSize (labelSize*0.72)
       const _gateLabelGap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sustainLabelGap')) || 6;
       const _freqMode = !!($('frequencyMode') && $('frequencyMode').checked);
       const gateEffCol = _freqMode ? (($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00') : (($('loudnessDecayColor') && $('loudnessDecayColor').value) || '#ff0000');
       const gateStatedCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
       const gateEffLblEl = $('gateEffLabel');
       const gateStatedLblEl = $('gateStatedLabel');
-      if(gateEffHorizEl){
-        if(effVisible){
-          gateEffHorizEl.setAttribute('x1', METER_X - DB_GUTTER_W - gateTickLen); gateEffHorizEl.setAttribute('y1', gateCloseY);
-          gateEffHorizEl.setAttribute('x2', METER_X - DB_GUTTER_W);               gateEffHorizEl.setAttribute('y2', gateCloseY);
-          gateEffHorizEl.style.stroke = gateEffCol;
-          gateEffHorizEl.style.display = '';
-        } else {
-          gateEffHorizEl.style.display = 'none';
-        }
-      }
+      setMeterArrow('gateEffectiveHoriz', METER_X, gateCloseY, true, _gateArrowSize, gateEffCol, effVisible);
       if(gateEffLblEl){
         if(effVisible){
           const pct = Math.round(((graph.y0 - gateCloseY) / graph.h) * 100);
-          gateEffLblEl.setAttribute('x', METER_X - DB_GUTTER_W - gateTickLen - _gateLabelGap);
+          gateEffLblEl.setAttribute('x', METER_X - _gateArrowSize - _gateLabelGap);
           gateEffLblEl.setAttribute('y', gateCloseY);
           gateEffLblEl.setAttribute('text-anchor', 'end');
           gateEffLblEl.setAttribute('dominant-baseline', 'middle');
@@ -472,20 +474,11 @@ function render(){
           gateEffLblEl.style.display = 'none';
         }
       }
-      if(gateStatedHorizEl){
-        if(statedVisible){
-          gateStatedHorizEl.setAttribute('x1', METER_X + METER_W);                gateStatedHorizEl.setAttribute('y1', gateStatedYRaw);
-          gateStatedHorizEl.setAttribute('x2', METER_X + METER_W + gateTickLen);  gateStatedHorizEl.setAttribute('y2', gateStatedYRaw);
-          gateStatedHorizEl.style.stroke = gateStatedCol;
-          gateStatedHorizEl.style.display = '';
-        } else {
-          gateStatedHorizEl.style.display = 'none';
-        }
-      }
+      setMeterArrow('gateStatedHoriz', METER_X + METER_W, gateStatedYRaw, false, _gateArrowSize, gateStatedCol, statedVisible);
       if(gateStatedLblEl){
         if(statedVisible){
           const pct = Math.round(((graph.y0 - gateStatedYRaw) / graph.h) * 100);
-          gateStatedLblEl.setAttribute('x', METER_X + METER_W + gateTickLen + _gateLabelGap);
+          gateStatedLblEl.setAttribute('x', METER_X + METER_W + _gateArrowSize + _gateLabelGap);
           gateStatedLblEl.setAttribute('y', gateStatedYRaw);
           gateStatedLblEl.setAttribute('text-anchor', 'start');
           gateStatedLblEl.setAttribute('dominant-baseline', 'middle');
@@ -560,20 +553,16 @@ function render(){
   const arrowL = document.getElementById('sustainArrowLeft');
   if(arrowR){ arrowR.setAttribute('markerWidth', arrowSize); arrowR.setAttribute('markerHeight', arrowSize); }
   if(arrowL){ arrowL.setAttribute('markerWidth', arrowSize); arrowL.setAttribute('markerHeight', arrowSize); }
-  $('sustainMarker').setAttribute('x1', markerEndX - SUSTAIN_ARROW_X_OFFSET - 1);
-  $('sustainMarker').setAttribute('y1', drawPS.y);
-  $('sustainMarker').setAttribute('x2', markerEndX - SUSTAIN_ARROW_X_OFFSET);
-  $('sustainMarker').setAttribute('y2', drawPS.y);
-  $('sustainMarker').style.stroke = ($('frequencyMode') && $('frequencyMode').checked) ? (($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00') : (($('loudnessDecayColor') && $('loudnessDecayColor').value) || '#ff0000');
+  const susArrowCol = ($('frequencyMode') && $('frequencyMode').checked) ? (($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00') : (($('loudnessDecayColor') && $('loudnessDecayColor').value) || '#ff0000');
   const showEffLines = !!($('showNewEffectiveLines') && $('showNewEffectiveLines').checked);
   const showModelDSusTick = (legD || legR || legS) && !showGateTime && showEffLines;
-  $('sustainMarker').style.display = showModelDSusTick ? '' : 'none';
+  setMeterArrow('meterArrowLSustain', meterX, drawPS.y, true, arrowSize, susArrowCol, showModelDSusTick);
   { const lbl=$('sustainMarkerLabel'); if(lbl){
-    lbl.setAttribute('x', (markerEndX - SUSTAIN_ARROW_X_OFFSET) - arrowSize - sustainLabelGap);
+    lbl.setAttribute('x', meterX - arrowSize - sustainLabelGap - SUSTAIN_ARROW_X_OFFSET);
     lbl.setAttribute('y', drawPS.y);
     lbl.setAttribute('text-anchor', 'end');
     lbl.setAttribute('dominant-baseline', 'middle');
-    lbl.setAttribute('fill', $('sustainMarker').style.stroke);
+    lbl.setAttribute('fill', susArrowCol);
     lbl.textContent = (useShortLabels ? '' : 'S = ') + fmtMeterVal(Math.round((e.floor + drawPS.level * e.scale) * 100));
     lbl.style.display = showModelDSusTick ? '' : 'none';
   } }
@@ -584,8 +573,7 @@ function render(){
   const kcOn = $('keyboardControl') && $('keyboardControl').checked;
   let statedSustainX = drawPS.x; // uncapped sustain x; equals drawPS.x when kc OFF
   let _statedY = null; // elevated for geometry logging
-  const statedSustainLineEl = $('statedSustainLine');
-  if(statedSustainLineEl){
+  {
     const showStatedLines = !!($('showNewStatedLines') && $('showNewStatedLines').checked);
     const ulD = !!($('underlayD') && $('underlayD').checked);
     const ulR = !!($('underlayR') && $('underlayR').checked);
@@ -595,12 +583,7 @@ function render(){
     _statedY = statedY;
     statedSustainX = pts.pEnd.x + graph.w * state.tbSustainGap;
     const underlayCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
-    statedSustainLineEl.setAttribute('x1', markerRightX + TEXTBOOK_LABEL_X_OFFSET);
-    statedSustainLineEl.setAttribute('y1', statedY);
-    statedSustainLineEl.setAttribute('x2', markerRightX + 1 + TEXTBOOK_LABEL_X_OFFSET);
-    statedSustainLineEl.setAttribute('y2', statedY);
-    statedSustainLineEl.style.stroke = underlayCol;
-    statedSustainLineEl.style.display = tbSusVis ? '' : 'none';
+    setMeterArrow('meterArrowRSustain', markerRightX, statedY, false, arrowSize, underlayCol, tbSusVis);
     const ssl=$('statedSustainLabel'); if(ssl){
       ssl.setAttribute('x', markerRightX + arrowSize + sustainLabelGap + TEXTBOOK_LABEL_X_OFFSET);
       ssl.setAttribute('y', statedY);
@@ -616,7 +599,7 @@ function render(){
   // Applied as a post-pass so normal visibility logic runs first; this only adds display:none.
   if(clipAtGateOn){
     // Elements with a single x anchor — hide if that x >= gateCloseX
-    [['sustainMarker','x1'],['sustainPoint','cx']].forEach(([id,attr]) => {
+    [['sustainPoint','cx']].forEach(([id,attr]) => {
       const el=$(id); if(!el) return;
       const x = parseFloat(el.getAttribute(attr));
       if(x >= gateCloseX) el.style.display='none';
@@ -654,7 +637,7 @@ function render(){
     };
     if(!_dbFreqMode){
       // dB labels positioned by linear-amplitude mapping: frac = 10^(dB/20)
-      const DB_MARKS = [0, -3, -6, -9, -12, -18];
+      const DB_MARKS = [-3, -6, -9, -12, -18];
       for(const D of DB_MARKS) _addLabel(String(D), Math.pow(10, D / 20));
     } else {
       // Hz labels at fixed calibration fractions (independent of the audio cutoff curve).
@@ -700,11 +683,9 @@ function render(){
 
   // Floor line and Amount line
   const freqMode = $('frequencyMode') && $('frequencyMode').checked;
-  const meterLeftX = meterX;
-  const floorLine = $('floorLine');
-  const amountLine = $('amountLine');
   const floorY = yFor(pts.e.floor);
   const amountY = Math.max(yFor(pts.e.floor + pts.e.scale), yFor(1));
+  const textbookAmountY = yFor(e.floor + (1 - e.floor) * e.scale);
   const showContour = freqMode && $('showContour') && $('showContour').checked;
   const anyModelLeg = legA || legD || legS || legR;
   const anyUnderlayLeg = !!( ($('underlayA')&&$('underlayA').checked) || ($('underlayD')&&$('underlayD').checked) || ($('underlayS')&&$('underlayS').checked) || ($('underlayR')&&$('underlayR').checked) );
@@ -712,80 +693,11 @@ function render(){
   const showContourRight = showContour && anyUnderlayLeg;
   const contourTickCol = ($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00';
   const contourTickColRight = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
-  // Contour ticks — left stubs (meter left edge) and right stubs (meter right edge)
-  const riserLen = Math.round(sustainTickLen * 0.65);
-  // Half stroke width in user units (non-scaling-stroke is in CSS px; convert via viewBox/screen ratio)
-  const markerLW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--markerLineWidth')) || 1;
-  const svgEl2 = document.getElementById('svg');
-  const pxToUser = svgEl2 ? (VB_WIDTH / svgEl2.getBoundingClientRect().width) : 1;
-  const halfStroke = (markerLW / 2) * pxToUser;
-  if(floorLine){
-    floorLine.setAttribute('x1', markerEndX - sustainTickLen);
-    floorLine.setAttribute('y1', floorY);
-    floorLine.setAttribute('x2', markerEndX);
-    floorLine.setAttribute('y2', floorY);
-    floorLine.style.stroke = contourTickCol;
-    floorLine.style.display = 'none';  // arrowhead-only: horizontal tick hidden (arrow lives on floorRiser)
-  }
-  const floorRiser = $('floorRiser');
-  if(floorRiser){
-    const rx = markerEndX - SUSTAIN_ARROW_X_OFFSET - arrowSize + halfStroke;
-    floorRiser.setAttribute('x1', rx); floorRiser.setAttribute('y1', floorY + 1);
-    floorRiser.setAttribute('x2', rx); floorRiser.setAttribute('y2', floorY);
-    floorRiser.style.stroke = contourTickCol;
-    floorRiser.style.display = showContourLeft ? '' : 'none';
-  }
-  const floorLineR = $('floorLineRight');
-  if(floorLineR){
-    floorLineR.setAttribute('x1', markerRightX);
-    floorLineR.setAttribute('y1', floorY);
-    floorLineR.setAttribute('x2', markerRightX + sustainTickLen);
-    floorLineR.setAttribute('y2', floorY);
-    floorLineR.style.stroke = contourTickColRight;
-    floorLineR.style.display = 'none';  // arrowhead-only: horizontal tick hidden (arrow lives on floorRiserRight)
-  }
-  const floorRiserR = $('floorRiserRight');
-  if(floorRiserR){
-    const rx = markerRightX + arrowSize - halfStroke + TEXTBOOK_LABEL_X_OFFSET;
-    floorRiserR.setAttribute('x1', rx); floorRiserR.setAttribute('y1', floorY + 1);
-    floorRiserR.setAttribute('x2', rx); floorRiserR.setAttribute('y2', floorY);
-    floorRiserR.style.stroke = contourTickColRight;
-    floorRiserR.style.display = showContourRight ? '' : 'none';
-  }
-  if(amountLine){
-    amountLine.setAttribute('x1', markerEndX - sustainTickLen);
-    amountLine.setAttribute('y1', amountY);
-    amountLine.setAttribute('x2', markerEndX);
-    amountLine.setAttribute('y2', amountY);
-    amountLine.style.stroke = contourTickCol;
-    amountLine.style.display = 'none';  // arrowhead-only: horizontal tick hidden (arrow lives on amountRiser)
-  }
-  const amountRiser = $('amountRiser');
-  if(amountRiser){
-    const rx = markerEndX - SUSTAIN_ARROW_X_OFFSET - arrowSize + halfStroke;
-    amountRiser.setAttribute('x1', rx); amountRiser.setAttribute('y1', amountY - 1);
-    amountRiser.setAttribute('x2', rx); amountRiser.setAttribute('y2', amountY);
-    amountRiser.style.stroke = contourTickCol;
-    amountRiser.style.display = showContourLeft ? '' : 'none';
-  }
-  const amountLineR = $('amountLineRight');
-  const textbookAmountY = yFor(e.floor + (1 - e.floor) * e.scale);
-  if(amountLineR){
-    amountLineR.setAttribute('x1', markerRightX);
-    amountLineR.setAttribute('y1', textbookAmountY);
-    amountLineR.setAttribute('x2', markerRightX + sustainTickLen);
-    amountLineR.setAttribute('y2', textbookAmountY);
-    amountLineR.style.stroke = contourTickColRight;
-    amountLineR.style.display = 'none';  // arrowhead-only: horizontal tick hidden (arrow lives on amountRiserRight)
-  }
-  const amountRiserR = $('amountRiserRight');
-  if(amountRiserR){
-    const rx = markerRightX + arrowSize - halfStroke + TEXTBOOK_LABEL_X_OFFSET;
-    amountRiserR.setAttribute('x1', rx); amountRiserR.setAttribute('y1', textbookAmountY - 1);
-    amountRiserR.setAttribute('x2', rx); amountRiserR.setAttribute('y2', textbookAmountY);
-    amountRiserR.style.stroke = contourTickColRight;
-    amountRiserR.style.display = showContourRight ? '' : 'none';
-  }
+  // Contour arrows — standalone triangles at the meter edges (left tips at meterX pointing right, right tips at markerRightX pointing left)
+  setMeterArrow('meterArrowLCutoff', meterX, floorY, true, arrowSize, contourTickCol, showContourLeft);
+  setMeterArrow('meterArrowLAmount', meterX, amountY, true, arrowSize, contourTickCol, showContourLeft);
+  setMeterArrow('meterArrowRCutoff', markerRightX, floorY, false, arrowSize, contourTickColRight, showContourRight);
+  setMeterArrow('meterArrowRAmount', markerRightX, textbookAmountY, false, arrowSize, contourTickColRight, showContourRight);
   // ---- CF / AOC contour labels ----
   const capHeight = _labelSize * 0.72;
   const contourLabelGap = sustainLabelGap;
@@ -796,14 +708,13 @@ function render(){
   const aocTextLeft = (useShortLabels ? '' : (_hp ? '' : 'Max ')) + fmtMeterVal(aocPctL);
   const aocPctR = Math.round((e.floor + (1 - e.floor) * e.scale) * 100);
   const aocTextRight = (useShortLabels ? '' : (_hp ? '' : 'Max ')) + fmtMeterVal(aocPctR);
-  const leftX = markerEndX - sustainTickLen - sustainLabelGap;
-  const rightX = markerRightX + sustainTickLen + sustainLabelGap;
   // CF left (Model D) — below cutoff arrow's free bottom end
   const cfLbl = $('cfLabel');
   if(cfLbl){
-    cfLbl.setAttribute('x', (markerEndX - SUSTAIN_ARROW_X_OFFSET) - arrowSize - sustainLabelGap);
-    cfLbl.setAttribute('y', floorY + arrowSize + contourLabelGap + capHeight);
+    cfLbl.setAttribute('x', meterX - arrowSize - sustainLabelGap - SUSTAIN_ARROW_X_OFFSET);
+    cfLbl.setAttribute('y', floorY);
     cfLbl.setAttribute('text-anchor', 'end');
+    cfLbl.setAttribute('dominant-baseline', 'middle');
     cfLbl.setAttribute('fill', contourTickCol);
     cfLbl.textContent = cfText;
     cfLbl.style.display = showContourLeft ? '' : 'none';
@@ -812,8 +723,9 @@ function render(){
   const cfLblR = $('cfLabelRight');
   if(cfLblR){
     cfLblR.setAttribute('x', markerRightX + arrowSize + sustainLabelGap + TEXTBOOK_LABEL_X_OFFSET);
-    cfLblR.setAttribute('y', floorY + arrowSize + contourLabelGap + capHeight);
+    cfLblR.setAttribute('y', floorY);
     cfLblR.setAttribute('text-anchor', 'start');
+    cfLblR.setAttribute('dominant-baseline', 'middle');
     cfLblR.setAttribute('fill', contourTickColRight);
     cfLblR.textContent = cfText;
     cfLblR.style.display = showContourRight ? '' : 'none';
@@ -821,9 +733,10 @@ function render(){
   // AOC left (Model D) — above amount arrow's free top end
   const aocLbl = $('aocLabel');
   if(aocLbl){
-    aocLbl.setAttribute('x', (markerEndX - SUSTAIN_ARROW_X_OFFSET) - arrowSize - sustainLabelGap);
-    aocLbl.setAttribute('y', amountY - arrowSize - contourLabelGap);
+    aocLbl.setAttribute('x', meterX - arrowSize - sustainLabelGap - SUSTAIN_ARROW_X_OFFSET);
+    aocLbl.setAttribute('y', amountY);
     aocLbl.setAttribute('text-anchor', 'end');
+    aocLbl.setAttribute('dominant-baseline', 'middle');
     aocLbl.setAttribute('fill', contourTickCol);
     aocLbl.textContent = aocTextLeft;
     aocLbl.style.display = showContourLeft ? '' : 'none';
@@ -832,8 +745,9 @@ function render(){
   const aocLblR = $('aocLabelRight');
   if(aocLblR){
     aocLblR.setAttribute('x', markerRightX + arrowSize + sustainLabelGap + TEXTBOOK_LABEL_X_OFFSET);
-    aocLblR.setAttribute('y', textbookAmountY - arrowSize - contourLabelGap);
+    aocLblR.setAttribute('y', textbookAmountY);
     aocLblR.setAttribute('text-anchor', 'start');
+    aocLblR.setAttribute('dominant-baseline', 'middle');
     aocLblR.setAttribute('fill', contourTickColRight);
     aocLblR.textContent = aocTextRight;
     aocLblR.style.display = showContourRight ? '' : 'none';

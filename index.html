@@ -52,20 +52,16 @@
           <path d="M10,0 L0,5 L10,10 Z" fill="context-stroke"/>
         </marker>
       </defs>
-      <line id="amountLine" x1="80" y1="30" x2="80" y2="30" style="stroke-width:var(--markerLineWidth);stroke-dasharray:none;vector-effect:non-scaling-stroke;display:none;" />
-      <line id="amountRiser" x1="80" y1="30" x2="80" y2="30" style="stroke-width:var(--markerLineWidth);stroke-dasharray:none;vector-effect:non-scaling-stroke;display:none;" marker-end="url(#sustainArrowRight)" />
-      <line id="amountLineRight" x1="80" y1="30" x2="80" y2="30" style="stroke-width:var(--markerLineWidth);stroke-dasharray:none;vector-effect:non-scaling-stroke;display:none;" />
-      <line id="amountRiserRight" x1="80" y1="30" x2="80" y2="30" style="stroke-width:var(--markerLineWidth);stroke-dasharray:none;vector-effect:non-scaling-stroke;display:none;" marker-end="url(#sustainArrowRight)" />
-      <line id="floorLine" x1="80" y1="445" x2="80" y2="445" style="stroke-width:var(--markerLineWidth);stroke-dasharray:none;vector-effect:non-scaling-stroke;display:none;" />
-      <line id="floorRiser" x1="80" y1="445" x2="80" y2="445" style="stroke-width:var(--markerLineWidth);stroke-dasharray:none;vector-effect:non-scaling-stroke;display:none;" marker-end="url(#sustainArrowRight)" />
-      <line id="floorLineRight" x1="80" y1="445" x2="80" y2="445" style="stroke-width:var(--markerLineWidth);stroke-dasharray:none;vector-effect:non-scaling-stroke;display:none;" />
-      <line id="floorRiserRight" x1="80" y1="445" x2="80" y2="445" style="stroke-width:var(--markerLineWidth);stroke-dasharray:none;vector-effect:non-scaling-stroke;display:none;" marker-end="url(#sustainArrowRight)" />
+      <polygon id="meterArrowLAmount" points="" style="display:none" />
+      <polygon id="meterArrowLCutoff" points="" style="display:none" />
+      <polygon id="meterArrowRAmount" points="" style="display:none" />
+      <polygon id="meterArrowRCutoff" points="" style="display:none" />
       <text id="cfLabel" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <text id="cfLabelRight" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <text id="aocLabel" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <text id="aocLabelRight" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
-      <line id="sustainMarker" class="marker-line" x1="80" y1="445" x2="80" y2="445" style="stroke-dasharray:none" marker-end="url(#sustainArrowRight)" />
-      <line id="statedSustainLine" class="marker-line" x1="80" y1="445" x2="80" y2="445" style="stroke:#00ffff;stroke-opacity:1;stroke-dasharray:none;display:none;" marker-start="url(#sustainArrowLeft)" />
+      <polygon id="meterArrowLSustain" points="" style="display:none" />
+      <polygon id="meterArrowRSustain" points="" style="display:none" />
       <text id="sustainMarkerLabel" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <text id="statedSustainLabel" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
 <line id="tbSustainMarker" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
@@ -87,8 +83,8 @@
       <text id="newStatedReleaseTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <line id="gateTimeLine" class="marker-line" style="display:none;stroke:var(--gateColor)"/>
       <line id="gateTopCap" class="marker-line" style="display:none;stroke:var(--gateColor);stroke-dasharray:none"/>
-      <line id="gateEffectiveHoriz" class="marker-line" style="display:none;stroke:var(--gateColor);stroke-dasharray:none" marker-end="url(#sustainArrowRight)"/>
-      <line id="gateStatedHoriz" class="marker-line" style="display:none;stroke:var(--gateColor);stroke-dasharray:none" marker-start="url(#sustainArrowLeft)"/>
+      <polygon id="gateEffectiveHoriz" points="" style="display:none" />
+      <polygon id="gateStatedHoriz" points="" style="display:none" />
       <text id="gateEffLabel" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <text id="gateStatedLabel" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <line id="gateStatedRelease" stroke="white" style="stroke-width:var(--innerLineWidth);vector-effect:non-scaling-stroke;display:none"/>
@@ -387,7 +383,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Graph margin: below</span><input id="graphBottomMargin" type="number" min="20" max="300" step="5" value="120"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Meter right margin</span><input id="meterRightMargin" type="number" min="0" max="600" step="5" value="265"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>dB label right margin</span><input id="dbLabelRightMargin" type="number" min="-40" max="120" step="1" value="0"></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Sustain arrow offset</span><input id="sustainArrowXOffset" type="number" min="0" max="120" step="1" value="0"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Model D label offset</span><input id="sustainArrowXOffset" type="number" min="0" max="120" step="1" value="0"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Textbook label offset</span><input id="textbookLabelXOffset" type="number" min="0" max="200" step="1" value="0"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Zoom fit right margin</span><input id="fitMargin" type="number" min="50" max="100" step="1" value="90"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Kiosk scale</span><input id="kioskScale" type="number" min="0.5" max="1.0" step="0.01" value="0.50"></div>
@@ -403,7 +399,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Envelope stroke width</span><input id="innerLineWidth" type="number" min="1" max="30" step="1" value="6"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Meter stroke width</span><input id="meterStrokeWidth" type="number" min="0" max="30" step="1" value="7"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Marker line width</span><input id="markerLineWidth" type="number" min="1" max="8" step="0.5" value="1"></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Meter width</span><input id="meterWidth" type="number" min="10" max="80" step="1" value="40"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Meter width</span><input id="meterWidth" type="number" min="10" max="250" step="10" value="40"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Blob diameter</span><input id="blobScale" type="number" min="1" max="8" step="0.5" value="3"></div>
         <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.55;margin:13px 0 5px;">Text sizes</div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Body text size</span><input id="labelSize" type="number" min="10" max="72" step="1" value="17"></div>

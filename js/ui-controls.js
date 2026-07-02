@@ -491,7 +491,7 @@ function initUIControls(){
   $('h2Scale').addEventListener('change',e=>{ const inp=e.target,c=Math.min(3.0,Math.max(1.0,isNaN(parseFloat(inp.value))?1.0:Math.round(parseFloat(inp.value)*10)/10)); inp.value=c.toFixed(1); document.documentElement.style.setProperty('--h2Scale',c); render(); });
   $('blobScale').addEventListener('input',e=>{ const inp=e.target,c=Math.min(8,Math.max(1,isNaN(parseFloat(inp.value))?3:Math.round(parseFloat(inp.value)*2)/2)); inp.value=c; syncRadii(); });
   $('consoleScale').addEventListener('input', e => { const inp=e.target,raw=parseFloat(inp.value),c=Math.min(1.0,Math.max(0.5,isNaN(raw)?0.7:raw)); inp.value=c; syncConsoleScale(); });
-  $('meterWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(80,Math.max(10,isNaN(parseInt(inp.value))?40:parseInt(inp.value))); inp.value=c; METER_W=c; recalcGeometry(); render(); });
+  $('meterWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(250,Math.max(10,isNaN(parseInt(inp.value))?40:parseInt(inp.value))); inp.value=c; METER_W=c; recalcGeometry(); render(); });
   $('meterRightMargin').addEventListener('input', e => { const inp=e.target,c=Math.min(600,Math.max(0,isNaN(parseInt(inp.value))?265:parseInt(inp.value))); inp.value=c; METER_RIGHT_MARGIN=c; recalcGeometry(); render(); });
   $('dbLabelRightMargin').addEventListener('input', e => { const inp=e.target,c=Math.min(120,Math.max(-40,isNaN(parseInt(inp.value))?0:parseInt(inp.value))); inp.value=c; DB_LABEL_RIGHT_MARGIN=c; render(); });
   $('sustainArrowXOffset').addEventListener('input', e => { const inp=e.target,c=Math.min(120,Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value))); inp.value=c; SUSTAIN_ARROW_X_OFFSET=c; render(); });
