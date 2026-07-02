@@ -72,6 +72,7 @@ function buildConfigSnapshot(){
     sustainArrowXOffset: Number($('sustainArrowXOffset').value),
     graphBottomMargin: Number($('graphBottomMargin').value),
     kioskScale: Number($('kioskScale').value),
+    kioskNudge: Number($('kioskNudge') ? $('kioskNudge').value : 0),
     dbLabelSize: Number($('dbLabelSize').value),
     tbSustainGapMax: Number($('tbSustainGapMax').value),
     vbWidth: Number($('vbWidth').value),
@@ -159,7 +160,8 @@ function loadConfigObject(cfg){
   if($('dbLabelRightMargin') && cfg.dbLabelRightMargin !== undefined){ $('dbLabelRightMargin').value = cfg.dbLabelRightMargin; DB_LABEL_RIGHT_MARGIN = Math.max(-40, Math.min(120, Number(cfg.dbLabelRightMargin) || 0)); }
   if($('sustainArrowXOffset') && cfg.sustainArrowXOffset !== undefined){ $('sustainArrowXOffset').value = cfg.sustainArrowXOffset; SUSTAIN_ARROW_X_OFFSET = Math.max(0, Math.min(120, Number(cfg.sustainArrowXOffset) || 0)); }
   if($('graphBottomMargin') && cfg.graphBottomMargin !== undefined){ $('graphBottomMargin').value = cfg.graphBottomMargin; GRAPH_BOTTOM_MARGIN = Math.max(20, Math.min(300, Number(cfg.graphBottomMargin) || 120)); }
-  if($('kioskScale') && cfg.kioskScale !== undefined){ KIOSK_SCALE = Math.max(0.5, Math.min(1.0, Number(cfg.kioskScale) || 0.5)); $('kioskScale').value = KIOSK_SCALE; if(window.applyKioskScale) applyKioskScale(); }
+  if($('kioskScale') && cfg.kioskScale !== undefined){ KIOSK_SCALE = Math.max(0.5, Math.min(1.0, Number(cfg.kioskScale) || 0.5)); $('kioskScale').value = KIOSK_SCALE.toFixed(2); if(window.applyKioskScale) applyKioskScale(); }
+  if($('kioskNudge') && cfg.kioskNudge !== undefined){ KIOSK_NUDGE = Math.max(-200, Math.min(200, Number(cfg.kioskNudge) || 0)); $('kioskNudge').value = KIOSK_NUDGE; if(window.applyKioskScale) applyKioskScale(); }
   if($('dbLabelSize') && cfg.dbLabelSize !== undefined){ $('dbLabelSize').value = cfg.dbLabelSize; DB_LABEL_SIZE = Math.max(6, Math.min(72, Number(cfg.dbLabelSize) || 11)); }
   if($('tbSustainGapMax') && cfg.tbSustainGapMax !== undefined){ $('tbSustainGapMax').value = cfg.tbSustainGapMax; SUSTAIN_GAP_MAX = Math.max(0.15, Math.min(0.30, (Number(cfg.tbSustainGapMax) || 15) / 100)); }
   if($('vbWidth')  && cfg.vbWidth  !== undefined){ $('vbWidth').value  = Math.round(Math.min(VB_WIDTH_MAX, Math.max(VB_WIDTH_MIN,  Number(cfg.vbWidth)  || 1200)) / 10) * 10; }

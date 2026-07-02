@@ -11,6 +11,7 @@ const VB_HEIGHT_MIN = 400;
 const BTN_ACTIVE_BG  = '#ffffff';
 const BTN_ACTIVE_FG  = '#111111';
 let KIOSK_SCALE = 0.5;
+let KIOSK_NUDGE = 0;  // manual ±200px vertical offset added on top of the auto-align/top-align dy (positive = down)
 let kioskTopAlign = false;  // true = bypass the -6 auto-align, revert to original top-aligned kiosk (translateY 0)
 
 // ---- applyKioskScale — set #kioskPanel transform (scale + vertical alignment translate) AND
@@ -32,7 +33,7 @@ function applyKioskScale(){
       dy = targetY - chevronY;
     }
   }
-  kp.style.transform = 'translateY(' + dy + 'px) scale(' + KIOSK_SCALE + ')';  // translate leftmost = exact Δpx
+  kp.style.transform = 'translateY(' + (dy + KIOSK_NUDGE) + 'px) scale(' + KIOSK_SCALE + ')';  // translate leftmost = exact Δpx; KIOSK_NUDGE = manual offset
 }
 const BTN_PARTIAL_BG = 'rgba(255,255,255,0.35)';
 
@@ -498,7 +499,8 @@ function initUIControls(){
   $('dbLabelSize').addEventListener('input', e => { const inp=e.target, c=Math.min(72,Math.max(6,isNaN(parseInt(inp.value))?11:parseInt(inp.value))); inp.value=c; DB_LABEL_SIZE=c; render(); });
   $('timeLabelGutterTop').addEventListener('input', e => { const inp=e.target,c=Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value)); inp.value=c; render(); });
   $('timeLabelGutterBottom').addEventListener('input', e => { const inp=e.target,c=Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value)); inp.value=c; render(); });
-  $('kioskScale').addEventListener('input', e => { const inp=e.target,c=Math.min(1.0,Math.max(0.5,isNaN(parseFloat(inp.value))?0.5:parseFloat(inp.value))); inp.value=c; KIOSK_SCALE=c; applyKioskScale(); });
+  $('kioskScale').addEventListener('input', e => { const inp=e.target,c=Math.min(1.0,Math.max(0.5,isNaN(parseFloat(inp.value))?0.5:parseFloat(inp.value))); inp.value=c.toFixed(2); KIOSK_SCALE=c; applyKioskScale(); });
+  $('kioskNudge').addEventListener('input', e => { const inp=e.target,c=Math.min(200,Math.max(-200,isNaN(parseInt(inp.value))?0:parseInt(inp.value))); inp.value=c; KIOSK_NUDGE=c; applyKioskScale(); });
   // Re-align the kiosk vertically when the viewport changes (no existing resize listener)
   window.addEventListener('resize', () => applyKioskScale());
   $('markerLineWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(8,Math.max(1,isNaN(parseFloat(inp.value))?1:Math.round(parseFloat(inp.value)*2)/2)); inp.value=c; document.documentElement.style.setProperty('--markerLineWidth',c); });
