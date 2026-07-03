@@ -41,7 +41,7 @@ function buildConfigSnapshot(){
     liveAnimate: (document.querySelector('input[name="mode"]:checked') || {}).value || 'live',
     lineColor: $('lineColor').value,
     bgColor: $('bgColor').value,
-    kioskBgColor: $('kioskBgColor') ? $('kioskBgColor').value : '#0000ff',
+    kioskBgColor: $('kioskBgColor') ? $('kioskBgColor').value : '#000000',
     loudnessAttackColor: $('loudnessAttackColor').value,
     loudnessDecayColor: $('loudnessDecayColor').value,
     loudnessReleaseColor: $('loudnessReleaseColor').value,
@@ -89,7 +89,7 @@ function buildConfigSnapshot(){
     timeLabelGutterTop: Number($('timeLabelGutterTop') ? $('timeLabelGutterTop').value : 0),
     timeLabelGutterBottom: Number($('timeLabelGutterBottom') ? $('timeLabelGutterBottom').value : 0),
     persistTime: Number($('persistTime') ? $('persistTime').value : 2000),
-    fitMargin: Number($('fitMargin') ? $('fitMargin').value : 90)
+    fitMargin: Number($('fitMargin') ? $('fitMargin').value : 94)
   };
 }
 
