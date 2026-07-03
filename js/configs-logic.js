@@ -76,6 +76,10 @@ function buildConfigSnapshot(){
     graphBottomMargin: Number($('graphBottomMargin').value),
     kioskScale: Number($('kioskScale').value),
     kioskNudge: Number($('kioskNudge') ? $('kioskNudge').value : 0),
+    showSafeZones: $('showSafeZones') ? $('showSafeZones').checked : false,
+    safeZoneLeftMargin: Number($('safeZoneLeftMargin') ? $('safeZoneLeftMargin').value : 0),
+    safeZoneTopMargin: Number($('safeZoneTopMargin') ? $('safeZoneTopMargin').value : 0),
+    safeZoneScale: Number($('safeZoneScale') ? $('safeZoneScale').value : 1),
     dbLabelSize: Number($('dbLabelSize').value),
     tbSustainGapMax: Number($('tbSustainGapMax').value),
     vbWidth: Number($('vbWidth').value),
@@ -104,7 +108,7 @@ function loadConfigObject(cfg){
   state.target.tbSustainGap = SUSTAIN_GAP_MAX;
 
   // Checkboxes
-  ['loudDecay','showContour','showNewEffectiveLines','showNewStatedLines','modelA','modelD','modelS','modelR','showGateTime','clipAtGate','showPeakDischarge','frequencyMode','hpMode','keyboardControl','showClipped','analogueCurve','linkRToD','dottedMarkers','meterGlow','meterScanlinesVisible','blobGlowEnabled','kioskKnobGlow','useShortLabels','showValuesAsPercent','kioskTopAlign','showMeterScale'].forEach(id => {
+  ['loudDecay','showContour','showNewEffectiveLines','showNewStatedLines','modelA','modelD','modelS','modelR','showGateTime','clipAtGate','showPeakDischarge','frequencyMode','hpMode','keyboardControl','showClipped','analogueCurve','linkRToD','dottedMarkers','meterGlow','meterScanlinesVisible','blobGlowEnabled','kioskKnobGlow','useShortLabels','showValuesAsPercent','kioskTopAlign','showMeterScale','showSafeZones'].forEach(id => {
     if($(id) && cfg[id] !== undefined) $(id).checked = cfg[id];
   });
   if($('useShortLabels')) useShortLabels = $('useShortLabels').checked;
@@ -166,6 +170,11 @@ function loadConfigObject(cfg){
   if($('graphBottomMargin') && cfg.graphBottomMargin !== undefined){ $('graphBottomMargin').value = cfg.graphBottomMargin; GRAPH_BOTTOM_MARGIN = Math.max(20, Math.min(300, Number(cfg.graphBottomMargin) || 120)); }
   if($('kioskScale') && cfg.kioskScale !== undefined){ KIOSK_SCALE = Math.max(0.5, Math.min(1.0, Number(cfg.kioskScale) || 0.5)); $('kioskScale').value = KIOSK_SCALE.toFixed(2); if(window.applyKioskScale) applyKioskScale(); }
   if($('kioskNudge') && cfg.kioskNudge !== undefined){ KIOSK_NUDGE = Math.max(-200, Math.min(200, Number(cfg.kioskNudge) || 0)); $('kioskNudge').value = KIOSK_NUDGE; if(window.applyKioskScale) applyKioskScale(); }
+  if($('showSafeZones')) showSafeZones = $('showSafeZones').checked;
+  if($('safeZoneLeftMargin') && cfg.safeZoneLeftMargin !== undefined){ safeZoneLeftMargin = Number(cfg.safeZoneLeftMargin) || 0; $('safeZoneLeftMargin').value = safeZoneLeftMargin; }
+  if($('safeZoneTopMargin') && cfg.safeZoneTopMargin !== undefined){ safeZoneTopMargin = Number(cfg.safeZoneTopMargin) || 0; $('safeZoneTopMargin').value = safeZoneTopMargin; }
+  if($('safeZoneScale') && cfg.safeZoneScale !== undefined){ safeZoneScale = Math.max(0.7, Math.min(2.0, Number(cfg.safeZoneScale) || 1)); $('safeZoneScale').value = safeZoneScale; }
+  if(window.applySafeZones) applySafeZones();
   if($('dbLabelSize') && cfg.dbLabelSize !== undefined){ $('dbLabelSize').value = cfg.dbLabelSize; DB_LABEL_SIZE = Math.max(6, Math.min(72, Number(cfg.dbLabelSize) || 11)); }
   if($('tbSustainGapMax') && cfg.tbSustainGapMax !== undefined){ $('tbSustainGapMax').value = cfg.tbSustainGapMax; SUSTAIN_GAP_MAX = Math.max(0.15, Math.min(0.30, (Number(cfg.tbSustainGapMax) || 15) / 100)); }
   if($('vbWidth')  && cfg.vbWidth  !== undefined){ $('vbWidth').value  = Math.round(Math.min(VB_WIDTH_MAX, Math.max(VB_WIDTH_MIN,  Number(cfg.vbWidth)  || 1200)) / 10) * 10; }

@@ -289,6 +289,7 @@
         </div>
       </div>
       <div class="row"><label><input id="showTimesAsSpans" type="checkbox"> Show times as spans</label></div>
+      <div class="row"><label><input id="showSafeZones" type="checkbox"> Show HD safe zones</label></div>
       <div class="row" style="position:relative;gap:6px">
         <button id="expertToggle" style="padding:4px 7px;min-height:unset;line-height:1.1;border-radius:6px;">Expert</button>
         <button id="pendingToggle" style="padding:4px 7px;min-height:unset;line-height:1.1;border-radius:6px;">Pending Removal</button>
@@ -424,6 +425,10 @@
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Use short labels</span><input id="useShortLabels" type="checkbox"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Show Values as %</span><input id="showValuesAsPercent" type="checkbox"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Kiosk Top Align</span><input id="kioskTopAlign" type="checkbox"></div>
+        <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.55;margin:13px 0 5px;">HD overlay</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Safe zone left margin</span><input id="safeZoneLeftMargin" type="number" min="-2000" max="2000" step="1" value="0"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Safe zone top margin</span><input id="safeZoneTopMargin" type="number" min="-2000" max="2000" step="1" value="0"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Safe zone scale</span><input id="safeZoneScale" type="number" min="0.7" max="2.0" step="0.05" value="1"></div>
       </div>
     </div>
   </div>
@@ -531,6 +536,7 @@
 <script src="js/shortcuts.js"></script>
 <script src="js/knobs.js"></script>
 <script src="js/kiosk.js"></script>
+<script src="js/safe-zones.js"></script>
 <script src="js/cue-list.js"></script>
 <script>
 
@@ -543,6 +549,7 @@ let TEXTBOOK_LABEL_X_OFFSET = 0;  // slides the WHOLE right/textbook cluster (3 
 let useShortLabels = false;  // condense cramped graph labels: ' = ' → ': ' and drop 'Max '/'Min ' prefixes
 let showValuesAsPercent = false;  // sustain/amount/cutoff labels: one-decimal 0-10 number (false) or percentage (true)
 let showTimesAsSpans = false;  // time labels: endpoint mode (false) or dimension-line spans with arrowheads (true)
+let showSafeZones = false; let safeZoneLeftMargin = 0; let safeZoneTopMargin = 0; let safeZoneScale = 1;  // HD safe-zone overlay
 let METER_STROKE_W = 7;
 let DB_LABEL_SIZE = 11;
 let SUSTAIN_GAP_MAX = 0.15;

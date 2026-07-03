@@ -506,6 +506,10 @@ function initUIControls(){
   $('timeLabelGutterBottom').addEventListener('input', e => { const inp=e.target,c=Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value)); inp.value=c; render(); });
   $('kioskScale').addEventListener('input', e => { const inp=e.target,c=Math.min(1.0,Math.max(0.5,isNaN(parseFloat(inp.value))?0.5:parseFloat(inp.value))); inp.value=c.toFixed(2); KIOSK_SCALE=c; applyKioskScale(); });
   $('kioskNudge').addEventListener('input', e => { const inp=e.target,c=Math.min(200,Math.max(-200,isNaN(parseInt(inp.value))?0:parseInt(inp.value))); inp.value=c; KIOSK_NUDGE=c; applyKioskScale(); });
+  $('showSafeZones').addEventListener('change', () => { showSafeZones = $('showSafeZones').checked; if(window.applySafeZones) applySafeZones(); });
+  $('safeZoneLeftMargin').addEventListener('input', e => { const inp=e.target,c=isNaN(parseInt(inp.value))?0:parseInt(inp.value); inp.value=c; safeZoneLeftMargin=c; if(window.applySafeZones) applySafeZones(); });
+  $('safeZoneTopMargin').addEventListener('input', e => { const inp=e.target,c=isNaN(parseInt(inp.value))?0:parseInt(inp.value); inp.value=c; safeZoneTopMargin=c; if(window.applySafeZones) applySafeZones(); });
+  $('safeZoneScale').addEventListener('input', e => { const inp=e.target,c=Math.min(2,Math.max(0.7,isNaN(parseFloat(inp.value))?1:parseFloat(inp.value))); inp.value=c; safeZoneScale=c; if(window.applySafeZones) applySafeZones(); });
   // Re-align the kiosk vertically when the viewport changes (no existing resize listener)
   window.addEventListener('resize', () => applyKioskScale());
   $('markerLineWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(8,Math.max(1,isNaN(parseFloat(inp.value))?1:Math.round(parseFloat(inp.value)*2)/2)); inp.value=c; document.documentElement.style.setProperty('--markerLineWidth',c); });
