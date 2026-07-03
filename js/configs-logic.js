@@ -41,6 +41,7 @@ function buildConfigSnapshot(){
     liveAnimate: (document.querySelector('input[name="mode"]:checked') || {}).value || 'live',
     lineColor: $('lineColor').value,
     bgColor: $('bgColor').value,
+    kioskBgColor: $('kioskBgColor') ? $('kioskBgColor').value : '#000000',
     loudnessAttackColor: $('loudnessAttackColor').value,
     loudnessDecayColor: $('loudnessDecayColor').value,
     loudnessReleaseColor: $('loudnessReleaseColor').value,
@@ -143,7 +144,7 @@ function loadConfigObject(cfg){
   }
 
   // Colours (dispatch input to update CSS variables)
-  ['lineColor','bgColor','loudnessAttackColor','loudnessDecayColor','loudnessReleaseColor','loudnessGateColor','filterAttackColor','filterDecayColor','filterReleaseColor','filterGateColor','meterFillColor','meterFillColorFilter','timeAxisStatedColor','contourLineColor','underlayColor','peakDischargeColor'].forEach(id => {
+  ['lineColor','bgColor','kioskBgColor','loudnessAttackColor','loudnessDecayColor','loudnessReleaseColor','loudnessGateColor','filterAttackColor','filterDecayColor','filterReleaseColor','filterGateColor','meterFillColor','meterFillColorFilter','timeAxisStatedColor','contourLineColor','underlayColor','peakDischargeColor'].forEach(id => {
     if($(id) && cfg[id]){ $(id).value = cfg[id]; $(id).dispatchEvent(new Event('input')); }
   });
 

@@ -12,6 +12,7 @@
 }
 :root{
   --bg:#00ff00;
+  --kioskBg:#000000;
   --fg:#ffffff;
   --kioskLoudnessColor:#F20D0D;
   --kioskFilterColor:#0DCAF2;

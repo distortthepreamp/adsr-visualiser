@@ -24,6 +24,8 @@
   height: 1160px;
   transform: scale(0.5);
   transform-origin: top left;
+  background: var(--kioskBg);
+  flex-shrink: 0;
 }
 
 #kioskCanvas {

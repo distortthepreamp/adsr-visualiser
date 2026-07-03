@@ -8,11 +8,11 @@ panelImgLoudness.addEventListener('load', () => { if(kioskOpen) drawKiosk(); });
 panelImgFilter.addEventListener('load',   () => { if(kioskOpen) drawKiosk(); });
 
 const KIOSK_KNOBS = [
-  { id:'cutoff',   x:280, y:371,  getVal:()=> state.floor, curve: false, modes: ['filter']   },
-  { id:'amount',   x:651, y:371,  getVal:()=> state.scale, curve: false, modes: ['filter']   },
-  { id:'attackF',  x:280, y:618,  getVal:()=> state.a,     curve: true,  modes: ['filter']   },
-  { id:'decayF',   x:466, y:618,  getVal:()=> state.d,     curve: true,  modes: ['filter']   },
-  { id:'sustainF', x:651, y:618,  getVal:()=> state.s,     curve: false, modes: ['filter']   },
+  { id:'cutoff',   x:280, y:369,  getVal:()=> state.floor, curve: false, modes: ['filter']   },
+  { id:'amount',   x:651, y:369,  getVal:()=> state.scale, curve: false, modes: ['filter']   },
+  { id:'attackF',  x:280, y:620,  getVal:()=> state.a,     curve: true,  modes: ['filter']   },
+  { id:'decayF',   x:466, y:620,  getVal:()=> state.d,     curve: true,  modes: ['filter']   },
+  { id:'sustainF', x:651, y:620,  getVal:()=> state.s,     curve: false, modes: ['filter']   },
   { id:'attack',   x:280, y:864,  getVal:()=> state.a,     curve: true,  modes: ['loudness'] },
   { id:'decay',    x:466, y:864,  getVal:()=> state.d,     curve: true,  modes: ['loudness'] },
   { id:'sustain',  x:651, y:864,  getVal:()=> state.s,     curve: false, modes: ['loudness'] },
@@ -137,11 +137,11 @@ function drawKiosk(){
     drawKnobCircle(466, 864, loudnessColor,     'decay');
     drawKnobCircle(651, 864, loudnessColor,     'sustain');
   } else {
-    drawKnobCircle(280, 618, filterColor,       'attack');
-    drawKnobCircle(466, 618, filterColor,       'decay');
-    drawKnobCircle(651, 618, filterColor,       'sustain');
-    drawKnobCircle(280, 371, cutoffAmountColor, 'cutoff');
-    drawKnobCircle(651, 371, cutoffAmountColor, 'amount');
+    drawKnobCircle(280, 620, filterColor,       'attack');
+    drawKnobCircle(466, 620, filterColor,       'decay');
+    drawKnobCircle(651, 620, filterColor,       'sustain');
+    drawKnobCircle(280, 369, cutoffAmountColor, 'cutoff');
+    drawKnobCircle(651, 369, cutoffAmountColor, 'amount');
   }
 
   // Compute time-based eased angles for attack and decay
@@ -165,7 +165,7 @@ function drawKiosk(){
   const switchRects = [];
   if (!filterOn) switchRects.push({ y: 864, color: '#ffffff', param: 'loud-decay'   });
   if (filterOn)  switchRects.push({ y: 744, color: '#ffffff', param: 'filter-decay' });
-  if (filterOn)  switchRects.push({ y: 248, color: SWITCH_BLUE, param: 'hp-mode'      });
+  if (filterOn)  switchRects.push({ y: 246, color: SWITCH_BLUE, param: 'hp-mode'      });
   if (filterOn)  switchRects.push({ y: 494, color: SWITCH_BLUE, param: 'keyboard1'    });
   if (filterOn)  switchRects.push({ y: 618, color: SWITCH_BLUE, param: 'keyboard2'    });
   const switchNowGlowing = activeKioskSwitch !== null && performance.now() < activeKioskSwitchUntil;
@@ -201,7 +201,7 @@ function drawKiosk(){
   });
 
   // Switch indicators (dart arrows)
-  if (filterOn)  drawSwitch(ctx, 248, hpModeOn,    'white');  // Filter Mode Lo/Hi
+  if (filterOn)  drawSwitch(ctx, 246, hpModeOn,    'white');  // Filter Mode Lo/Hi
   if (filterOn)  drawSwitch(ctx, 744, loudDecayOn, 'black');  // Filter Decay
   if (filterOn)  drawSwitch(ctx, 494, kb1On,       'white');  // Keyboard 1
   if (filterOn)  drawSwitch(ctx, 618, kb2On,       'white');  // Keyboard 2

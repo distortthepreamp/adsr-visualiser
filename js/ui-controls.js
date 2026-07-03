@@ -477,6 +477,7 @@ function initUIControls(){
   // Colour inputs
   $('lineColor').addEventListener('input',e=>document.documentElement.style.setProperty('--line', e.target.value));
   $('bgColor').addEventListener('input',e=>document.documentElement.style.setProperty('--bg', e.target.value));
+  $('kioskBgColor').addEventListener('input',e=>document.documentElement.style.setProperty('--kioskBg', e.target.value));
   $('meterFillColor').addEventListener('input',e=>document.documentElement.style.setProperty('--meterFill', e.target.value));
   $('meterFillColorFilter').addEventListener('input',e=>document.documentElement.style.setProperty('--meterFillFilter', e.target.value));
   $('timeAxisStatedColor') && $('timeAxisStatedColor').addEventListener('input',e=>document.documentElement.style.setProperty('--timeAxisStatedColor', e.target.value));
