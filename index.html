@@ -67,6 +67,7 @@
 <line id="tbSustainMarker" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
       <line id="tbModelDSustainLine" x1="80" y1="445" x2="80" y2="445" style="vector-effect:non-scaling-stroke;display:none;" />
       <circle id="sustainPoint" class="tap-marker" cx="80" cy="445" style="opacity:.85" />
+      <g id="timeSpans"></g>
       <line id="newStatedDecayDrop" class="marker-line" stroke="cyan" style="display:none"/>
       <text id="newStatedDecayTime" font-family="UniversCondensed" style="display:none;font-size:calc(var(--labelSize) * 1px)"/>
       <line id="newStatedAttackDrop" class="marker-line" stroke="cyan" style="display:none"/>
@@ -287,6 +288,7 @@
           <div class="row"><label><input type="checkbox" id="showNewStatedLines"> Times: Textbook</label></div>
         </div>
       </div>
+      <div class="row"><label><input id="showTimesAsSpans" type="checkbox"> Show times as spans</label></div>
       <div class="row" style="position:relative;gap:6px">
         <button id="expertToggle" style="padding:4px 7px;min-height:unset;line-height:1.1;border-radius:6px;">Expert</button>
         <button id="pendingToggle" style="padding:4px 7px;min-height:unset;line-height:1.1;border-radius:6px;">Pending Removal</button>
@@ -539,6 +541,7 @@ let SUSTAIN_ARROW_X_OFFSET = 0;  // slides ONLY the left/meter sustain arrowhead
 let TEXTBOOK_LABEL_X_OFFSET = 0;  // slides the WHOLE right/textbook cluster (3 arrows + 3 labels) right together (0 = current position)
 let useShortLabels = false;  // condense cramped graph labels: ' = ' → ': ' and drop 'Max '/'Min ' prefixes
 let showValuesAsPercent = false;  // sustain/amount/cutoff labels: one-decimal 0-10 number (false) or percentage (true)
+let showTimesAsSpans = false;  // time labels: endpoint mode (false) or dimension-line spans with arrowheads (true)
 let METER_STROKE_W = 7;
 let DB_LABEL_SIZE = 11;
 let SUSTAIN_GAP_MAX = 0.15;

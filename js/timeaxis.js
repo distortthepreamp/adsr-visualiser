@@ -12,6 +12,34 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
   const timeLabelGutterBottom = Math.max(0, Number(($('timeLabelGutterBottom') && $('timeLabelGutterBottom').value) || 0));
   const statedLabelY    = graph.y0 - graph.h + TIME_LABEL_STATED_Y_OFFSET - timeLabelGutterTop;
   const effectiveLabelY = graph.y0 + TIME_LABEL_EFFECTIVE_Y_OFFSET + timeLabelGutterBottom;
+  // Span mode: dimension line (startX→endX at the label's y) with outward arrowhead triangles; label re-centred to the midpoint, nudged above the line.
+  const _spanGroup = document.getElementById('timeSpans');
+  if(_spanGroup){ while(_spanGroup.firstChild) _spanGroup.removeChild(_spanGroup.firstChild); }
+  const _spanLabelSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--labelSize')) || 17;
+  const _spanSize  = Math.round(_spanLabelSize * 0.72);
+  const _spanNudge = Math.round(_spanLabelSize * 0.7);
+  const applySpan = (el, startX, endX, y, color) => {
+    if(!showTimesAsSpans || !el || !_spanGroup) return;
+    el.setAttribute('x', (startX + endX) / 2);
+    // Top band (stated, above the graph) nudges up; bottom band (effective, below graph.y0) nudges down to clear the line + arrowheads
+    el.setAttribute('y', (y > graph.y0) ? (y + _spanNudge + _spanSize) : (y - _spanNudge));
+    const NS = 'http://www.w3.org/2000/svg';
+    const ln = document.createElementNS(NS, 'line');
+    ln.setAttribute('x1', startX); ln.setAttribute('y1', y);
+    ln.setAttribute('x2', endX);   ln.setAttribute('y2', y);
+    ln.setAttribute('stroke', color);
+    ln.setAttribute('style', 'stroke-width:var(--markerLineWidth);vector-effect:non-scaling-stroke');
+    _spanGroup.appendChild(ln);
+    const tri = (tipX, pointsRight) => {
+      const baseX = pointsRight ? (tipX - _spanSize) : (tipX + _spanSize);
+      const p = document.createElementNS(NS, 'polygon');
+      p.setAttribute('points', tipX+','+y+' '+baseX+','+(y - _spanSize/2)+' '+baseX+','+(y + _spanSize/2));
+      p.setAttribute('fill', color);
+      _spanGroup.appendChild(p);
+    };
+    tri(startX, false);  // left end → points left (outward)
+    tri(endX, true);     // right end → points right (outward)
+  };
   const newStatedCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
   const newEffAttackCol = (freqMode ? ($('filterAttackColor') && $('filterAttackColor').value) : ($('loudnessAttackColor') && $('loudnessAttackColor').value)) || '#ffffff';
   const newEffDecayCol = (freqMode ? ($('filterDecayColor') && $('filterDecayColor').value) : ($('loudnessDecayColor') && $('loudnessDecayColor').value)) || '#ffffff';
@@ -34,6 +62,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
         newStatedDecayTimeLabelEl.setAttribute('fill', newStatedCol);
         newStatedDecayTimeLabelEl.textContent = 'D' + (useShortLabels ? ': ' : ' = ') + Math.round(msFromPosition(state.d)) + (useShortLabels ? '' : 'ms');
         newStatedDecayTimeLabelEl.style.display='';
+        applySpan(newStatedDecayTimeLabelEl, pts.p1.x, pts.pEnd.x, statedLabelY, newStatedCol);
       }
     } else {
       newStatedDecayDropEl.style.display='none';
@@ -57,6 +86,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
         newStatedAttackTimeLabelEl.setAttribute('fill', newStatedCol);
         newStatedAttackTimeLabelEl.textContent = 'A' + (useShortLabels ? ': ' : ' = ') + Math.round(msFromPosition(state.a)) + (useShortLabels ? '' : 'ms');
         newStatedAttackTimeLabelEl.style.display='';
+        applySpan(newStatedAttackTimeLabelEl, pts.p0.x, pts.p1.x, statedLabelY, newStatedCol);
       }
     } else if(($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && effA){
       // Textbook hidden but Model D attack shown: keep the attack time label at the same
@@ -69,6 +99,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
         newStatedAttackTimeLabelEl.setAttribute('fill', newEffAttackCol);
         newStatedAttackTimeLabelEl.textContent = 'A' + (useShortLabels ? ': ' : ' = ') + Math.round(msFromPosition(state.a)) + (useShortLabels ? '' : 'ms');
         newStatedAttackTimeLabelEl.style.display='';
+        applySpan(newStatedAttackTimeLabelEl, pts.p0.x, pts.p1.x, statedLabelY, newEffAttackCol);
       }
     } else {
       newStatedAttackDropEl.style.display='none';
@@ -102,6 +133,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
         newEffectiveDecayTimeLabelEl.setAttribute('fill', newEffDecayCol);
         newEffectiveDecayTimeLabelEl.textContent = 'D' + (useShortLabels ? ': ' : ' = ') + Math.round(pixelsToTimeSec(drawPS.x - decayStartX) * 1000) + (useShortLabels ? '' : 'ms');
         newEffectiveDecayTimeLabelEl.style.display='';
+        applySpan(newEffectiveDecayTimeLabelEl, decayStartX, drawPS.x, effectiveLabelY, newEffDecayCol);
       }
     } else {
       newEffectiveDecayDropEl.style.display='none';
@@ -132,6 +164,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
       newEffAttackTimeLabelEl.setAttribute('fill', newEffAttackCol);
       newEffAttackTimeLabelEl.textContent = 'A' + (useShortLabels ? ': ' : ' = ') + Math.round(pixelsToTimeSec(ceilAttackX - pts.p0.x) * 1000) + (useShortLabels ? '' : 'ms');
       newEffAttackTimeLabelEl.style.display='';
+      applySpan(newEffAttackTimeLabelEl, pts.p0.x, ceilAttackX, effectiveLabelY, newEffAttackCol);
     }
   } else {
     if(newEffAttackDropEl) newEffAttackDropEl.style.display='none';
@@ -152,6 +185,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
       newEffClipTimeLabelEl.setAttribute('fill', newEffAttackCol);
       newEffClipTimeLabelEl.textContent = 'C' + (useShortLabels ? ': ' : ' = ') + Math.round(pixelsToTimeSec(ceilDecayX - ceilAttackX) * 1000) + (useShortLabels ? '' : 'ms');
       newEffClipTimeLabelEl.style.display='';
+      applySpan(newEffClipTimeLabelEl, ceilAttackX, ceilDecayX, effectiveLabelY, newEffAttackCol);
     }
   } else {
     if(newEffAttackDropEndEl) newEffAttackDropEndEl.style.display='none';
@@ -188,6 +222,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
         newEffectiveReleaseTimeLabelEl.setAttribute('fill', newEffReleaseCol);
         newEffectiveReleaseTimeLabelEl.textContent = 'R' + (useShortLabels ? ': ' : ' = ') + Math.round(pixelsToTimeSec(effRelPx) * 1000) + (useShortLabels ? '' : 'ms');
         newEffectiveReleaseTimeLabelEl.style.display='';
+        applySpan(newEffectiveReleaseTimeLabelEl, releaseStartX, fx, effectiveLabelY, newEffReleaseCol);
       }
     } else {
       newEffReleaseDropEl.style.display='none';
@@ -212,6 +247,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
         newStatedReleaseTimeLabelEl.setAttribute('fill', newStatedCol);
         newStatedReleaseTimeLabelEl.textContent = 'R' + (useShortLabels ? ': ' : ' = ') + Math.round(msFromPosition(state.r)) + (useShortLabels ? '' : 'ms');
         newStatedReleaseTimeLabelEl.style.display='';
+        applySpan(newStatedReleaseTimeLabelEl, pts.pEnd.x + graph.w * state.tbSustainGap, stRelX, statedLabelY, newStatedCol);
       }
     } else {
       newStatedReleaseDropEl.style.display='none';

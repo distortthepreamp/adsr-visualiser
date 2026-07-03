@@ -442,6 +442,7 @@ function initUIControls(){
   $('showMeterScale').addEventListener('change', render);
   $('useShortLabels').addEventListener('change', () => { useShortLabels = $('useShortLabels').checked; render(); });
   $('showValuesAsPercent').addEventListener('change', () => { showValuesAsPercent = $('showValuesAsPercent').checked; render(); });
+  $('showTimesAsSpans').addEventListener('change', () => { showTimesAsSpans = $('showTimesAsSpans').checked; render(); if(window.cueRecord) cueRecord('show-spans'); });
   $('kioskTopAlign').addEventListener('change', () => { kioskTopAlign = $('kioskTopAlign').checked; applyKioskScale(); });
   $('blobGlowEnabled').addEventListener('change', () => { applyBlobGlow(); if(state.currentPhase==='sustain') startGlowPulse(); else stopGlowPulse(); });
   $('blobGlowRadius').addEventListener('input', e => { const inp=e.target,c=Math.min(30,Math.max(0,isNaN(parseInt(inp.value))?8:parseInt(inp.value))); inp.value=c; applyBlobGlow(); if(state.currentPhase==='sustain') startGlowPulse(); });
