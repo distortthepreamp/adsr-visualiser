@@ -76,6 +76,7 @@ function buildConfigSnapshot(){
     graphBottomMargin: Number($('graphBottomMargin').value),
     kioskScale: Number($('kioskScale').value),
     kioskNudge: Number($('kioskNudge') ? $('kioskNudge').value : 0),
+    kioskRightMargin: Number($('kioskRightMargin') ? $('kioskRightMargin').value : 0),
     showSafeZones: $('showSafeZones') ? $('showSafeZones').checked : false,
     safeZoneLeftMargin: Number($('safeZoneLeftMargin') ? $('safeZoneLeftMargin').value : 0),
     safeZoneTopMargin: Number($('safeZoneTopMargin') ? $('safeZoneTopMargin').value : 0),
@@ -170,6 +171,7 @@ function loadConfigObject(cfg){
   if($('graphBottomMargin') && cfg.graphBottomMargin !== undefined){ $('graphBottomMargin').value = cfg.graphBottomMargin; GRAPH_BOTTOM_MARGIN = Math.max(20, Math.min(300, Number(cfg.graphBottomMargin) || 120)); }
   if($('kioskScale') && cfg.kioskScale !== undefined){ KIOSK_SCALE = Math.max(0.5, Math.min(1.0, Number(cfg.kioskScale) || 0.5)); $('kioskScale').value = KIOSK_SCALE.toFixed(2); if(window.applyKioskScale) applyKioskScale(); }
   if($('kioskNudge') && cfg.kioskNudge !== undefined){ KIOSK_NUDGE = Math.max(-200, Math.min(200, Number(cfg.kioskNudge) || 0)); $('kioskNudge').value = KIOSK_NUDGE; if(window.applyKioskScale) applyKioskScale(); }
+  if($('kioskRightMargin') && cfg.kioskRightMargin !== undefined){ KIOSK_RIGHT_MARGIN = Math.max(0, Math.min(800, Number(cfg.kioskRightMargin) || 0)); $('kioskRightMargin').value = KIOSK_RIGHT_MARGIN; if(window.applyKioskRightMargin) applyKioskRightMargin(); }
   if($('showSafeZones')) showSafeZones = $('showSafeZones').checked;
   if($('safeZoneLeftMargin') && cfg.safeZoneLeftMargin !== undefined){ safeZoneLeftMargin = Number(cfg.safeZoneLeftMargin) || 0; $('safeZoneLeftMargin').value = safeZoneLeftMargin; }
   if($('safeZoneTopMargin') && cfg.safeZoneTopMargin !== undefined){ safeZoneTopMargin = Number(cfg.safeZoneTopMargin) || 0; $('safeZoneTopMargin').value = safeZoneTopMargin; }

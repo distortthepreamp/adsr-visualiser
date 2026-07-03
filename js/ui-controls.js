@@ -12,6 +12,7 @@ const BTN_ACTIVE_BG  = '#ffffff';
 const BTN_ACTIVE_FG  = '#111111';
 let KIOSK_SCALE = 0.5;
 let KIOSK_NUDGE = 0;  // manual ±200px vertical offset added on top of the auto-align/top-align dy (positive = down)
+let KIOSK_RIGHT_MARGIN = 0;  // px padding-right on #kioskLayout: pushes content in from the viewport right edge, narrowing #stageColumn
 let kioskTopAlign = false;  // true = bypass the -6 auto-align, revert to original top-aligned kiosk (translateY 0)
 
 // ---- applyKioskScale — set #kioskPanel transform (scale + vertical alignment translate) AND
@@ -34,6 +35,12 @@ function applyKioskScale(){
     }
   }
   kp.style.transform = 'translateY(' + (dy + KIOSK_NUDGE) + 'px) scale(' + KIOSK_SCALE + ')';  // translate leftmost = exact Δpx; KIOSK_NUDGE = manual offset
+}
+// ---- applyKioskRightMargin — padding-right on #kioskLayout narrows #stageColumn (border-box is global, no overflow); re-align after the reflow frame ----
+function applyKioskRightMargin(){
+  const kl = $('kioskLayout');
+  if(kl) kl.style.paddingRight = KIOSK_RIGHT_MARGIN + 'px';
+  if(window.applyKioskScale) requestAnimationFrame(applyKioskScale);  // rAF: the SVG/stageColumn reflow lands next frame, then re-align the chevron to the -6 mark
 }
 const BTN_PARTIAL_BG = 'rgba(255,255,255,0.35)';
 
@@ -506,6 +513,7 @@ function initUIControls(){
   $('timeLabelGutterBottom').addEventListener('input', e => { const inp=e.target,c=Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value)); inp.value=c; render(); });
   $('kioskScale').addEventListener('input', e => { const inp=e.target,c=Math.min(1.0,Math.max(0.5,isNaN(parseFloat(inp.value))?0.5:parseFloat(inp.value))); inp.value=c.toFixed(2); KIOSK_SCALE=c; applyKioskScale(); });
   $('kioskNudge').addEventListener('input', e => { const inp=e.target,c=Math.min(200,Math.max(-200,isNaN(parseInt(inp.value))?0:parseInt(inp.value))); inp.value=c; KIOSK_NUDGE=c; applyKioskScale(); });
+  $('kioskRightMargin').addEventListener('input', e => { const inp=e.target,c=Math.min(800,Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value))); inp.value=c; KIOSK_RIGHT_MARGIN=c; applyKioskRightMargin(); });
   $('showSafeZones').addEventListener('change', () => { showSafeZones = $('showSafeZones').checked; if(window.applySafeZones) applySafeZones(); });
   $('safeZoneLeftMargin').addEventListener('input', e => { const inp=e.target,c=isNaN(parseInt(inp.value))?0:parseInt(inp.value); inp.value=c; safeZoneLeftMargin=c; if(window.applySafeZones) applySafeZones(); });
   $('safeZoneTopMargin').addEventListener('input', e => { const inp=e.target,c=isNaN(parseInt(inp.value))?0:parseInt(inp.value); inp.value=c; safeZoneTopMargin=c; if(window.applySafeZones) applySafeZones(); });
