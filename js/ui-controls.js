@@ -500,7 +500,7 @@ function initUIControls(){
   $('h1Scale').addEventListener('change',e=>{ const inp=e.target,c=Math.min(3.0,Math.max(1.0,isNaN(parseFloat(inp.value))?1.0:Math.round(parseFloat(inp.value)*10)/10)); inp.value=c.toFixed(1); document.documentElement.style.setProperty('--h1Scale',c); render(); });
   $('h2Scale').addEventListener('change',e=>{ const inp=e.target,c=Math.min(3.0,Math.max(1.0,isNaN(parseFloat(inp.value))?1.0:Math.round(parseFloat(inp.value)*10)/10)); inp.value=c.toFixed(1); document.documentElement.style.setProperty('--h2Scale',c); render(); });
   $('blobScale').addEventListener('input',e=>{ const inp=e.target,c=Math.min(8,Math.max(1,isNaN(parseFloat(inp.value))?3:Math.round(parseFloat(inp.value)*2)/2)); inp.value=c; syncRadii(); });
-  $('consoleScale').addEventListener('input', e => { const inp=e.target,raw=parseFloat(inp.value),c=Math.min(1.0,Math.max(0.5,isNaN(raw)?0.7:raw)); inp.value=c; syncConsoleScale(); });
+  $('consoleScale').addEventListener('input', e => { const inp=e.target,raw=parseFloat(inp.value),c=Math.min(1.0,Math.max(0.3,isNaN(raw)?0.7:raw)); inp.value=c; syncConsoleScale(); });
   $('meterWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(250,Math.max(10,isNaN(parseInt(inp.value))?40:parseInt(inp.value))); inp.value=c; METER_W=c; recalcGeometry(); render(); });
   $('meterRightMargin').addEventListener('input', e => { const inp=e.target,c=Math.min(600,Math.max(0,isNaN(parseInt(inp.value))?265:parseInt(inp.value))); inp.value=c; METER_RIGHT_MARGIN=c; recalcGeometry(); render(); });
   $('dbLabelRightMargin').addEventListener('input', e => { const inp=e.target,c=Math.min(120,Math.max(-40,isNaN(parseInt(inp.value))?0:parseInt(inp.value))); inp.value=c; DB_LABEL_RIGHT_MARGIN=c; render(); });
@@ -511,13 +511,13 @@ function initUIControls(){
   $('dbLabelSize').addEventListener('input', e => { const inp=e.target, c=Math.min(72,Math.max(6,isNaN(parseInt(inp.value))?11:parseInt(inp.value))); inp.value=c; DB_LABEL_SIZE=c; render(); });
   $('timeLabelGutterTop').addEventListener('input', e => { const inp=e.target,c=Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value)); inp.value=c; render(); });
   $('timeLabelGutterBottom').addEventListener('input', e => { const inp=e.target,c=Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value)); inp.value=c; render(); });
-  $('kioskScale').addEventListener('input', e => { const inp=e.target,c=Math.min(1.0,Math.max(0.5,isNaN(parseFloat(inp.value))?0.5:parseFloat(inp.value))); inp.value=c.toFixed(2); KIOSK_SCALE=c; applyKioskScale(); });
+  $('kioskScale').addEventListener('input', e => { const inp=e.target,c=Math.min(1.0,Math.max(0.3,isNaN(parseFloat(inp.value))?0.5:parseFloat(inp.value))); inp.value=c.toFixed(2); KIOSK_SCALE=c; applyKioskScale(); });
   $('kioskNudge').addEventListener('input', e => { const inp=e.target,c=Math.min(200,Math.max(-200,isNaN(parseInt(inp.value))?0:parseInt(inp.value))); inp.value=c; KIOSK_NUDGE=c; applyKioskScale(); });
   $('kioskRightMargin').addEventListener('input', e => { const inp=e.target,c=Math.min(800,Math.max(0,isNaN(parseInt(inp.value))?0:parseInt(inp.value))); inp.value=c; KIOSK_RIGHT_MARGIN=c; applyKioskRightMargin(); });
   $('showSafeZones').addEventListener('change', () => { showSafeZones = $('showSafeZones').checked; if(window.applySafeZones) applySafeZones(); });
   $('safeZoneLeftMargin').addEventListener('input', e => { const inp=e.target,c=isNaN(parseInt(inp.value))?0:parseInt(inp.value); inp.value=c; safeZoneLeftMargin=c; if(window.applySafeZones) applySafeZones(); });
   $('safeZoneTopMargin').addEventListener('input', e => { const inp=e.target,c=isNaN(parseInt(inp.value))?0:parseInt(inp.value); inp.value=c; safeZoneTopMargin=c; if(window.applySafeZones) applySafeZones(); });
-  $('safeZoneScale').addEventListener('input', e => { const inp=e.target,c=Math.min(2,Math.max(0.7,isNaN(parseFloat(inp.value))?1:parseFloat(inp.value))); inp.value=c; safeZoneScale=c; if(window.applySafeZones) applySafeZones(); });
+  $('safeZoneScale').addEventListener('input', e => { const inp=e.target,c=Math.min(2,Math.max(0.5,isNaN(parseFloat(inp.value))?1:parseFloat(inp.value))); inp.value=c; safeZoneScale=c; if(window.applySafeZones) applySafeZones(); });
   // Re-align the kiosk vertically when the viewport changes (no existing resize listener)
   window.addEventListener('resize', () => applyKioskScale());
   $('markerLineWidth').addEventListener('input', e => { const inp=e.target,c=Math.min(8,Math.max(1,isNaN(parseFloat(inp.value))?1:Math.round(parseFloat(inp.value)*2)/2)); inp.value=c; document.documentElement.style.setProperty('--markerLineWidth',c); });

@@ -169,13 +169,13 @@ function loadConfigObject(cfg){
   if($('sustainArrowXOffset') && cfg.sustainArrowXOffset !== undefined){ $('sustainArrowXOffset').value = cfg.sustainArrowXOffset; SUSTAIN_ARROW_X_OFFSET = Math.max(0, Math.min(120, Number(cfg.sustainArrowXOffset) || 0)); }
   if($('textbookLabelXOffset') && cfg.textbookLabelXOffset !== undefined){ $('textbookLabelXOffset').value = cfg.textbookLabelXOffset; TEXTBOOK_LABEL_X_OFFSET = Math.max(0, Math.min(200, Number(cfg.textbookLabelXOffset) || 0)); }
   if($('graphBottomMargin') && cfg.graphBottomMargin !== undefined){ $('graphBottomMargin').value = cfg.graphBottomMargin; GRAPH_BOTTOM_MARGIN = Math.max(20, Math.min(300, Number(cfg.graphBottomMargin) || 120)); }
-  if($('kioskScale') && cfg.kioskScale !== undefined){ KIOSK_SCALE = Math.max(0.5, Math.min(1.0, Number(cfg.kioskScale) || 0.5)); $('kioskScale').value = KIOSK_SCALE.toFixed(2); if(window.applyKioskScale) applyKioskScale(); }
+  if($('kioskScale') && cfg.kioskScale !== undefined){ KIOSK_SCALE = Math.max(0.3, Math.min(1.0, Number(cfg.kioskScale) || 0.5)); $('kioskScale').value = KIOSK_SCALE.toFixed(2); if(window.applyKioskScale) applyKioskScale(); }
   if($('kioskNudge') && cfg.kioskNudge !== undefined){ KIOSK_NUDGE = Math.max(-200, Math.min(200, Number(cfg.kioskNudge) || 0)); $('kioskNudge').value = KIOSK_NUDGE; if(window.applyKioskScale) applyKioskScale(); }
   if($('kioskRightMargin') && cfg.kioskRightMargin !== undefined){ KIOSK_RIGHT_MARGIN = Math.max(0, Math.min(800, Number(cfg.kioskRightMargin) || 0)); $('kioskRightMargin').value = KIOSK_RIGHT_MARGIN; if(window.applyKioskRightMargin) applyKioskRightMargin(); }
   if($('showSafeZones')) showSafeZones = $('showSafeZones').checked;
   if($('safeZoneLeftMargin') && cfg.safeZoneLeftMargin !== undefined){ safeZoneLeftMargin = Number(cfg.safeZoneLeftMargin) || 0; $('safeZoneLeftMargin').value = safeZoneLeftMargin; }
   if($('safeZoneTopMargin') && cfg.safeZoneTopMargin !== undefined){ safeZoneTopMargin = Number(cfg.safeZoneTopMargin) || 0; $('safeZoneTopMargin').value = safeZoneTopMargin; }
-  if($('safeZoneScale') && cfg.safeZoneScale !== undefined){ safeZoneScale = Math.max(0.7, Math.min(2.0, Number(cfg.safeZoneScale) || 1)); $('safeZoneScale').value = safeZoneScale; }
+  if($('safeZoneScale') && cfg.safeZoneScale !== undefined){ safeZoneScale = Math.max(0.5, Math.min(2.0, Number(cfg.safeZoneScale) || 1)); $('safeZoneScale').value = safeZoneScale; }
   if(window.applySafeZones) applySafeZones();
   if($('dbLabelSize') && cfg.dbLabelSize !== undefined){ $('dbLabelSize').value = cfg.dbLabelSize; DB_LABEL_SIZE = Math.max(6, Math.min(72, Number(cfg.dbLabelSize) || 11)); }
   if($('tbSustainGapMax') && cfg.tbSustainGapMax !== undefined){ $('tbSustainGapMax').value = cfg.tbSustainGapMax; SUSTAIN_GAP_MAX = Math.max(0.15, Math.min(0.30, (Number(cfg.tbSustainGapMax) || 15) / 100)); }
