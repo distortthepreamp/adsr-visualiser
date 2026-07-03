@@ -41,7 +41,7 @@ function buildConfigSnapshot(){
     liveAnimate: (document.querySelector('input[name="mode"]:checked') || {}).value || 'live',
     lineColor: $('lineColor').value,
     bgColor: $('bgColor').value,
-    kioskBgColor: $('kioskBgColor') ? $('kioskBgColor').value : '#000000',
+    kioskBgColor: $('kioskBgColor') ? $('kioskBgColor').value : '#0000ff',
     loudnessAttackColor: $('loudnessAttackColor').value,
     loudnessDecayColor: $('loudnessDecayColor').value,
     loudnessReleaseColor: $('loudnessReleaseColor').value,
