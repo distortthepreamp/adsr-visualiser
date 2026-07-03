@@ -18,12 +18,23 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
   const _spanLabelSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--labelSize')) || 17;
   const _spanSize  = Math.round(_spanLabelSize * 0.72);
   const _spanNudge = Math.round(_spanLabelSize * 0.7);
-  const applySpan = (el, startX, endX, y, color) => {
+  const _spanLineHeight = _spanLabelSize;
+  const applySpan = (el, startX, endX, y, color, name) => {
     if(!showTimesAsSpans || !el || !_spanGroup) return;
-    el.setAttribute('x', (startX + endX) / 2);
-    // Top band (stated, above the graph) nudges up; bottom band (effective, below graph.y0) nudges down to clear the line + arrowheads
-    el.setAttribute('y', (y > graph.y0) ? (y + _spanNudge + _spanSize) : (y - _spanNudge));
+    const midX = (startX + endX) / 2;
     const NS = 'http://www.w3.org/2000/svg';
+    // Two-line stacked label: name (line 1) on top for both bands; value + "ms" (line 2) below.
+    const num = (el.textContent.match(/-?\d+/) || [''])[0];
+    el.setAttribute('x', midX);
+    // Top band (stated, above the graph): both lines above the line; bottom band (effective, below graph.y0): both below, clearing the arrowheads.
+    const nameY = (y > graph.y0) ? (y + _spanNudge + _spanSize) : (y - _spanNudge - _spanLineHeight);
+    el.setAttribute('y', nameY);
+    el.textContent = '';
+    const ts1 = document.createElementNS(NS, 'tspan');
+    ts1.setAttribute('x', midX); ts1.setAttribute('dy', 0); ts1.textContent = name;
+    const ts2 = document.createElementNS(NS, 'tspan');
+    ts2.setAttribute('x', midX); ts2.setAttribute('dy', _spanLineHeight); ts2.textContent = num + 'ms';
+    el.appendChild(ts1); el.appendChild(ts2);
     const ln = document.createElementNS(NS, 'line');
     ln.setAttribute('x1', startX); ln.setAttribute('y1', y);
     ln.setAttribute('x2', endX);   ln.setAttribute('y2', y);
@@ -62,7 +73,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
         newStatedDecayTimeLabelEl.setAttribute('fill', newStatedCol);
         newStatedDecayTimeLabelEl.textContent = 'D' + (useShortLabels ? ': ' : ' = ') + Math.round(msFromPosition(state.d)) + (useShortLabels ? '' : 'ms');
         newStatedDecayTimeLabelEl.style.display='';
-        applySpan(newStatedDecayTimeLabelEl, pts.p1.x, pts.pEnd.x, statedLabelY, newStatedCol);
+        applySpan(newStatedDecayTimeLabelEl, pts.p1.x, pts.pEnd.x, statedLabelY, newStatedCol, 'Decay');
       }
     } else {
       newStatedDecayDropEl.style.display='none';
@@ -86,11 +97,12 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
         newStatedAttackTimeLabelEl.setAttribute('fill', newStatedCol);
         newStatedAttackTimeLabelEl.textContent = 'A' + (useShortLabels ? ': ' : ' = ') + Math.round(msFromPosition(state.a)) + (useShortLabels ? '' : 'ms');
         newStatedAttackTimeLabelEl.style.display='';
-        applySpan(newStatedAttackTimeLabelEl, pts.p0.x, pts.p1.x, statedLabelY, newStatedCol);
+        applySpan(newStatedAttackTimeLabelEl, pts.p0.x, pts.p1.x, statedLabelY, newStatedCol, 'Attack');
       }
-    } else if(($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && effA){
-      // Textbook hidden but Model D attack shown: keep the attack time label at the same
-      // (textbook) position, coloured like the Model D attack. Drop LINE stays hidden.
+    } else if(!showTimesAsSpans && ($('showNewEffectiveLines') && $('showNewEffectiveLines').checked) && effA){
+      // Textbook hidden but Model D attack shown (endpoint mode only): keep the attack time label at the same
+      // (textbook) position, coloured like the Model D attack. Drop LINE stays hidden. In span mode the
+      // actual attack shows as its own bottom-band span instead (see the effective-attack span block below).
       newStatedAttackDropEl.style.display='none';
       if(newStatedAttackTimeLabelEl){
         newStatedAttackTimeLabelEl.setAttribute('x', pts.p1.x);
@@ -99,7 +111,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
         newStatedAttackTimeLabelEl.setAttribute('fill', newEffAttackCol);
         newStatedAttackTimeLabelEl.textContent = 'A' + (useShortLabels ? ': ' : ' = ') + Math.round(msFromPosition(state.a)) + (useShortLabels ? '' : 'ms');
         newStatedAttackTimeLabelEl.style.display='';
-        applySpan(newStatedAttackTimeLabelEl, pts.p0.x, pts.p1.x, statedLabelY, newEffAttackCol);
+        applySpan(newStatedAttackTimeLabelEl, pts.p0.x, pts.p1.x, statedLabelY, newEffAttackCol, 'Attack');
       }
     } else {
       newStatedAttackDropEl.style.display='none';
@@ -133,7 +145,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
         newEffectiveDecayTimeLabelEl.setAttribute('fill', newEffDecayCol);
         newEffectiveDecayTimeLabelEl.textContent = 'D' + (useShortLabels ? ': ' : ' = ') + Math.round(pixelsToTimeSec(drawPS.x - decayStartX) * 1000) + (useShortLabels ? '' : 'ms');
         newEffectiveDecayTimeLabelEl.style.display='';
-        applySpan(newEffectiveDecayTimeLabelEl, decayStartX, drawPS.x, effectiveLabelY, newEffDecayCol);
+        applySpan(newEffectiveDecayTimeLabelEl, decayStartX, drawPS.x, effectiveLabelY, newEffDecayCol, 'Decay');
       }
     } else {
       newEffectiveDecayDropEl.style.display='none';
@@ -164,11 +176,23 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
       newEffAttackTimeLabelEl.setAttribute('fill', newEffAttackCol);
       newEffAttackTimeLabelEl.textContent = 'A' + (useShortLabels ? ': ' : ' = ') + Math.round(pixelsToTimeSec(ceilAttackX - pts.p0.x) * 1000) + (useShortLabels ? '' : 'ms');
       newEffAttackTimeLabelEl.style.display='';
-      applySpan(newEffAttackTimeLabelEl, pts.p0.x, ceilAttackX, effectiveLabelY, newEffAttackCol);
+      applySpan(newEffAttackTimeLabelEl, pts.p0.x, ceilAttackX, effectiveLabelY, newEffAttackCol, 'Attack');
     }
   } else {
     if(newEffAttackDropEl) newEffAttackDropEl.style.display='none';
     if(newEffAttackTimeLabelEl) newEffAttackTimeLabelEl.style.display='none';
+  }
+  // Effective attack (SPAN MODE, non-clip): actual attack shows as a normal bottom-band span like decay/release,
+  // rather than borrowing the textbook top slot. Placed AFTER the clip left-pair block so its else (which hides
+  // this element when not clipped) doesn't override us. !isClipped keeps it mutually exclusive with the clip 'A' span.
+  if(showTimesAsSpans && !isClipped && effLinesOn && effA && newEffAttackTimeLabelEl){
+    newEffAttackTimeLabelEl.setAttribute('x', pts.p1.x);
+    newEffAttackTimeLabelEl.setAttribute('y', effectiveLabelY);
+    newEffAttackTimeLabelEl.setAttribute('text-anchor', 'middle');
+    newEffAttackTimeLabelEl.setAttribute('fill', newEffAttackCol);
+    newEffAttackTimeLabelEl.textContent = 'A' + (useShortLabels ? ': ' : ' = ') + Math.round(msFromPosition(state.a)) + (useShortLabels ? '' : 'ms');
+    newEffAttackTimeLabelEl.style.display='';
+    applySpan(newEffAttackTimeLabelEl, pts.p0.x, pts.p1.x, effectiveLabelY, newEffAttackCol, 'Attack');
   }
   // Right pair: decay-side clipping line + C label (modelD leg)
   const showRightClip = clipBase && effD;
@@ -185,7 +209,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
       newEffClipTimeLabelEl.setAttribute('fill', newEffAttackCol);
       newEffClipTimeLabelEl.textContent = 'C' + (useShortLabels ? ': ' : ' = ') + Math.round(pixelsToTimeSec(ceilDecayX - ceilAttackX) * 1000) + (useShortLabels ? '' : 'ms');
       newEffClipTimeLabelEl.style.display='';
-      applySpan(newEffClipTimeLabelEl, ceilAttackX, ceilDecayX, effectiveLabelY, newEffAttackCol);
+      applySpan(newEffClipTimeLabelEl, ceilAttackX, ceilDecayX, effectiveLabelY, newEffAttackCol, 'Clip');
     }
   } else {
     if(newEffAttackDropEndEl) newEffAttackDropEndEl.style.display='none';
@@ -222,7 +246,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
         newEffectiveReleaseTimeLabelEl.setAttribute('fill', newEffReleaseCol);
         newEffectiveReleaseTimeLabelEl.textContent = 'R' + (useShortLabels ? ': ' : ' = ') + Math.round(pixelsToTimeSec(effRelPx) * 1000) + (useShortLabels ? '' : 'ms');
         newEffectiveReleaseTimeLabelEl.style.display='';
-        applySpan(newEffectiveReleaseTimeLabelEl, releaseStartX, fx, effectiveLabelY, newEffReleaseCol);
+        applySpan(newEffectiveReleaseTimeLabelEl, releaseStartX, fx, effectiveLabelY, newEffReleaseCol, 'Release');
       }
     } else {
       newEffReleaseDropEl.style.display='none';
@@ -247,7 +271,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
         newStatedReleaseTimeLabelEl.setAttribute('fill', newStatedCol);
         newStatedReleaseTimeLabelEl.textContent = 'R' + (useShortLabels ? ': ' : ' = ') + Math.round(msFromPosition(state.r)) + (useShortLabels ? '' : 'ms');
         newStatedReleaseTimeLabelEl.style.display='';
-        applySpan(newStatedReleaseTimeLabelEl, pts.pEnd.x + graph.w * state.tbSustainGap, stRelX, statedLabelY, newStatedCol);
+        applySpan(newStatedReleaseTimeLabelEl, pts.pEnd.x + graph.w * state.tbSustainGap, stRelX, statedLabelY, newStatedCol, 'Release');
       }
     } else {
       newStatedReleaseDropEl.style.display='none';
