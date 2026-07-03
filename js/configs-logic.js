@@ -89,7 +89,7 @@ function buildConfigSnapshot(){
     timeLabelGutterTop: Number($('timeLabelGutterTop') ? $('timeLabelGutterTop').value : 0),
     timeLabelGutterBottom: Number($('timeLabelGutterBottom') ? $('timeLabelGutterBottom').value : 0),
     persistTime: Number($('persistTime') ? $('persistTime').value : 2000),
-    fitMargin: Number($('fitMargin') ? $('fitMargin').value : 94)
+    fitMargin: Number($('fitMargin') ? $('fitMargin').value : 90)
   };
 }
 

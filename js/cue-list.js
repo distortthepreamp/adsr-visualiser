@@ -369,7 +369,7 @@ function executeEvent(event) {
       case 'zoom-fit':
         { const rx = state._fitRightmostX;
           if(rx && rx > graph.x0 + 1){
-            const margin = Number(($('fitMargin') && $('fitMargin').value) || 94) / 100;
+            const margin = Number(($('fitMargin') && $('fitMargin').value) || 90) / 100;
             // Fit target width tracks the meter's real left edge (via METER_RIGHT_MARGIN); at margin==GRAPH_RIGHT_PAD the correction is zero. MUST match computeFitZoom() in js/ui-controls.js.
             let z = state.zoomFactor * (Math.max(120, graph.w * margin + GRAPH_RIGHT_PAD - METER_RIGHT_MARGIN)) / (rx - graph.x0);
             z = Math.max(0.1, Math.min(48, Math.round(z * 10) / 10));
