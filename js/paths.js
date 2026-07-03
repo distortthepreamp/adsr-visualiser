@@ -544,6 +544,7 @@ function render(){
 
   const markerEndX = meterX - DB_GUTTER_W;  // left-side ticks end at the gutter's left edge
   const markerRightX = meterX + meterW;      // right-side ticks start at the meter's right edge
+  const METER_ARROW_GAP = 10;  // push the meter arrowheads (and their labels) out this many px so tips clear the meter stroke
   const _labelSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--labelSize')) || 17;
   const arrowSize = Math.round(_labelSize * 0.72);
   const sustainTickLen = Math.round(_labelSize * 1.5);
@@ -556,12 +557,12 @@ function render(){
   const susArrowCol = ($('frequencyMode') && $('frequencyMode').checked) ? (($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00') : (($('loudnessDecayColor') && $('loudnessDecayColor').value) || '#ff0000');
   const showEffLines = !!($('showNewEffectiveLines') && $('showNewEffectiveLines').checked);
   const showModelDSusTick = (legD || legR || legS) && !showGateTime && showEffLines;
-  setMeterArrow('meterArrowLSustain', meterX, drawPS.y, true, arrowSize, susArrowCol, showModelDSusTick);
+  setMeterArrow('meterArrowLSustain', meterX - METER_ARROW_GAP, drawPS.y, true, arrowSize, susArrowCol, showModelDSusTick);
   { const lbl=$('sustainMarkerLabel'); if(lbl){
-    lbl.setAttribute('x', meterX - arrowSize - sustainLabelGap - SUSTAIN_ARROW_X_OFFSET);
+    lbl.setAttribute('x', (meterX - METER_ARROW_GAP) - arrowSize - sustainLabelGap - SUSTAIN_ARROW_X_OFFSET);
     lbl.setAttribute('y', drawPS.y);
     lbl.setAttribute('text-anchor', 'end');
-    lbl.setAttribute('dominant-baseline', 'middle');
+    lbl.setAttribute('dominant-baseline', 'central');
     lbl.setAttribute('fill', susArrowCol);
     lbl.textContent = (useShortLabels ? '' : 'S = ') + fmtMeterVal(Math.round((e.floor + drawPS.level * e.scale) * 100));
     lbl.style.display = showModelDSusTick ? '' : 'none';
@@ -583,12 +584,12 @@ function render(){
     _statedY = statedY;
     statedSustainX = pts.pEnd.x + graph.w * state.tbSustainGap;
     const underlayCol = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
-    setMeterArrow('meterArrowRSustain', markerRightX, statedY, false, arrowSize, underlayCol, tbSusVis);
+    setMeterArrow('meterArrowRSustain', markerRightX + METER_ARROW_GAP, statedY, false, arrowSize, underlayCol, tbSusVis);
     const ssl=$('statedSustainLabel'); if(ssl){
-      ssl.setAttribute('x', markerRightX + arrowSize + sustainLabelGap + TEXTBOOK_LABEL_X_OFFSET);
+      ssl.setAttribute('x', (markerRightX + METER_ARROW_GAP) + arrowSize + sustainLabelGap + TEXTBOOK_LABEL_X_OFFSET);
       ssl.setAttribute('y', statedY);
       ssl.setAttribute('text-anchor', 'start');
-      ssl.setAttribute('dominant-baseline', 'middle');
+      ssl.setAttribute('dominant-baseline', 'central');
       ssl.setAttribute('fill', underlayCol);
       ssl.textContent = (useShortLabels ? '' : 'S = ') + fmtMeterVal(Math.round((e.floor + state.s * (1 - e.floor) * e.scale) * 100));
       ssl.style.display = tbSusVis ? '' : 'none';
@@ -694,10 +695,10 @@ function render(){
   const contourTickCol = ($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00';
   const contourTickColRight = ($('underlayColor') && $('underlayColor').value) || '#ffffff';
   // Contour arrows — standalone triangles at the meter edges (left tips at meterX pointing right, right tips at markerRightX pointing left)
-  setMeterArrow('meterArrowLCutoff', meterX, floorY, true, arrowSize, contourTickCol, showContourLeft);
-  setMeterArrow('meterArrowLAmount', meterX, amountY, true, arrowSize, contourTickCol, showContourLeft);
-  setMeterArrow('meterArrowRCutoff', markerRightX, floorY, false, arrowSize, contourTickColRight, showContourRight);
-  setMeterArrow('meterArrowRAmount', markerRightX, textbookAmountY, false, arrowSize, contourTickColRight, showContourRight);
+  setMeterArrow('meterArrowLCutoff', meterX - METER_ARROW_GAP, floorY, true, arrowSize, contourTickCol, showContourLeft);
+  setMeterArrow('meterArrowLAmount', meterX - METER_ARROW_GAP, amountY, true, arrowSize, contourTickCol, showContourLeft);
+  setMeterArrow('meterArrowRCutoff', markerRightX + METER_ARROW_GAP, floorY, false, arrowSize, contourTickColRight, showContourRight);
+  setMeterArrow('meterArrowRAmount', markerRightX + METER_ARROW_GAP, textbookAmountY, false, arrowSize, contourTickColRight, showContourRight);
   // ---- CF / AOC contour labels ----
   const capHeight = _labelSize * 0.72;
   const contourLabelGap = sustainLabelGap;
@@ -711,10 +712,10 @@ function render(){
   // CF left (Model D) — below cutoff arrow's free bottom end
   const cfLbl = $('cfLabel');
   if(cfLbl){
-    cfLbl.setAttribute('x', meterX - arrowSize - sustainLabelGap - SUSTAIN_ARROW_X_OFFSET);
+    cfLbl.setAttribute('x', (meterX - METER_ARROW_GAP) - arrowSize - sustainLabelGap - SUSTAIN_ARROW_X_OFFSET);
     cfLbl.setAttribute('y', floorY);
     cfLbl.setAttribute('text-anchor', 'end');
-    cfLbl.setAttribute('dominant-baseline', 'middle');
+    cfLbl.setAttribute('dominant-baseline', 'central');
     cfLbl.setAttribute('fill', contourTickCol);
     cfLbl.textContent = cfText;
     cfLbl.style.display = showContourLeft ? '' : 'none';
@@ -722,10 +723,10 @@ function render(){
   // CF right (textbook) — below cutoff arrow's free bottom end
   const cfLblR = $('cfLabelRight');
   if(cfLblR){
-    cfLblR.setAttribute('x', markerRightX + arrowSize + sustainLabelGap + TEXTBOOK_LABEL_X_OFFSET);
+    cfLblR.setAttribute('x', (markerRightX + METER_ARROW_GAP) + arrowSize + sustainLabelGap + TEXTBOOK_LABEL_X_OFFSET);
     cfLblR.setAttribute('y', floorY);
     cfLblR.setAttribute('text-anchor', 'start');
-    cfLblR.setAttribute('dominant-baseline', 'middle');
+    cfLblR.setAttribute('dominant-baseline', 'central');
     cfLblR.setAttribute('fill', contourTickColRight);
     cfLblR.textContent = cfText;
     cfLblR.style.display = showContourRight ? '' : 'none';
@@ -733,10 +734,10 @@ function render(){
   // AOC left (Model D) — above amount arrow's free top end
   const aocLbl = $('aocLabel');
   if(aocLbl){
-    aocLbl.setAttribute('x', meterX - arrowSize - sustainLabelGap - SUSTAIN_ARROW_X_OFFSET);
+    aocLbl.setAttribute('x', (meterX - METER_ARROW_GAP) - arrowSize - sustainLabelGap - SUSTAIN_ARROW_X_OFFSET);
     aocLbl.setAttribute('y', amountY);
     aocLbl.setAttribute('text-anchor', 'end');
-    aocLbl.setAttribute('dominant-baseline', 'middle');
+    aocLbl.setAttribute('dominant-baseline', 'central');
     aocLbl.setAttribute('fill', contourTickCol);
     aocLbl.textContent = aocTextLeft;
     aocLbl.style.display = showContourLeft ? '' : 'none';
@@ -744,10 +745,10 @@ function render(){
   // AOC right (textbook) — above amount arrow's free top end
   const aocLblR = $('aocLabelRight');
   if(aocLblR){
-    aocLblR.setAttribute('x', markerRightX + arrowSize + sustainLabelGap + TEXTBOOK_LABEL_X_OFFSET);
+    aocLblR.setAttribute('x', (markerRightX + METER_ARROW_GAP) + arrowSize + sustainLabelGap + TEXTBOOK_LABEL_X_OFFSET);
     aocLblR.setAttribute('y', textbookAmountY);
     aocLblR.setAttribute('text-anchor', 'start');
-    aocLblR.setAttribute('dominant-baseline', 'middle');
+    aocLblR.setAttribute('dominant-baseline', 'central');
     aocLblR.setAttribute('fill', contourTickColRight);
     aocLblR.textContent = aocTextRight;
     aocLblR.style.display = showContourRight ? '' : 'none';
