@@ -594,6 +594,7 @@ function cueStepBack() {
     // Only waits before current position — rewind to beginning
     cueIndex = 0;
     cueTimecodeMs = 0;
+    if (window.computeStateAtPosition) computeStateAtPosition(cueIndex);
     updateTimecodeDisplay();
     updateCueScriptView();
     return;
@@ -609,6 +610,8 @@ function cueStepBack() {
 
   cueIndex = firstOfLine;
   cueTimecodeMs = cueTimecodeAtIndex(cueIndex);
+  // Reconstruct the resting state at the new pointer (folds cues [0, cueIndex) atemporally).
+  if (window.computeStateAtPosition) computeStateAtPosition(cueIndex);
   updateTimecodeDisplay();
   updateCueScriptView();
 }
