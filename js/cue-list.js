@@ -465,6 +465,24 @@ function updateCueScriptView() {
     } else {
       div.style.opacity = '0.6';
     }
+    // Click-a-cue: if this raw line carries any cue event, make it a jump target.
+    // Jump to the pointer position just after this line ran (lastEventOfLine + 1) so the
+    // clicked line becomes the highlighted "current" row (highlight anchors on cueList[cueIndex-1]).
+    if (rawIdx >= 0 && rawIdx < lines.length) {
+      let lastOfLine = -1;
+      for (let k = 0; k < cueList.length; k++) { if (cueList[k].rawLine === rawIdx) lastOfLine = k; }
+      if (lastOfLine >= 0) {
+        const targetIndex = lastOfLine + 1;
+        div.style.cursor = 'pointer';
+        div.addEventListener('click', () => {
+          if (window.computeStateAtPosition) computeStateAtPosition(targetIndex);
+          cueIndex = targetIndex;
+          cueTimecodeMs = cueTimecodeAtIndex(cueIndex);
+          updateTimecodeDisplay();
+          updateCueScriptView();
+        });
+      }
+    }
     frag.appendChild(div);
   }
   view.innerHTML = '';
