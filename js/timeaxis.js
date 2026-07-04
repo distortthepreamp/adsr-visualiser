@@ -36,8 +36,8 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
     ts2.setAttribute('x', midX); ts2.setAttribute('dy', _spanLineHeight); ts2.textContent = num + 'ms';
     el.appendChild(ts1); el.appendChild(ts2);
     const ln = document.createElementNS(NS, 'line');
-    ln.setAttribute('x1', startX); ln.setAttribute('y1', y);
-    ln.setAttribute('x2', endX);   ln.setAttribute('y2', y);
+    ln.setAttribute('x1', startX + _spanSize/2); ln.setAttribute('y1', y);
+    ln.setAttribute('x2', endX - _spanSize/2);   ln.setAttribute('y2', y);
     ln.setAttribute('stroke', color);
     ln.setAttribute('style', 'stroke-width:var(--markerLineWidth);vector-effect:non-scaling-stroke');
     _spanGroup.appendChild(ln);
