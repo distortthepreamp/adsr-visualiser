@@ -241,6 +241,28 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
       newEffAttackDropEl.style.display='';
     }
   }
+  // Attack-START drop lines at the attack onset (pts.p0.x, the floor start point) — mirrors the release-start drops.
+  // Actual: floor level down to the time axis (below). Textbook: ceiling down to the floor level (above).
+  // Each follows its voice's drop convention/gating; clip doesn't apply (the onset sits at the floor, not the peak).
+  {
+    const axStartX = pts.p0.x, floorY = pts.p0.y;
+    const effStartEl=$('newEffectiveAttackStartDrop');
+    if(effStartEl){
+      if(effLinesOn && effA){
+        effStartEl.setAttribute('x1',axStartX); effStartEl.setAttribute('y1',floorY);
+        effStartEl.setAttribute('x2',axStartX); effStartEl.setAttribute('y2',graph.y0); effStartEl.setAttribute('stroke',newEffAttackCol);
+        effStartEl.style.display='';
+      } else { effStartEl.style.display='none'; }
+    }
+    const stStartEl=$('newStatedAttackStartDrop');
+    if(stStartEl){
+      if(showNewStated && ($('underlayA') && $('underlayA').checked)){
+        stStartEl.setAttribute('x1',axStartX); stStartEl.setAttribute('y1',graph.y0-graph.h);
+        stStartEl.setAttribute('x2',axStartX); stStartEl.setAttribute('y2',floorY); stStartEl.setAttribute('stroke',newStatedCol);
+        stStartEl.style.display='';
+      } else { stStartEl.style.display='none'; }
+    }
+  }
   // Effective release drop line: descends from the green release curve's floor point to the time axis
   const newEffReleaseDropEl=$('newEffectiveReleaseDrop');
   const newEffectiveReleaseTimeLabelEl=$('newEffectiveReleaseTime');
@@ -323,6 +345,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
   if(clipGateX !== null){
     ['newStatedDecayDrop','newStatedDecayTime','newStatedAttackDrop','newStatedAttackTime',
      'newEffectiveReleaseStartDrop','newStatedReleaseStartDrop',
+     'newEffectiveAttackStartDrop','newStatedAttackStartDrop',
      'newStatedReleaseDrop','newStatedReleaseTime',
      'newEffectiveDecayDrop','newEffectiveDecayTime',
      'newEffectiveAttackDrop','newEffectiveAttackTime',
