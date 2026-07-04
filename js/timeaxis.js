@@ -254,6 +254,16 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
       newEffReleaseDropEl.setAttribute('x1',fx); newEffReleaseDropEl.setAttribute('y1',fy);
       newEffReleaseDropEl.setAttribute('x2',fx); newEffReleaseDropEl.setAttribute('y2',graph.y0); newEffReleaseDropEl.setAttribute('stroke',newEffReleaseCol);
       newEffReleaseDropEl.style.display='';
+      // Release-START drop (actual): vertical at the release onset (end of the sustain gap) from the
+      // Model D sustain level down to the time axis — mirrors the effective decay / release-end drops.
+      { const effRelStartX = pts.pEnd.x + graph.w * state.tbSustainGap;
+        const el=$('newEffectiveReleaseStartDrop');
+        if(el){
+          el.setAttribute('x1',effRelStartX); el.setAttribute('y1',drawPS.y);
+          el.setAttribute('x2',effRelStartX); el.setAttribute('y2',graph.y0); el.setAttribute('stroke',newEffReleaseCol);
+          el.style.display='';
+        }
+      }
       if(newEffectiveReleaseTimeLabelEl){
         const releaseStartX = pts.pEnd.x + graph.w * state.tbSustainGap;
         const effRelPx = fx - releaseStartX;
@@ -268,6 +278,7 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
     } else {
       newEffReleaseDropEl.style.display='none';
       if(newEffectiveReleaseTimeLabelEl) newEffectiveReleaseTimeLabelEl.style.display='none';
+      { const el=$('newEffectiveReleaseStartDrop'); if(el) el.style.display='none'; }
     }
   }
   // Stated release drop line: ascends from the textbook release floor point to the graph top
@@ -281,6 +292,17 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
       newStatedReleaseDropEl.setAttribute('x1',stRelX); newStatedReleaseDropEl.setAttribute('y1',stRelY);
       newStatedReleaseDropEl.setAttribute('x2',stRelX); newStatedReleaseDropEl.setAttribute('y2',graph.y0-graph.h); newStatedReleaseDropEl.setAttribute('stroke',newStatedCol);
       newStatedReleaseDropEl.style.display='';
+      // Release-START drop (textbook): vertical at the release onset from the graph ceiling down to the
+      // textbook sustain level (same proportional-headroom formula as the decay drop / cream sustain).
+      { const stRelStartX = pts.pEnd.x + graph.w * state.tbSustainGap;
+        const stSusY = yFor(pts.e.floor + state.s * (1 - pts.e.floor) * pts.e.scale);
+        const el=$('newStatedReleaseStartDrop');
+        if(el){
+          el.setAttribute('x1',stRelStartX); el.setAttribute('y1',graph.y0-graph.h);
+          el.setAttribute('x2',stRelStartX); el.setAttribute('y2',stSusY); el.setAttribute('stroke',newStatedCol);
+          el.style.display='';
+        }
+      }
       if(newStatedReleaseTimeLabelEl){
         newStatedReleaseTimeLabelEl.setAttribute('x', stRelX);
         newStatedReleaseTimeLabelEl.setAttribute('y', statedLabelY);
@@ -293,12 +315,14 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
     } else {
       newStatedReleaseDropEl.style.display='none';
       if(newStatedReleaseTimeLabelEl) newStatedReleaseTimeLabelEl.style.display='none';
+      { const el=$('newStatedReleaseStartDrop'); if(el) el.style.display='none'; }
     }
   }
   // Clip at Gate: hide drop lines and time labels whose anchor x >= clipGateX.
   // Applied as a post-pass after all normal visibility logic.
   if(clipGateX !== null){
     ['newStatedDecayDrop','newStatedDecayTime','newStatedAttackDrop','newStatedAttackTime',
+     'newEffectiveReleaseStartDrop','newStatedReleaseStartDrop',
      'newStatedReleaseDrop','newStatedReleaseTime',
      'newEffectiveDecayDrop','newEffectiveDecayTime',
      'newEffectiveAttackDrop','newEffectiveAttackTime',
