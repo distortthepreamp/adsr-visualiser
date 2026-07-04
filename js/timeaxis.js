@@ -62,7 +62,10 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
   if(newStatedDecayDropEl){
     const showStatedDecayDrop = showNewStated && ($('underlayD') && $('underlayD').checked);
     if(showStatedDecayDrop){
-      const ulPSY = overrange ? Math.max(yFor(pts.e.floor + state.s * pts.e.scale), yFor(1)) : yFor(pts.e.floor + state.s * pts.e.scale); // textbook (uncapped) sustain y
+      // Textbook sustain y — MUST match the cream curve's sustain in paths.js:196 (proportional headroom):
+      // floor + s*(1-floor)*scale. This never exceeds 1, so no overrange/ceiling clamp is needed (the old
+      // s*scale form omitted the (1-floor) factor, landing the drop above the sustain when cutoff>0).
+      const ulPSY = yFor(pts.e.floor + state.s * (1 - pts.e.floor) * pts.e.scale);
       newStatedDecayDropEl.setAttribute('x1',pts.pEnd.x); newStatedDecayDropEl.setAttribute('y1',graph.y0-graph.h);
       newStatedDecayDropEl.setAttribute('x2',pts.pEnd.x); newStatedDecayDropEl.setAttribute('y2',ulPSY); newStatedDecayDropEl.setAttribute('stroke',newStatedCol);
       newStatedDecayDropEl.style.display='';
