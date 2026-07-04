@@ -86,10 +86,22 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
   if(newStatedAttackDropEl){
     const showStatedAttackDrop = showNewStated && ($('underlayA') && $('underlayA').checked);
     if(showStatedAttackDrop){
-      const tbPeakY = Math.max(pts.p1.y, yFor(1)); // attack peak y (= drawP1.y in non-clipped mode)
-      newStatedAttackDropEl.setAttribute('x1',pts.p1.x); newStatedAttackDropEl.setAttribute('y1',graph.y0-graph.h);
-      newStatedAttackDropEl.setAttribute('x2',pts.p1.x); newStatedAttackDropEl.setAttribute('y2',tbPeakY); newStatedAttackDropEl.setAttribute('stroke',newStatedCol);
-      newStatedAttackDropEl.style.display='';
+      // Stated attack vertical (ceiling → TEXTBOOK apex). Keyed to the textbook (cream) apex's own y,
+      // NOT the effective/green apex (pts.p1.y): the textbook peak is the "proportional ceiling"
+      // floor+(1-floor)*scale (matches paths.js ulP1Y), which reaches the ceiling only at amount max (scale>=1).
+      // The green curve can clip (floor+scale>=1) while the cream apex still sits below the ceiling with a real
+      // peak — so suppress ONLY when the textbook apex genuinely reaches the ceiling. Draw to that apex too
+      // (using pts.p1.y would target the off-graph effective apex and mis-place it for any floor>0).
+      // (This ceiling→apex segment pairs with the effective apex→axis drop for a full two-colour peak mark.)
+      // The attack-time LABEL below is always drawn regardless of clip (unchanged).
+      const tbApexY = yFor(pts.e.floor + (1 - pts.e.floor) * pts.e.scale);
+      if(tbApexY <= yFor(1)){
+        newStatedAttackDropEl.style.display='none';
+      } else {
+        newStatedAttackDropEl.setAttribute('x1',pts.p1.x); newStatedAttackDropEl.setAttribute('y1',graph.y0-graph.h);
+        newStatedAttackDropEl.setAttribute('x2',pts.p1.x); newStatedAttackDropEl.setAttribute('y2',tbApexY); newStatedAttackDropEl.setAttribute('stroke',newStatedCol);
+        newStatedAttackDropEl.style.display='';
+      }
       if(newStatedAttackTimeLabelEl){
         newStatedAttackTimeLabelEl.setAttribute('x', pts.p1.x);
         newStatedAttackTimeLabelEl.setAttribute('y', statedLabelY);
