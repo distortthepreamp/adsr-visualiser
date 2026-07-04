@@ -288,7 +288,7 @@
           <div class="row"><label><input type="checkbox" id="showNewStatedLines"> Times: Textbook</label></div>
         </div>
       </div>
-      <div class="row"><label><input id="showTimesAsSpans" type="checkbox"> Show times as spans</label></div>
+      <div class="row"><label><input id="showTimesAsSpans" type="checkbox" checked> Show times as spans</label></div>
       <div class="row"><label><input id="showSafeZones" type="checkbox"> Show HD safe zones</label></div>
       <div class="row" style="position:relative;gap:6px">
         <button id="expertToggle" style="padding:4px 7px;min-height:unset;line-height:1.1;border-radius:6px;">Expert</button>
@@ -549,7 +549,7 @@ let SUSTAIN_ARROW_X_OFFSET = 0;  // slides ONLY the left/meter sustain arrowhead
 let TEXTBOOK_LABEL_X_OFFSET = 0;  // slides the WHOLE right/textbook cluster (3 arrows + 3 labels) right together (0 = current position)
 let useShortLabels = false;  // condense cramped graph labels: ' = ' → ': ' and drop 'Max '/'Min ' prefixes
 let showValuesAsPercent = false;  // sustain/amount/cutoff labels: one-decimal 0-10 number (false) or percentage (true)
-let showTimesAsSpans = false;  // time labels: endpoint mode (false) or dimension-line spans with arrowheads (true)
+let showTimesAsSpans = true;  // time labels: endpoint mode (false) or dimension-line spans with arrowheads (true)
 let showSafeZones = false; let safeZoneLeftMargin = 0; let safeZoneTopMargin = 0; let safeZoneScale = 1;  // HD safe-zone overlay
 let METER_STROKE_W = 7;
 let DB_LABEL_SIZE = 11;

@@ -215,8 +215,10 @@ function updateTimeAxis(pts, overrange, showClipped, freqMode, drawPS, statedSus
     if(newEffAttackDropEndEl) newEffAttackDropEndEl.style.display='none';
     if(newEffClipTimeLabelEl) newEffClipTimeLabelEl.style.display='none';
   }
-  // Non-clipped attack line (single line at attack peak, no labels — only when attack leg on + clipping conditions met but not actually clipped)
-  if(effLinesOn && effA && freqMode && overrange && showClipped && !isClipped){
+  // Effective attack drop line at the attack peak (pts.p1.x) — shown in NORMAL use too, gated like the stated attack drop
+  // (Times: Model D + Model D attack leg), not just clip/overrange. !isClipped keeps it out of the clip left-pair's way
+  // (which draws this element at ceilAttackX). The decay-side clip crossing (newEffectiveAttackDropEnd) is unaffected.
+  if(effLinesOn && effA && !isClipped){
     const drawP1Y = Math.max(pts.p1.y, ceilY);
     if(newEffAttackDropEl){
       newEffAttackDropEl.setAttribute('x1',pts.p1.x); newEffAttackDropEl.setAttribute('y1',drawP1Y);
