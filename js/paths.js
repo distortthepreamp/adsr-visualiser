@@ -52,7 +52,6 @@ function setMeterArrow(id, tipX, tipY, pointsRight, size, fill, show){
 
 function render(){
   try {
-  const DB_GUTTER_W = 60;  // dB-scale gutter width (user units); mirror-ready for right side
   // Keep viewBox and VB_WIDTH-dependent elements in sync
   const svgEl = document.getElementById('svg');
   if(svgEl) svgEl.setAttribute('viewBox', `0 ${VB_Y_ORIGIN} ${VB_WIDTH} ${VB_HEIGHT_EFF}`);
@@ -449,9 +448,7 @@ function render(){
         gateTimeLabelEl.style.display = '';
       }
       // Gate meter ticks — short horizontal arrows beside the meter at the gate-close level.
-      // markerEndX / sustainTickLen are defined later, so compute locally from globals.
       const _gateLabelSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--labelSize')) || 17;
-      const gateTickLen = Math.round(_gateLabelSize * 1.5);
       const _gateArrowSize = Math.round(_gateLabelSize * 0.72);  // matches Stage-2 arrowSize (labelSize*0.72)
       const _gateLabelGap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sustainLabelGap')) || 6;
       const _freqMode = !!($('frequencyMode') && $('frequencyMode').checked);
@@ -542,18 +539,11 @@ function render(){
   const meterAbsTop = graph.y0 - graph.h;  // yFor(1) = 85
   const meterAbsBottom = graph.y0;          // yFor(0) = 445
 
-  const markerEndX = meterX - DB_GUTTER_W;  // left-side ticks end at the gutter's left edge
   const markerRightX = meterX + meterW;      // right-side ticks start at the meter's right edge
   const METER_ARROW_GAP = 10;  // push the meter arrowheads (and their labels) out this many px so tips clear the meter stroke
   const _labelSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--labelSize')) || 17;
   const arrowSize = Math.round(_labelSize * 0.72);
-  const sustainTickLen = Math.round(_labelSize * 1.5);
   const sustainLabelGap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sustainLabelGap')) || 6;
-  // Size arrowhead markers to match label cap height
-  const arrowR = document.getElementById('sustainArrowRight');
-  const arrowL = document.getElementById('sustainArrowLeft');
-  if(arrowR){ arrowR.setAttribute('markerWidth', arrowSize); arrowR.setAttribute('markerHeight', arrowSize); }
-  if(arrowL){ arrowL.setAttribute('markerWidth', arrowSize); arrowL.setAttribute('markerHeight', arrowSize); }
   const susArrowCol = ($('frequencyMode') && $('frequencyMode').checked) ? (($('filterDecayColor') && $('filterDecayColor').value) || '#ffff00') : (($('loudnessDecayColor') && $('loudnessDecayColor').value) || '#ff0000');
   const showEffLines = !!($('showNewEffectiveLines') && $('showNewEffectiveLines').checked);
   const showModelDSusTick = (legD || legR || legS) && !showGateTime && showEffLines;
@@ -615,7 +605,6 @@ function render(){
     meterBox.style.strokeWidth = METER_STROKE_W;
   }
   // dB scale labels — computed reference numbers in the gutter column, inset to the fill range
-  const gutterX = meterX - DB_GUTTER_W;
   const dbLabels = $('dbScaleLabels');
   if(dbLabels){
     // Loudness mode → dB scale; filter mode → Hz scale. Same gutter, same styling.
@@ -700,8 +689,6 @@ function render(){
   setMeterArrow('meterArrowRCutoff', markerRightX + METER_ARROW_GAP, floorY, false, arrowSize, contourTickColRight, showContourRight);
   setMeterArrow('meterArrowRAmount', markerRightX + METER_ARROW_GAP, textbookAmountY, false, arrowSize, contourTickColRight, showContourRight);
   // ---- CF / AOC contour labels ----
-  const capHeight = _labelSize * 0.72;
-  const contourLabelGap = sustainLabelGap;
   const _hp = $('hpMode') && $('hpMode').checked;
   const cfPct = Math.round(e.floor * 100);
   const cfText = (useShortLabels ? '' : (_hp ? 'Min ' : '')) + fmtMeterVal(cfPct);
