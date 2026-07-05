@@ -652,6 +652,13 @@ function hold(startT = 0, mode){
       // No sustain leg visible (both Model D + Textbook sustain hidden): end the play at decay end
       // instead of holding an orphaned sustain tone. finishExcursion() hard-cuts audio + persist-or-clear.
       if(!effLegVisible('sustain') && !statedLegVisible('sustain')){
+        // Persist ON: the blob rests at the decay-end point but was zeroed to opacity 0 above
+        // (sustain-leg visibility). Restore it keyed to the DECAY leg (the curve that just played),
+        // so the persisted blob is visible; a hidden decay leg stays hidden. (visibility already 'visible'.)
+        if($('persistEnabled') && $('persistEnabled').checked){
+          if(effLegVisible('decay'))    $('dot').style.opacity = '1';
+          if(statedLegVisible('decay')) $('dotStated').style.opacity = '1';
+        }
         finishExcursion();
         return;
       }
