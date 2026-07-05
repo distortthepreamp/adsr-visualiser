@@ -396,6 +396,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Kiosk scale</span><input id="kioskScale" type="number" min="0.3" max="1.0" step="0.01" value="0.50"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Kiosk nudge</span><input id="kioskNudge" type="number" min="-200" max="200" step="1" value="0"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Kiosk right margin</span><input id="kioskRightMargin" type="number" min="0" max="800" step="10" value="0"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Kiosk key width</span><input id="kioskKeyWidth" type="number" min="0" max="30" step="1" value="7"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Time label gutter (top)</span><input id="timeLabelGutterTop" type="number" min="0" step="1" value="0"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Time label gutter (bottom)</span><input id="timeLabelGutterBottom" type="number" min="0" step="1" value="0"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:3px 0;"><span>Textbook sustain gap max</span><input id="tbSustainGapMax" type="number" min="15" max="30" step="1" value="15"></div>
@@ -557,6 +558,7 @@ let showValuesAsPercent = false;  // sustain/amount/cutoff labels: one-decimal 0
 let showTimesAsSpans = true;  // time labels: endpoint mode (false) or dimension-line spans with arrowheads (true)
 let showSafeZones = false; let safeZoneLeftMargin = 0; let safeZoneTopMargin = 0; let safeZoneScale = 1;  // HD safe-zone overlay
 let METER_STROKE_W = 7;
+let KIOSK_KEY_WIDTH = 7;  // kiosk key-line (excribed outline) width in px; drives --kioskKeyWidth
 let DB_LABEL_SIZE = 11;
 let SUSTAIN_GAP_MAX = 0.15;
 const METER_GAP = 20;

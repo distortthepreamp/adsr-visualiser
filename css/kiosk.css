@@ -26,6 +26,9 @@
   transform-origin: top left;
   background: var(--kioskBg);
   flex-shrink: 0;
+  /* Key line: excribed outline (outside the panel box, no layout effect, doesn't overlap the canvas),
+     colour shared with the meter box (var(--line)), width in its own var. Scales with transform:scale. */
+  outline: var(--kioskKeyWidth) solid var(--line);
 }
 
 #kioskCanvas {

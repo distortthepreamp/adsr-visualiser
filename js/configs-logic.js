@@ -69,6 +69,7 @@ function buildConfigSnapshot(){
     consoleScale: Number($('consoleScale').value),
     meterWidth: Number($('meterWidth').value),
     meterStrokeWidth: Number($('meterStrokeWidth').value),
+    kioskKeyWidth: Number($('kioskKeyWidth') ? $('kioskKeyWidth').value : 7),
     meterRightMargin: Number($('meterRightMargin').value),
     dbLabelRightMargin: Number($('dbLabelRightMargin').value),
     sustainArrowXOffset: Number($('sustainArrowXOffset').value),
@@ -164,6 +165,7 @@ function loadConfigObject(cfg){
   if($('consoleScale') && cfg.consoleScale !== undefined){ $('consoleScale').value = cfg.consoleScale; syncConsoleScale(); }
   if($('meterWidth') && cfg.meterWidth !== undefined){ $('meterWidth').value = cfg.meterWidth; METER_W = Math.max(10, Math.min(250, Number(cfg.meterWidth) || 40)); }
   if($('meterStrokeWidth') && cfg.meterStrokeWidth !== undefined){ $('meterStrokeWidth').value = cfg.meterStrokeWidth; METER_STROKE_W = Math.max(0, Math.min(30, Number(cfg.meterStrokeWidth) || 7)); }
+  if($('kioskKeyWidth') && cfg.kioskKeyWidth !== undefined){ KIOSK_KEY_WIDTH = Math.max(0, Math.min(30, Number(cfg.kioskKeyWidth) || 7)); $('kioskKeyWidth').value = KIOSK_KEY_WIDTH; document.documentElement.style.setProperty('--kioskKeyWidth', KIOSK_KEY_WIDTH + 'px'); }
   if($('meterRightMargin') && cfg.meterRightMargin !== undefined){ $('meterRightMargin').value = cfg.meterRightMargin; METER_RIGHT_MARGIN = Math.max(0, Math.min(600, Number(cfg.meterRightMargin) || 265)); }
   if($('dbLabelRightMargin') && cfg.dbLabelRightMargin !== undefined){ $('dbLabelRightMargin').value = cfg.dbLabelRightMargin; DB_LABEL_RIGHT_MARGIN = Math.max(-40, Math.min(120, Number(cfg.dbLabelRightMargin) || 0)); }
   if($('sustainArrowXOffset') && cfg.sustainArrowXOffset !== undefined){ $('sustainArrowXOffset').value = cfg.sustainArrowXOffset; SUSTAIN_ARROW_X_OFFSET = Math.max(0, Math.min(120, Number(cfg.sustainArrowXOffset) || 0)); }

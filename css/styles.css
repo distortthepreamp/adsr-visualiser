@@ -13,6 +13,7 @@
 :root{
   --bg:#00ff00;
   --kioskBg:#000000;
+  --kioskKeyWidth:7px;  /* kiosk key-line (excribed outline) width; matches METER_STROKE_W default, own var to diverge later */
   --fg:#ffffff;
   --kioskLoudnessColor:#F20D0D;
   --kioskFilterColor:#0DCAF2;
