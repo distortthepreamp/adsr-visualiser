@@ -649,6 +649,12 @@ function hold(startT = 0, mode){
 
     // Glow at sustain (both blobs parked, before release)
     if(releaseT === undefined && pos.phase === 'sustain' && spos.phase === 'sustain'){
+      // No sustain leg visible (both Model D + Textbook sustain hidden): end the play at decay end
+      // instead of holding an orphaned sustain tone. finishExcursion() hard-cuts audio + persist-or-clear.
+      if(!effLegVisible('sustain') && !statedLegVisible('sustain')){
+        finishExcursion();
+        return;
+      }
       if(!glowStarted){ startGlowPulse(); glowStarted = true; }
       if(effVis && !pos.done) applyBlobGlow();
       if(!effVis || pos.done) $('dot').removeAttribute('filter');
