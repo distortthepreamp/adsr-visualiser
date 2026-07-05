@@ -94,16 +94,31 @@ function setDot(pt, visible=true){
 
 // ---- Shared excursion finish (persist or immediate reset) ----
 function finishExcursion(){
-  stopGlowPulse();
-  $('dot').removeAttribute('filter');
-  $('dotStated').removeAttribute('filter');
+  const persist = !!($('persistEnabled') && $('persistEnabled').checked);
+  if(persist){
+    // Keep a PULSING glow on the visible persisted blob through the persist window; defer teardown to the
+    // timer callback below. (finishExcursion can be reached before the sustain glow-pulse started — e.g. the
+    // sustain-hidden early-stop — so start the pulse here rather than assume it's running. Both respect
+    // blobGlowEnabled.) The glow filter is shared, so strip it from any hidden blob (opacity '0').
+    startGlowPulse();
+    applyBlobGlow();
+    if($('dot') && $('dot').style.opacity === '0') $('dot').removeAttribute('filter');
+    if($('dotStated') && $('dotStated').style.opacity === '0') $('dotStated').removeAttribute('filter');
+  } else {
+    stopGlowPulse();
+    $('dot').removeAttribute('filter');
+    $('dotStated').removeAttribute('filter');
+  }
   audioCut();
   state.held = false;
   window._holdReleaseTrigger = null;
-  if($('persistEnabled') && $('persistEnabled').checked){
+  if(persist){
     const persistMs = Number(($('persistTime') && $('persistTime').value) || 2000);
     state.persistTimer = setTimeout(() => {
       state.persistTimer = null;
+      stopGlowPulse();                       // stop the pulse + strip filters exactly when the blob clears
+      $('dot').removeAttribute('filter');
+      $('dotStated').removeAttribute('filter');
       hideDot();
       hideDotStated();
       state.currentPhase = 'idle';
@@ -636,15 +651,20 @@ function hold(startT = 0, mode){
     // Effective blob
     setDot(pos, true);
     const effVis = effLegVisible(pos.phase);
-    $('dot').style.opacity = effVis ? '1' : '0';
-    if(!effVis || pos.done) $('dot').removeAttribute('filter');
+    // Opacity: keep the blob VISIBLE at the decay-end/sustain point keyed to the DECAY leg (the phase it
+    // just finished) when parked at sustain — so a blob that arrives first (slo-mo, unequal times) doesn't
+    // blink out while the other is still decaying. Glow/meter logic below still keys off effVis.
+    const effShow = effVis || (pos.phase === 'sustain' && effLegVisible('decay'));
+    $('dot').style.opacity = effShow ? '1' : '0';
+    if(!effShow || pos.done) $('dot').removeAttribute('filter');
     $('meterFill').style.opacity = effVis ? '' : '0';
 
     // Stated blob
     setDotStated(spos, true);
     const sVis = statedLegVisible(spos.phase);
-    $('dotStated').style.opacity = sVis ? '1' : '0';
-    if(!sVis || spos.done) $('dotStated').removeAttribute('filter');
+    const sShow = sVis || (spos.phase === 'sustain' && statedLegVisible('decay'));
+    $('dotStated').style.opacity = sShow ? '1' : '0';
+    if(!sShow || spos.done) $('dotStated').removeAttribute('filter');
     $('meterFillStated').style.opacity = sVis ? '' : '0';
 
     // Glow at sustain (both blobs parked, before release)
@@ -669,8 +689,8 @@ function hold(startT = 0, mode){
       state.currentPhase = 'sustain';
     } else if(releaseT === undefined){
       // At least one blob still in attack/decay — glow individual sustain arrivals
-      if(pos.phase === 'sustain' && effVis && !pos.done) applyBlobGlow();
-      if(spos.phase === 'sustain' && sVis && !spos.done) applyBlobGlow();
+      if(pos.phase === 'sustain' && effShow && !pos.done) applyBlobGlow();
+      if(spos.phase === 'sustain' && sShow && !spos.done) applyBlobGlow();
     }
 
     // Release completion: both blobs done
